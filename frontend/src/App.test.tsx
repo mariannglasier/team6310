@@ -7,9 +7,7 @@ test('increments the counter when clicked', async () => {
   const user = userEvent.setup()
   render(<App />)
 
-  await user.click(
-    screen.getByRole('button', { name: /count is 0/i }),
-  )
+  await user.click(screen.getByRole('button', { name: /count is 0/i }))
 
   expect(
     screen.getByRole('button', { name: /count is 1/i }),
