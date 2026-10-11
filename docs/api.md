@@ -150,6 +150,108 @@ Before integration, the project must establish whether the client provides an ex
 
 The data format, update frequency, available fields, and process for verifying information must be determined with the client. 
 
+## 7. Electricity Prices — U.S. Energy Information Administration (EIA)
+Source: 
+https://catalog.data.gov/dataset/electricity-data-average-retail-price-of-electricity-application-programming-interface-api 
+
+API documentation: 
+https://www.eia.gov/opendata/documentation.php 
+
+Integration method: REST API returning structured data in JSON by default, with XML also supported.
+
+Authentication: EIA API key required. The key must be included in the request URL. 
+
+The U.S. Energy Information Administration publishes electricity data, including average retail electricity prices by state and customer sector. The project can use the residential-sector data for Georgia to establish a reference electricity cost.
+
+Potential uses include:
+
+Establishing electricity-cost assumptions for simulation households.
+
+Comparing simulated utility expenses against historical state-level prices.
+
+Visualizing how residential electricity prices change over time.
+
+API endpoint example:
+
+https://api.eia.gov/v2/electricity/retail-sales/data/
+
+Example request parameters would select the price data field, Georgia as the state, residential customers as the sector, and the desired reporting frequency and date range. The API returns observations with reporting periods, geographic identifiers, and price values. 
+
+The returned prices are average retail prices, not individual household bills. Actual expenses depend on electricity consumption, utility rates, fees, and other factors. A simulation would need an explicit assumption about household electricity usage to calculate a monthly bill.
+
+## 8. Consumer Price Index (CPI) for Food and Beverages — FRED
+Source: 
+https://fred.stlouisfed.org/series/CUURA319SAF 
+
+API documentation: 
+https://fred.stlouisfed.org/docs/api/fred/ 
+
+Integration method: REST API returning structured data in JSON or XML. The observations endpoint also supports Excel and CSV downloads. 
+
+Authentication: FRED API key required.
+
+FRED, operated by the Federal Reserve Bank of St. Louis, provides access to economic time series published by government agencies and other sources. The series CUURA319SAF measures the Consumer Price Index for All Urban Consumers for food and beverages in the Atlanta–Sandy Springs–Roswell, Georgia metropolitan area. It is published by the U.S. Bureau of Labor Statistics and is reported monthly as an index, with a reference period of 1982–1984 = 100. 
+
+Potential uses include:
+
+Visualizing historical changes in food and beverage prices in the Atlanta metropolitan area.
+
+Providing regional inflation context for the simulation.
+
+Adjusting a previously established food-budget assumption to reflect changes in the price index, using a documented calculation.
+
+Example API endpoint:
+
+https://api.stlouisfed.org/fred/series/observations
+
+Example request parameters:
+
+series_id=CUURA319SAF
+
+api_key=YOUR_API_KEY
+
+file_type=json
+
+The request can also specify a date range. The response contains dated observations and their corresponding index values. Missing observations must be handled explicitly. 
+
+The CPI series measures changes in the price level for a category of consumer goods and services. It does not provide the current dollar price of a particular grocery item or the total amount a household needs to spend on food.
+
+The application should retain the observation date, series identifier, units, and geographic scope when storing or displaying these values.
+
+## 9. FINRA National Financial Capability Study (NFCS)
+Source: 
+https://www.finrafoundation.org/nfcs-data-and-downloads 
+
+Integration method: Downloadable datasets, including CSV, Stata (.dta), and SPSS (.sav) files. The downloadable archives also include codebooks, questionnaires, and methodological documentation. No public REST API is documented on the cited download page. 
+
+Authentication: No API key is required to download the publicly available datasets.
+
+The FINRA Foundation's National Financial Capability Study collects survey data about financial behaviors, attitudes, knowledge, and access to financial products and services among U.S. adults. Its State-by-State Survey provides information that can be analyzed at both state and national levels. Survey data is collected approximately every three years. 
+
+Potential uses include:
+
+Providing real-world context for financial hardship and household financial resilience.
+
+Comparing simulation outcomes with survey findings about emergency savings and financial preparedness, where suitable questions are available.
+
+Visualizing differences in financial behaviors and reported financial circumstances between Georgia and the national population.
+
+The intended integration method is a controlled dataset import:
+
+Download the appropriate State-by-State Survey dataset from the official FINRA website.
+
+Inspect the accompanying codebook and methodology documentation to identify relevant questions, response codes, and geographic fields.
+
+Import the required data into the application's data store or a separate analysis workflow.
+
+Filter the data for Georgia and calculate the appropriate statistics.
+
+Record the survey year, source, sample information, and relevant methodological limitations alongside the resulting metrics.
+
+The NFCS is primarily a survey-based source rather than a source of continuously updated economic measurements. Its findings are best suited to contextualizing simulation results in visualizations, rather than directly supplying current prices or defining simulation expenses.
+
+The application must distinguish reported survey responses from measured economic outcomes and avoid treating survey findings as representative of every individual household.
+
  
 
 # What Is the Purpose of These Data Sources? 
