@@ -88,6 +88,21 @@ Verify changes against the relevant acceptance criteria in the Iteration Plan.
 
 Use the project's established testing, linting, type-checking, and build tools.
 
+Run all frontend commands from `frontend/`.
+
+- Install dependencies: `npm ci`
+- Start development server: `npm run dev`
+- Tests: `npm test` (Vitest + React Testing Library)
+- Watch tests: `npm run test:watch`
+- Lint: `npm run lint`
+- Check formatting: `npm run format:check`
+- Apply formatting: `npm run format`
+- Type check: `npm run typecheck`
+- Build: `npm run build`
+
+Before submitting changes, run formatting checks, linting,
+type checking, tests, and the production build.
+
 **[TEAM TO FILL IN: Test command and testing framework: __________]**
 
 **[TEAM TO FILL IN: Linting command: __________]**
