@@ -1,4 +1,3 @@
-[Technically Incomplete]
 # External Data and API Integration 
 
 # What APIs and Data Sources Do We Intend to Use? 
