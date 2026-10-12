@@ -98,6 +98,7 @@ One game attempt and its current financial and scenario state.
 | status | text | Game progress state. | Allowed values and transitions unresolved (C4). |
 | started_at | timestamptz | Attempt start timestamp. | Default and requiredness unresolved. |
 | version_id | uuid | Content version used for this attempt. | Specified FK → content_versions.version_id; C1. |
+| session_id | uuid | Group session this attempt belongs to. | Nullable FK → group_sessions.session_id; NULL for individual play. |
 
 ### `playthrough_expenses`
 
@@ -187,7 +188,6 @@ Identifies a complete edition of game content and publication metadata.
 
 | Table | Proposed field | Proposed type | Reason / status |
 | --- | --- | --- | --- |
-| playthroughs | session_id | uuid, nullable | FK to group_sessions.session_id needed for the plan's group-to-playthrough relationship; NULL for individual play. Unresolved I1. |
 | scenarios | version_id | uuid | FK to content_versions.version_id needed if scenarios are versioned with other content. Unresolved I2. |
 
 ### External entity: `auth.users`
@@ -212,7 +212,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | choices | player_responses.choice_id | 1:N | A choice may be selected in many attempts. |
 | playthroughs | playthrough_expenses.playthrough_id | 1:N | An attempt has individual bill occurrences. |
 | persona_expenses | playthrough_expenses.expense_id | 1:N | A scheduled expense generates occurrences across attempts and due dates. |
-| group_sessions | playthroughs.session_id (missing) | Intended 1:N | Plan describes this relationship, but the field is absent. Proposed optional FK; I1. |
+| group_sessions | playthroughs.session_id | 1:N | A group can contain multiple playthroughs; individual playthroughs have NULL session_id. |
 | choices | cac_support_effects.choice_id | 1:N | Plan marks this with an unexplained asterisk; I6. |
 | content_versions | version_id in personas, choices, statistics, scenario_statistics, playthroughs, playthrough_expenses, player_responses, group_sessions, persona_expenses, cac_support_effects | 1:N per table | Each listed FK references content_versions.version_id; cross-table version consistency is unresolved. |
 | content_versions | scenarios.version_id (missing) | Proposed 1:N | Needed to version scenarios; I2. |
@@ -249,7 +249,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 
 | ID | Source issue | Consequence | Proposed resolution (not approved schema) |
 | --- | --- | --- | --- |
-| I1 | Plan relationship section says group_sessions has many playthroughs and individual games have no session_id, but playthroughs field list omits session_id. ERD also depicts the conceptual group link. | Group membership cannot be represented by the listed fields. | Add nullable playthroughs.session_id FK to group_sessions.session_id; NULL denotes individual play. Clarify that individual rows have a NULL column value, rather than a different table structure. |
+| I1 | Resolved: The team agreed to add nullable playthroughs.session_id, referencing group_sessions.session_id. Individual playthroughs use NULL. Migration implementation is pending. |
 | I2 | scenarios has no version_id in the plan or its attribute list in the ERD, although content_versions is described as covering scenario changes and the ERD depicts a content-version/scenario link. | Scenarios cannot be explicitly tied to the content snapshot referenced by choices and games. | Add scenarios.version_id and establish version-consistent references, or explicitly document that scenarios are shared/unversioned. |
 | I3 | content_versions lists version_id once as its PK and again as an FK to content_versions. The ERD shows one version_id attribute. | The duplicate field cannot be implemented as two columns with the same name; intended self-reference is unclear. | Treat the repeated entry as a likely copy/paste error pending confirmation. If ancestry is intended, use a separately named nullable parent_version_id; do not silently add it. |
 | I4 | Mixed capitalization and the plan's general starting_balance label differ from the ERD's general_starting_balance; Answered_at also differs in case. | Literal implementation could produce inconsistent or quoted identifiers. | Use the normalized names in this file; verify names against migrations before implementation. |
