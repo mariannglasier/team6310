@@ -1,173 +1,86 @@
 # AGENTS.md — CAC Poverty Exercise
 
-## 1. Purpose
+## 1. Role and source of truth
 
-This file provides persistent instructions for AI development agents working on the CAC Poverty Exercise.
+You are assisting the team building the CAC Poverty Exercise. **Project documentation describes what to build; this file describes how to work.** Preserve approved requirements, do not invent missing decisions, and do not confuse prototype screens or proposed designs with implemented functionality.
 
-The project is an interactive poverty simulation for the Community Assistance Center (CAC), supporting individual gameplay, facilitated group sessions, educational statistics, and administrative content management.
+Read only the specifications relevant to the task, and follow their distinctions between **specified**, **proposed**, **unconfirmed**, and **implemented**:
 
-Agents must follow the team's approved specifications and existing architectural decisions. Do not independently introduce significant features, technologies, or changes to intended application behavior.
+| Source | Consult when |
+| --- | --- |
+| `docs/architecture.md` | Changing system components, responsibilities, technology, or integrations |
+| `docs/data-model.md` | Changing data entities, schema, migrations, financial state, or content versions |
+| `docs/api.md` | Changing external data ingestion, source references, statistics, or interfaces |
+| `docs/design/ui-spec.md` | Building screens, interactions, responsive layouts, or accessible controls |
+| `docs/design/user-flows.md` | Changing setup, simulation, replay, group, or staff journeys |
+| `docs/security.md` (if present) | Authentication, authorization, privacy, secrets, and protected operations |
+| `README.md`, `frontend/package.json`, and relevant code | Setup, actual scripts, current implementation, and conventions |
+| Approved Iteration Plan and client decisions | Sprint priority and acceptance criteria; locate with the team if not in the repository |
 
-## 2. Authoritative Project Documentation
+The UI spec links to the mid-fidelity Figma prototype. Its sample households, amounts, charts, and credentials are **illustrative**, not approved production data. If specifications disagree, report the conflict and request team clarification before significant work.
 
-Before making changes, consult the relevant specifications in the `docs/` directory.
+## 2. Current repository and scope
 
-| Document | When to Consult |
-|---|---|
-| `docs/architecture.md` | Before changing system structure, components, technologies, or responsibilities |
-| `docs/data-model.md` | Before modifying database entities, relationships, or stored data |
-| `docs/api.md` | Before changing component interfaces, backend operations, or external integrations |
-| `docs/security.md` | Before implementing authentication, authorization, or data handling |
-| `docs/design/ui-spec.md` | Before implementing or modifying user interface components |
-| `docs/design/user-flows.md` | Before changing navigation, gameplay flows, or user interactions |
+- Root contains `docs/`, `frontend/`, `.github/workflows/`, `AGENTS.md`, and `README.md` in the supplied repository screenshot.
+- The supplied frontend is a React 19 + TypeScript + Vite 8 scaffold; `frontend/src/App.tsx` is still a starter counter, not the CAC application.
+- `@supabase/supabase-js` is installed, but this does **not** establish that Supabase integration, database migrations, or authentication have been implemented.
+- **Sprint 1:** individual simulation from landing/setup through scenario choices, inline recap, and ending summary.
+- **Later scope:** facilitated group play, staff content administration, and their unfinished workflows. Do not build later-sprint features merely because they appear in the prototype.
 
-Also consult relevant user stories and acceptance criteria from the team's approved Iteration Plan.
+## 3. Architectural and security guardrails
 
-**[TEAM TO FILL IN: Repository path to the approved Iteration Plan and acceptance criteria: __________]**
+- Use the existing React/TypeScript/Vite frontend and the team's Supabase/PostgreSQL architecture. Do not introduce a second backend or replace the stack without approval.
+- Keep UI rendering and temporary selection state separate from authoritative financial calculations, persisted responses, and protected content operations.
+- Use approved stored personas, scenarios, choices, and economic values; do not hardcode prototype amounts as production data or invent simulation rules.
+- Selecting a choice must not commit a financial change. A submitted choice must not be applied twice; show a success recap only after a confirmed commit.
+- CAC support availability is distinct from actual assistance received. Missing statistics must not block play or trigger fabricated values.
+- Keep external source metadata (source, units, geography, period, and retrieval/import information). Never use AI-generated narrative as authoritative economic data or auto-publish unreviewed scenarios.
+- General players do not require sign-in. Authenticate and **authorize** staff separately. Do not expose service-role keys, external API secrets, or protected operations to untrusted browser code.
+- Do not change database entities, versioning, migrations, RLS, group timing rules, or simulation calculations where the specifications explicitly mark the design unresolved. Request approval first.
 
-**[TEAM TO FILL IN: Location of approved Figma designs or prototype links: __________]**
+## 4. Work process and planning-only mode
 
-Treat these sources as authoritative for their respective areas. If documentation conflicts with the current implementation or another specification, report the conflict rather than choosing a resolution independently.
+For nontrivial tasks:
 
-## 3. Development Constraints
+1. Read the task, acceptance criteria, relevant docs, and affected code.
+2. Inspect existing dependencies, tests, and patterns; distinguish existing functionality from intended behavior.
+3. Propose a scoped plan with affected files, implementation steps, risks, unresolved questions, and verification steps.
+4. Implement **only when authorized**. Prefer small reviewable changes and avoid unrelated refactors.
+5. Run relevant checks, inspect results, and test important success/failure cases.
+6. Update affected documentation and report changes, test results, and limitations.
 
-Follow the approved technology stack:
+**When asked for a plan, including the first Development Readiness implementation task: stop after proposing the plan. Do not edit code, install dependencies, change schemas, or create configuration until the team explicitly approves implementation.**
 
-- Frontend: React + TypeScript
-- Backend: Supabase
-- Database: PostgreSQL through Supabase
-- Authentication: Supabase Auth
-- Real-time communication: Supabase Realtime
-- Hosting: Cloudflare Pages
+## 5. Run and verify the frontend
 
-Development requirements:
+The following scripts are confirmed in `frontend/package.json`. Run commands from the `frontend/` directory:
 
-- Maintain separation between frontend, backend, and database responsibilities.
-- Follow existing project conventions and component organization.
-- Keep editable simulation content in the database rather than hardcoding it.
-- Preserve existing database relationships and constraints.
-- Do not introduce new frameworks or major dependencies without approval.
-- Do not modify database schemas without reviewing the data model and associated migrations.
-- Do not expose privileged credentials in client-side code.
-- Enforce authorization and protected operations through appropriate backend and database controls.
-- Do not implement unapproved external integrations or AI-generated content functionality.
+```bash
+npm ci
+npm run dev
+npm run test
+npm run lint
+npm run format:check
+npm run typecheck
+npm run build
+```
 
-Refer to `docs/architecture.md` and `docs/security.md` for detailed architectural and security requirements.
+- `npm run test`: Vitest (with React Testing Library available).
+- `npm run lint`: ESLint.
+- `npm run format:check`: Prettier verification; use `npm run format` only when formatting changes are authorized.
+- `npm run typecheck`: TypeScript project build/check.
+- `npm run build`: TypeScript check followed by Vite production build.
+- The supplied `App.test.tsx` tests the starter counter only. It does **not** verify CAC simulation behavior.
+- `.github/workflows/` exists, but the CI YAML was not supplied. Inspect the actual workflow before claiming what CI runs.
 
-## 4. Development Workflow
+For application changes, test relevant flows against `docs/design/user-flows.md`: valid/invalid setup selection; support on/off; choice selection versus submission; duplicate and failed submission; correct balance/expense results; inline recap; missing comparison; ending/replay; keyboard and mobile interactions. For later features, test group timing/realtime and staff authorization when implemented. Never claim a test or deployment passed unless you actually observed it.
 
-For nontrivial tasks, follow this process:
+## 6. Unclear or conflicting requirements
 
-1. **Review:** Read the task, relevant specifications, and acceptance criteria.
-2. **Investigate:** Inspect existing code, dependencies, and related components.
-3. **Plan:** Identify affected files, dependencies, implementation steps, and verification methods.
-4. **Request Approval:** Present the plan before making significant changes when approval is required.
-5. **Implement:** Make focused changes that follow existing conventions and approved requirements.
-6. **Verify:** Run relevant checks and test affected functionality.
-7. **Document:** Update affected specifications and summarize completed work.
+Before implementation, consult the relevant document's open-issues section. In particular, `docs/data-model.md` flags group-session and versioning inconsistencies, and `docs/design/user-flows.md` leaves simulation rules, Review behavior, group timing, and administration details open. `docs/api.md` specifies source strategies but not every economic transformation, update approval, or cache rule.
 
-Prefer small, reviewable changes over broad refactoring.
+If a decision is missing: (1) describe the ambiguity, (2) explain its effect on the requested task, (3) propose options only as options, and (4) request a team decision. Do not silently resolve major architectural, financial, privacy, or user-experience questions. Record approved decisions in the appropriate spec before implementation.
 
-Do not rewrite working functionality unnecessarily.
+## 7. Completion report
 
-### Planning-Only Tasks
-
-When asked to propose an implementation plan:
-
-- Read the task and relevant project specifications.
-- Investigate the existing repository.
-- Identify dependencies, risks, and unresolved requirements.
-- Propose a step-by-step implementation and verification plan.
-- **Stop before implementing.**
-
-Do not modify application code, database schemas, dependencies, or configuration files until the team approves implementation.
-
-## 5. Testing and Verification
-
-Verify changes against the relevant acceptance criteria in the Iteration Plan.
-
-Use the project's established testing, linting, type-checking, and build tools.
-
-Run all frontend commands from `frontend/`.
-
-- Install dependencies: `npm ci`
-- Start development server: `npm run dev`
-- Tests: `npm test` (Vitest + React Testing Library)
-- Watch tests: `npm run test:watch`
-- Lint: `npm run lint`
-- Check formatting: `npm run format:check`
-- Apply formatting: `npm run format`
-- Type check: `npm run typecheck`
-- Build: `npm run build`
-
-Before submitting changes, run formatting checks, linting,
-type checking, tests, and the production build.
-
-**[TEAM TO FILL IN: Test command and testing framework: __________]**
-
-**[TEAM TO FILL IN: Linting command: __________]**
-
-**[TEAM TO FILL IN: Type-checking command: __________]**
-
-**[TEAM TO FILL IN: Build command: __________]**
-
-When applicable, verify that:
-
-- Simulation choices produce correct financial consequences and progress updates.
-- Player responses are recorded accurately.
-- Group session codes, deadlines, and response restrictions function correctly.
-- Real-time session updates reach the appropriate devices.
-- Administrative operations enforce authorization.
-- Database changes preserve data integrity.
-- Interfaces remain responsive and keyboard accessible.
-- Statistical comparisons display accurate source information.
-- Existing functionality is not unintentionally affected.
-
-Do not claim tests passed unless they were actually executed.
-
-If testing cannot be completed, identify the unverified functionality and explain why.
-
-## 6. Security and Data Handling
-
-Follow the requirements in `docs/security.md`.
-
-In particular:
-
-- Do not introduce unnecessary collection of participant personal information.
-- Use anonymous identifiers for simulation participation.
-- Protect individual responses and administrative data.
-- Do not expose service-role keys or other privileged secrets in browser code.
-- Respect database access policies and authentication requirements.
-- Use aggregate data for group comparisons.
-- Preserve the source, reporting period, geography, and units of educational statistics.
-- Do not represent simulation participant responses as population statistics.
-
-Do not bypass security controls to simplify development or testing.
-
-## 7. Handling Unclear Requirements
-
-If requirements are incomplete, contradictory, or ambiguous:
-
-1. Review the relevant project documentation.
-2. Inspect existing implementation patterns when available.
-3. Identify the exact missing decision or conflict.
-4. Ask the development team for clarification before making significant changes.
-5. Document approved decisions in the appropriate specification.
-
-Do not invent missing requirements or assume proposed functionality has been approved.
-
-If a task depends on an unresolved architecture, security, data, or user experience decision, stop and request clarification before proceeding with that portion of the work.
-
-## 8. Reporting and Documentation
-
-After completing an approved implementation task, provide:
-
-- A summary of changes.
-- Files or components modified.
-- Important implementation decisions.
-- Tests performed and their results.
-- Remaining issues, assumptions, or follow-up work.
-
-Update the relevant documentation when implementation changes affect the system architecture, data model, interfaces, security, or user experience.
-
-The goal is to produce maintainable, secure, and verifiable code that follows the CAC's approved requirements.
+After authorized implementation, report: what changed, files affected, important choices, commands/tests actually run and their outcomes, and remaining issues. Keep architecture, data-model, API, security, and UI/flow documentation consistent with any approved changes. Do not claim a feature is complete solely because the scaffold builds.
