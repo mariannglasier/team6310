@@ -1,0 +1,164 @@
+# CAC Poverty Simulation — UI Specification
+
+## Purpose and authority
+
+This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
+
+The experience lets players navigate a fictional household's 30-day month. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.
+
+The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and anonymous response data, Supabase Auth for staff authentication, and Cloudflare Pages for frontend deployment.
+
+## Design system and shared components
+
+- Use Roboto throughout. Establish hierarchy through heading size, weight, and appropriate emphasis or italics.
+- Use the project color tokens below consistently. These are project-selected values, not a claim of official CAC brand hex codes. Centralize them in the application theme.
+- Use rounded cards, consistent padding, clear section separation, filled primary buttons, and outlined secondary buttons.
+- Show selection through a control or text label as well as a border. Keyboard focus must remain distinct from selection.
+- Use semantic headings, labeled inputs, keyboard-operable controls, visible focus, sufficient contrast, and readable error messages. Never rely on color alone.
+- Public navigation contains CAC branding, Learn About CAC, Donate, and Employee Admin. Learn and donation links use configured CAC-approved destinations.
+- Setup uses a four-step indicator: Introduction, Household, CAC support, Review. Show the current step and completed steps.
+- Single-choice card sets behave as radio groups. Selecting a card does not advance the screen or commit a financial decision.
+- Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
+- On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
+
+### Color tokens
+
+| Token | Hex | Use |
+| --- | --- | --- |
+| `primary` | `#B3261E` | CAC branding, primary buttons, destructive action accents |
+| `primary-hover` | `#8F1E18` | Primary button hover/pressed state |
+| `accent` | `#245F8A` | Selected card borders, data accents, links |
+| `accent-hover` | `#194767` | Accent hover/pressed state |
+| `accent-surface` | `#EAF2F8` | Selected cards and recap surfaces; use primary text on this surface |
+| `text` | `#111111` | Primary text and headings |
+| `text-muted` | `#595959` | Supporting copy and secondary labels |
+| `surface` | `#FFFFFF` | Cards, header, input surfaces, text on filled red/blue buttons |
+| `background` | `#F5F5F5` | Page background |
+| `border` | `#767676` | Input and interactive-control boundaries |
+| `divider` | `#D9D9D9` | Decorative separators; not the sole control boundary |
+| `disabled-surface` | `#E0E0E0` | Disabled buttons, with muted text and disabled semantics |
+| `focus` | `#245F8A` | Visible focus ring with a white separation gap on filled controls |
+
+White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a blue border plus a selected label/control; keyboard focus uses a separate outer ring. Charts use blue and red with direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
+
+## 1. Landing page
+
+Display CAC branding and navigation, an introduction, the headline “One month. Real trade-offs. No simple answers.”, a Play Simulation button, and a month-at-a-glance card emphasizing 30 days. Explain that households are fictional and the experience builds understanding.
+
+Play Simulation opens Introduction. Employee Admin opens staff sign-in. Learn About CAC and Donate open their configured destinations.
+
+## 2. Introduction and mode selection
+
+Explain that expenses and changing circumstances affect household resources during a simulated month. Display three mode cards: Play Individually, Host a Group, and Join a Group. Show the setup indicator and Back/Continue actions.
+
+Individual mode proceeds to household selection. Host a Group opens host session setup. Join a Group opens session-code entry. Back returns to the landing page.
+
+## 3. Household selection
+
+Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing.
+
+Continue opens CAC support selection. Back returns to Introduction. Example names and amounts are illustrative; production values come from approved content.
+
+## 4. CAC support selection
+
+Display With CAC Support and Without CAC Support as mutually exclusive options. Require an explicit selection before continuing. Explain that support may appear during relevant situations and actual assistance depends on eligibility and availability.
+
+Choosing with support enables relevant assistance choices during gameplay, such as visiting the CAC market when food is low. It does not automatically grant cash or assistance. Without support excludes those assistance choices. Continue opens Review.
+
+## 5. Review and confirmation
+
+Show the selected household, starting money, and CAC support setting. Provide edit actions that return to the corresponding setup step and preserve other selections. Provide Confirm Selection to start the simulation.
+
+After confirmation, household and support settings are locked for that run. Active gameplay must not expose setup inspection, setup editing, or Back to Review. Replace that navigation with End Simulation.
+
+## 6. Simulation decision screen
+
+Display:
+
+- Current day and progress through 30 days.
+- Household's available balance.
+- Upcoming expenses with amounts and due dates.
+- Scenario heading and explanation.
+- Available decision cards with relevant immediate costs or support labels.
+- Submit Decision and End Simulation actions.
+
+Render options from scenario content and the selected support setting; do not assume a fixed number of options. Submit Decision remains unavailable until a valid option is selected. Selection alone does not change finances.
+
+Submitting commits the choice and its defined effects once. Disable repeated submission while processing and after success. Each completed question advances the simulation by one day; the player reviews its recap before moving to the next question. Normal completion occurs after the Day 30 question. Do not introduce an automatic early-ending rule based on balance.
+
+Use financial outcomes and expense schedules supplied by the simulation model. Do not invent amounts, income dates, affordability rules, or consequences in presentation components.
+
+## 7. Inline decision recap
+
+Keep the chosen card highlighted and show a recap directly beneath the options. This is a state of the decision screen, not a separate page.
+
+The recap contains Decision Recorded, the selected option, immediate consequence, Balance Before, Cost Today, Balance After, After Upcoming Expenses, and Circumstance Change. Distinguish actual current balance from a projection after future expenses. Submitted choices are read-only.
+
+Display a short approved U.S. or Atlanta-area comparison when associated with the question. Include value, unit, geography, data period, and source. Label community statistics separately from the player's choice and anonymous simulation responses. Missing comparisons do not block continuation.
+
+Individual players use Continue Simulation to advance. Group participants see that advancement is controlled by their host. Both retain access to their own recap.
+
+## 8. Results summary
+
+Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run.
+
+Include days completed, ending/current balance, completed decisions and consequences, CAC support availability and actual use, and applicable comparisons. Do not fabricate results for unanswered questions.
+
+Provide Replay, View Data Visualization, Donate to CAC, Visit CAC Site, and Return Home. Replay returns to household setup so the player can choose a household and support setting again. A new run resets balance, day, decision history, circumstances, and expense state.
+
+## 9. Interactive data visualization page
+
+View Data Visualization opens a separate page that provides an interactive educational review of data. Keep this page distinct from the results summary. Allow the user to explore available comparisons through accessible interactive controls and display readable labels, values, units, and source information.
+
+### Measures and visualizations
+
+| Measure | Display | Population and calculation |
+| --- | --- | --- |
+| Decision distribution | Horizontal bars labeled with each choice, count, and percentage | Count one committed response per run for the selected question. Divide each option count by all valid responses to that question under the active filters. Responses from early-ended runs remain eligible. |
+| Ending balance distribution | Balance distribution by CAC support setting, with the current player's balance marked when eligible | Use completed Day 30 runs for the same household. Show dollar units and separate with/without-support groups. Exclude early-ended runs; their balance remains visible in their own summary. |
+| CAC support use | Labeled used/unused counts and percentages | Use completed, support-enabled runs under the household filter. Used means at least one assistance choice was committed. Divide used runs by all eligible completed support-enabled runs. |
+| Community context | Source-backed statistic cards beside relevant question context | Show approved figures separately from simulation aggregates, including value, unit, geography, data period, and source. Do not place unrelated real-world metrics on a shared numeric scale. |
+
+### Filters and sample sizes
+
+- Household: offer all households for decision distribution/support use; require one household for ending-balance comparisons. From a results summary, initially use that run's household.
+- CAC support setting: offer with support, without support, or both for decision distributions and ending balances. Both shows ending-balance groups side by side. Support-use calculations always use support-enabled runs.
+- Question: select the situation for decision distribution and linked community context. Hide this filter for ending balances and overall support use.
+- Defaults: on entry from results, select that household and show both support settings for applicable comparisons. For question-based views, initialize to a question the player answered. Provide clearly labeled controls and a reset action.
+- Show the number of eligible responses/runs behind each chart and behind each support group. Update counts and percentages when filters change.
+- Group debrief comparisons use the current session's participants; public data views use eligible anonymous runs. Label the population explicitly.
+- Compare only compatible question/option definitions and household financial configurations; preserve content-version compatibility when assembling aggregates.
+
+Clearly separate anonymous player results from approved community statistics. Use meaningful scales and readable labels. Provide accessible values alongside every chart. Display No responses available when the eligible count is zero; do not display an invented percentage or divide by zero. Distinguish full and early-ended runs. Provide navigation back to results and home.
+
+## 10. Group interfaces
+
+### Host
+
+Provide session creation, a shareable join code, participant progress/status, controls to advance each participant to their next question, and End Group Simulation. Host advancement changes a participant's question position, not their submitted choice or household finances. Participants do not share one financial state.
+
+When the host ends the session early, stop further decision submissions and send participants to summaries of their completed work. Provide an end-of-session comparison and debrief view using available participant results.
+
+### Participant
+
+Provide code entry, session validation feedback, household/support setup, a waiting state, decision screens, inline recaps, and an individual results summary. Each participant manages a separate household balance and decision history.
+
+After completing the simulation, participants can review their recap while others finish. Group comparisons appear at the end and must distinguish full runs from runs ended early.
+
+## 11. Employee sign-in and administration
+
+Employee sign-in includes labeled Work email and Password fields, Sign In, and Back to main site. Mask passwords. Authenticate through Supabase Auth and verify staff authorization before exposing protected records or mutations. Do not include sample credentials in production.
+
+The dashboard contains Statistics and Scenario Questions tabs, record counts, content locations, status, last-updated information, and editing actions. Staff can edit both statistics and questions. Statistics retain value, unit, geography, data period, source, and related questions. Question editing must preserve the model's question/choice relationships.
+
+Validate edits and show save success or failure. Saved changes affect simulations started after the save; active runs retain their existing content version. Main Site returns to the public site. Sign Out ends staff authentication and protected access. Any content removal must respect data-model references and active-run versions.
+
+## Persistence, loading, and errors
+
+Players are anonymous; do not require names, email addresses, or player accounts. Identify each run using an anonymous session identifier. Refreshing in the same browser restores the run's household, support setting, day, balance, decisions, and current decision/recap state. Group participants also retain their session association. Restore committed choices without applying their effects again.
+
+Show loading feedback during content retrieval and submission. If required content fails to load, show Retry and prevent invalid advancement. Submission failures preserve the selected option and show an error; do not show Decision Recorded before successful commitment. Announce recap and asynchronous errors to assistive technology. An ended run restores its results state rather than reopening decision submission.
+
+## Verification criteria
+
+Verify explicit household/support choices, editable Review, locked active setup, both support modes, one-day advancement per question, Day 30 completion, early-ending summaries, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized editing, and content-version isolation. Check keyboard and narrow-screen use throughout.
