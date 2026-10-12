@@ -42,6 +42,7 @@ Situations encountered during gameplay.
 | title | text | Scenario title. | Nullability unresolved. |
 | description | text | Situation presented to players. | Nullability unresolved. |
 | default_day | integer | Default simulation day. | Day bounds and scheduling semantics unresolved (C3). |
+| version_id | uuid | Content version this scenario belongs to. | Team-approved FK → content_versions.version_id; C1. |
 
 ### `choices`
 
@@ -188,7 +189,6 @@ Identifies a complete edition of game content and publication metadata.
 
 | Table | Proposed field | Proposed type | Reason / status |
 | --- | --- | --- | --- |
-| scenarios | version_id | uuid | FK to content_versions.version_id needed if scenarios are versioned with other content. Unresolved I2. |
 
 ### External entity: `auth.users`
 
@@ -215,7 +215,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | group_sessions | playthroughs.session_id | 1:N | A group can contain multiple playthroughs; individual playthroughs have NULL session_id. |
 | choices | cac_support_effects.choice_id | 1:N | Plan marks this with an unexplained asterisk; I6. |
 | content_versions | version_id in personas, choices, statistics, scenario_statistics, playthroughs, playthrough_expenses, player_responses, group_sessions, persona_expenses, cac_support_effects | 1:N per table | Each listed FK references content_versions.version_id; cross-table version consistency is unresolved. |
-| content_versions | scenarios.version_id (missing) | Proposed 1:N | Needed to version scenarios; I2. |
+| content_versions | scenarios.version_id | 1:N | Each scenario belongs to a content version; team-approved, migration implementation pending. |
 | auth.users | group_sessions.facilitator_user_id | 1:N | User facilitates sessions. |
 | auth.users | content_versions.created_by | 1:N | User authors content versions. |
 
@@ -245,13 +245,13 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | C9 | Supabase access | Define RLS and grants for public content reads, player-owned state, facilitator access, and CAC content editing/publication. Anonymous player ownership and CAC editor roles are not modeled. This is an implementation requirement to resolve, not an existing policy. |
 | C10 | Performance | Consider indexes for frequently queried FK columns, join_code lookup, and response/bill retrieval by playthrough. Indexes other than those implied by PKs are proposals, not source-specified constraints. |
 
-## 5. Unresolved inconsistencies
+## 5. Inconsistencies and resolution status.
 
-| ID | Source issue | Consequence | Proposed resolution (not approved schema) |
+| ID | Source issue | Consequence | Resolution / current status |
 | --- | --- | --- | --- |
-| I1 | Resolved: The team agreed to add nullable playthroughs.session_id, referencing group_sessions.session_id. Individual playthroughs use NULL. Migration implementation is pending. |
-| I2 | scenarios has no version_id in the plan or its attribute list in the ERD, although content_versions is described as covering scenario changes and the ERD depicts a content-version/scenario link. | Scenarios cannot be explicitly tied to the content snapshot referenced by choices and games. | Add scenarios.version_id and establish version-consistent references, or explicitly document that scenarios are shared/unversioned. |
-| I3 | content_versions lists version_id once as its PK and again as an FK to content_versions. The ERD shows one version_id attribute. | The duplicate field cannot be implemented as two columns with the same name; intended self-reference is unclear. | Treat the repeated entry as a likely copy/paste error pending confirmation. If ancestry is intended, use a separately named nullable parent_version_id; do not silently add it. |
+| I1 | Plan relationship section says group_sessions has many playthroughs and individual games have no session_id, but playthroughs field list omits session_id. ERD also depicts the conceptual group link. | Group membership cannot be represented by the listed fields. | Resolved: The team agreed to add nullable playthroughs.session_id, referencing group_sessions.session_id. Individual playthroughs use NULL. Migration implementation is pending. |
+| I2 | scenarios has no version_id in the plan or its attribute list in the ERD, although content_versions is described as covering scenario changes and the ERD depicts a content-version/scenario link. | Scenarios cannot be explicitly tied to the content snapshot referenced by choices and games. | Resolved: Team-approved: add scenarios.version_id referencing content_versions.version_id. Migration implementation pending. |
+| I3 | content_versions lists version_id once as its PK and again as an FK to content_versions. The ERD shows one version_id attribute. | The duplicate field cannot be implemented as two columns with the same name; intended self-reference is unclear. | Resolved: Just a simple copy/paste error. Duplicate can be ignored. |
 | I4 | Mixed capitalization and the plan's general starting_balance label differ from the ERD's general_starting_balance; Answered_at also differs in case. | Literal implementation could produce inconsistent or quoted identifiers. | Use the normalized names in this file; verify names against migrations before implementation. |
 | I5 | scenario_statistics carries version_id but its PK contains only scenario_id and statistic_id. | The same ID pair cannot be stored in multiple versions. This may be correct if IDs change per snapshot, but conflicts with stable IDs reused across versions. | Decide snapshot identity strategy first; retain pair PK for per-version row IDs or consider a version-inclusive key and compatible referenced keys for stable IDs. |
 | I6 | choices → cac_support_effects is written as one-to-many with an unexplained asterisk. | Multiple effects are structurally allowed, but stacking, eligibility, order, and response-text selection are undefined. | Confirm one effect versus many. For one, consider UNIQUE(choice_id); for many, define combination rules and add eligibility/order fields only if needed. |
@@ -262,4 +262,8 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 
 This draft covers all 12 application entities, the external authentication reference, every listed field, intended relationships, and explicit versus proposed constraints. It is suitable for design review but is not a migration script or a certification of the deployed database.
 
-Before implementation, resolve I1-I3 and I5, choose types and nullability, confirm status and money rules, and define version consistency and ownership/RLS. Update both source documents and this file after those decisions. Validate the final model against actual PostgreSQL migrations when available.
+I1-I3 are resolved at the design level; migration implementation is pending.
+Before implementation, resolve I5 and the remaining applicable decisions,
+choose types and nullability, confirm status and money rules, and define
+version consistency and ownership/RLS. Update the source documents to
+reflect approved decisions, then validate this model against the migrations.
