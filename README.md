@@ -79,15 +79,7 @@ View results in the repository's Actions tab.
 
 ## Database and Environment Setup
 
-Supabase setup is owned by the database integration teammate.
-
-This section must be updated with:
-- Required environment variables and an .env.example
-- Local or hosted development database instructions
-- Migration and seed-data commands
-- Instructions for verifying the connection
-
-Do not commit local environment files or privileged credentials.
+Supabase is connected, but no information is in the database currently.
 
 ## Repository Structure
 
