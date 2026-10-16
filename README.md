@@ -1,105 +1,90 @@
-# CAC Poverty Exercise
+## Development Environment Setup
 
-An educational poverty simulation for the Community Assistance Center
-in Sandy Springs, Georgia.
+### Prerequisites
 
-## Technology Stack
+Before running the project, make sure you have the following installed:
 
-- Frontend: React + TypeScript, built with Vite
-- Backend and database: Supabase / PostgreSQL
-- Group updates: Supabase Realtime
-- Planned hosting: Cloudflare Pages
+- [Node.js](https://nodejs.org/) (version 22.12+ or a compatible newer version)
+- npm (included with Node.js)
+- [Git](https://git-scm.com/downloads)
 
-## Current Development Status
+### 1. Clone the Repository
 
-The frontend starter and verification tooling are configured.
-Supabase connection, database migrations, and seed data are being
-configured separately. Game features are still under development.
-
-## Prerequisites
-
-- Git
-- Node.js 24.x and npm
-
-## Install
-
-Clone the repository:
+Clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/mariannglasier/team6310.git
-cd team6310/frontend
-npm ci
 ```
 
-## Run Locally
+Navigate to the project directory:
 
-From the frontend directory:
+```bash
+cd team6310
+```
+
+### 2. Install Dependencies
+
+Navigate to the frontend directory containing `package.json`:
+
+```bash
+cd frontend
+```
+
+Install the required dependencies:
+
+```bash
+npm install
+```
+
+### 3. Configure Environment Variables
+
+This project uses Supabase for backend services. Before running the application, configure your local environment variables.
+
+1. In the `frontend` directory, locate the `.env.example` file.
+2. Create a copy of `.env.example` and rename it to `.env.local`.
+3. Open `.env.local` and replace the placeholder values with your Supabase project credentials.
+4. Save the file before starting the development server.
+
+The environment variables should follow the structure provided in `.env.example`.
+
+**Note:** Contact a team member if you need access to the Supabase project credentials. Do not commit `.env.local` to GitHub, as it contains environment-specific configuration. Ensure `.env.local` is included in `.gitignore`.
+
+### 4. Start the Development Server
+
+Once the dependencies and environment variables are configured, run:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed in the terminal.
-Press Ctrl+C to stop the development server.
+Open the local URL displayed in the terminal (typically `http://localhost:5173/`) to view the application.
 
-## Verify Changes
+The development server supports hot module replacement, allowing changes to appear automatically in the browser.
 
-Run these commands from the frontend directory:
+### 4. Run Tests and Code Quality Checks
 
-```bash
-npm run format:check
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
+The following commands are available:
 
-All commands must succeed before submitting a change.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Type-check and build the application for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run test` | Run tests using Vitest |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run lint` | Check code for ESLint issues |
+| `npm run typecheck` | Check TypeScript types |
+| `npm run format` | Format code using Prettier |
+| `npm run format:check` | Check code formatting without modifying files |
 
-Additional development commands:
+### 5. Stop the Development Server
 
-```bash
-# Apply formatting
-npm run format
+Press `Ctrl + C` in the terminal to stop the server.
 
-# Run tests continuously while developing
-npm run test:watch
-```
+### Troubleshooting
 
-The current test checks the starter counter interaction.
-Game-specific tests will be added as features are implemented.
+**Missing dependencies:** Run `npm install` again from the frontend directory.
 
-## Continuous Integration
+**Port already in use:** Vite may automatically select another available port. Check the terminal for the correct URL.
 
-The Frontend CI GitHub Actions workflow runs formatting checks,
-linting, TypeScript checks, tests, and a production build on pushes
-and pull requests.
-
-View results in the repository's Actions tab.
-
-## Database and Environment Setup
-
-Supabase is connected, but no information is in the database currently.
-
-## Repository Structure
-
-- frontend/: React application and frontend tooling
-- docs/: Architecture, data model, and external data documentation
-- AGENTS.md: Instructions for development agents
-- .github/workflows/ci.yml: Automated frontend checks
-
-## Project Documentation
-
-- [Architecture](docs/architecture.md)
-- [Data Model](docs/data_model.md)
-- [External Data Sources](docs/apis.md)
-
-## Windows PowerShell
-
-If PowerShell blocks npm.ps1, use npm.cmd instead of npm.
-For example:
-
-```powershell
-npm.cmd ci
-npm.cmd run dev
-```
+**PowerShell execution policy error (Windows):** If PowerShell blocks npm commands, use `npm.cmd install` and `npm.cmd run dev`, or run the commands in Command Prompt.
