@@ -72,7 +72,7 @@ Raw data is not retained indefinitely. Retention and cleanup are centrally confi
 
 ## Content integrity and auditing
 
-Only authorized staff can save question/statistic changes. Validate required values, units, sources, geography, dates, option relationships, and financial fields. Preserve references to earlier content versions for existing runs. Newly started simulations use content saved before their start; active runs retain their initial version, including after refresh.
+Only authorized staff can save pending question/statistic/scenario draft changes and approve publication. Validate required values, units, sources, geography, dates, category/persona/service links, fact roles, option relationships, and financial fields. Published editions are immutable; preserve references to earlier editions for existing runs. Newly started simulations use the latest published edition; active runs retain their initial version, including after refresh.
 
 Record content changes with staff actor, affected record/version, action, and time. Do not log passwords or tokens. Content removal must preserve valid historical references and must not alter already committed player outcomes.
 

@@ -20,7 +20,7 @@ flowchart TD
     L["Landing and introduction"] --> H["Choose household"]
     H --> C["Choose CAC support"]
     C --> R["Review and confirm"]
-    R --> D["Make a daily decision"]
+    R --> D["Make an available decision"]
     D --> A["Review inline recap"]
     A --> N{"Day 30 completed?"}
     N -->|No: Continue| D
@@ -38,10 +38,18 @@ flowchart TD
 2. No household is selected by default. Select one approved profile to enable Continue.
 3. Choose with or without CAC support before starting. Require an explicit choice and explain that assistance appears only in relevant situations.
 4. Review displays the selected household, starting money, and support setting. Edit actions return to the appropriate setup step while preserving the other choices.
-5. Confirm Selection initializes a fresh run at Day 1 with the selected persona and support setting, its approved content version, and the simulation model's initial financial state.
+5. Confirm Selection initializes a fresh run in the pre-game stage with the selected persona, support setting, and approved published `version_id`. The run's weekly income starts at $0; changing employment and income state is run-specific.
 6. Once started, the player cannot inspect or edit setup. The active run offers End Simulation rather than Back to Review.
 
 Setup Back actions preserve choices. Changing a household before confirmation uses that household's starting values when the run is initialized; it does not create a financial transaction.
+
+## Pre-game employment sequence
+
+Before Day 1, show approved job options the persona qualifies for, their weekly incomes, and (when CAC is enabled) approved preparation choices. Preparation is recorded explicitly and does not itself grant assistance or employment. Show the pre-game result and the general fact, plus the CAC fact in CAC mode, before Day 1.
+
+On Day 2, offer the approved professional-clothing choices. The specified preparation-and-clothing combinations determine the first interview result; purchased or CAC-provided professional clothing becomes run state and is not charged again. After a failure, prompt the player to reapply for a lower-requirement job without skipping the Day 2 result. On Day 3, if required by the route, reuse owned professional clothing and show only the applicable clothing choice; the player gets the lower-requirement job regardless of the available clothing selection. The job catalog and preparation details remain unresolved; see [scenarios.md](../docs/scenarios.md).
+
+After hiring, weekly income is paid seven days after the hiring day, not immediately. On an income due day, show a brief income notification and apply the credit before presenting scenarios. The tax-filing scenario is non-scheduled: “Try my best” has no refund or deduction; CAC assistance gives the specified $1,000 refund immediately; and the paid-preparer choice first checks whether the player can afford the fee. If not, end the run before applying any fee or refund consequence. The preparer fee amount remains unresolved.
 
 ## Daily decision and recap
 
@@ -62,14 +70,14 @@ flowchart TD
 3. Submit Decision records the option under its question and applies the approved financial/situational effects exactly once. Block repeated commits from clicks, retries, or refreshes.
 4. Show the inline recap beneath the cards, preserving the selected option. Include immediate consequence, financial breakdown, projected balance after upcoming expenses, and circumstance changes.
 5. Submitted choices become read-only. Include an approved question-linked comparison when available.
-6. Individual players select Continue Simulation after reviewing the recap. Each completed question advances one day, with the next question representing the next day. Advancing does not reapply the previous choice.
+6. Individual players select Continue Simulation after reviewing the recap. Multiple decisions may occur on the same day; completing a question does not inherently advance the calendar. Advance only after required same-day events and recaps are handled. Advancing does not reapply the previous choice.
 7. Completion of the Day 30 question leads to the results summary after its recap. The day counter remains within the 30-day month.
 
-The UI consumes balances, scheduled expenses/income, and consequences from the simulation model. Upcoming-expense projections are separate from actual deductions. Do not use player identity to calculate finances or introduce new financial policies in the frontend. Normal completion is Day 30; players can also choose End Simulation.
+The UI consumes balances, scheduled income, end-of-day scenarios, and consequences from the simulation model. Upcoming-expense projections are separate from actual deductions. Automatic income is credited in a brief notification before that day's scenarios; scheduled and non-scheduled scenarios use the same scenario interaction flow. An attempted unaffordable optional choice or an unaffordable/missed required payment ends the run without recording an unaffordable charge. Do not use player identity to calculate finances or introduce new financial policies in the frontend. Normal completion is Day 30; players can also choose End Simulation.
 
 ## CAC support
 
-Store the support setting at confirmation and keep it fixed for the run. With support, relevant questions offer assistance options, such as visiting the CAC market when food is low. Without support, those options are excluded.
+Store the support setting at confirmation and keep it fixed for the run. With support, relevant questions offer assistance options, such as visiting the CAC market when food is low. Without support, those options are excluded. Availability is separate from actual use, and assistance is capped to the eligible remaining expense.
 
 Assistance affects the household only when its corresponding choice is submitted. Apply the scenario's approved assistance effect; choosing support during setup alone does not grant a benefit. Track actual use separately from availability. The ending summary can therefore distinguish support disabled, available but unused, and used.
 
@@ -129,11 +137,11 @@ Host advancement must not count an unanswered question as a completed decision o
 
 1. Employee Admin opens staff sign-in. Enter work email and password, then Sign In.
 2. Authenticate through Supabase Auth and verify CAC staff authorization. Failed authentication or denied authorization keeps protected content inaccessible.
-3. Open the dashboard and choose Statistics or Scenario Questions.
+3. Open the dashboard and choose Statistics or Scenario Questions. Scenario work is organized by the six approved categories, edition-scoped persona/category and scenario/persona applicability, and explicit service coverage.
 4. Inspect the record and its related display locations, status, and last-updated information.
 5. Edit either content type. Statistics preserve their source/context and question associations. Question changes preserve valid choice and scenario relationships.
-6. Save validated edits. Show success only after persistence succeeds; on failure retain edits and display an error.
-7. Apply the saved content to simulations started after the save. Active simulations retain the version captured at their start, including after refresh. Keep content referenced by existing runs accessible according to the data model.
+6. Save validated edits as pending draft content. Show success only after persistence succeeds; on failure retain edits and display an error. Generation requests produce one scenario and allow at most three total model attempts.
+7. Staff approve and publish a complete immutable edition through a protected operation. New simulations use it; active simulations retain the starting `version_id`, including after refresh. Keep content referenced by existing runs accessible according to the data model.
 8. Main Site returns to the public site. Sign Out ends authentication and prevents subsequent protected access.
 
 Staff authentication does not require player authentication. Public players remain anonymous.
@@ -155,4 +163,4 @@ Staff authentication does not require player authentication. Public players rema
 
 ## Verification criteria
 
-Verify setup validation, Review edits and confirmation, immutable active setup, support opportunities and use tracking, one day per question, refresh recovery, duplicate-safe submission, Day 30 and early-end summaries, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, and saved-content isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.
+Verify setup validation, Review edits and confirmation, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, same-day decisions, scheduled income, refresh recovery, duplicate-safe submission, required-event early endings, Day 30 summaries, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.

@@ -4,7 +4,7 @@
 
 This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
 
-The experience lets players navigate a fictional household's 30-day month. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.
+The experience has a pre-game employment stage followed by Days 1–30. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.
 
 The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and anonymous response data, Supabase Auth for staff authentication, and Cloudflare Pages for frontend deployment.
 
@@ -55,7 +55,7 @@ Individual mode proceeds to household selection. Host a Group opens host session
 
 ## 3. Household selection
 
-Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing.
+Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing. Category and scenario availability are determined by approved persona-category and scenario-persona links.
 
 Continue opens CAC support selection. Back returns to Introduction. Example names and amounts are illustrative; production values come from approved content.
 
@@ -71,11 +71,19 @@ Show the selected household, starting money, and CAC support setting. Provide ed
 
 After confirmation, household and support settings are locked for that run. Active gameplay must not expose setup inspection, setup editing, or Back to Review. Replace that navigation with End Simulation.
 
-## 6. Simulation decision screen
+## 6. Pre-game and fixed employment sequence
+
+Before Day 1, show eligible approved jobs, weekly income, and CAC preparation where applicable. Preparation does not silently change state until its choice is submitted. On Day 2, present the approved professional-clothing choices and show the scripted first-interview result. Purchased or CAC-provided professional clothing is persistent run state and must not be charged again. After failure, show the lower-requirement reapplication prompt without skipping the result. On Day 3, reuse owned professional clothing and filter choices accordingly; the player gets the lower-requirement job regardless of the available clothing selection. The job catalog remains unresolved; do not invent it. Display weekly pay only on its scheduled due days, beginning seven days after hiring, with a brief income notification before that day's scenarios.
+
+The non-scheduled Financial Literacy & Taxes scenario displays no refund or deduction for “Try my best.” For the paid-preparer choice, verify that the player can afford the approved fee before applying any consequence; if not, end the game before applying the fee or refund. If affordable, apply the fee and the specified $1,000 refund immediately. CAC assistance applies the specified $1,000 refund immediately without a player-paid fee. The approved preparer fee remains unresolved.
+
+If an optional choice is attempted and unaffordable, end the run even if it is the only available choice. If a required payment is missed or unaffordable, end the run. In both cases, do not display a successful deduction or invent a loan.
+
+## 7. Simulation decision screen
 
 Display:
 
-- Current day and progress through 30 days.
+- Pre-game state or current day and progress through 30 days.
 - Household's available balance.
 - Upcoming expenses with amounts and due dates.
 - Scenario heading and explanation.
@@ -84,17 +92,17 @@ Display:
 
 Render options from scenario content and the selected support setting; do not assume a fixed number of options. Submit Decision remains unavailable until a valid option is selected. Selection alone does not change finances.
 
-Submitting commits the choice and its defined effects once. Disable repeated submission while processing and after success. Each completed question advances the simulation by one day; the player reviews its recap before moving to the next question. Normal completion occurs after the Day 30 question. Do not introduce an automatic early-ending rule based on balance.
+Submitting commits the choice and its defined effects once. Disable repeated submission while processing and after success. Multiple decisions may occur on one day; completing a question does not inherently advance the calendar. Process scheduled income and required payable events through the simulation model, and end early when a required event cannot be paid. Normal completion occurs after Day 30. Do not introduce an automatic early-ending rule based only on balance.
 
 Use financial outcomes and expense schedules supplied by the simulation model. Do not invent amounts, income dates, affordability rules, or consequences in presentation components.
 
-## 7. Inline decision recap
+## 8. Inline decision recap
 
 Keep the chosen card highlighted and show a recap directly beneath the options. This is a state of the decision screen, not a separate page.
 
 The recap contains Decision Recorded, the selected option, immediate consequence, Balance Before, Cost Today, Balance After, After Upcoming Expenses, and Circumstance Change. Distinguish actual current balance from a projection after future expenses. Submitted choices are read-only.
 
-Display a short approved U.S. or Atlanta-area comparison when associated with the question. Include value, unit, geography, data period, and source. Label community statistics separately from the player's choice and anonymous simulation responses. Missing comparisons do not block continuation.
+Display the scenario's approved general fact; in CAC mode also display its approved CAC fact. Include value, unit, geography, data period, and source, and distinguish support availability from support actually used. Label community statistics separately from the player's choice and anonymous simulation responses. Missing comparisons do not block continuation.
 
 Individual players use Continue Simulation to advance. Group participants see that advancement is controlled by their host. Both retain access to their own recap.
 
@@ -149,9 +157,9 @@ After completing the simulation, participants can review their recap while other
 
 Employee sign-in includes labeled Work email and Password fields, Sign In, and Back to main site. Mask passwords. Authenticate through Supabase Auth and verify staff authorization before exposing protected records or mutations. Do not include sample credentials in production.
 
-The dashboard contains Statistics and Scenario Questions tabs, record counts, content locations, status, last-updated information, and editing actions. Staff can edit both statistics and questions. Statistics retain value, unit, geography, data period, source, and related questions. Question editing must preserve the model's question/choice relationships.
+The dashboard contains Statistics and Scenario Questions tabs, category and coverage metadata, record counts, content locations, edition status, last-updated information, and editing actions. Staff can edit pending drafts but cannot mutate published editions. Statistics retain value, unit, geography, data period, source, and related questions. Question editing must preserve category/persona/service links and the one-general/one-CAC fact relationship.
 
-Validate edits and show save success or failure. Saved changes affect simulations started after the save; active runs retain their existing content version. Main Site returns to the public site. Sign Out ends staff authentication and protected access. Any content removal must respect data-model references and active-run versions.
+Validate edits and show draft-save or approval success/failure. Published changes affect simulations started after publication; active runs retain their existing content version. Main Site returns to the public site. Sign Out ends staff authentication and protected access. Any content removal must respect data-model references and active-run versions.
 
 ## Persistence, loading, and errors
 
@@ -161,4 +169,4 @@ Show loading feedback during content retrieval and submission. If required conte
 
 ## Verification criteria
 
-Verify explicit household/support choices, editable Review, locked active setup, both support modes, one-day advancement per question, Day 30 completion, early-ending summaries, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized editing, and content-version isolation. Check keyboard and narrow-screen use throughout.
+Verify explicit household/support choices, editable Review, locked active setup, pre-game employment and clothing flow, both support modes, same-day decisions, scheduled weekly income, Day 30 completion, inability-to-pay early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard and narrow-screen use throughout.

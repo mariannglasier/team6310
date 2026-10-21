@@ -4,7 +4,7 @@
 
 Before running the project, make sure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (version 22.12+ or a compatible newer version)
+- [Node.js](https://nodejs.org/) (version 24.x)
 - npm (included with Node.js)
 - [Git](https://git-scm.com/downloads)
 
@@ -33,7 +33,7 @@ cd frontend
 Install the required dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 ### 3. Configure Environment Variables

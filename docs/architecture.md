@@ -2,7 +2,7 @@
 
 ## 1. Purpose and scope
 
-The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a fictional household's 30-day month and make decisions involving housing, food, transportation, employment, and unexpected expenses. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.
+The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a pre-game stage followed by Days 1–30 and make decisions involving approved scenario categories, housing, food, employment, and unexpected expenses. Multiple decisions may occur on one day. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.
 
 Sprint 1 prioritizes the individual simulation. The broader application also includes facilitated group play, interactive data exploration, and an administrative portal for authorized CAC employees.
 
@@ -65,9 +65,9 @@ flowchart TD
 
 Setup proceeds through Introduction, Household, CAC Support, and Review. Household and support selections are explicit. Review allows edits before confirmation; confirmation starts a new run at Day 1 and locks those settings.
 
-The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. The interface displays a successful inline recap only after commitment succeeds.
+The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. Scheduled scenarios and income occurrences use one authoritative, idempotent charge/credit path. A required payable event that cannot be paid ends the run with its actual day and reason. The interface displays a successful inline recap only after commitment succeeds.
 
-The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players continue after the recap; each completed question advances one day. Normal completion follows the Day 30 question. End Simulation produces a clearly labeled partial summary. Replay returns to household selection and creates a separate run with fresh state.
+The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players continue after the recap; completing a question does not inherently advance the calendar, so same-day decisions and required events are processed before advancing. Normal completion follows Day 30. End Simulation and inability to pay produce clearly labeled partial summaries. Replay returns to household selection and creates a separate run with fresh state.
 
 CAC support availability and actual assistance use are separate. Enabling support during setup allows relevant assistance choices; it does not automatically grant financial benefits.
 
@@ -97,17 +97,17 @@ The documented application entities are:
 
 | Area | Entities | Purpose |
 | --- | --- | --- |
-| Simulation content | `personas`, `persona_expenses`, `scenarios`, `choices`, `cac_support_effects` | Household starting conditions, scheduled expenses, decisions, and assistance effects |
+| Simulation content | `categories`, `personas`, `persona_categories`, `scenarios`, `scenario_personas`, `service_coverage`, `choices`, `cac_support_effects` | Edition-scoped route coverage, household definitions, scenarios, decisions, and assistance effects |
 | Educational statistics | `statistics`, `scenario_statistics` | Source-backed figures and links to relevant scenarios |
 | Gameplay records | `playthroughs`, `playthrough_expenses`, `player_responses` | Run state, bill occurrences, and committed decisions |
 | Group coordination | `group_sessions` | Facilitated sessions and participant association |
-| Content history | `content_versions` | Identify the content used by runs and preserve historical references |
+| Content history | `content_versions`, `scenario_generation_requests`, `source_bindings` | Immutable published editions, pending drafts, generation review, and resolved-cost provenance |
 
 Individual playthroughs have no group association; group playthroughs reference their session. Scenarios belong to content versions. Supabase supplies `auth.users` separately from the application entities. Detailed fields and relationships are defined in [Data model](data-model.md); proposed SQL types and constraints there remain proposals rather than an implemented schema.
 
 ## 5. External data boundary
 
-[External data and API integration](api.md) identifies Census ACS, HUD Fair Market Rents and Income Limits, BLS occupational wage data, USDA food plans, EIA electricity prices, FRED price indices, FINRA survey data, and CAC-provided community information as intended sources.
+[External data and API integration](api.md) identifies Census ACS, HUD Fair Market Rents and Income Limits, BLS occupational wage data, USDA food plans, EIA electricity prices, FRED price indices, FINRA survey data, and CAC-provided community information as intended sources. Monthly checks run at the first midnight in `America/New_York`; refreshes are staged for staff approval.
 
 The data-processing boundary accommodates API retrieval and reviewed dataset imports. It validates inputs and preserves source, units, geography, reporting period, and retrieval/import context. Simulation content references approved economic values, and application rules define their financial effects. External API credentials remain outside browser code.
 

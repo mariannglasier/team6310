@@ -1,4 +1,6 @@
-# External Data and API Integration 
+# External Data and API Integration
+
+Scenario maintenance and gameplay use the approved relational content model in [scenarios.md](scenarios.md). External sources provide provenance-backed inputs and facts; they do not generate authoritative financial rules or player outcomes.
 
 # What APIs and Data Sources Do We Intend to Use? 
 
@@ -344,7 +346,7 @@ Calculated values, produced by applying a defined formula to the inputs.
 
 The formulas, parameters, and assumptions used to produce financial values must be documented and consistently applied. AI-generated content may suggest scenarios or values for review, but generated suggestions should not automatically become authoritative economic data. 
 
-The exact calculation methods and supported scenario mechanics remain to be determined. 
+The exact source-specific formulas and supported scenario mechanics remain to be determined; the money representation, rounding, signs, assistance cap, and edition/persistence rules are resolved in [scenarios.md](scenarios.md).
 
 ### Updating Simulation Data 
 
@@ -352,9 +354,15 @@ Economic datasets should be refreshed according to their publication schedules a
 
 Refreshing a shared source dataset must not silently change the financial assumptions of an existing approved simulation or rewrite completed playthroughs. 
 
-When newer source data becomes available, the application should support an explicit update process for the affected simulation values. The exact behavior—such as updating an existing experience or creating a new version—remains an architectural decision. 
+When newer source data becomes available, the application stages an affected draft edition with a before/after diff and validation results. Published editions are immutable; stable logical IDs may recur in edition-scoped records, and playthroughs retain their starting `version_id`. Do not overwrite active or completed content.
 
-## 2. Data Used by Visualization 
+## Scenario generation and source bindings
+
+An authorized administrator or maintenance process may create a generation request, but gameplay never asks a model to create content. Each request produces at most one scenario draft, uses the configured server-side model identifier (default: GPT-5.4 mini), and allows at most three total model attempts. Validation errors may be returned to later attempts; after the third failure the request is failed with actionable errors for staff. Generated prose, IDs, facts, costs, and effects are never trusted without validation and approval.
+
+Scenario amounts use edition-scoped source bindings. A binding records its target field, source observation or approved assumption, units, controlled formula and inputs, resolved USD amount, and provenance. Use exact decimal/integer-cent calculations, round each final amount once to cents with half-cent ties away from zero, and keep `scenario_parameters` deferred until concrete reuse justifies it. The final binding schema and supported variables/formulas remain open in [scenarios.md](scenarios.md).
+
+## 2. Data Used by Visualization
 
 The visualization feature will use external statistics to provide real-world context for simulation results. 
 
@@ -378,7 +386,9 @@ Visualization data may use a temporary cache rather than permanent storage when 
 
  
 
-# How Often Should the Sources Be Queried or Updated? 
+# How Often Should the Sources Be Queried or Updated?
+
+In addition to source-specific release checks, run the maintenance check on the first day of every month at 12:00 a.m. `America/New_York` (`0 0 1 * *` in that timezone). Check APIs and approved CAC file-import locations, preserve immutable observations and revisions, and stage affected amounts, facts, mappings, and narrative in a pending edition. Staff approval is required before publication; active runs are never mutated.
 
 Update frequency should be determined separately for each source. External economic datasets are published on different schedules, and checking for new data does not necessarily require downloading or reprocessing the entire dataset every time. 
 
@@ -410,7 +420,7 @@ Client-provided data
 
 Follow the client's update schedule once confirmed. 
 
-These are proposed policies, not implemented schedules. The final refresh process should also account for failed requests, unavailable releases, API rate limits, and the need to validate newly retrieved data. 
+These are design requirements, not implemented schedules. The final refresh process should also account for failed requests, unavailable releases, API rate limits, and the need to validate newly retrieved data. A maintenance run must be idempotent for its month, retain last approved usable values when a source fails, and create at most one pending draft for a newly confirmed service.
 
 For visualization, a shorter-lived cache may be appropriate to avoid repeated identical requests. However, the cache duration should reflect the dataset's publication frequency and the application's needs, rather than assuming every source changes in real time. 
 
@@ -478,7 +488,7 @@ AI-generated simulation content should use approved data and defined simulation 
 
 ## Data Updates and Historical Records 
 
-Source data may change over time, but the application should retain sufficient information to explain which values informed a simulation or visualization. The exact retention and versioning strategy remains to be defined. 
+Source data may change over time, but immutable observations, bindings, approved facts, and edition snapshots must explain which values informed a simulation or visualization. Existing playthroughs retain their starting edition; retention duration and cleanup policy remain subject to [security](security.md).
 
  
 
@@ -534,7 +544,7 @@ The database design for source data, cached responses, imported datasets, and si
 
 The formulas and rules used to transform published statistics into simulation expenses and income. 
 
-Whether updating an existing simulation changes its stored values or creates a new version. 
+The exact API variables, source observations, geographies, quantities, conversions, baselines, and formulas for each binding.
 
 The approval process for updated economic assumptions and AI-generated simulation experiences. 
 

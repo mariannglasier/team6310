@@ -16,6 +16,7 @@ Read the documents relevant to the task:
 | `docs/security.md` | Authentication, authorization, ownership, privacy, and protected operations |
 | `design/ui-spec.md` | Screens, theme tokens, controls, accessibility, and visualizations |
 | `design/user-flows.md` | Setup, decisions, recaps, recovery, replay, group, and staff journeys |
+| `docs/scenarios.md` | Authoritative scenario categories, content editions, generation, sources, employment sequence, calendar, money, and unresolved scenario decisions |
 | `README.md`, `frontend/package.json`, and affected code | Setup, available scripts, and implementation conventions |
 | Task acceptance criteria and approved iteration plan | Task boundaries and sprint priorities |
 
@@ -42,13 +43,16 @@ Use the established React/TypeScript/Vite frontend and Supabase/PostgreSQL backe
 Keep rendering and temporary UI selection state separate from protected operations and persisted financial state. Follow these requirements:
 
 - Require explicit household and support selections. Allow Review edits before confirmation, then lock both settings for the active run.
+- Use the six approved scenario categories, edition-scoped persona-category and scenario-persona links, and explicit service coverage. Each scenario edition has exactly one general fact and one CAC fact.
 - Selecting an option does not change finances or response counts. Submission applies approved effects once and displays success only after commitment.
 - Validate current scenario, choice relationships, ownership, support eligibility, and content version in protected operations. Commit response and state changes atomically.
 - Keep upcoming-expense projections separate from actual deductions. Use the simulation model's approved amounts and schedules.
-- Advance one day per completed question. Complete normally after Day 30; label early endings with actual progress. Do not invent an automatic ending based on balance.
+- Use a pre-game stage followed by Days 1–30. Multiple decisions may occur on one day; completing a question does not inherently advance the calendar. Complete normally after Day 30; a required payable event that cannot be paid ends the run with actual progress. Do not invent an automatic ending based only on balance.
+- Use USD, exact money calculations, signed balance changes, capped assistance, idempotent charges/credits, scheduled versus non-scheduled scenarios, and weekly income initialized at zero. Weekly pay starts seven days after hiring.
+- Preserve stable logical IDs in immutable published edition records; keep pending edits separate and pin every playthrough to its starting `version_id`. Monthly source checks stage updates for staff approval.
 - Track CAC assistance availability separately from actual use. Support selection alone grants no benefit.
 - Restore committed state on refresh without reapplying effects. Replay creates a fresh run and preserves earlier response records.
-- Preserve the content version of active runs when staff save changes.
+- Preserve the content version of active runs when staff save or publish changes; draft saves must not affect gameplay.
 - Label community statistics separately from simulation aggregates. Follow specified chart populations and denominators; missing comparisons do not block play.
 - Follow the UI specification's tokens, semantic controls, keyboard behavior, focus states, and narrow-screen layouts.
 
@@ -112,7 +116,7 @@ The frontend CI workflow runs the same verification checks on pushes and pull re
 
 Add meaningful tests for implemented behavior. The existing starter-counter test does not cover the poverty simulation.
 
-For individual simulation changes, test the relevant setup validation, selection-versus-submission behavior, financial results, support availability/use, duplicate and failed submissions, recaps, day advancement, early/full endings, refresh restoration, and replay. Check missing-data states, keyboard use, and responsive layout where affected.
+For individual simulation changes, test the relevant setup validation, selection-versus-submission behavior, financial results, support availability/use, duplicate and failed submissions, recaps, same-day decisions, scheduled income, day advancement, required-event early/full endings, refresh restoration, and replay. Check missing-data states, keyboard use, and responsive layout where affected.
 
 For database and security changes, verify allow/deny behavior directly at the API/database boundary, including cross-player access, unauthorized content changes, duplicate/stale submissions, and protected aggregate responses. For later features, verify host/participant boundaries, independent group state, staff authorization, and active-run content isolation.
 
