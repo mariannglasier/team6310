@@ -362,6 +362,20 @@ An authorized administrator or maintenance process may create a generation reque
 
 Scenario amounts use edition-scoped source bindings. A binding records its target field, source observation or approved assumption, units, controlled formula and inputs, resolved USD amount, and provenance. Use exact decimal/integer-cent calculations, round each final amount once to cents with half-cent ties away from zero, and keep `scenario_parameters` deferred until concrete reuse justifies it. The final binding schema and supported variables/formulas remain open in [scenarios.md](scenarios.md).
 
+### OpenAI scenario-generation integration
+
+The OpenAI API is used only by the protected backend workflow to generate one structured scenario draft from an administrator or maintenance request. Gameplay never calls the model and never generates scenarios dynamically.
+
+The configured model identifier is stored in server-side configuration, such as `SCENARIO_MODEL`. The generation service must support model changes without rewriting validation or approval logic. The configured identifier must be validated before deployment.
+
+Each request may make at most three total model attempts and may produce at most one scenario draft. Validation errors may be returned to later attempts. After the final unsuccessful attempt, the request is marked failed and actionable errors are shown to staff.
+
+The model output is untrusted input. The backend must validate its structure, IDs, category and persona relationships, source bindings, costs, facts, supported state transitions, and content version before storing it as a pending draft. Generated content cannot publish directly or change gameplay rules.
+
+OpenAI credentials must remain server-side in environment or secret-management configuration. They must not appear in browser code, Git, documentation, request logs, or generated content. The workflow should retain the configured model, schema/template revision, attempt count, validation findings, and timestamps without storing secrets or unnecessary personal data.
+
+This integration is a planned design requirement. It is not implemented in the current repository.
+
 ## 2. Data Used by Visualization
 
 The visualization feature will use external statistics to provide real-world context for simulation results. 
