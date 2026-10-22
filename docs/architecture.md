@@ -6,7 +6,7 @@ The CAC Poverty Exercise is an educational web application developed by Georgia 
 
 Sprint 1 prioritizes the individual simulation. The broader application also includes facilitated group play, interactive data exploration, and an administrative portal for authorized CAC employees.
 
-This document describes the application's intended architecture. The repository currently contains the frontend starter, development tooling, a Supabase client module, and Supabase configuration. The initial migration file is empty, and the existing application and test still demonstrate the starter counter. Application features and database protections described below are implementation requirements.
+This document describes the application's intended architecture. The repository contains React Router navigation, labeled placeholder pages, a shared navigation layout, development tooling, a Supabase client module, and Supabase configuration. The admin dashboard route redirects to sign-in until authentication and staff authorization are integrated. Route tests cover placeholder entry, navigation/history, keyboard focus, and this closed boundary; they do not establish database security. The initial migration file is empty. Simulation features and database protections described below remain implementation requirements.
 
 ## 2. Architecture and rationale
 
@@ -60,6 +60,14 @@ flowchart TD
 ```
 
 ## 3. Frontend responsibilities
+
+### Implemented foundation
+
+`frontend/src/app/` defines React Router paths and a dashboard boundary that currently redirects all access to sign-in. `pages/` separates public, individual, group, and admin placeholders; `layouts/` provides the shared shell. `components/ui/` provides reusable controls using specification tokens and locally bundled Roboto. Prototype layout sources are documented in [Prototype reference](../design/prototype-reference.md).
+
+`types/domain.ts` defines initial readonly frontend read models, including branded safe integer USD cents. These are not finalized database DTOs. `state/simulationState.ts` keeps temporary choices separate from a committed service snapshot; it performs no balance calculations, response commits, or calendar advancement. `hooks/useSimulation.ts` supports explicit restoration and ignores stale responses. `services/simulationService.ts` defines an unconnected contract whose default implementation rejects operations. `services/supabase.ts` lazily accesses the existing client so placeholder routes do not require credentials. No prototype fixtures or browser-storage financial logic are used by the frontend.
+
+Backend response validation, ownership, eligibility, edition validation, atomic commitment, idempotency, results retention, and database authorization remain future feature work. Component and reducer tests establish frontend scaffolding behavior only; native dialog browser behavior, responsive visual rendering, deployed deep links, and backend security require their own verification.
 
 ### Individual simulation
 
@@ -130,7 +138,7 @@ These protections apply to database/API calls and realtime subscriptions as well
 
 The frontend uses Node.js 24 and the committed npm lockfile. `frontend/.env.example` defines `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; `frontend/src/lib/supabaseClient.ts` creates the client and rejects missing values when the module is loaded.
 
-The Frontend CI workflow at `.github/workflows/ci.yml` runs on pushes and pull requests. It installs dependencies with `npm ci`, checks formatting, runs ESLint and TypeScript checks, executes tests, and builds production assets. The current test covers the starter counter; feature tests must be added alongside implementation. CI configuration alone does not establish that a particular run passed.
+The Frontend CI workflow at `.github/workflows/ci.yml` runs on pushes and pull requests. It installs dependencies with `npm ci`, checks formatting, runs ESLint and TypeScript checks, executes tests, and builds production assets. Current tests cover routing placeholders, shared controls, and UI state/service scaffolding; gameplay and backend tests must be added alongside implementation. CI configuration alone does not establish that a particular run passed.
 
 Agent workflow and verification commands are defined in the root [AGENTS.md](../AGENTS.md).
 

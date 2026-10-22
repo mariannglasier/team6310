@@ -17,7 +17,7 @@ This standing specification defines user journeys and state transitions for indi
 
 ```mermaid
 flowchart TD
-    L["Landing and introduction"] --> H["Choose household"]
+    L["Landing"] --> H["Choose household"]
     H --> C["Choose CAC support"]
     C --> R["Review and confirm"]
     R --> D["Make a scenario decision"]
@@ -34,7 +34,7 @@ flowchart TD
 
 ## Setup
 
-1. Play Simulation opens Introduction. Select Play Individually and continue to Household.
+1. Start simulation on the landing page opens household/persona selection directly. Until that screen is implemented, it opens the Individual simulation placeholder. No intermediate Introduction page is shown; the legacy introduction URL redirects to the individual route.
 2. No household is selected by default. Select one approved profile to enable Continue.
 3. Choose with or without CAC support before starting. Require an explicit choice and explain that assistance appears only in relevant situations.
 4. Review displays the selected household, starting money, and support setting. Edit actions return to the appropriate setup step while preserving the other choices.

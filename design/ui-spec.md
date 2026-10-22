@@ -17,7 +17,7 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Use rounded cards, consistent padding, clear section separation, filled primary buttons, and outlined secondary buttons.
 - Show selection through a control or text label as well as a border. Keyboard focus must remain distinct from selection.
 - Use semantic headings, labeled inputs, keyboard-operable controls, visible focus, sufficient contrast, and readable error messages. Never rely on color alone.
-- Public navigation contains CAC branding, Learn About CAC, Donate, and Employee Admin. Learn and donation links use configured CAC-approved destinations.
+- All application routes, including placeholders and future pages, use the same shared header: CAC logo on the left and Learn About CAC, Explore Data, and Donate on the right. Both the header and footer CAC logos link to the application landing route `/`. Learn and Donate use configured CAC-approved external destinations.
 - Setup uses a four-step indicator: Introduction, Household, CAC support, Review. Show the current step and completed steps.
 - Single-choice card sets behave as radio groups. Selecting a card does not advance the screen or commit a financial decision.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
@@ -45,21 +45,25 @@ White text is used on filled primary/accent controls. Black text is used on ligh
 
 ## 1. Landing page
 
-Display CAC branding and navigation, an introduction, the headline “One month. Real trade-offs. No simple answers.”, a Play Simulation button, and a month-at-a-glance card emphasizing 30 days. Explain that households are fictional and the experience builds understanding.
+The shared footer on every route, including placeholders and future pages, includes a CAC logo linking to the application landing route `/`, “Helping neighbors in Sandy Springs and Dunwoody.”, a Contact CAC section with `(770) 552-4889` and `info@ourcac.org` as telephone/email links, and a Resources section. Privacy and Sources are explicitly unavailable future links until approved destinations are supplied; do not use temporary Figma preview URLs. Show “Tax ID #: 58-1825565”. Stack footer sections on narrow screens.
 
-Play Simulation opens Introduction. Employee Admin opens staff sign-in. Learn About CAC and Donate open their configured destinations.
+Display only the CAC logo on the left of the landing header, with Learn About CAC, Explore Data, and Donate controls on the right. Replace the previous landing headline with “Financial crises can happen to anyone. How would you respond?” The introductory paragraph is “Explore the everyday decisions households face in Sandy Springs and Dunwoody and the role the Community Assistance Center plays in helping neighbors thrive.” The next paragraph is “Accept the challenge to step into a fictional household’s shoes. Balance competing needs for 30 days and reflect on choices shaped by limited resources.”
 
-## 2. Introduction and mode selection
+Provide Start simulation and Join a group buttons, followed by a smaller Host a group link. These open the existing Individual simulation, participant, and host routes respectively. Start simulation will open persona selection when it is implemented; there is no intermediate Introduction page. Use the supplied `design/assests/foodpantry2.png` photo with descriptive alternative text and no caption beneath it. Remove the former fictional-households disclaimer and “Your month at a glance” label. Keep the three explanation cards, replacing 01/02/03 with house, receipt, and bar-chart icons. These landing revisions were supplied by the team on October 22, 2026; all pages inherit the same shared header navigation. Explore Data reserves `/data` for later implementation and currently reaches the existing fallback page.
 
-Explain that expenses and changing circumstances affect household resources during a simulated month. Display three mode cards: Play Individually, Host a Group, and Join a Group. Show the setup indicator and Back/Continue actions.
+The team approved `https://ourcac.org/` for Learn About CAC and `https://ourcac.org/donate-online/` for Donate on October 22, 2026. Landing-page links use these destinations in the same tab. Team-supplied introductory and explanatory copy is centralized in `frontend/src/pages/public/landingContent.ts`; its wording is presentation content, not scenario data.
 
-Individual mode proceeds to household selection. Host a Group opens host session setup. Join a Group opens session-code entry. Back returns to the landing page.
+## 2. Simulation entry
+
+The landing page provides the individual, host, and participant entry actions. Start simulation proceeds directly to household/persona selection when implemented; for now it opens the Individual simulation placeholder. There is no intermediate Introduction/mode selection page.
+
+The legacy `/simulation/introduction` URL redirects to `/simulation/individual`. Host a Group opens host session setup. Join a Group opens session-code entry. Household setup returns to the landing page when navigating back.
 
 ## 3. Household selection
 
 Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing. Category and scenario availability are determined by approved persona-category and scenario-persona links.
 
-Continue opens CAC support selection. Back returns to Introduction. Example names and amounts are illustrative; production values come from approved content.
+Continue opens CAC support selection. Back returns to the landing page. Example names and amounts are illustrative; production values come from approved content.
 
 ## 4. CAC support selection
 

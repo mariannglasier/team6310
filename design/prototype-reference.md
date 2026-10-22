@@ -19,6 +19,16 @@ These links point to a live file, not a frozen revision. At the start of a story
 
 ## How agents retrieve context
 
+### Local exported reference
+
+The team supplied an export at [`design/figma-prototype/`](./figma-prototype/) on October 22, 2026. There is no `references/figma-make/` directory in the current checkout. Use the local export for basic layouts when the live connection exposes only resource links. Keep the export unchanged; it is reference material, not application source or authority for business behavior. The export's own environment notes describe Figma Make, not this repository's running environment.
+
+Source inspection for frontend foundation work covered `GamePrimitives.tsx`, `AdminPortal.tsx` field/button/dialog patterns, `GroupFlow.tsx` native dialogs, `SetupProgress.tsx`, `SetupFrame.tsx`, `SetupSupport.tsx`, and their CSS, along with `App.tsx`, `gameSessionState.ts`, `groupSessionService.ts`, household/support fixtures, scenario/choice/expense/employment fixtures, and learning data. Source inspection is not rendered visual verification.
+
+Adaptation decisions follow existing repository requirements: use the four-step Introduction/Household/CAC support/Review indicator, approved UI tokens, Roboto, accessible form associations, and protected service boundaries. Do not adopt the export's three-step setup, alternate color systems, sample jobs/amounts, two-scenario calendar, demo staff authentication, local-storage financial authority, or end-run data deletion. No new business decisions are established by the export.
+
+### Live Figma retrieval
+
 1. Read the story, relevant repository specifications, and affected application code first.
 2. Use a Figma connection authenticated as a user with access to the shared file. Repository links do not grant Figma permissions. Each teammate must verify their own connection can retrieve this file.
 3. Load the Figma design-to-code skill before calling `get_design_context`. For this Make file, use `fileKey: "r3ZuSmL60FTO8hapPAoBNR"` and `nodeId: "0:1"`, following the tool's Make-specific instructions. Include the skill's required logging parameter. The URL's `code-node-id=0-6` is not a Design frame ID.

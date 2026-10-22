@@ -33,7 +33,7 @@ Read actual configuration and code before making implementation claims. If relev
 - `.github/workflows/ci.yml` defines automated frontend checks.
 - `agentic-test-responces/` contains a prior agent-task record.
 
-The current application and test are the frontend starter counter. Do not claim the simulation, deployed database, or access policies are implemented based on installed dependencies or documentation.
+The current application provides React Router navigation and labeled placeholder pages, with route tests. The administrative route boundary redirects all dashboard entry to sign-in pending real authentication and staff authorization. Do not claim the simulation, deployed database, or access policies are implemented based on installed dependencies, route scaffolding, or documentation.
 
 Sprint 1 prioritizes the individual simulation. Group gameplay and employee administration belong to later scope. Implement the assigned task and its acceptance criteria without expanding into other features or unrelated refactoring.
 
@@ -115,7 +115,7 @@ The frontend CI workflow runs the same verification checks on pushes and pull re
 
 ## 7. Verification and completion
 
-Add meaningful tests for implemented behavior. The existing starter-counter test does not cover the poverty simulation.
+Add meaningful tests for implemented behavior. The frontend foundation tests cover routes, shared controls, and UI state/service scaffolding; they do not cover implemented poverty simulation or database behavior.
 
 For individual simulation changes, test the relevant setup validation, selection-versus-submission behavior, financial results, support availability/use, duplicate and failed submissions, recaps, same-day decisions, scheduled income, day advancement, required-event early/full endings, refresh restoration, and replay. Check missing-data states, keyboard use, and responsive layout where affected.
 
