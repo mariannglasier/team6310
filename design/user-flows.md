@@ -20,7 +20,7 @@ flowchart TD
     L["Landing and introduction"] --> H["Choose household"]
     H --> C["Choose CAC support"]
     C --> R["Review and confirm"]
-    R --> D["Make an available decision"]
+    R --> D["Make a scenario decision"]
     D --> A["Review inline recap"]
     A --> N{"Day 30 completed?"}
     N -->|No: Continue| D
