@@ -2,6 +2,8 @@
 
 ## Purpose and authority
 
+For the shared Figma Make prototype, source navigation, and agent retrieval workflow, see [Prototype reference](./prototype-reference.md). Use it for visual context alongside this specification; prototype fixtures and behavior do not override approved requirements.
+
 This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
 
 The experience has a pre-game employment stage followed by Days 1–30. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.

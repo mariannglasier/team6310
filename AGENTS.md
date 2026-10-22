@@ -15,6 +15,7 @@ Read the documents relevant to the task:
 | `docs/api.md` | External sources, economic inputs, provenance, and data processing |
 | `docs/security.md` | Authentication, authorization, ownership, privacy, and protected operations |
 | `design/ui-spec.md` | Screens, theme tokens, controls, accessibility, and visualizations |
+| `design/prototype-reference.md` | Shared Figma Make prototype, retrieval instructions, visual-reference authority, and story navigation |
 | `design/user-flows.md` | Setup, decisions, recaps, recovery, replay, group, and staff journeys |
 | `docs/scenarios.md` | Authoritative scenario categories, content editions, generation, sources, employment sequence, calendar, money, and unresolved scenario decisions |
 | `README.md`, `frontend/package.json`, and affected code | Setup, available scripts, and implementation conventions |
