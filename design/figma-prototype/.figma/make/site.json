@@ -1,0 +1,10 @@
+{
+  "description": "Explore financial trade-offs in a poverty simulation by managing household decisions, tailored for Community Assistance Center users to enhance understanding of financial challenges.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

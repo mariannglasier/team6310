@@ -2,11 +2,11 @@
 
 ## 1. Purpose and scope
 
-The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a fictional household's 30-day month and make decisions involving housing, food, transportation, employment, and unexpected expenses. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.
+The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a pre-game stage followed by Days 1–30 and make decisions involving approved scenario categories, housing, food, employment, and unexpected expenses. Multiple decisions may occur on one day. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.
 
 Sprint 1 prioritizes the individual simulation. The broader application also includes facilitated group play, interactive data exploration, and an administrative portal for authorized CAC employees.
 
-This document describes the application's intended architecture. The repository currently contains the frontend starter, development tooling, a Supabase client module, and Supabase configuration. The initial migration file is empty, and the existing application and test still demonstrate the starter counter. Application features and database protections described below are implementation requirements.
+This document describes the application's intended architecture. The repository contains React Router navigation, labeled placeholder pages, a shared navigation layout, development tooling, a Supabase client module, and Supabase configuration. The admin dashboard route redirects to sign-in until authentication and staff authorization are integrated. Route tests cover placeholder entry, navigation/history, keyboard focus, and this closed boundary; they do not establish database security. The initial migration file is empty. Simulation features and database protections described below remain implementation requirements.
 
 ## 2. Architecture and rationale
 
@@ -61,13 +61,21 @@ flowchart TD
 
 ## 3. Frontend responsibilities
 
+### Implemented foundation
+
+`frontend/src/app/` defines React Router paths and a dashboard boundary that currently redirects all access to sign-in. `pages/` separates public, individual, group, and admin placeholders; `layouts/` provides the shared shell. `components/ui/` provides reusable controls using specification tokens and locally bundled Roboto. Prototype layout sources are documented in [Prototype reference](../design/prototype-reference.md).
+
+`types/domain.ts` defines initial readonly frontend read models, including branded safe integer USD cents. These are not finalized database DTOs. `state/simulationState.ts` keeps temporary choices separate from a committed service snapshot; it performs no balance calculations, response commits, or calendar advancement. `hooks/useSimulation.ts` supports explicit restoration and ignores stale responses. `services/simulationService.ts` defines an unconnected contract whose default implementation rejects operations. `services/supabase.ts` lazily accesses the existing client so placeholder routes do not require credentials. No prototype fixtures or browser-storage financial logic are used by the frontend.
+
+Backend response validation, ownership, eligibility, edition validation, atomic commitment, idempotency, results retention, and database authorization remain future feature work. Component and reducer tests establish frontend scaffolding behavior only; native dialog browser behavior, responsive visual rendering, deployed deep links, and backend security require their own verification.
+
 ### Individual simulation
 
 Setup proceeds through Introduction, Household, CAC Support, and Review. Household and support selections are explicit. Review allows edits before confirmation; confirmation starts a new run at Day 1 and locks those settings.
 
-The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. The interface displays a successful inline recap only after commitment succeeds.
+The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. Scheduled scenarios and income occurrences use one authoritative, idempotent charge/credit path. A required payable event that cannot be paid ends the run with its actual day and reason. The interface displays a successful inline recap only after commitment succeeds.
 
-The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players continue after the recap; each completed question advances one day. Normal completion follows the Day 30 question. End Simulation produces a clearly labeled partial summary. Replay returns to household selection and creates a separate run with fresh state.
+The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players continue after the recap; completing a question does not inherently advance the calendar, so same-day decisions and required events are processed before advancing. Normal completion follows Day 30. End Simulation and inability to pay produce clearly labeled partial summaries. Replay returns to household selection and creates a separate run with fresh state.
 
 CAC support availability and actual assistance use are separate. Enabling support during setup allows relevant assistance choices; it does not automatically grant financial benefits.
 
@@ -97,17 +105,17 @@ The documented application entities are:
 
 | Area | Entities | Purpose |
 | --- | --- | --- |
-| Simulation content | `personas`, `persona_expenses`, `scenarios`, `choices`, `cac_support_effects` | Household starting conditions, scheduled expenses, decisions, and assistance effects |
+| Simulation content | `categories`, `personas`, `persona_categories`, `scenarios`, `scenario_personas`, `service_coverage`, `choices`, `cac_support_effects` | Edition-scoped route coverage, household definitions, scenarios, decisions, and assistance effects |
 | Educational statistics | `statistics`, `scenario_statistics` | Source-backed figures and links to relevant scenarios |
 | Gameplay records | `playthroughs`, `playthrough_expenses`, `player_responses` | Run state, bill occurrences, and committed decisions |
 | Group coordination | `group_sessions` | Facilitated sessions and participant association |
-| Content history | `content_versions` | Identify the content used by runs and preserve historical references |
+| Content history | `content_versions`, `scenario_generation_requests`, `source_bindings` | Immutable published editions, pending drafts, generation review, and resolved-cost provenance |
 
 Individual playthroughs have no group association; group playthroughs reference their session. Scenarios belong to content versions. Supabase supplies `auth.users` separately from the application entities. Detailed fields and relationships are defined in [Data model](data-model.md); proposed SQL types and constraints there remain proposals rather than an implemented schema.
 
 ## 5. External data boundary
 
-[External data and API integration](api.md) identifies Census ACS, HUD Fair Market Rents and Income Limits, BLS occupational wage data, USDA food plans, EIA electricity prices, FRED price indices, FINRA survey data, and CAC-provided community information as intended sources.
+[External data and API integration](api.md) identifies Census ACS, HUD Fair Market Rents and Income Limits, BLS occupational wage data, USDA food plans, EIA electricity prices, FRED price indices, FINRA survey data, and CAC-provided community information as intended sources. Monthly checks run at the first midnight in `America/New_York`; refreshes are staged for staff approval.
 
 The data-processing boundary accommodates API retrieval and reviewed dataset imports. It validates inputs and preserves source, units, geography, reporting period, and retrieval/import context. Simulation content references approved economic values, and application rules define their financial effects. External API credentials remain outside browser code.
 
@@ -130,7 +138,7 @@ These protections apply to database/API calls and realtime subscriptions as well
 
 The frontend uses Node.js 24 and the committed npm lockfile. `frontend/.env.example` defines `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; `frontend/src/lib/supabaseClient.ts` creates the client and rejects missing values when the module is loaded.
 
-The Frontend CI workflow at `.github/workflows/ci.yml` runs on pushes and pull requests. It installs dependencies with `npm ci`, checks formatting, runs ESLint and TypeScript checks, executes tests, and builds production assets. The current test covers the starter counter; feature tests must be added alongside implementation. CI configuration alone does not establish that a particular run passed.
+The Frontend CI workflow at `.github/workflows/ci.yml` runs on pushes and pull requests. It installs dependencies with `npm ci`, checks formatting, runs ESLint and TypeScript checks, executes tests, and builds production assets. Current tests cover routing placeholders, shared controls, and UI state/service scaffolding; gameplay and backend tests must be added alongside implementation. CI configuration alone does not establish that a particular run passed.
 
 Agent workflow and verification commands are defined in the root [AGENTS.md](../AGENTS.md).
 

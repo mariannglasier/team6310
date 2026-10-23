@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+                  <defs>
+                    <linearGradient id="ground" x2="1" y2="1">
+                      <stop stop-color="#eaf2ef"/><stop offset="1" stop-color="#d5e3df"/>
+                    </linearGradient>
+                    <filter id="shadow" x="-30%" y="-30%" width="170%" height="180%">
+                      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#254b43" flood-opacity=".15"/>
+                    </filter>
+                    <g id="tree">
+                      <path d="M0 0v-45" stroke="#85725c" stroke-width="10"/>
+                      <path d="M-26-30 0-101 26-30Z" fill="#437766"/>
+                      <path d="M0-101 26-30H0Z" fill="#315d51"/>
+                    </g>
+                    <g id="coin">
+                      <ellipse cy="5" rx="25" ry="13" fill="#bd8840"/>
+                      <ellipse rx="25" ry="13" fill="#ebbe6c"/>
+                      <ellipse rx="17" ry="8" fill="none" stroke="#ffe1a0" stroke-width="2"/>
+                    </g>
+                  </defs>
+                  <rect width="1000" height="620" fill="url(#ground)"/>
+                  <ellipse cx="496" cy="464" rx="367" ry="106" fill="#476c61" opacity=".09"/>
+                  <g filter="url(#shadow)">
+                    <path d="m98 293 400-195 400 195v33L498 527 98 326Z" fill="#a4b6a5"/>
+                    <path d="m98 293 400-195 400 195-400 201Z" fill="#f7f2df"/>
+                    <path d="m498 494 400-201v33L498 527Z" fill="#8fa897"/>
+                    <path d="m168 293 330-160 330 160-330 164Z" fill="#c4d8b8"/>
+                    <path d="m181 292 317-147 314 147-314 150Z" fill="none" stroke="#fffaf0" stroke-width="35" stroke-linejoin="round"/>
+                    <path d="m181 292 317-147 314 147-314 150Z" fill="none" stroke="#b7c5b4" stroke-width="35" stroke-dasharray="2 37" stroke-linejoin="round"/>
+                    <path d="m181 292 67-31" stroke="#b50935" stroke-width="35"/>
+                    <path d="m747 322 65-30" stroke="#e5b258" stroke-width="35"/>
+                    <path d="m499 442 66-32" stroke="#8fb8cb" stroke-width="35"/>
+                    <path d="m360 212 46-22" stroke="#8fb8cb" stroke-width="35"/>
+                    <path d="m290 304 210-98 208 98-208 104Z" fill="#b0c99f"/>
+                    <path d="m448 355 52-25 85 42-52 25Z" fill="#eee9d6"/>
+                    <use href="#tree" transform="translate(329 303) scale(.8)"/>
+                    <use href="#tree" transform="translate(695 305) scale(.85)"/>
+                    <use href="#tree" transform="translate(643 260) scale(.6)"/>
+                    <path d="m407 274 88-44 100 50v76l-89 44-99-50Z" fill="#fff8e7"/>
+                    <path d="m506 324 89-44v76l-89 44Z" fill="#d9cfb9"/>
+                    <path d="m393 276 101-105 115 107-103 51Z" fill="#b50935"/>
+                    <path d="m494 171 115 107-103 51-11-107Z" fill="#8c1534"/>
+                    <path d="m393 276 101-105 1 51-74 69Z" fill="#d1465f"/>
+                    <path d="m435 308 32 16v36l-32-16Z" fill="#7aafbc"/>
+                    <path d="m450 316v35m-15-25 32 16" stroke="#fff8e7" stroke-width="3"/>
+                    <path d="m533 330 29-14v56l-29 14Z" fill="#5e796e"/>
+                    <path d="m570 311 15-7v23l-15 7Z" fill="#7aafbc"/>
+                    <path d="M548 350v4" stroke="#f1d08c" stroke-width="4" stroke-linecap="round"/>
+                    <path d="m548 211 0-38 22 11v46Z" fill="#f4e9d5"/>
+                    <path d="m548 173 12-6 22 11-12 6Z" fill="#fff7e6"/>
+                  </g>
+                  <g transform="translate(166 128) rotate(-9)" filter="url(#shadow)">
+                    <rect width="160" height="172" rx="14" fill="#fffdf5"/>
+                    <path d="M14 0h132a14 14 0 0 1 14 14v27H0V14A14 14 0 0 1 14 0Z" fill="#b50935"/>
+                    <path d="M40-8V14M120-8V14" stroke="#643943" stroke-width="8" stroke-linecap="round"/>
+                    <text x="80" y="95" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="700" fill="#263f38">30</text>
+                    <text x="80" y="122" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="3" fill="#687c71">DAYS</text>
+                    <path d="M35 146h90" stroke="#e1e7dc" stroke-width="5" stroke-linecap="round"/>
+                  </g>
+                  <g transform="translate(725 115) rotate(10)" filter="url(#shadow)">
+                    <rect x="7" y="9" width="153" height="183" rx="13" fill="#a8c2c5"/>
+                    <rect width="153" height="183" rx="13" fill="#fffdf5"/>
+                    <text x="76" y="32" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#587269">YOUR BUDGET</text>
+                    <circle cx="76" cy="81" r="29" fill="#f6e5bf"/>
+                    <text x="76" y="94" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" fill="#a17437">$</text>
+                    <path d="M26 130h100M26 151h100" stroke="#e5e8df" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M26 130h65" stroke="#568676" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M26 151h38" stroke="#b50935" stroke-width="9" stroke-linecap="round"/>
+                  </g>
+                  <g transform="translate(279 353)">
+                    <ellipse cy="31" rx="31" ry="15" fill="#345e52" opacity=".17"/>
+                    <path d="M-24 20q5-14 10-42h28q5 28 10 42-24 19-48 0" fill="#b50935"/>
+                    <path d="M0-22h14q5 28 10 42Q10 30 0 28Z" fill="#8c1534"/>
+                    <circle cy="-33" r="18" fill="#cf3f5e"/>
+                    <path d="M-9-40q3-7 11-6" fill="none" stroke="#ef95a6" stroke-width="4" stroke-linecap="round"/>
+                  </g>
+                  <g transform="translate(680 452)">
+                    <use href="#coin" y="20"/><use href="#coin" y="10"/><use href="#coin"/>
+                    <use href="#coin" x="55" y="27"/><use href="#coin" x="55" y="17"/>
+                  </g>
+                  <g transform="translate(350 470) rotate(-7)" filter="url(#shadow)">
+                    <rect width="203" height="74" rx="12" fill="#fffdf5"/>
+                    <rect x="13" y="13" width="48" height="48" rx="9" fill="#e2eee1"/>
+                    <path d="m24 33 13-10 13 10v17H24Z" fill="none" stroke="#4e7b65" stroke-width="3" stroke-linejoin="round"/>
+                    <path d="M34 50V39h8v11" fill="none" stroke="#4e7b65" stroke-width="3"/>
+                    <text x="75" y="32" font-family="Arial,sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#64776d">COMMUNITY</text>
+                    <text x="75" y="52" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#284f41">Support matters.</text>
+                  </g>
+                </svg>

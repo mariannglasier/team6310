@@ -21,7 +21,7 @@ This relational model supports an educational financial decision game for the Co
 
 ### `personas`
 
-Selectable household profiles and initial financial conditions.
+Selectable household profiles and initial financial conditions. Persona definitions are edition-scoped; changing employment and income state belongs to a playthrough, not this table.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
@@ -29,20 +29,22 @@ Selectable household profiles and initial financial conditions.
 | name | text | Household profile name. | Nullability unresolved. |
 | description | text | Household background. | Nullability unresolved. |
 | general_starting_balance | numeric(12,2) | Initial available balance. | Naming normalized; allowed range unresolved (I4, C2). |
-| monthly_income | numeric(12,2) | Monthly household income. | Income timing and range unresolved (C2, C3). |
+| weekly_income | numeric(12,2) | Approved weekly income for the persona/job definition. | USD; use approved job qualifications. A run's changing income is stored in playthrough employment state. |
 | version_id | uuid | Owning content version. | Specified FK → content_versions.version_id; C1. |
 
 ### `scenarios`
 
-Situations encountered during gameplay.
+Situations encountered during gameplay. Stable logical scenario IDs may recur in multiple immutable editions; edition-scoped records identify the revision.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
 | scenario_id | uuid | Unique scenario identifier. | Specified PK. |
 | title | text | Scenario title. | Nullability unresolved. |
 | description | text | Situation presented to players. | Nullability unresolved. |
-| default_day | integer | Default simulation day. | Day bounds and scheduling semantics unresolved (C3). |
+| default_day | integer | Default scheduling guidance for a scenario. | Pre-game or Days 1–30; fixed employment events override this guidance. |
 | version_id | uuid | Content version this scenario belongs to. | Team-approved FK → content_versions.version_id; C1. |
+| category_id | uuid | Scenario category. | Required FK → categories.category_id; one of the six approved categories in [scenarios.md](scenarios.md). |
+| schedule_type | text | `scheduled` or `non_scheduled`. | Required; scheduled status controls timing/projection metadata, while both types use the same end-of-day scenario flow. Automatic income is a separate credited occurrence. |
 
 ### `choices`
 
@@ -53,9 +55,9 @@ Available scenario answers, consequences, and next destinations.
 | choice_id | uuid | Unique choice identifier. | Specified PK. |
 | scenario_id | uuid | Scenario offering this choice. | Specified FK → scenarios.scenario_id. |
 | choice_text | text | Answer shown to players. | Nullability unresolved. |
-| balance_change | numeric(12,2) | Base financial effect of choosing this answer. | Sign convention unresolved (C2). |
+| balance_change | numeric(12,2) | Base signed financial effect of choosing this answer in USD. | Negative removes household money; positive adds it. Exact arithmetic and final-cent rounding follow [scenarios.md](scenarios.md). |
 | response_text | text | Feedback after the choice. | Nullability unresolved. |
-| next_scenario_id | uuid | Next scenario, if any. | Specified optional FK → scenarios.scenario_id; NULL may represent an ending. |
+| next_scenario_id | uuid | Next scenario, if any. | Specified optional FK → scenarios.scenario_id; NULL does not by itself end a run when normal routing can select another scenario. |
 | version_id | uuid | Owning content version. | Specified FK → content_versions.version_id; C1. |
 
 ### `statistics`
@@ -80,9 +82,18 @@ Junction table connecting scenarios and relevant statistics.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
-| scenario_id | uuid | Linked scenario. | Specified composite PK component and FK → scenarios.scenario_id. |
-| statistic_id | uuid | Linked statistic. | Specified composite PK component and FK → statistics.statistic_id. |
-| version_id | uuid | Version associated with the link. | Specified FK → content_versions.version_id; PK/version conflict unresolved (I5). |
+| scenario_id | uuid | Linked scenario. | Composite PK component and edition-scoped FK → scenarios. |
+| statistic_id | uuid | Linked statistic. | Composite PK component and edition-scoped FK → statistics. |
+| version_id | uuid | Version associated with the link. | Required; composite references enforce the same edition as scenario and statistic. |
+| fact_role | text | `general` or `cac`. | Required; exactly one of each role per scenario per edition. |
+
+### `categories`
+
+The six approved scenario categories: Housing & Utilities; Food & Nutrition; Employment & Adult Education; Essential Goods & Clothing; Childcare & Youth; and Financial Literacy & Taxes. Category names and scenario/persona applicability are content decisions, not eligibility policy.
+
+### `persona_categories` and `scenario_personas`
+
+Edition-scoped applicability links. `persona_categories(version_id, persona_id, category_id)` identifies categories a persona can encounter. `scenario_personas(version_id, scenario_id, persona_id)` identifies selectable scenarios. Publication validation requires at least one scenario-persona link, category compatibility, and a viable six-category route for each selectable persona.
 
 ### `playthroughs`
 
@@ -93,13 +104,14 @@ One game attempt and its current financial and scenario state.
 | playthrough_id | uuid | Unique attempt identifier. | Specified PK. |
 | persona_id | uuid | Selected household profile. | Specified FK → personas.persona_id. |
 | current_scenario_id | uuid | Current scenario. | Specified FK → scenarios.scenario_id; nullability at start/end unresolved. |
-| current_balance | numeric(12,2) | Current available balance. | Negative-balance rules unresolved (C2). |
-| current_day | integer | Current simulation day. | Day bounds unresolved (C3). |
+| current_balance | numeric(12,2) | Current available balance in USD. | Exact decimal or integer-cent arithmetic; signed changes. A required payable event that cannot be paid ends the run without recording an unaffordable charge. |
+| current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; multiple decisions can occur on one day. |
 | cac_support_enabled | boolean | Whether CAC assistance applies. | Default and requiredness unresolved. |
 | status | text | Game progress state. | Allowed values and transitions unresolved (C4). |
 | started_at | timestamptz | Attempt start timestamp. | Default and requiredness unresolved. |
 | version_id | uuid | Content version used for this attempt. | Specified FK → content_versions.version_id; C1. |
 | session_id | uuid | Group session this attempt belongs to. | Nullable FK → group_sessions.session_id; NULL for individual play. |
+| employment_state | jsonb | Run-specific job, preparation, clothing, hiring, and current weekly-income state. | Proposed shape; do not infer from narrative. Initialize weekly income to $0; weekly pay begins seven days after hiring. |
 
 ### `playthrough_expenses`
 
@@ -158,6 +170,22 @@ Scheduled household expenses, either one-time or recurring.
 | repeat_interval_days | integer | Days between later occurrences. | Specified optional; blank means once. Proposed SQL representation: NULL, with positive integers for recurrence. |
 | version_id | uuid | Owning content version. | Specified FK → content_versions.version_id; C1. |
 
+### `scheduled_income_occurrences`
+
+Run-specific automatic income occurrences. Each occurrence references the playthrough's job/edition, due day, and approved amount, and is idempotent. Income is not modeled as an expense or scenario choice; it is credited every seven days after hiring.
+
+### `source_bindings`
+
+Edition-scoped provenance for a choice or expense amount: target field, source observation or approved assumption, unit, controlled formula and inputs, resolved USD amount, and whether the value is sourced, calculated, or staff-approved. `scenario_parameters` is intentionally deferred until concrete scenarios justify reusable values.
+
+### `scenario_generation_requests`
+
+Tracks admin/maintenance requests, target edition/service, description, configured model, schema revision, attempt count, validation errors, status, resulting draft, timestamps, and idempotency key. One request yields at most one scenario draft and at most three total model attempts.
+
+### `service_coverage`
+
+Edition-scoped links from a scenario to confirmed client-facing CAC services. Coverage is explicit and must not be inferred from keywords.
+
 ### `cac_support_effects`
 
 Assistance associated with choices when CAC support is enabled.
@@ -203,7 +231,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | personas | playthroughs.persona_id | 1:N | A persona may be used in many attempts. |
 | personas | persona_expenses.persona_id | 1:N | A persona has scheduled expenses. |
 | scenarios | choices.scenario_id | 1:N | A scenario offers choices. Minimum choices unresolved. |
-| scenarios | choices.next_scenario_id | 1:N, optional from choice | Many choices may lead to the same scenario; destination may be NULL for an ending. |
+| scenarios | choices.next_scenario_id | 1:N, optional from choice | Many choices may lead to the same scenario; destination may be NULL without implicitly ending normal play. |
 | scenarios | playthroughs.current_scenario_id | 1:N | Many attempts may currently be on one scenario. |
 | scenarios | group_sessions.current_scenario_id | 1:N | Many groups may currently be on one scenario. |
 | scenarios | scenario_statistics.scenario_id | 1:N | One side of the junction. |
@@ -213,8 +241,8 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | playthroughs | playthrough_expenses.playthrough_id | 1:N | An attempt has individual bill occurrences. |
 | persona_expenses | playthrough_expenses.expense_id | 1:N | A scheduled expense generates occurrences across attempts and due dates. |
 | group_sessions | playthroughs.session_id | 1:N | A group can contain multiple playthroughs; individual playthroughs have NULL session_id. |
-| choices | cac_support_effects.choice_id | 1:N | Plan marks this with an unexplained asterisk; I6. |
-| content_versions | version_id in personas, choices, statistics, scenario_statistics, playthroughs, playthrough_expenses, player_responses, group_sessions, persona_expenses, cac_support_effects | 1:N per table | Each listed FK references content_versions.version_id; cross-table version consistency is unresolved. |
+| choices | cac_support_effects.choice_id | 0:1 per edition | At most one financial assistance effect per choice per edition. |
+| content_versions | version_id in edition-scoped content and run records | 1:N per table | Published editions are immutable. Composite keys or equivalent protected operations enforce edition consistency; playthroughs retain their starting version_id. |
 | content_versions | scenarios.version_id | 1:N | Each scenario belongs to a content version; team-approved, migration implementation pending. |
 | auth.users | group_sessions.facilitator_user_id | 1:N | User facilitates sessions. |
 | auth.users | content_versions.created_by | 1:N | User authors content versions. |
@@ -223,7 +251,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 
 ### Source-specified design constraints
 
-- Every application table has the PK documented in Section 2. `scenario_statistics` has the composite PK `(scenario_id, statistic_id)`; this prevents duplicate pairs across the whole table, regardless of `version_id`.
+- Logical IDs are stable across editions, while edition-scoped records use `(version_id, logical_id)` keys or an equivalent enforced design. `scenario_statistics` must permit the same logical pair in different editions.
 - All source-specified FKs are listed in Sections 2 and 3. FK enforcement would require a referenced row to exist whenever the FK is non-NULL.
 - `choices.next_scenario_id`, `persona_expenses.repeat_interval_days`, `playthrough_expenses.paid_at`, and `content_versions.published_at` are explicitly optional in the plan.
 - A blank repeat interval represents a one-time expense. The proposed SQL representation is NULL rather than an empty string.
@@ -234,11 +262,11 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 
 | ID | Area | Proposed rule or decision required |
 | --- | --- | --- |
-| C1 | Content versions | Pin each attempt/group to a version; ensure referenced persona, choices, expenses, statistics, and scenarios belong to that version. Decide immutable published snapshots versus editable rows, version numbering uniqueness, publication transitions, and whether published_at must exist for published/archived content. Simple ID-only FKs do not enforce matching versions; consider composite keys/FKs or transactional validation. |
-| C2 | Money | Use exact numeric amounts, confirm currency (proposed USD), precision, scale, and rounding. Define signed choice adjustments and whether income, expenses, and assistance must be nonnegative. Do not constrain balances to nonnegative until failure/overdraft behavior is decided. |
-| C3 | Simulation time | Define day 0 versus day 1, simulation duration, allowed day ranges, and income payment schedule. Proposed repeat interval CHECK: repeat_interval_days IS NULL OR repeat_interval_days > 0. Decide handling of overdue bills and charges past the simulation end. |
+| C1 | Content versions | Resolved design: stable logical IDs with edition-scoped rows; published editions are immutable; pending edits are separate; every playthrough retains its starting version_id. Final DDL and publication transaction remain pending. |
+| C2 | Money | Resolved design: USD, exact decimal/integer-cent arithmetic, final rounding once to cents with half-cent ties away from zero, signed balance changes, and capped assistance. |
+| C3 | Simulation time | Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
 | C4 | States and nullability | Define playthrough statuses and transitions; confirm group/content status vocabularies. Decide required text, FKs, timestamps, and version fields; decide whether current_scenario_id may be NULL while waiting or after completion. |
-| C5 | Decision/payment consistency | Validate that a selected choice belongs to the active scenario, an expense belongs to the selected persona, and all records match the attempt's content version. Apply balance changes and insert response/payment records atomically. Decide replay/revisit rules before adding response uniqueness; repeated choices may be valid. Proposed bill uniqueness (playthrough_id, expense_id, due_day) requires confirmation. |
+| C5 | Decision/payment consistency | Validate scenario, choice, ownership, eligibility, support, and edition in protected operations. Commit response, state changes, and payment/income idempotency atomically. Prevent duplicate scheduled/scenario charges. |
 | C6 | Group participation | Define join-code uniqueness (global or active sessions only), expiration, membership identity, participant visibility, deadline enforcement, and how group answers advance each attempt. No round identifier or vote aggregation rule is supplied. |
 | C7 | Statistics | Define value types, units, reporting-period format, supported geographies, source requirements, and review cadence. No additional provenance table or relationship to a specific choice is specified. |
 | C8 | Referential actions and defaults | Choose ON DELETE/ON UPDATE behavior for every FK, especially content referenced by completed games and auth user deletion. Decide ID generation and timestamp/boolean defaults; avoid assuming cascades. |
@@ -253,8 +281,8 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | I2 | scenarios has no version_id in the plan or its attribute list in the ERD, although content_versions is described as covering scenario changes and the ERD depicts a content-version/scenario link. | Scenarios cannot be explicitly tied to the content snapshot referenced by choices and games. | Resolved: Team-approved: add scenarios.version_id referencing content_versions.version_id. Migration implementation pending. |
 | I3 | content_versions lists version_id once as its PK and again as an FK to content_versions. The ERD shows one version_id attribute. | The duplicate field cannot be implemented as two columns with the same name; intended self-reference is unclear. | Resolved: Just a simple copy/paste error. Duplicate can be ignored. |
 | I4 | Mixed capitalization and the plan's general starting_balance label differ from the ERD's general_starting_balance; Answered_at also differs in case. | Literal implementation could produce inconsistent or quoted identifiers. | Use the normalized names in this file; verify names against migrations before implementation. |
-| I5 | scenario_statistics carries version_id but its PK contains only scenario_id and statistic_id. | The same ID pair cannot be stored in multiple versions. This may be correct if IDs change per snapshot, but conflicts with stable IDs reused across versions. | Retain pair PK for per-version row IDs. |
-| I6 | choices → cac_support_effects is written as one-to-many with an unexplained asterisk. | Multiple effects are structurally allowed, but stacking, eligibility, order, and response-text selection are undefined. | Confirm one effect versus many. For one, consider UNIQUE(choice_id); for many, define combination rules and add eligibility/order fields only if needed. |
+| I5 | scenario_statistics carries version_id but its original PK omitted it. | Stable logical IDs cannot be reused safely across editions with that PK. | Superseded: use edition-scoped composite identity and exactly one `general` plus one `cac` fact role per scenario/edition. |
+| I6 | choices → cac_support_effects was structurally one-to-many. | Unbounded stacking could create unintended cash or duplicate effects. | Resolved design: at most one financial assistance effect per choice per edition; assistance is capped to the eligible remaining expense. |
 | I7 | ERD includes facilitator_user_id as an underlined attribute while session_id is also underlined; the plan labels session_id as PK and facilitator_user_id as FK. | Underlining could be misread as a composite group_sessions PK. | Follow the plan's session_id-only PK and facilitator_user_id FK in this draft; confirm and correct ERD notation. |
 | I8 | ERD is conceptual; connector lines/cardinality labels are not legible in the supplied rendering, and several FK attributes are expressed through relationships rather than listed as ovals. | Mandatory participation and precise cardinalities cannot be independently verified from the image. | Use different ERD made by Roger. |
 
@@ -262,8 +290,8 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 
 This draft covers all 12 application entities, the external authentication reference, every listed field, intended relationships, and explicit versus proposed constraints. It is suitable for design review but is not a migration script or a certification of the deployed database.
 
-I1-I3 are resolved at the design level; migration implementation is pending.
-Before implementation, resolve I5 and the remaining applicable decisions,
-choose types and nullability, confirm status and money rules, and define
-version consistency and ownership/RLS. Update the source documents to
-reflect approved decisions, then validate this model against the migrations.
+I1-I6 are resolved at the design level where noted; migration implementation is pending.
+Open scenario decisions remain in [scenarios.md](scenarios.md), including the
+job catalog, preparer fee, optional-choice affordability and missed-payment edge
+cases, source variables and formulas, binding shape, and service inventory. Validate the final
+DDL, composite references, idempotency, and ownership/RLS before implementation.
