@@ -17,7 +17,7 @@ React Router connects the responsive landing page and clearly labeled feature pl
 | `/admin/dashboard` | Reserved dashboard; redirects to sign-in |
 | Any unmatched path | Page-not-found fallback |
 
-The administrative route boundary denies all dashboard entry until trusted Supabase authentication and separately verified staff authorization are integrated. It is only a UI structure and does not establish backend access control. No protected data or API calls are present in these placeholders.
+The administrative route boundary denies all dashboard entry until trusted Supabase authentication and separately verified staff authorization are integrated. It is only a UI structure and does not establish backend access control. No protected application data is loaded. The individual placeholder can explicitly establish an anonymous participant Auth session; this creates no simulation run or application row. See the frontend guide for local and hosted Auth prerequisites.
 
 Current frontend structure:
 
@@ -46,7 +46,7 @@ The landing page adapts the exported hero/three-card layout with team-supplied c
 
 See [Frontend component and architecture guide](frontend/README.md) for usage, extension boundaries, and remaining verification. Frontend read models are not finalized database rows. Simulation service methods deliberately reject calls until protected backend operations are integrated; no local-storage simulation or financial engine was copied from the prototype.
 
-Routing uses browser history. The deployment must serve the SPA entry document for application deep links; confirm that behavior on Cloudflare Pages before claiming deployed refresh support. Local route tests use a memory router. The app's placeholders do not import the Supabase client or require live credentials; future client consumers require the environment values below.
+Routing uses browser history. The deployment must serve the SPA entry document for application deep links; confirm that behavior on Cloudflare Pages before claiming deployed refresh support. Local route tests use a memory router. Public pages do not require Supabase credentials. Explicit participant session preparation on the individual placeholder requires the environment values below; it reuses the lazy centralized client.
 
 ### Prerequisites
 

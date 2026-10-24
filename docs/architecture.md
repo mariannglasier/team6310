@@ -6,7 +6,7 @@ The CAC Poverty Exercise is an educational web application developed by Georgia 
 
 Sprint 1 prioritizes the individual simulation. The broader application also includes facilitated group play, interactive data exploration, and an administrative portal for authorized CAC employees.
 
-This document describes the application's intended architecture. The repository contains React Router navigation, labeled placeholder pages, a shared navigation layout, development tooling, a Supabase client module, and Supabase configuration. The admin dashboard route redirects to sign-in until authentication and staff authorization are integrated. Route tests cover placeholder entry, navigation/history, keyboard focus, and this closed boundary; they do not establish database security. The initial migration file is empty. Simulation features and database protections described below remain implementation requirements.
+This document describes the application's intended architecture. The repository contains React Router navigation, labeled placeholder pages, a shared navigation layout, development tooling, a Supabase client module, and Supabase configuration. The admin dashboard route redirects to sign-in until authentication and staff authorization are integrated. Route tests cover placeholder entry, navigation/history, keyboard focus, and this closed boundary; they do not establish database security. The individual placeholder can explicitly prepare an anonymous participant Auth session through the centralized client; it creates no run or application data. Hosted Auth configuration and live verification remain pending. The initial migration file is empty. Simulation features and database protections described below remain implementation requirements.
 
 ## 2. Architecture and rationale
 
@@ -62,6 +62,13 @@ flowchart TD
 ## 3. Frontend responsibilities
 
 ### Implemented foundation
+
+A development-only `/dev/integration-test` route can prepare an anonymous session
+and insert a test message through the centralized client. The separate
+`20261025000000_integration_test.sql` migration defines only a temporary owned-row
+table and restrictive anonymous-participant policies; it is not applied
+automatically or part of the simulation schema. Live database enforcement remains
+unverified until the [manual checks](integration-test.md) are performed.
 
 `frontend/src/app/` defines React Router paths and a dashboard boundary that currently redirects all access to sign-in. `pages/` separates public, individual, group, and admin placeholders; `layouts/` provides the shared shell. `components/ui/` provides reusable controls using specification tokens and locally bundled Roboto. Prototype layout sources are documented in [Prototype reference](../design/prototype-reference.md).
 

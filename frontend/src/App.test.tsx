@@ -45,6 +45,7 @@ test.each([
   ['/donate', 'Donate'],
   ['/simulation/introduction', 'Individual simulation'],
   ['/simulation/individual', 'Individual simulation'],
+  ['/dev/integration-test', 'Temporary Supabase integration test'],
   ['/simulation/results', 'Simulation results'],
   ['/group/host', 'Host a Group'],
   ['/group/join', 'Join a Group'],

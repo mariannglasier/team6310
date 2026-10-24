@@ -39,6 +39,44 @@ npm run build
 
 `npm run test:watch` watches tests; `npm run preview` serves a production build locally. CI results and deployed Cloudflare deep-link behavior must be checked separately.
 
+## Participant sessions
+
+For the isolated development-only owned-row test at `/dev/integration-test`, see
+[manual migration and verification instructions](../docs/integration-test.md).
+The migration is not applied automatically; mocked tests do not establish RLS.
+
+At `/simulation/individual`, select **Prepare participant session**. No credentials,
+run, or application rows are created. `services/participantSession.ts` reuses the
+central client and SDK-managed storage/refresh. It verifies an existing anonymous
+user, creates a session only if none exists, and shares concurrent requests.
+Rendering, navigation, and startup do not sign in automatically. Retries recheck
+the session. Non-anonymous sessions remain untouched; use a separate browser
+profile for participant testing. The status reports preparation, not continuous
+session monitoring. Future protected operations must revalidate authorization.
+Clearing browser storage can lose access; a shared browser profile shares identity.
+
+Local Supabase: anonymous sign-ins are enabled in `supabase/config.toml`. Restart
+the local stack after Auth configuration changes. The anonymous signup limit
+remains 30/hour/IP; review workshop capacity on shared networks and abuse controls.
+
+Hosted development: a project administrator must manually verify the project,
+enable **Allow anonymous sign-ins** in Auth settings, confirm new-user signup is
+allowed, and review rate limits. Local config does not change hosted settings.
+Use the existing `.env.local` URL/publishable key and restart Vite after changes.
+The local port-3000 Auth redirect URLs do not affect this redirect-free flow.
+
+Before public/workshop rollout, configure CAPTCHA/Turnstile and rate limiting as
+required by `docs/security.md`. CAPTCHA token collection is not implemented here;
+a hosted project requiring CAPTCHA will reject session creation until token
+integration is added. Do not disable existing CAPTCHA to make this check pass.
+Hosted settings were not changed and live authentication is not verified.
+
+Anonymous Auth users use the database `authenticated` role, without staff rights;
+the admin boundary remains closed. An owned-row test still needs an approved
+ownership column, restrictive RLS/grants, a manually applied migration, and live
+allow/deny verification. Future financial effects must be calculated/validated by
+protected backend operations rather than trusted from browser calculations.
+
 ## Shared UI
 
 Import controls directly from `src/components/ui/`. Layout dimensions and variants reference the local Figma export; repository requirements control tokens, accessibility, and behavior. `ui.css` uses the tokens in `index.css`, responsive wrapping/grid layouts, and visible keyboard focus. Roboto is served from bundled Fontsource assets without a Google Fonts request.

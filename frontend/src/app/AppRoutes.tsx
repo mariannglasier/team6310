@@ -12,6 +12,7 @@ import {
   NotFoundPage,
 } from '../pages/public/InformationPages'
 import { LandingPage } from '../pages/public/LandingPage'
+import { IntegrationTestPage } from '../pages/development/IntegrationTestPage'
 import { AdminRouteBoundary } from './AdminRouteBoundary'
 import { paths } from './paths'
 
@@ -19,6 +20,12 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
+        {import.meta.env.DEV && (
+          <Route
+            path="/dev/integration-test"
+            element={<IntegrationTestPage />}
+          />
+        )}
         <Route path={paths.home} element={<LandingPage />} />
         <Route path={paths.learn} element={<LearnPage />} />
         <Route path={paths.donate} element={<DonatePage />} />
