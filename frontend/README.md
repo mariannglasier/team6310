@@ -13,6 +13,22 @@ On PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`. See the [root
 
 Public placeholders run without Supabase credentials. Before using a backend service, copy `.env.example` to `.env.local` and supply the development project's URL and publishable key. Local environment files are ignored by Git. Never put a privileged key in frontend configuration. `services/supabase.ts` lazily loads the existing validated client in `lib/supabaseClient.ts`.
 
+For an explicit read-only connectivity diagnostic, start Vite, open the local page,
+and run this in the browser console:
+
+```js
+const { checkSupabaseConnection } =
+  await import('/src/services/checkSupabaseConnection.ts')
+await checkSupabaseConnection()
+```
+
+This reuses the configured client to list Storage buckets, returning only success
+and HTTP status, never bucket metadata or configuration. It creates no resources
+and does not run at application startup. Success verifies this API request, even
+when no buckets exist; it does not verify application tables or RLS. A 401/403
+indicates a credentials/access rejection; a null status means no HTTP status was
+available. Client initialization rejects missing configuration before the request.
+
 ```sh
 npm run format:check
 npm run lint
