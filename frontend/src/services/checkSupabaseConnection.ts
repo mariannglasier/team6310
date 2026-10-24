@@ -8,6 +8,6 @@ export async function checkSupabaseConnection() {
 
   // Do not return bucket metadata, configuration, or raw server error messages.
   return error
-    ? { ok: false, status: error.statusCode ?? null }
+    ? { ok: false, status: error.status != null ? String(error.status) : null }
     : { ok: true, status: '200' }
 }

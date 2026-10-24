@@ -21,7 +21,7 @@ it('reports success without returning bucket metadata', async () => {
 
 it('returns only the status on access rejection', async () => {
   listBuckets.mockResolvedValue({
-    error: { statusCode: '403', message: 'raw' },
+    error: { status: 403, statusCode: 'AccessDenied', message: 'raw' },
   })
   expect(await checkSupabaseConnection()).toEqual({ ok: false, status: '403' })
 })
