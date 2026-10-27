@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { Navigation } from '../components/ui/Navigation'
-import { paths } from '../app/paths'
+import { isStagePath, paths } from '../app/paths'
 import { externalLinks } from '../app/externalLinks'
 import cacLogo from '../assets/cac-logo.png'
 import './AppLayout.css'
@@ -9,6 +9,8 @@ import './AppLayout.css'
 export function AppLayout() {
   const { pathname } = useLocation()
   const isLanding = pathname === paths.home
+  // Every simulation page sits on the scenic stage between header and footer.
+  const isStage = isStagePath(pathname)
   const previousPath = useRef(pathname)
   useEffect(() => {
     const heading = document.querySelector<HTMLHeadingElement>('#page-heading')
@@ -18,39 +20,59 @@ export function AppLayout() {
   }, [pathname])
 
   return (
-    <div className={isLanding ? 'landing-shell app-shell' : 'app-shell'}>
+    <div
+      className={[
+        'app-shell',
+        isLanding && 'landing-shell',
+        isStage && 'app-shell--stage',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <header className="site-header">
-        <Link
-          className="site-title landing-brand"
-          to={paths.home}
-          aria-label="CAC Poverty Simulation"
-        >
-          <img
-            src={cacLogo}
-            width="128"
-            height="64"
-            alt="Community Assistance Center"
+      <div className="app-viewport">
+        <header className="site-header">
+          <Link
+            className="site-title landing-brand"
+            to={paths.home}
+            aria-label="CAC Poverty Simulation"
+          >
+            <img
+              src={cacLogo}
+              width="128"
+              height="64"
+              alt="Community Assistance Center"
+            />
+          </Link>
+          <Navigation
+            label="Main navigation"
+            items={[
+              {
+                to: externalLinks.learn,
+                label: 'Learn About CAC',
+                external: true,
+              },
+              { to: paths.data, label: 'Explore Data' },
+              { to: externalLinks.donate, label: 'Donate', external: true },
+            ]}
           />
-        </Link>
-        <Navigation
-          label="Main navigation"
-          items={[
-            {
-              to: externalLinks.learn,
-              label: 'Learn About CAC',
-              external: true,
-            },
-            { to: paths.data, label: 'Explore Data' },
-            { to: externalLinks.donate, label: 'Donate', external: true },
-          ]}
-        />
-      </header>
-      <main id="main-content" tabIndex={-1}>
-        <Outlet />
-      </main>
+        </header>
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className={isStage ? 'stage' : undefined}
+        >
+          {isStage ? (
+            <div className="stage__panel">
+              <Outlet />
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </main>
+      </div>
       <footer className="site-footer landing-footer">
         <div className="landing-footer__brand">
           <Link to={paths.home} aria-label="Return to landing page">

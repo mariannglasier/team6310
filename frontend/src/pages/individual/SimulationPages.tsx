@@ -1,55 +1,77 @@
-import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { HouseholdCarousel } from '../../components/simulation/HouseholdCarousel'
 import { PlaceholderPage } from '../../components/PlaceholderPage'
-import { Button } from '../../components/ui/Button'
-import {
-  ensureParticipantSession,
-  ParticipantSessionError,
-} from '../../services/participantSession'
+import { Button, ButtonLink } from '../../components/ui/Button'
+import { PageSection } from '../../components/ui/PageSection'
+import { SetupProgress } from '../../components/ui/SetupProgress'
+import { useFitScale } from '../../hooks/useFitScale'
+import { useHouseholds } from '../../hooks/useHouseholds'
+import { paths } from '../../app/paths'
+import { useSetup } from '../../state/setupContext'
+
+// Household choices come from approved published content. Selecting one is
+// temporary UI state: it creates no run, locks nothing, and changes no finances.
+// Jobs are not chosen here; employment decisions start on Day 1.
+function HouseholdChoices({
+  selectedId,
+  onSelect,
+}: {
+  selectedId: string | null
+  onSelect: (personaId: string) => void
+}) {
+  const { state, retry } = useHouseholds()
+  if (state.status === 'loading')
+    return <p aria-live="polite">Loading households…</p>
+  if (state.status === 'error')
+    return (
+      <div>
+        <p role="alert">{state.message}</p>
+        <Button variant="secondary" onClick={retry}>
+          Retry loading households
+        </Button>
+      </div>
+    )
+  if (state.status === 'empty')
+    return <p>No households have been published yet.</p>
+  return (
+    <HouseholdCarousel
+      personas={state.households.personas}
+      selectedId={selectedId}
+      onSelect={onSelect}
+    />
+  )
+}
 
 export function IndividualPage() {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
-    'idle',
-  )
-  const [message, setMessage] = useState('')
-  async function prepareSession() {
-    setStatus('loading')
-    setMessage('Preparing participant session…')
-    try {
-      await ensureParticipantSession()
-      setStatus('ready')
-      setMessage(
-        'Participant session is ready. No simulation run has been created.',
-      )
-    } catch (error) {
-      setStatus('error')
-      setMessage(
-        error instanceof ParticipantSessionError
-          ? error.message
-          : 'Unable to prepare participant session. Please retry or contact the facilitator.',
-      )
-    }
-  }
+  const { selectedId, select } = useSetup()
+  const navigate = useNavigate()
+  const [fitTarget, fitStyle] = useFitScale<HTMLDivElement>()
   return (
-    <PlaceholderPage title="Individual simulation">
-      <p>
-        Household setup and individual gameplay are not implemented yet. Opening
-        this page does not start a run.
-      </p>
-      <p>
-        Prepare an anonymous participant session without entering credentials.
-        This browser remembers the session; clearing browser storage can remove
-        access to future saved progress. Use a separate browser profile for each
-        participant sharing a device.
-      </p>
-      <Button
-        onClick={prepareSession}
-        loading={status === 'loading'}
-        disabled={status === 'ready'}
+    <div ref={fitTarget} style={fitStyle} className="household-page">
+      <PageSection
+        title="Every household has a story."
+        eyebrow="Individual simulation"
+        leading={<SetupProgress step={1} />}
       >
-        Prepare participant session
-      </Button>
-      <p role={status === 'error' ? 'alert' : 'status'}>{message}</p>
-    </PlaceholderPage>
+        <p className="household-page__intro">
+          Choose the household whose finances you will manage for 30 days.
+          Choosing a household does not start the simulation, and you can review
+          your setup before it is locked.
+        </p>
+        <HouseholdChoices selectedId={selectedId} onSelect={select} />
+        <div className="household-actions">
+          <ButtonLink to={paths.home} variant="secondary">
+            Back
+          </ButtonLink>
+          <Button
+            disabled={selectedId === null}
+            onClick={() => navigate(paths.review)}
+          >
+            Continue
+          </Button>
+        </div>
+      </PageSection>
+    </div>
   )
 }
 export function ResultsPage() {

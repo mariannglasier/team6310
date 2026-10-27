@@ -30,21 +30,23 @@ test('legacy introduction URL redirects to the individual placeholder without th
     '/simulation/individual',
   )
   expect(
-    screen.getByRole('heading', { name: 'Individual simulation' }),
+    screen.getByRole('heading', { name: 'Every household has a story.' }),
   ).toBeInTheDocument()
   expect(
     screen.queryByText(/introduction and mode selection experience/i),
   ).not.toBeInTheDocument()
+  // Setup begins at household selection; there is no Introduction step.
   expect(
-    screen.queryByRole('list', { name: /Setup step/ }),
-  ).not.toBeInTheDocument()
+    screen.getByRole('list', { name: 'Setup step 1 of 2' }),
+  ).toBeInTheDocument()
+  expect(screen.queryByText('Introduction')).not.toBeInTheDocument()
 })
 test.each([
   ['/', 'Financial hardship can happen to anyone. How would you respond?'],
   ['/learn', 'Learn About CAC'],
   ['/donate', 'Donate'],
-  ['/simulation/introduction', 'Individual simulation'],
-  ['/simulation/individual', 'Individual simulation'],
+  ['/simulation/introduction', 'Every household has a story.'],
+  ['/simulation/individual', 'Every household has a story.'],
   ['/dev/integration-test', 'Temporary Supabase integration test'],
   ['/simulation/results', 'Simulation results'],
   ['/group/host', 'Host a Group'],
@@ -67,7 +69,7 @@ test('Play navigation and browser history restore pages and move focus', async (
     }),
   )
   expect(
-    screen.getByRole('heading', { name: 'Individual simulation' }),
+    screen.getByRole('heading', { name: 'Every household has a story.' }),
   ).toHaveFocus()
   await user.click(screen.getByRole('button', { name: 'History back' }))
   expect(
@@ -77,10 +79,10 @@ test('Play navigation and browser history restore pages and move focus', async (
   ).toHaveFocus()
   await user.click(screen.getByRole('button', { name: 'History forward' }))
   expect(
-    screen.getByRole('heading', { name: 'Individual simulation' }),
+    screen.getByRole('heading', { name: 'Every household has a story.' }),
   ).toBeInTheDocument()
   expect(
-    screen.getByRole('heading', { name: 'Individual simulation' }),
+    screen.getByRole('heading', { name: 'Every household has a story.' }),
   ).toBeInTheDocument()
 })
 test.each([
@@ -150,7 +152,7 @@ test('keyboard navigation reaches the skip link and page navigation', async () =
   ).toHaveFocus()
   await user.keyboard('{Enter}')
   expect(
-    screen.getByRole('heading', { name: 'Individual simulation' }),
+    screen.getByRole('heading', { name: 'Every household has a story.' }),
   ).toHaveFocus()
 })
 
@@ -271,5 +273,34 @@ test.each([
     expect(
       screen.getByRole('link', { name: 'Return to landing page' }),
     ).toHaveAttribute('href', '/')
+  },
+)
+
+test('review without a selected household returns to household selection', () => {
+  renderRoute('/simulation/review')
+  expect(screen.getByLabelText('Current path')).toHaveTextContent(
+    '/simulation/individual',
+  )
+})
+test.each(['/simulation/individual', '/simulation/results'])(
+  'simulation page %s sits on the scenic stage between the header and footer',
+  (path) => {
+    const { container } = renderRoute(path)
+    const stage = container.querySelector('main.stage')
+    expect(stage).not.toBeNull()
+    expect(stage?.querySelector(':scope > .stage__panel')).not.toBeNull()
+    expect(screen.getByRole('banner')).not.toContainElement(
+      stage as HTMLElement,
+    )
+    expect(screen.getByRole('contentinfo')).not.toContainElement(
+      stage as HTMLElement,
+    )
+  },
+)
+test.each(['/', '/learn', '/group/host', '/unknown/path'])(
+  'non-simulation page %s does not use the scenic stage',
+  (path) => {
+    const { container } = renderRoute(path)
+    expect(container.querySelector('.stage, .stage__panel')).toBeNull()
   },
 )

@@ -1,0 +1,454 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Page ---------- */
+/* The page fills the white stage panel. Its heading block is centered, and the
+   whole page block scales uniformly (see useFitScale) so the setup fits the
+   screen without changing the layout of the cards. */
+.household-page {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 100%;
+  max-width: 80rem;
+  margin: auto;
+}
+.household-page > section {
+  display: flex;
+  flex-direction: column;
+}
+.household-page > section > * {
+  flex: none;
+}
+.household-page .ui-progress {
+  margin-block: 0 0.75rem;
+}
+.household-page .placeholder-label,
+.household-page h1,
+.household-page__intro {
+  text-align: center;
+}
+.household-page .placeholder-label {
+  margin: 0;
+}
+.household-page h1 {
+  margin: 0.125rem 0 0.5rem;
+  font-size: clamp(1.75rem, 4.5vw, 3rem);
+}
+.household-page__intro {
+  max-width: 44rem;
+  margin: 0 auto 0.5rem;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+.household-page__status {
+  margin: 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+.household-page__status:not(:empty) {
+  margin-top: 0.5rem;
+}
+.household-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* ---------- Carousel ---------- */
+.household-carousel {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+  grid-template-areas:
+    'previous viewport next'
+    '. dots .';
+  align-items: center;
+  gap: 0 0.75rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.household-carousel__controls {
+  display: contents;
+}
+.household-carousel__viewport {
+  grid-area: viewport;
+  min-width: 0;
+  padding: 1.25em 0.5rem 1.5em;
+  overflow: hidden;
+}
+.household-carousel__track {
+  display: grid;
+  isolation: isolate;
+}
+.household-carousel__slide {
+  grid-area: 1 / 1;
+  justify-self: center;
+  width: 58%;
+  min-width: 0;
+  transition:
+    transform 320ms ease,
+    opacity 320ms ease,
+    visibility 320ms;
+}
+.household-carousel__slide.is-center {
+  z-index: 3;
+}
+.household-carousel__slide.is-previous,
+.household-carousel__slide.is-next {
+  z-index: 1;
+  opacity: 0.55;
+  cursor: pointer;
+}
+.household-carousel__slide.is-previous {
+  transform: translateX(-52%) rotate(-3deg) scale(0.88);
+}
+.household-carousel__slide.is-next {
+  transform: translateX(52%) rotate(3deg) scale(0.88);
+}
+.household-carousel__slide.is-hidden {
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.household-carousel__arrow {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.household-carousel__arrow:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.household-carousel__arrow:focus-visible,
+.household-carousel__dot:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.household-carousel__arrow--previous {
+  grid-area: previous;
+}
+.household-carousel__arrow--next {
+  grid-area: next;
+}
+.household-carousel__dots {
+  grid-area: dots;
+  display: flex;
+  justify-content: center;
+}
+.household-carousel__dot {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.household-carousel__dot::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 0.625rem;
+  height: 0.625rem;
+  translate: -50% -50%;
+  border: 2px solid var(--text-muted);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  transition: width 160ms ease;
+}
+.household-carousel__dot.is-active::before {
+  width: 1.75rem;
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+/* ---------- Card ---------- */
+.household-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: 0.75em;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+  cursor: pointer;
+}
+.household-card.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-surface);
+  box-shadow:
+    0 0 0 2px var(--accent),
+    0 8px 24px rgb(0 0 0 / 12%);
+}
+.household-card:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+.household-card input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.household-photo {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 11.5em;
+  min-height: 10.625em;
+  border-bottom: 1px solid var(--divider);
+}
+.household-photo svg {
+  display: block;
+  width: min(100%, 18.75em);
+  height: 100%;
+}
+.household-photo--blue {
+  background: #dcebf9;
+}
+.household-photo--rose {
+  background: #fbe5e3;
+}
+.household-photo--green {
+  background: #e4ead9;
+}
+.household-photo--violet {
+  background: #ebe4f5;
+}
+.household-photo--neutral {
+  background: #e9e9e9;
+}
+.household-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5em;
+  min-width: 0;
+  padding: 1em 1.25em 1.25em;
+}
+.household-name {
+  font-size: 1.75em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.household-tagline {
+  color: var(--accent);
+  font-weight: 700;
+}
+.household-detail {
+  color: var(--text-muted);
+}
+.household-detail b {
+  color: var(--text);
+}
+.household-bio {
+  margin-bottom: 0.5em;
+  padding-top: 0.5em;
+  border-top: 1px solid var(--divider);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.household-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: center;
+  max-width: 100%;
+  min-height: 2.75rem;
+  margin-top: auto;
+  padding: 0.5rem 1.375rem;
+  border: 2px solid var(--primary);
+  border-radius: 1.5rem;
+  background: var(--primary);
+  color: var(--surface);
+  font-size: max(0.875rem, 0.875em);
+  font-weight: 700;
+  text-align: center;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+.household-card.is-selected .household-choice {
+  border-color: var(--accent);
+  background: var(--surface);
+  color: var(--accent);
+}
+.household-choice__check {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* ---------- Avatar artwork ---------- */
+.persona-avatar .avatar-ground {
+  fill: rgb(255 255 255 / 55%);
+}
+.persona-avatar .avatar-halo {
+  fill: rgb(255 255 255 / 70%);
+}
+.persona-avatar .avatar-halo--small {
+  fill: rgb(255 255 255 / 55%);
+}
+.persona-avatar .avatar-shirt--alex {
+  fill: #3b7bb8;
+}
+.persona-avatar .avatar-hoodie {
+  fill: #2d6199;
+}
+.persona-avatar .avatar-shirt--jordan {
+  fill: #c84b5f;
+}
+.persona-avatar .avatar-shirt--maya {
+  fill: #f3a330;
+}
+.persona-avatar .avatar-shirt--patricia {
+  fill: #789163;
+}
+.persona-avatar .avatar-shirt--sofia {
+  fill: #6a4c93;
+}
+.persona-avatar .avatar-shirt--generic {
+  fill: #8a8f98;
+}
+.persona-avatar .avatar-blouse {
+  fill: #fff;
+}
+.persona-avatar .avatar-skin--deep {
+  fill: #875137;
+}
+.persona-avatar .avatar-skin--warm {
+  fill: #d39367;
+}
+.persona-avatar .avatar-skin--gold {
+  fill: #b86f3d;
+}
+.persona-avatar .avatar-skin--light {
+  fill: #e4b38e;
+}
+.persona-avatar .avatar-skin--tan {
+  fill: #c68a5e;
+}
+.persona-avatar .avatar-hair--dark {
+  fill: #24252b;
+}
+.persona-avatar .avatar-hair--brown {
+  fill: #814b32;
+}
+.persona-avatar .avatar-hair--curly {
+  fill: #2f2631;
+}
+.persona-avatar .avatar-hair--silver {
+  fill: #a3a5aa;
+}
+.persona-avatar .avatar-eye {
+  fill: #24252b;
+}
+.persona-avatar .avatar-earring {
+  fill: #e0b04a;
+}
+.persona-avatar .avatar-line {
+  fill: none;
+  stroke: #24252b;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.persona-avatar .avatar-line--thin {
+  stroke-width: 1.75;
+}
+.persona-avatar .avatar-line--light {
+  stroke: #fff;
+  stroke-width: 2;
+}
+.persona-avatar .avatar-necklace {
+  fill: none;
+  stroke: #e0b04a;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 56.25rem) {
+  .household-carousel__slide {
+    width: 74%;
+  }
+  .household-carousel__slide.is-previous {
+    transform: translateX(-38%) rotate(-3deg) scale(0.88);
+  }
+  .household-carousel__slide.is-next {
+    transform: translateX(38%) rotate(3deg) scale(0.88);
+  }
+}
+@media (max-width: 40rem) {
+  /* Phones: one card at a time, controls underneath. */
+  .household-carousel {
+    grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+    grid-template-areas:
+      'viewport viewport viewport'
+      'previous dots next';
+  }
+  .household-carousel__viewport {
+    padding-inline: 0.25rem;
+  }
+  .household-carousel__slide {
+    width: 100%;
+  }
+  .household-carousel__slide.is-previous,
+  .household-carousel__slide.is-next {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .household-photo {
+    height: 8.5em;
+    min-height: 0;
+  }
+  .household-name {
+    font-size: 1.375em;
+  }
+  .household-actions .ui-button {
+    flex: 1 1 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .household-carousel__slide,
+  .household-choice,
+  .household-carousel__dot::before {
+    transition: none;
+  }
+}

@@ -16,6 +16,28 @@ export interface Persona extends EditionRecord {
   readonly description: string
   readonly startingBalance: UsdCents
 }
+// Read model of an approved, active job in a published edition. Weekly income is
+// the database's generated value (round(median hourly wage x hours, 2)); the client
+// never recomputes it and never treats a job as hired without a protected operation.
+export interface Job extends EditionRecord {
+  readonly socCode: string
+  readonly title: string
+  readonly description: string | null
+  readonly hoursPerWeek: number
+  readonly medianHourlyWage: UsdCents
+  readonly weeklyGrossIncome: UsdCents
+  readonly wageYear: number
+  readonly areaName: string
+  readonly wageSourceUrl: string
+  // CAC-authored free-text note from simulation_requirements, if present.
+  readonly requirementsNote: string | null
+}
+// The newest published edition and its approved households (personas).
+export interface PublishedHouseholds {
+  readonly versionId: string
+  readonly versionNumber: number
+  readonly personas: readonly Persona[]
+}
 export interface Scenario extends EditionRecord {
   readonly categoryId: string
   readonly title: string

@@ -45,8 +45,8 @@ For the isolated development-only owned-row test at `/dev/integration-test`, see
 [manual migration and verification instructions](../docs/integration-test.md).
 The migration is not applied automatically; mocked tests do not establish RLS.
 
-At `/simulation/individual`, select **Prepare participant session**. No credentials,
-run, or application rows are created. `services/participantSession.ts` reuses the
+The individual page no longer has a session button. The anonymous participant session helper, `services/participantSession.ts`, is still exercised by the development-only integration page. It creates no credentials,
+run, or application rows, and reuses the
 central client and SDK-managed storage/refresh. It verifies an existing anonymous
 user, creates a session only if none exists, and shares concurrent requests.
 Rendering, navigation, and startup do not sign in automatically. Retries recheck
@@ -88,7 +88,7 @@ Import controls directly from `src/components/ui/`. Layout dimensions and varian
 | `Form`, `TextField`, `TextAreaField`, `SelectField` | Native form semantics and input props; fields require a visible label. Optional hints/errors are associated with unique IDs. Use select children for options.                                                                |
 | `RadioGroup`                                        | Controlled native radio cards with explicit `value: string \| null`, visible selected text, disabled/required states, and group errors. Selection invokes only the caller's callback.                                        |
 | `Dialog`                                            | Controlled `open`, `title`, `description`, `onDismiss`, and optional children. Native modal behavior; Close/Escape request dismissal. Parent must set `open` false. Focus starts on Close and returns to the trigger.        |
-| `SetupProgress`                                     | `step={1 \| 2 \| 3 \| 4}` for Introduction, Household, CAC support, Review. Noninteractive; states are expressed in text and `aria-current`.                                                                                 |
+| `SetupProgress`                                     | `step={1 \| 2 \| 3}` for Household, CAC support, Review (there is no Introduction step). Noninteractive; states are expressed in text and `aria-current`.                                                                    |
 | `Navigation`                                        | Labeled router navigation from `{to, label}` items with active-link semantics. Used by `AppLayout`.                                                                                                                          |
 | `PageSection`                                       | One page-level heading per route; supports an optional eyebrow. `PlaceholderPage` wraps it for unfinished pages.                                                                                                             |
 
@@ -111,6 +111,7 @@ The field components present caller-provided validation errors; they do not impl
 - `state/simulationState.ts`: a pure UI reducer with restoration status, selected choice, error, and committed snapshot. Selection does not change money, decisions, assistance use, or progress. Loading/errors prevent selection; unknown choices and selections in ended runs are ignored. Request IDs prevent stale restore results from replacing newer state.
 - `hooks/useSimulation.ts`: explicit restore and select callbacks; no automatic network calls or local-storage persistence. Restoration clears temporary choices on success and preserves the prior committed snapshot on failure.
 - `services/simulationService.ts`: initial start/restore/submit interface. The default implementation raises `ServiceUnavailableError`; no method fabricates a successful run. Submit accepts IDs, edition, and request ID, never a client balance.
+- `services/contentService.ts`: read-only loaders for the newest published edition: `loadHouseholds()` (personas; used by the persona-selection page) and `loadJobs(versionId)` (approved jobs; reserved for the Day 1 job step, not called by setup). Explicit columns, money converted to integer cents, validation, safe errors. `hooks/useHouseholds.ts` loads households on mount for `components/simulation/HouseholdCarousel`, a responsive stacked carousel (arrows, dots, ArrowLeft/ArrowRight, swipe; single card on phones) of radio cards with illustrated `PersonaAvatar` artwork chosen by household name (unknown names get a neutral fallback). Selecting a household is temporary UI state: it creates no run and changes no finances; Continue is disabled until a household is chosen and does not yet advance because CAC support selection is not built. `JobCatalog` is retained for the Day 1 step. The service relies on database Row Level Security for exposure; hiring and pay remain future protected operations.
 - `services/supabase.ts`: centralized lazy client entry point. Final RPC names, DTO validation, content relationships, and error mapping belong in future adapters here.
 
 The read models and service contract are scaffolding, not finalized SQL/API schemas. Day ranges, edition/choice relationships, ownership, current scenario, support eligibility, affordability, and atomic/idempotent updates must be validated at the protected backend boundary. Extend the types from approved specifications as that work is implemented; never treat prototype fixtures as approved inputs. Browser state or a run ID alone is not authorization.

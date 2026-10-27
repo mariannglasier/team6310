@@ -78,7 +78,7 @@ Backend response validation, ownership, eligibility, edition validation, atomic 
 
 ### Individual simulation
 
-Setup proceeds through Introduction, Household, CAC Support, and Review. Household and support selections are explicit. Review allows edits before confirmation; confirmation starts a new run at Day 1 and locks those settings.
+Setup proceeds through Household and Review. The household selection is explicit. CAC support is deferred: the client will offer it as an option after players complete a regular run without it, so runs are currently without support. Review allows the household to be changed before confirmation; confirmation starts a new run and locks the setup. The household selection is temporary frontend state until a run is created.
 
 The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. Scheduled scenarios and income occurrences use one authoritative, idempotent charge/credit path. A required payable event that cannot be paid ends the run with its actual day and reason. The interface displays a successful inline recap only after commitment succeeds.
 
