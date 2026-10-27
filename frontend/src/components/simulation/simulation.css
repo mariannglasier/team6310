@@ -1,0 +1,44 @@
+.job-catalog {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.job-card {
+  background: #fff;
+  border: 1px solid #767676;
+  border-radius: 0.5rem;
+  color: #111;
+  padding: 1rem;
+}
+
+.job-card h3 {
+  margin-top: 0;
+}
+
+.job-card dl {
+  margin: 0.75rem 0;
+}
+
+.job-card dl div {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.job-card dt {
+  color: #595959;
+}
+
+.job-card dd {
+  font-weight: 700;
+  margin: 0;
+}
+
+.job-card__source {
+  color: #595959;
+  font-size: 0.875rem;
+}

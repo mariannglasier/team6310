@@ -1,9 +1,13 @@
 import './ui.css'
 
-const steps = ['Introduction', 'Household', 'CAC support', 'Review'] as const
-export function SetupProgress({ step }: { step: 1 | 2 | 3 | 4 }) {
+// CAC support is not part of setup yet; it returns as a later option.
+const steps = ['Household', 'Review'] as const
+export function SetupProgress({ step }: { step: 1 | 2 }) {
   return (
-    <ol className="ui-progress" aria-label={`Setup step ${step} of 4`}>
+    <ol
+      className="ui-progress"
+      aria-label={`Setup step ${step} of ${steps.length}`}
+    >
       {steps.map((label, index) => (
         <li
           key={label}

@@ -15,5 +15,11 @@ export default defineConfig({
     command: 'npm run dev -- --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: false,
+    // Local placeholder project so UI tests never reach a real database; the
+    // specs that need data mock these requests.
+    env: {
+      VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
+      VITE_SUPABASE_PUBLISHABLE_KEY: 'e2e-placeholder-key',
+    },
   },
 })

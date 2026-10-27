@@ -1,0 +1,104 @@
+.review-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 30em) minmax(0, 20em);
+  justify-content: center;
+  align-items: start;
+  gap: 1.25em;
+  margin-top: 0.5rem;
+}
+.review-profile,
+.review-next {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--divider);
+  border-radius: 0.75em;
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+}
+.review-profile .household-photo {
+  position: relative;
+}
+.review-profile__badge {
+  position: absolute;
+  top: 0.75em;
+  left: 0.75em;
+  padding: 0.125em 0.625em;
+  border: 1px solid var(--divider);
+  border-radius: 1em;
+  background: var(--surface);
+  font-size: 0.75em;
+  font-weight: 700;
+}
+.review-profile__body {
+  display: grid;
+  gap: 0.75em;
+  padding: 1em 1.25em 1.25em;
+}
+.review-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1em;
+}
+.review-heading h2,
+.review-next h2 {
+  margin: 0.125em 0 0;
+  font-size: 1.5em;
+  line-height: 1.2;
+}
+.review-heading p {
+  margin: 0.25em 0 0;
+}
+.review-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.8125em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.review-change {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: 700;
+}
+.review-budget {
+  padding-block: 0.75em;
+  border-block: 1px solid var(--divider);
+}
+.review-budget strong {
+  display: block;
+  font-size: 1.75em;
+  line-height: 1.2;
+}
+.review-story {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.review-next {
+  display: grid;
+  gap: 0.5em;
+  padding: 1.25em;
+  border-color: var(--accent);
+  background: var(--accent-surface);
+}
+.review-next p {
+  margin: 0;
+  line-height: 1.5;
+}
+.review-next__meta {
+  padding-top: 0.75em;
+  border-top: 1px solid var(--divider);
+  color: var(--text-muted);
+  font-size: 0.875em;
+}
+.review-message {
+  text-align: center;
+}
+@media (max-width: 48rem) {
+  .review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

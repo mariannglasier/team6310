@@ -1,0 +1,15 @@
+# Python tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local environment files (never commit real credentials)
+.env
+.env.local
+.env.*.local
+integrations/**/.env
+
+# Downloaded BLS source files
+integrations/bls_oews/data/

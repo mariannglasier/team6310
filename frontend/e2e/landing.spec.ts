@@ -85,7 +85,7 @@ test('keyboard and Play navigation reach the individual placeholder', async ({
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/simulation\/individual$/)
   await expect(
-    page.getByRole('heading', { name: 'Individual simulation' }),
+    page.getByRole('heading', { name: 'Every household has a story.' }),
   ).toBeFocused()
 })
 
@@ -128,7 +128,7 @@ test('landing group links and reserved data destination are connected', async ({
 test('placeholder header matches landing and both logos navigate home', async ({
   page,
 }) => {
-  await page.goto('/simulation/individual')
+  await page.goto('/simulation/results')
   await expect(
     page.getByRole('contentinfo').getByRole('heading', { name: 'Contact CAC' }),
   ).toBeVisible()
@@ -137,7 +137,7 @@ test('placeholder header matches landing and both logos navigate home', async ({
     .getByRole('link', { name: 'Return to landing page' })
     .click()
   await expect(page).toHaveURL('http://127.0.0.1:4173/')
-  await page.goto('/simulation/individual')
+  await page.goto('/simulation/results')
   await expect(page.getByRole('navigation').getByRole('link')).toHaveText([
     'Learn About CAC',
     'Explore Data',

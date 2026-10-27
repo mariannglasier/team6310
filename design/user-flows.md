@@ -18,8 +18,7 @@ This standing specification defines user journeys and state transitions for indi
 ```mermaid
 flowchart TD
     L["Landing"] --> H["Choose household"]
-    H --> C["Choose CAC support"]
-    C --> R["Review and confirm"]
+    H --> R["Review and confirm"]
     R --> D["Make a scenario decision"]
     D --> A["Review inline recap"]
     A --> N{"Day 30 completed?"}
@@ -36,9 +35,9 @@ flowchart TD
 
 1. Start simulation on the landing page opens household/persona selection directly. Until that screen is implemented, it opens the Individual simulation placeholder. No intermediate Introduction page is shown; the legacy introduction URL redirects to the individual route.
 2. No household is selected by default. Select one approved profile to enable Continue.
-3. Choose with or without CAC support before starting. Require an explicit choice and explain that assistance appears only in relevant situations.
-4. Review displays the selected household, starting money, and support setting. Edit actions return to the appropriate setup step while preserving the other choices.
-5. Confirm Selection initializes a fresh run in the pre-game stage with the selected persona, support setting, and approved published `version_id`. The run's weekly income starts at $0; changing employment and income state is run-specific.
+3. Continue opens Review directly. CAC support is not a setup step for now: the client decided it will be offered as an option after players complete a regular run without it, and its design is a later task. Until then every run is without support (assistance choices are not offered).
+4. Review displays the selected household, starting money, and its story, with a Change action that returns to household selection while preserving the choice. Review has no run-creation behavior until the protected start operation is connected; Confirm Selection reports that no run was created.
+5. Confirm Selection initializes a fresh run in the pre-game stage with the selected persona, the run's support setting (currently without support), and approved published `version_id`. The run's weekly income starts at $0; changing employment and income state is run-specific.
 6. Once started, the player cannot inspect or edit setup. The active run offers End Simulation rather than Back to Review.
 
 Setup Back actions preserve choices. Changing a household before confirmation uses that household's starting values when the run is initialized; it does not create a financial transaction.

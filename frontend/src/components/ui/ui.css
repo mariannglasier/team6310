@@ -150,8 +150,9 @@
 }
 .ui-progress {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 12rem));
+  justify-content: center;
+  gap: 1rem 3rem;
   list-style: none;
   padding: 0;
   margin-block: 1.5rem;
@@ -211,7 +212,11 @@
 }
 @media (max-width: 37.5rem) {
   .ui-progress {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .ui-progress li {
+    flex-direction: column;
+    text-align: center;
   }
   .ui-dialog__actions .ui-button {
     width: 100%;

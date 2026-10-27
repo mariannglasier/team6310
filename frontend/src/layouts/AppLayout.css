@@ -175,3 +175,61 @@ main {
     gap: 1.75rem;
   }
 }
+
+/* Scenic stage (all simulation pages). The viewport wrapper makes header plus
+   stage exactly one screen tall; the footer follows below the fold. The image
+   fills only the main area, never the header or footer, and the white panel
+   keeps all content on a solid surface. */
+.app-viewport {
+  display: contents;
+}
+.app-shell--stage .app-viewport {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  min-height: 0;
+}
+.app-shell--stage .site-header {
+  flex: none;
+  padding-block: 0.5rem;
+}
+@media (max-height: 56rem) {
+  .app-shell--stage .landing-brand img {
+    width: 96px;
+    height: 48px;
+  }
+}
+.app-shell--stage main.stage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(0.5rem, 3.5vh, 2.5rem) clamp(0.5rem, 5vw, 5rem);
+  background:
+    linear-gradient(rgb(219 241 249 / 12%), rgb(219 241 249 / 12%)),
+    url('../assets/scenic-simulation-background.jpg') center bottom / cover
+      no-repeat;
+}
+.stage__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  max-width: 80rem;
+  min-height: 0;
+  margin-inline: auto;
+  padding: clamp(0.75rem, 2.5vh, 2rem) clamp(0.75rem, 2.5vw, 2.5rem);
+  overflow-y: auto;
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: 0 24px 54px rgb(24 67 86 / 24%);
+}
+@media (max-width: 40rem) {
+  .stage__panel {
+    border-radius: 0.75rem;
+  }
+}

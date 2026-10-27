@@ -139,14 +139,15 @@ test('disabled radio groups do not permit selection', async () => {
   expect(onChange).not.toHaveBeenCalled()
 })
 
-test('progress includes all four specified steps and identifies completed/current steps', () => {
-  render(<SetupProgress step={3} />)
+test('progress includes the two setup steps and identifies completed/current steps', () => {
+  render(<SetupProgress step={2} />)
+  expect(screen.getByRole('list', { name: 'Setup step 2 of 2' })).toBeVisible()
   const items = screen.getAllByRole('listitem')
-  expect(items).toHaveLength(4)
-  expect(items[0]).toHaveTextContent('IntroductionCompleted')
-  expect(items[1]).toHaveTextContent('HouseholdCompleted')
-  expect(items[2]).toHaveAttribute('aria-current', 'step')
-  expect(items[3]).toHaveTextContent('ReviewUpcoming')
+  expect(items).toHaveLength(2)
+  expect(items[0]).toHaveTextContent('HouseholdCompleted')
+  expect(items[1]).toHaveAttribute('aria-current', 'step')
+  expect(items[1]).toHaveTextContent('ReviewCurrent step')
+  expect(screen.queryByText('CAC support')).not.toBeInTheDocument()
 })
 
 // jsdom does not implement native modal lifecycle. These shims test our wiring;

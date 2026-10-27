@@ -10,7 +10,7 @@ React Router connects the responsive landing page and clearly labeled feature pl
 | `/learn` | CAC information; approved content/destination pending |
 | `/donate` | Donation; approved external destination pending |
 | `/simulation/introduction` | Legacy URL redirects to `/simulation/individual` |
-| `/simulation/individual` | Individual setup/gameplay |
+| `/simulation/individual` | Persona (household) selection, the first setup step; reads approved households from the published edition (read-only, no run is created). Job selection happens later on Day 1 |
 | `/simulation/results` | Results/summary |
 | `/group/host`, `/group/join` | Host and participant entry |
 | `/admin/login` | Employee sign-in; no credential collection yet |
@@ -136,3 +136,72 @@ Press `Ctrl + C` in the terminal to stop the server.
 **Port already in use:** Vite may automatically select another available port. Check the terminal for the correct URL.
 
 **PowerShell execution policy error (Windows):** If PowerShell blocks npm commands, use `npm.cmd install` and `npm.cmd run dev`, or run the commands in Command Prompt.
+
+## BLS wage synchronization
+
+`integrations/bls_oews/` keeps the eight CAC jobs' wages current from the U.S. Bureau of Labor Statistics Occupational Employment and Wage Statistics (OEWS). It updates draft `public.jobs` rows only. It never approves, activates, or publishes content, and it never touches personas, playthroughs, balances, or CAC-authored job fields. Design details: [docs/api.md](docs/api.md#implemented-job-wage-integration-draft-content-only).
+
+### Where the data comes from and how jobs map
+
+- Measure: median hourly wage, Atlanta-Sandy Springs-Roswell, GA metro (`12060`), cross-industry, latest annual OEWS release (reference month May). Official source: <https://www.bls.gov/oes/tables.htm>; reference profile: <https://data.bls.gov/oesprofile/>.
+- Automated path: the BLS Public Data API (the OEWS files on `bls.gov` reject scripted downloads with HTTP 403). The latest published year is detected at run time, not hardcoded.
+- Fallback: download the official OEWS metropolitan `.xlsx` (for example `MSA_M2025_dl.xlsx`) in a browser and pass `--file`.
+- Mapping (matched to `public.jobs` by `soc_code` and `version_id`): 35-3023 Fast Food Worker; 41-2011 Cashier; 41-2031 Retail Sales Associate; 53-7065 Warehouse Stocker; 37-2011 Janitor / Cleaner; 31-1120 Home Health / Personal Care Aide; 43-4051 Customer Service Representative; 43-9061 General Office Clerk. Edit `integrations/bls_oews/config.py` only with team approval.
+- Written fields: `median_hourly_wage`, `wage_year`, `wage_source_url` (the specific BLS series), `last_synced_at`. `weekly_gross_income` is computed by PostgreSQL from the wage and CAC-set `hours_per_week`. Unchanged rows are not rewritten, so repeated runs change nothing.
+
+### Run locally
+
+Requires Python 3.11+. From the repository root:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r integrations/bls_oews/requirements.txt
+python -m pytest integrations/bls_oews/tests -q
+
+# Fetch and validate only; nothing is written. Works without Supabase credentials
+# (database comparison is then skipped).
+python -m integrations.bls_oews.bls_oews_sync --dry-run
+
+# Compare against the database (still read-only) once credentials are set:
+python -m integrations.bls_oews.bls_oews_sync --dry-run
+
+# Live write to the latest draft version:
+python -m integrations.bls_oews.bls_oews_sync
+
+# Use a manually downloaded official file instead of the API:
+python -m integrations.bls_oews.bls_oews_sync --dry-run --file ~/Downloads/MSA_M2025_dl.xlsx
+```
+
+Options: `--version-id <uuid>` targets a specific content version; `--year` is required if the file name has no `M20YY`; `--source-url` sets provenance for `--file` runs. Exit codes: `0` success, `1` some wages were missing or invalid (others may still be updated), `2` missing configuration, `3` source/database error or protected-content violation.
+
+### Environment variables
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SUPABASE_URL` | Live runs and database dry-runs | Project URL (`https://<ref>.supabase.co`). |
+| `SUPABASE_SERVICE_ROLE_KEY` | Live runs and database dry-runs | Privileged server-side key. Never put it in `frontend/`, any `VITE_*` variable, Git, docs, or logs. |
+| `BLS_API_KEY` | Optional | Free BLS registration key; raises API limits. |
+
+For local runs, export them in your shell or keep them in an untracked file (for example `integrations/bls_oews/.env`, which `.gitignore` excludes) and load it with `set -a; source integrations/bls_oews/.env; set +a`. Use placeholders only in committed files.
+
+### Scheduled workflow
+
+`.github/workflows/bls_oews_sync.yml` runs at midnight `America/New_York` on the first day of each month (two UTC crons plus a local-time guard cover daylight saving) and on demand via **Actions > BLS OEWS wage sync > Run workflow** (defaults to dry run). It runs the importer tests, verifies that the secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` exist (failing visibly if not; optional `BLS_API_KEY`), then runs the sync and writes a change/error summary to the run page. If the latest content version is draft, its wages are updated in place. Content Version 1 is now published, so the next run that finds changed wages creates a new draft version (version 2) rather than editing it. If the latest version is published, a new draft version containing copies of the eight jobs is created (once; later runs reuse it), and the published version is untouched. A run fails when any occupation lacks a valid Atlanta median wage.
+
+### CAC administrator review and approval
+
+1. Open the workflow run summary and review the before/after wages and any errors or warnings.
+2. In Supabase, inspect the draft version's jobs and compare `wage_source_url` and `wage_year` with the BLS profile for Atlanta.
+3. Confirm `hours_per_week` and requirements, then set `reviewed_at`, `is_approved`, and (when ready for play) `is_active`. These are manual staff actions; the importer never sets them. A new draft's jobs start unapproved and inactive.
+4. Publishing a content version is a separate staff decision. Active and completed playthroughs stay pinned to their starting `version_id`.
+
+### Troubleshooting
+
+- `CONFIGURATION ERROR: Missing required environment variable(s)`: set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or GitHub Actions secrets).
+- `BLS API did not succeed` / `REQUEST_NOT_PROCESSED`: daily API limit or outage. Retry later, set `BLS_API_KEY`, or use `--file`.
+- HTTP 403 from `bls.gov`: expected for scripts; download the file in a browser and use `--file`.
+- `no valid <year> median hourly wage published` / suppressed (`*`, `#`): BLS did not publish a usable value for that occupation and area. The stored wage is left unchanged; ask CAC whether to choose another occupation.
+- `hourly median ... disagrees with annual median`: ambiguous source data was rejected; verify against the OEWS profile before proceeding.
+- `release ... is older than stored wage_year`: a stale release was ignored.
+- `published content is immutable`: the target version is published; omit `--version-id` or target a draft.
+- `no job row in version`: the importer never inserts jobs into an existing version; ask staff to add the missing CAC job row.

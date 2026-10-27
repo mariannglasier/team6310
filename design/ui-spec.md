@@ -16,7 +16,9 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Show selection through a control or text label as well as a border. Keyboard focus must remain distinct from selection.
 - Use semantic headings, labeled inputs, keyboard-operable controls, visible focus, sufficient contrast, and readable error messages. Never rely on color alone.
 - All application routes, including placeholders and future pages, use the same shared header: CAC logo on the left and Learn About CAC, Explore Data, and Donate on the right. Both the header and footer CAC logos link to the application landing route `/`. Learn and Donate use configured CAC-approved external destinations.
-- Setup uses a four-step indicator: Introduction, Household, CAC support, Review. Show the current step and completed steps.
+- Setup uses a two-step indicator: Household, Review. Show the current step and completed steps. CAC support is not a setup step for now; it returns later as an option offered after a regular run without it.
+- Every simulation page (`/simulation/*`) sits on the scenic stage: the supplied scenic illustration (`frontend/src/assets/scenic-simulation-background.jpg`) fills only the area between the shared header and footer, behind a white rounded content panel with an inset on every side so the scenery shows around it. The image is decorative (no alt text, no content on it); all text and controls stay on the solid white panel at the design tokens. The header and footer never sit on the image.
+- Setup pages fit one screen: header plus stage fill the viewport, the footer follows below the fold, and the page content scales down uniformly (not below 0.7) to fit without reflowing the layout. Below that scale the panel scrolls instead of shrinking text further.
 - Single-choice card sets behave as radio groups. Selecting a card does not advance the screen or commit a financial decision.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
 - On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
@@ -61,9 +63,11 @@ The legacy `/simulation/introduction` URL redirects to `/simulation/individual`.
 
 Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing. Category and scenario availability are determined by approved persona-category and scenario-persona links.
 
-Continue opens CAC support selection. Back returns to the landing page. Example names and amounts are illustrative; production values come from approved content.
+Continue opens Review. Back returns to the landing page. The page heading block (step indicator, label, title, introduction) is centered above the carousel. Example names and amounts are illustrative; production values come from approved content.
 
-## 4. CAC support selection
+## 4. CAC support selection (deferred)
+
+Not part of setup for now. The client will offer CAC support as an option after players complete a regular run without it; this will be specified and implemented in a later task. Until then runs are without support and no support selection is shown. The behavior below is retained for that later work.
 
 Display With CAC Support and Without CAC Support as mutually exclusive options. Require an explicit selection before continuing. Explain that support may appear during relevant situations and actual assistance depends on eligibility and availability.
 
@@ -71,7 +75,7 @@ Choosing with support enables relevant assistance choices during gameplay, such 
 
 ## 5. Review and confirmation
 
-Show the selected household, starting money, and CAC support setting. Provide edit actions that return to the corresponding setup step and preserve other selections. Provide Confirm Selection to start the simulation.
+Show the selected household (illustration, name, tagline, starting money, and story) and a short "what happens next" panel. Provide a Change action that returns to household selection and preserves the choice, a Household back button, and Confirm Selection to start the simulation. Until the protected start operation exists, Confirm Selection reports that no run was created. Review redirects to household selection when nothing is selected. The "what happens next" wording is prototype copy pending approval; no CAC support setting is shown while support is deferred.
 
 After confirmation, household and support settings are locked for that run. Active gameplay must not expose setup inspection, setup editing, or Back to Review. Replace that navigation with End Simulation.
 
