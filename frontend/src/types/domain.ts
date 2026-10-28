@@ -32,6 +32,21 @@ export interface Job extends EditionRecord {
   // CAC-authored free-text note from simulation_requirements, if present.
   readonly requirementsNote: string | null
 }
+export interface Statistic extends EditionRecord {
+  readonly description: string
+  readonly value: number
+  readonly unit: string | null
+  readonly category: string | null
+  readonly displayText: string | null
+  readonly visualizationType: string | null
+  readonly visualizationConfig: Readonly<Record<string, unknown>>
+  readonly geography: string | null
+  readonly dataPeriod: string | null
+  readonly sourceUrl: string | null
+}
+export interface ScenarioStatistic extends Statistic {
+  readonly factRole: 'general' | 'cac'
+}
 // The newest published edition and its approved households (personas).
 export interface PublishedHouseholds {
   readonly versionId: string

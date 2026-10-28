@@ -6,7 +6,7 @@ This relational model supports an educational financial decision game for the Co
 
 **Platform:** Supabase (PostgreSQL), as specified by the project team. Application entities are relational tables
 
-**Sources:** `Team 6310 ERD.drawio.png` and `Database Plan.pdf` (four pages). The plan supplies explicit field lists, PK/FK labels, and relationship explanations; the ERD supplies entities, attributes, and conceptual links. No SQL migrations or live database schema were provided. Consequently, this file documents design intent, not verified database enforcement.
+**Sources:** `Team 6310 ERD.drawio.png`, `Database Plan.pdf` (four pages), and the repository's Supabase migrations. The plan supplies explicit field lists, PK/FK labels, and relationship explanations; the ERD supplies entities, attributes, and conceptual links. The initial migration is empty and the later migration history is partial, so this file documents design intent and tracked changes, not a verified snapshot of the deployed database.
 
 ### Reading the field tables
 
@@ -67,13 +67,17 @@ Researched facts, source references, and review metadata.
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
 | statistic_id | uuid | Unique statistic identifier. | Specified PK. |
-| description | text | Meaning of the statistic. | Nullability unresolved. |
+| description | text | Meaning and context of the statistic. | Nullability unresolved. |
 | value | numeric | Measured value. | Proposed numeric; confirm whether nonnumeric values are needed (C7). |
 | unit | text | Measurement unit. | Allowed units unresolved (C7). |
+| category | text | Statistic's category for organization and filtering. | Vocabulary and nullability unresolved (C7). |
+| display_text | text | Human-readable statistic label or display copy. | Nullability unresolved. |
+| visualization_type | text | Visualization intended for the statistic. | Supported values and nullability unresolved (C7). |
+| visualization_config | jsonb | Object containing visualization-specific configuration. | Defaults to an empty object; shape is visualization-specific. |
 | geography | text | Area covered by the data. | Geographic vocabulary unresolved (C7). |
-| data_period | text | Reporting period. | Proposed text to accommodate years or ranges; format unresolved. |
+| data_period | text | Reporting period. | Accommodates years or ranges; format unresolved (C7). |
 | source_url | text | Reference URL for the statistic. | Requiredness and URL validation unresolved. |
-| last_reviewed_at | timestamptz | Most recent review timestamp. | Nullability and review policy unresolved. |
+| last_checked_at | timestamptz | Most recent date/time the statistic was checked. | Renamed from `last_reviewed_at`; review cadence and nullability unresolved. |
 | version_id | uuid | Owning content version. | Specified FK → content_versions.version_id; C1. |
 
 ### `scenario_statistics`
@@ -268,7 +272,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | C4 | States and nullability | Define playthrough statuses and transitions; confirm group/content status vocabularies. Decide required text, FKs, timestamps, and version fields; decide whether current_scenario_id may be NULL while waiting or after completion. |
 | C5 | Decision/payment consistency | Validate scenario, choice, ownership, eligibility, support, and edition in protected operations. Commit response, state changes, and payment/income idempotency atomically. Prevent duplicate scheduled/scenario charges. |
 | C6 | Group participation | Define join-code uniqueness (global or active sessions only), expiration, membership identity, participant visibility, deadline enforcement, and how group answers advance each attempt. No round identifier or vote aggregation rule is supplied. |
-| C7 | Statistics | Define value types, units, reporting-period format, supported geographies, source requirements, and review cadence. No additional provenance table or relationship to a specific choice is specified. |
+| C7 | Statistics | Define value types, category vocabulary, supported visualization types/configuration shapes, units, reporting-period format, supported geographies, source requirements, and review cadence. No additional provenance table or relationship to a specific choice is specified. |
 | C8 | Referential actions and defaults | Choose ON DELETE/ON UPDATE behavior for every FK, especially content referenced by completed games and auth user deletion. Decide ID generation and timestamp/boolean defaults; avoid assuming cascades. |
 | C9 | Supabase access | Define RLS and grants for public content reads, player-owned state, facilitator access, and CAC content editing/publication. Anonymous player ownership and CAC editor roles are not modeled. This is an implementation requirement to resolve, not an existing policy. |
 | C10 | Performance | Consider indexes for frequently queried FK columns, join_code lookup, and response/bill retrieval by playthrough. Indexes other than those implied by PKs are proposals, not source-specified constraints. |

@@ -167,7 +167,7 @@ it('shows a safe error with retry when households cannot load', async () => {
     .mockResolvedValueOnce(households)
   renderPage()
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Unable to load households and jobs',
+    'Unable to load approved content',
   )
   expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   await userEvent.click(

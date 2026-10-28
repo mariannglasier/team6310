@@ -3,6 +3,8 @@ import {
   type Job,
   type Persona,
   type PublishedHouseholds,
+  type ScenarioStatistic,
+  type Statistic,
   type UsdCents,
 } from '../types/domain'
 import { getSupabaseClient } from './supabase'
@@ -14,7 +16,7 @@ import { getSupabaseClient } from './supabase'
 export class ContentUnavailableError extends Error {
   constructor(options?: ErrorOptions) {
     super(
-      'Unable to load households and jobs right now. Please retry or contact the facilitator.',
+      'Unable to load approved content right now. Please retry or contact the facilitator.',
       options,
     )
     this.name = 'ContentUnavailableError'
@@ -26,6 +28,11 @@ export interface ContentService {
   loadHouseholds(): Promise<PublishedHouseholds | null>
   // Approved jobs for a pinned edition; used by the later pre-game job step.
   loadJobs(versionId: string): Promise<readonly Job[]>
+  // Scenario-linked facts from the published edition pinned to the current run.
+  loadScenarioStatistics(
+    scenarioId: string,
+    versionId: string,
+  ): Promise<readonly ScenarioStatistic[]>
 }
 
 const MONEY = /^(-)?(\d+)(?:\.(\d{1,2}))?$/
@@ -70,6 +77,48 @@ function toNumber(value: unknown, field: string): number {
 }
 
 type Row = Record<string, unknown>
+
+function statisticNumber(value: unknown, field: string): number {
+  const number = typeof value === 'string' ? Number(value) : value
+  if (typeof number !== 'number' || !Number.isFinite(number))
+    throw new Error(`${field} is not a finite number`)
+  return number
+}
+
+function nullableString(value: unknown, field: string): string | null {
+  if (value === null || value === undefined) return null
+  if (typeof value !== 'string')
+    throw new Error(`${field} is not a string or null`)
+  return value
+}
+
+function visualizationConfig(
+  value: unknown,
+): Readonly<Record<string, unknown>> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    throw new Error('visualization_config is not an object')
+  return Object.fromEntries(Object.entries(value))
+}
+
+export function toStatistic(row: Row): Statistic {
+  return {
+    id: requireString(row.statistic_id, 'statistic_id'),
+    versionId: requireString(row.version_id, 'version_id'),
+    description: requireString(row.description, 'description'),
+    value: statisticNumber(row.value, 'value'),
+    unit: nullableString(row.unit, 'unit'),
+    category: nullableString(row.category, 'category'),
+    displayText: nullableString(row.display_text, 'display_text'),
+    visualizationType: nullableString(
+      row.visualization_type,
+      'visualization_type',
+    ),
+    visualizationConfig: visualizationConfig(row.visualization_config),
+    geography: nullableString(row.geography, 'geography'),
+    dataPeriod: nullableString(row.data_period, 'data_period'),
+    sourceUrl: nullableString(row.source_url, 'source_url'),
+  }
+}
 
 export function toPersona(row: Row): Persona {
   // All approved households begin unemployed with $0 weekly income.
@@ -169,4 +218,57 @@ async function loadJobs(versionId: string): Promise<readonly Job[]> {
   }
 }
 
-export const contentService: ContentService = { loadHouseholds, loadJobs }
+async function loadScenarioStatistics(
+  scenarioId: string,
+  versionId: string,
+): Promise<readonly ScenarioStatistic[]> {
+  try {
+    const supabase = await getSupabaseClient()
+    const links = await supabase
+      .from('scenario_statistics')
+      .select('statistic_id,fact_role')
+      .eq('scenario_id', scenarioId)
+      .eq('version_id', versionId)
+    if (links.error) throw links.error
+    const linkedFacts = links.data ?? []
+    if (linkedFacts.length === 0) return []
+
+    const statistics = await supabase
+      .from('statistics')
+      .select(
+        'statistic_id,version_id,description,value,unit,category,display_text,visualization_type,visualization_config,geography,data_period,source_url',
+      )
+      .eq('version_id', versionId)
+      .in(
+        'statistic_id',
+        linkedFacts.map((link) => link.statistic_id),
+      )
+    if (statistics.error) throw statistics.error
+
+    const byId = new Map(
+      (statistics.data ?? []).map((row) => [row.statistic_id, row]),
+    )
+    const facts = linkedFacts.map((link) => {
+      const statisticRow = byId.get(link.statistic_id)
+      if (!statisticRow) throw new Error('linked statistic is unavailable')
+      const factRole = link.fact_role
+      if (factRole !== 'general' && factRole !== 'cac')
+        throw new Error('fact_role is invalid')
+      const statistic = toStatistic(statisticRow)
+      if (statistic.versionId !== versionId)
+        throw new Error('statistic belongs to a different edition')
+      return { ...statistic, factRole }
+    })
+    return facts.sort((a, b) =>
+      a.factRole === b.factRole ? 0 : a.factRole === 'general' ? -1 : 1,
+    )
+  } catch (error) {
+    return unavailable(error)
+  }
+}
+
+export const contentService: ContentService = {
+  loadHouseholds,
+  loadJobs,
+  loadScenarioStatistics,
+}
