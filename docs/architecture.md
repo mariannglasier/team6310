@@ -107,6 +107,26 @@ The database remains authoritative; this initial read adds no write operation,
 gameplay calculation, or synchronization protocol. The retained UUID is still
 memory-only, so full browser refresh recovery remains unimplemented.
 
+The financial tracking interface follows the Figma Make `GameSession.tsx` and
+`game-session.css` reference: day timeline, household/balance sidebar, central
+simulation placeholder, and upcoming-expense panel. `FinancialTracking` renders
+the loaded playthrough and expense resource from the existing page state; it
+maintains no duplicate balance/day state. Desktop uses three columns, tablet two,
+and mobile stacks the panels with a sticky day/balance summary.
+
+After the owned run loads, `services/householdExpenses.ts` reads its pinned-edition
+persona expense definitions and run-specific expense occurrences. Available
+occurrences supply their own amount, due day, and payment timestamp; names come
+only from the selected household's definitions. Recorded payments are displayed
+separately. With no occurrences, the UI explicitly labels the saved household
+schedule and its first due dates; it does not expand recurrence or infer payment
+status. Lists are ordered by due day, with unknown dates last. Expense read
+failures do not hide the run's balance or substitute mock data. No runtime mock
+financial values are used. Starting-balance, income-received, and expenses-charged
+totals remain unavailable because the current loaded state does not supply those
+historical totals. This milestone adds reads and presentation only, with no
+financial calculations, payment processing, or state synchronization.
+
 The following describes the broader intended simulation behavior.
 
 Setup proceeds through Household and Review. The household selection is explicit. CAC support is deferred: the client will offer it as an option after players complete a regular run without it, so runs are currently without support. Review allows the household to be changed before confirmation; confirmation starts a new run and locks the setup. The household selection is temporary frontend state until a run is created.

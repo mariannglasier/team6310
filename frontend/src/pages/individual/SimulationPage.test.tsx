@@ -1,3 +1,4 @@
+import { loadHouseholdExpenses } from '../../services/householdExpenses'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
@@ -6,6 +7,10 @@ import { SetupContext, type CreatedPlaythrough } from '../../state/setupContext'
 import { loadPlaythrough } from '../../services/loadPlaythrough'
 import { usdCents } from '../../types/domain'
 import type { LoadedPlaythrough } from '../../types/playthrough'
+
+vi.mock('../../services/householdExpenses', () => ({
+  loadHouseholdExpenses: vi.fn(),
+}))
 
 vi.mock('../../services/loadPlaythrough', async (original) => ({
   ...(await original<typeof import('../../services/loadPlaythrough')>()),
@@ -55,6 +60,10 @@ function renderPage(
 }
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.mocked(loadHouseholdExpenses).mockResolvedValue({
+    source: 'definitions',
+    items: [],
+  })
   vi.mocked(loadPlaythrough).mockResolvedValue(loaded)
 })
 it('shows loading then the saved household, exact balance, day, and status', async () => {
@@ -65,7 +74,7 @@ it('shows loading then the saved household, exact balance, day, and status', asy
   expect(await screen.findByText('Saved household')).toBeInTheDocument()
   expect(screen.getByText('$350.25')).toBeInTheDocument()
   expect(screen.getByText('1')).toBeInTheDocument()
-  expect(screen.getByText('active')).toBeInTheDocument()
+  expect(screen.getByText('Status: active')).toBeInTheDocument()
   expect(screen.queryByText('Temporary name')).not.toBeInTheDocument()
   expect(loadPlaythrough).toHaveBeenCalledExactlyOnceWith('run')
 })
@@ -95,7 +104,8 @@ it('renders null display fields as unavailable, not zero or a default stage', as
     status: null,
   })
   renderPage()
-  expect(await screen.findAllByText('Unavailable')).toHaveLength(4)
+  expect(await screen.findByText('Current day unavailable')).toBeInTheDocument()
+  expect(screen.getByText('Household unavailable')).toBeInTheDocument()
   expect(screen.queryByText('$0.00')).not.toBeInTheDocument()
   expect(screen.getByRole('alert')).toHaveTextContent(
     'this content version is unavailable',

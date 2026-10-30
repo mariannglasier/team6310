@@ -7,27 +7,51 @@ import {
   loadPlaythrough,
   PlaythroughLoadError,
 } from '../../services/loadPlaythrough'
-import { formatUsd } from '../../lib/money'
+import { FinancialTracking } from '../../components/simulation/FinancialTracking'
+import { loadHouseholdExpenses } from '../../services/householdExpenses'
+import type { ExpenseState } from '../../types/householdExpenses'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'unavailable' }
   | { status: 'error' }
-  | { status: 'ready'; playthrough: LoadedPlaythrough }
+  | { status: 'ready'; playthrough: LoadedPlaythrough; expenses: ExpenseState }
 
 function RecordedPlaythrough({ id }: { id: string }) {
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   useEffect(() => {
     let current = true
     loadPlaythrough(id).then(
-      (playthrough) => {
-        if (current)
-          setState(
-            playthrough
-              ? { status: 'ready', playthrough }
-              : { status: 'unavailable' },
-          )
+      async (playthrough) => {
+        if (!current) return
+        if (!playthrough) {
+          setState({ status: 'unavailable' })
+          return
+        }
+        setState({
+          status: 'ready',
+          playthrough,
+          expenses: { status: 'loading' },
+        })
+        try {
+          const data = await loadHouseholdExpenses(playthrough)
+          if (current)
+            setState({
+              status: 'ready',
+              playthrough,
+              expenses: data
+                ? { status: 'ready', data }
+                : { status: 'unavailable' },
+            })
+        } catch {
+          if (current)
+            setState({
+              status: 'ready',
+              playthrough,
+              expenses: { status: 'unavailable' },
+            })
+        }
       },
       () => {
         if (current) setState({ status: 'error' })
@@ -52,27 +76,16 @@ function RecordedPlaythrough({ id }: { id: string }) {
   return (
     <>
       <p role="status">Your playthrough has been loaded.</p>
-      <dl>
-        <dt>Household</dt>
-        <dd>{run.persona?.name ?? 'Unavailable'}</dd>
-        <dt>Current balance</dt>
-        <dd>
-          {run.currentBalance === null
-            ? 'Unavailable'
-            : formatUsd(run.currentBalance)}
-        </dd>
-        <dt>Current day</dt>
-        <dd>{run.currentDay ?? 'Unavailable'}</dd>
-        <dt>Status</dt>
-        <dd>{run.status ?? 'Unavailable'}</dd>
-      </dl>
+      <FinancialTracking run={run} expenses={state.expenses}>
+        <h2>Your simulation</h2>
+        <p>Gameplay is not available yet.</p>
+      </FinancialTracking>
       {!run.persona && (
         <p role="alert">
           Household information for this content version is unavailable.
         </p>
       )}
       <p>Playthrough ID: {run.id}</p>
-      <p>Gameplay is not available yet.</p>
     </>
   )
 }

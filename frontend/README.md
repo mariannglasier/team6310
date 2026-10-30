@@ -129,3 +129,20 @@ Tests cover route loading/history, keyboard navigation, the closed dashboard bou
 The original export remains unchanged in `design/figma-prototype/`. It is outside the frontend build and supplies basic layout reference only.
 
 The footer in `layouts/AppLayout.tsx` is shared by every route, including placeholders. Its complete responsive styling lives in `layouts/AppLayout.css`; future pages inherit the same CAC logo, tagline, contact links, future resource links, and Tax ID automatically.
+
+### Simulation financial tracking
+
+`components/simulation/FinancialTracking.tsx` adapts the approved Figma Make
+financial panels and timeline. It receives the loaded run and expense resource
+from the existing page state rather than owning another balance or day.
+`services/householdExpenses.ts` reads the selected household's expense definitions
+and the run's occurrences, both pinned to the run's edition. Occurrences use saved
+amounts and payment timestamps; paid items are separate. Without occurrences,
+definitions show explicitly labeled first due dates and unknown payment status.
+Recurrence is never expanded. Missing dates sort last; missing amounts are never
+replaced with zero. Expense failures leave the balance/day visible. Runtime mock
+data, financial calculations, payment actions, and synchronization are absent.
+Figma historical totals remain unavailable until supplied by authoritative state.
+
+Run `npm run test:e2e -- financial-tracking.spec.ts` for mocked desktop, tablet,
+mobile, and narrow-mobile layout checks. These tests never contact hosted Supabase.

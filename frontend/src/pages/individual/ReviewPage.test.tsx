@@ -1,3 +1,4 @@
+import { loadHouseholdExpenses } from '../../services/householdExpenses'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
@@ -17,6 +18,10 @@ import {
 import { createIndividualPlaythrough } from '../../services/playthroughService'
 import { SimulationPage } from './SimulationPage'
 import { loadPlaythrough } from '../../services/loadPlaythrough'
+
+vi.mock('../../services/householdExpenses', () => ({
+  loadHouseholdExpenses: vi.fn(),
+}))
 
 vi.mock('../../services/loadPlaythrough', () => ({ loadPlaythrough: vi.fn() }))
 
@@ -84,6 +89,10 @@ const chooseCenter = async (user: ReturnType<typeof userEvent.setup>) => {
 
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.mocked(loadHouseholdExpenses).mockResolvedValue({
+    source: 'definitions',
+    items: [],
+  })
   vi.mocked(loadPlaythrough).mockImplementation(async (id) => ({
     id,
     personaId: 'p1',
