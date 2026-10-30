@@ -111,8 +111,23 @@ The financial tracking interface follows the Figma Make `GameSession.tsx` and
 `game-session.css` reference: day timeline, household/balance sidebar, central
 simulation placeholder, and upcoming-expense panel. `FinancialTracking` renders
 the loaded playthrough and expense resource from the existing page state; it
-maintains no duplicate balance/day state. Desktop uses three columns, tablet two,
-and mobile stacks the panels with a sticky day/balance summary.
+maintains no duplicate balance/day state. The `/simulation` route omits the shared
+setup-page wrapper: only the central content has `stage__panel`, with the financial
+panels as siblings and the day header/timeline above the grid. All content scrolls
+with the document; the center has no independent scroll container. The redundant
+page title and loaded notification are omitted. Other setup routes retain their
+existing layout.
+
+The gameplay CSS uses the Figma reference's responsive ranges: at 1151px and above,
+three columns use `.75fr / 4.5fr / 1fr` with 180px/220px sidebar minimums and 16px
+gaps; at 761–1150px, two columns use `.8fr / 2.5fr` with upcoming information below
+the center and a one-row timeline. At 760px and below, household/balance, center,
+and upcoming panels stack in that order, with a two-row, 15-column timeline. At
+480px and below, center padding tightens to 20px and upcoming content is one column.
+The 12px outer margins, 8px main padding, panel sizes, typography, and separators
+come from `design/figma-prototype/src/game-session.css`. Existing precise monetary
+formatting, unavailable-data messages, and run identifiers remain functional.
+The existing application header/footer and avatar artwork are preserved.
 
 After the owned run loads, `services/householdExpenses.ts` reads its pinned-edition
 persona expense definitions and run-specific expense occurrences. Available

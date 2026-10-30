@@ -195,15 +195,11 @@ it('creates the selected household, retains its ID, and opens the placeholder', 
     screen.queryByText(/Your playthrough was created/),
   ).not.toBeInTheDocument()
   complete('created-run-id')
-  expect(
-    await screen.findByText('Your playthrough has been loaded.'),
-  ).toBeInTheDocument()
+  expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
   expect(screen.getByText('Playthrough ID: created-run-id')).toBeInTheDocument()
   expect(screen.getByLabelText('Current path')).toHaveTextContent('/simulation')
   await user.click(screen.getByRole('button', { name: 'Revisit Review' }))
-  expect(
-    await screen.findByText('Your playthrough has been loaded.'),
-  ).toBeInTheDocument()
+  expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Revisit Household' }))
   expect(
     await screen.findByText('Playthrough ID: created-run-id'),
@@ -230,9 +226,7 @@ it('preserves the household after failure and allows retry', async () => {
     '/simulation/review',
   )
   await user.click(screen.getByRole('button', { name: 'Confirm selection' }))
-  expect(
-    await screen.findByText('Your playthrough has been loaded.'),
-  ).toBeInTheDocument()
+  expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
   expect(createIndividualPlaythrough).toHaveBeenNthCalledWith(2, 'p1')
 })
 

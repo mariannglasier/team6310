@@ -49,7 +49,6 @@ test.each([
   ['/simulation/individual', 'Every household has a story.'],
   ['/dev/integration-test', 'Temporary Supabase integration test'],
   ['/simulation/results', 'Simulation results'],
-  ['/simulation', 'Individual simulation'],
   ['/group/host', 'Host a Group'],
   ['/group/join', 'Join a Group'],
   ['/admin/login', 'Employee sign-in'],
@@ -305,3 +304,14 @@ test.each(['/', '/learn', '/group/host', '/unknown/path'])(
     expect(container.querySelector('.stage, .stage__panel')).toBeNull()
   },
 )
+
+test('simulation direct entry has no redundant page title', () => {
+  renderRoute('/simulation')
+  expect(
+    screen.queryByRole('heading', { name: 'Individual simulation' }),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.getByRole('region', { name: 'Individual simulation' }),
+  ).toBeInTheDocument()
+  expect(document.title).toBe('Individual simulation | CAC Poverty Simulation')
+})

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { PageSection } from '../../components/ui/PageSection'
 import { ButtonLink } from '../../components/ui/Button'
 import { paths } from '../../app/paths'
 import { useSetup } from '../../state/setupContext'
@@ -74,26 +73,23 @@ function RecordedPlaythrough({ id }: { id: string }) {
     )
   const run = state.playthrough
   return (
-    <>
-      <p role="status">Your playthrough has been loaded.</p>
-      <FinancialTracking run={run} expenses={state.expenses}>
-        <h2>Your simulation</h2>
-        <p>Gameplay is not available yet.</p>
-      </FinancialTracking>
+    <FinancialTracking run={run} expenses={state.expenses}>
+      <h2>Your simulation</h2>
+      <p>Gameplay is not available yet.</p>
       {!run.persona && (
         <p role="alert">
           Household information for this content version is unavailable.
         </p>
       )}
-      <p>Playthrough ID: {run.id}</p>
-    </>
+      <p className="finance-run-id">Playthrough ID: {run.id}</p>
+    </FinancialTracking>
   )
 }
 
 export function SimulationPage() {
   const { createdPlaythrough } = useSetup()
   return (
-    <PageSection title="Individual simulation">
+    <section className="simulation-page" aria-label="Individual simulation">
       {createdPlaythrough ? (
         <RecordedPlaythrough
           key={createdPlaythrough.id}
@@ -107,6 +103,6 @@ export function SimulationPage() {
           <ButtonLink to={paths.individual}>Choose a household</ButtonLink>
         </>
       )}
-    </PageSection>
+    </section>
   )
 }

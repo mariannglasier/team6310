@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
 test('financial panels follow the approved layout and stay readable at every viewport', async ({
@@ -102,34 +103,145 @@ test('financial panels follow the approved layout and stay readable at every vie
   })
   await expect(expenses.getByRole('listitem').first()).toContainText('Rent')
   await expect(expenses.getByRole('listitem').nth(1)).toContainText('Utilities')
-  await expenses.scrollIntoViewIfNeeded()
-  await expect(expenses.getByText('$500.00')).toBeVisible()
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth - innerWidth,
+
+  await expect(page.getByText('Your playthrough has been loaded.')).toHaveCount(
+    0,
+  )
+  await expect(
+    page.getByRole('heading', { name: 'Individual simulation' }),
+  ).toHaveCount(0)
+  // Compare the actual layout against a minimal shell rendered with the source
+  // Figma CSS, including both sides of every gameplay breakpoint.
+  const reference = await page.context().newPage()
+  const sourceCss = readFileSync(
+    new URL(
+      '../../design/figma-prototype/src/game-session.css',
+      import.meta.url,
     ),
-  ).toBeLessThanOrEqual(0)
-  const boxes = await page.evaluate(() => {
-    const box = (selector: string) => {
-      const r = document.querySelector(selector)!.getBoundingClientRect()
-      return { x: r.x, y: r.y, width: r.width }
+    'utf8',
+  )
+  const themeCss = readFileSync(
+    new URL('../../design/figma-prototype/src/setup-flow.css', import.meta.url),
+    'utf8',
+  )
+  await reference.setContent(`<style>*{box-sizing:border-box}body{margin:0}.setup-flow{--setup-heading-size:48px}${themeCss}${sourceCss}</style>
+    <main class="setup-main game-session setup-flow">
+      <div class="play-top"><h1>Day 2 of 30</h1></div>
+      <ol class="play-timeline">${Array.from({ length: 30 }, (_, i) => `<li><span>${i + 1}</span></li>`).join('')}</ol>
+      <div class="play-layout">
+        <aside class="play-sidebar"><div class="play-household"><span class="setup-mini-avatar"></span><h2>Alex</h2></div><div class="play-status"><strong>$350.00</strong></div></aside>
+        <div class="play-main"><div class="play-box"><div class="play-content">Placeholder</div></div></div>
+        <aside class="play-right"><section>Upcoming expenses</section></aside>
+      </div>
+    </main>`)
+  const widths: Record<string, number[]> = {
+    desktop: [1440, 1151],
+    tablet: [1150, 1024, 768, 761],
+    mobile: [760, 600, 481],
+    'narrow-mobile': [480, 390, 320],
+  }
+  for (const width of widths[testInfo.project.name]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await reference.setViewportSize({ width, height: 1000 })
+    const actual = await page.evaluate(() => {
+      const style = (s: string) => getComputedStyle(document.querySelector(s)!)
+      const box = (s: string) => {
+        const r = document.querySelector(s)!.getBoundingClientRect()
+        return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }
+      }
+      const panel = document.querySelector('.stage__panel')!
+      return {
+        columns: style('.finance-layout').gridTemplateColumns,
+        gap: style('.finance-layout').gap,
+        timelineColumns: style('.finance-timeline').gridTemplateColumns,
+        timelineGap: style('.finance-timeline').rowGap,
+        circle: style('.finance-timeline span').width,
+        padding: style('.finance-content').padding,
+        sidebarPadding: style('.finance-sidebar').padding,
+        upcomingColumns: style('.finance-right').gridTemplateColumns,
+        left: box('.finance-sidebar'),
+        main: box('.stage__panel'),
+        right: box('.finance-right'),
+        top: box('.finance-top'),
+        timeline: box('.finance-timeline'),
+        overflow: document.documentElement.scrollWidth - innerWidth,
+        nested: [
+          ...document.querySelectorAll('.simulation-page, .simulation-page *'),
+        ].filter((el) =>
+          ['auto', 'scroll'].includes(getComputedStyle(el).overflowY),
+        ).length,
+        panelOverflow: getComputedStyle(panel).overflowY,
+        descendants:
+          panel.contains(document.querySelector('.finance-sidebar')) ||
+          panel.contains(document.querySelector('.finance-right')) ||
+          panel.contains(document.querySelector('.finance-top')) ||
+          panel.contains(document.querySelector('.finance-timeline')),
+      }
+    })
+    const expected = await reference.evaluate(() => {
+      const style = (s: string) => getComputedStyle(document.querySelector(s)!)
+      return {
+        columns: style('.play-layout').gridTemplateColumns,
+        gap: style('.play-layout').gap,
+        timelineColumns: style('.play-timeline').gridTemplateColumns,
+        timelineGap: style('.play-timeline').rowGap,
+        circle: style('.play-timeline span').width,
+        padding: style('.play-content').padding,
+        sidebarPadding: style('.play-sidebar').padding,
+        upcomingColumns: style('.play-right').gridTemplateColumns,
+      }
+    })
+    for (const key of Object.keys(expected) as (keyof typeof expected)[])
+      expect(actual[key], `${width}px ${key}`).toBe(expected[key])
+    expect(
+      actual.overflow,
+      `${width}px horizontal overflow`,
+    ).toBeLessThanOrEqual(0)
+    expect(actual.nested, `${width}px nested scrolling`).toBe(0)
+    expect(actual.panelOverflow).toBe('visible')
+    expect(actual.descendants).toBe(false)
+    expect(actual.top.bottom).toBeLessThanOrEqual(actual.timeline.y)
+    expect(actual.timeline.bottom).toBeLessThanOrEqual(actual.left.y)
+    if (width > 1150) {
+      expect(actual.left.right).toBeLessThanOrEqual(actual.main.x)
+      expect(actual.main.right).toBeLessThanOrEqual(actual.right.x)
+    } else if (width > 760) {
+      expect(actual.left.right).toBeLessThanOrEqual(actual.main.x)
+      expect(actual.right.y).toBeGreaterThanOrEqual(actual.main.bottom)
+      expect(actual.main.x).toBe(actual.right.x)
+    } else {
+      expect(actual.left.bottom).toBeLessThanOrEqual(actual.main.y)
+      expect(actual.main.bottom).toBeLessThanOrEqual(actual.right.y)
+      expect(actual.main.x).toBe(actual.right.x)
     }
+    await page.getByText('$350.00', { exact: true }).scrollIntoViewIfNeeded()
+    await expect(page.getByText('$350.00', { exact: true })).toBeVisible()
+    await expenses.scrollIntoViewIfNeeded()
+    await expect(expenses.getByText('$500.00')).toBeVisible()
+    await page.screenshot({
+      path: testInfo.outputPath(`financial-tracking-${width}.png`),
+      fullPage: true,
+    })
+  }
+  // Long future stage content must extend the page rather than create a scroller.
+  await page.locator('.finance-content').evaluate((element) => {
+    const content = document.createElement('div')
+    content.style.height = '1800px'
+    content.textContent = 'Long stage content for layout verification'
+    element.append(content)
+  })
+  const naturalFlow = await page.evaluate(() => {
+    const panel = document.querySelector('.stage__panel')!
     return {
-      left: box('.finance-sidebar'),
-      main: box('.finance-main'),
-      right: box('.finance-right'),
+      height: panel.clientHeight,
+      scrollHeight: panel.scrollHeight,
+      documentHeight: document.documentElement.scrollHeight,
+      viewport: innerHeight,
     }
   })
-  if (testInfo.project.name === 'desktop') {
-    expect(boxes.left.x).toBeLessThan(boxes.main.x)
-    expect(boxes.main.x).toBeLessThan(boxes.right.x)
-  } else if (testInfo.project.name === 'tablet') {
-    expect(boxes.left.x).toBeLessThan(boxes.main.x)
-    expect(Math.abs(boxes.main.x - boxes.right.x)).toBeLessThan(2)
-  } else {
-    expect(Math.abs(boxes.left.x - boxes.right.x)).toBeLessThan(2)
-    expect(boxes.right.y).toBeGreaterThan(boxes.left.y)
-  }
+  expect(naturalFlow.height).toBeGreaterThanOrEqual(1800)
+  expect(naturalFlow.scrollHeight - naturalFlow.height).toBeLessThanOrEqual(1)
+  expect(naturalFlow.documentHeight).toBeGreaterThan(naturalFlow.viewport)
+  await reference.close()
   expect(inserts).toBe(1)
-  await page.screenshot({ path: testInfo.outputPath('financial-tracking.png') })
 })

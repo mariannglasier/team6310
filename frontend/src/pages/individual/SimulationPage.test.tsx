@@ -73,6 +73,15 @@ it('shows loading then the saved household, exact balance, day, and status', asy
   )
   expect(await screen.findByText('Saved household')).toBeInTheDocument()
   expect(screen.getByText('$350.25')).toBeInTheDocument()
+  expect(
+    screen.queryByText('Your playthrough has been loaded.'),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('heading', { name: 'Individual simulation' }),
+  ).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+    'Day 1 of 30',
+  )
   expect(screen.getByText('1')).toBeInTheDocument()
   expect(screen.getByText('Status: active')).toBeInTheDocument()
   expect(screen.queryByText('Temporary name')).not.toBeInTheDocument()

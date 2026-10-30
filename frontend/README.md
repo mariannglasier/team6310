@@ -146,3 +146,13 @@ Figma historical totals remain unavailable until supplied by authoritative state
 
 Run `npm run test:e2e -- financial-tracking.spec.ts` for mocked desktop, tablet,
 mobile, and narrow-mobile layout checks. These tests never contact hosted Supabase.
+
+Gameplay layout refinement: `/simulation` renders financial sidebars outside the
+central `stage__panel`, with the day heading/timeline above it. Content uses normal
+document scrolling; the panel is not independently scrollable. The Figma gameplay
+breakpoints are 1151px (three columns), 761–1150px (two columns), 481–760px
+(single column, 15-column timeline), and up to 480px (tighter center padding).
+Financial state, reads, ordering, and unavailable-data handling are unchanged.
+The financial browser spec compares layout dimensions against the source Figma
+CSS at 12 viewport widths, including both sides of each breakpoint, and verifies
+panel order, overflow, and absence of nested scrolling.

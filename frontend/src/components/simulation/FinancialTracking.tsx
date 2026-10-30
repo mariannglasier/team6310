@@ -90,18 +90,14 @@ export function FinancialTracking({
   return (
     <div className="financial-tracking">
       <div className="finance-top" aria-live="polite">
-        <strong>
-          {run.currentDay === null
-            ? 'Current day unavailable'
-            : `Day ${run.currentDay} of 30`}
-        </strong>
-        <span>One choice at a time.</span>
-        <span className="finance-mobile-balance">
-          Current balance:{' '}
-          {run.currentBalance === null
-            ? 'Unavailable'
-            : formatUsd(run.currentBalance)}
-        </span>
+        <div>
+          <h1 id="page-heading" tabIndex={-1}>
+            {run.currentDay === null
+              ? 'Current day unavailable'
+              : `Day ${run.currentDay} of 30`}
+          </h1>
+          <span>One choice at a time.</span>
+        </div>
       </div>
       <ol className="finance-timeline" aria-label="30-day month progress">
         {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => (
@@ -122,12 +118,14 @@ export function FinancialTracking({
         <aside className="finance-sidebar" aria-label="Household and balance">
           <section className="finance-household">
             <span className="finance-label">Your household</span>
-            {run.persona && (
-              <div className="finance-avatar">
-                <PersonaAvatar name={run.persona.name} />
-              </div>
-            )}
-            <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
+            <div className="finance-household-profile">
+              {run.persona && (
+                <div className="finance-avatar">
+                  <PersonaAvatar name={run.persona.name} />
+                </div>
+              )}
+              <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
+            </div>
             <small>Status: {run.status ?? 'Unavailable'}</small>
           </section>
           <section className="finance-money" aria-label="Current balance">
@@ -153,49 +151,54 @@ export function FinancialTracking({
             </dl>
           </section>
         </aside>
-        <div className="finance-main">{children}</div>
+        <div className="finance-main stage__panel">
+          <div className="finance-content">{children}</div>
+        </div>
         <aside
           className="finance-right"
           aria-label="Upcoming household expenses"
         >
-          <h2>Coming up</h2>
-          <p className="finance-subtitle">Upcoming scheduled expenses</p>
-          {expenses.status === 'loading' && (
-            <p role="status">Loading household expenses…</p>
-          )}
-          {expenses.status === 'unavailable' && (
-            <p role="status">Household expenses are unavailable.</p>
-          )}
-          {expenses.status === 'ready' && (
-            <>
-              {definitions && (
-                <p className="finance-source">
-                  Household schedule · First due dates only. Individual expense
-                  occurrences are not available.
-                </p>
-              )}
-              {unpaid.length ? (
-                <ExpenseList items={unpaid} definitions={definitions} />
-              ) : (
-                <p>
-                  No{' '}
-                  {definitions
-                    ? 'household expense definitions'
-                    : 'unpaid expense occurrences'}{' '}
-                  are available.
-                </p>
-              )}
-              {paid.length > 0 && (
-                <>
-                  <h3>Recorded payments</h3>
-                  <ExpenseList items={paid} definitions={false} />
-                </>
-              )}
-              <small>
-                Shown for planning. Displaying an expense does not deduct money.
-              </small>
-            </>
-          )}
+          <section>
+            <h2>Coming up</h2>
+            <p className="finance-subtitle">Upcoming scheduled expenses</p>
+            {expenses.status === 'loading' && (
+              <p role="status">Loading household expenses…</p>
+            )}
+            {expenses.status === 'unavailable' && (
+              <p role="status">Household expenses are unavailable.</p>
+            )}
+            {expenses.status === 'ready' && (
+              <>
+                {definitions && (
+                  <p className="finance-source">
+                    Household schedule · First due dates only. Individual
+                    expense occurrences are not available.
+                  </p>
+                )}
+                {unpaid.length ? (
+                  <ExpenseList items={unpaid} definitions={definitions} />
+                ) : (
+                  <p>
+                    No{' '}
+                    {definitions
+                      ? 'household expense definitions'
+                      : 'unpaid expense occurrences'}{' '}
+                    are available.
+                  </p>
+                )}
+                {paid.length > 0 && (
+                  <>
+                    <h3>Recorded payments</h3>
+                    <ExpenseList items={paid} definitions={false} />
+                  </>
+                )}
+                <small>
+                  Shown for planning. Displaying an expense does not deduct
+                  money.
+                </small>
+              </>
+            )}
+          </section>
         </aside>
       </div>
     </div>
