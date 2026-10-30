@@ -1,6 +1,12 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
+import {
+  MemoryRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { ReviewPage } from './ReviewPage'
 import { IndividualPage } from './SimulationPages'
@@ -8,7 +14,15 @@ import {
   contentService,
   ContentUnavailableError,
 } from '../../services/contentService'
-import { simulationService } from '../../services/simulationService'
+import { createIndividualPlaythrough } from '../../services/playthroughService'
+import { SimulationPage } from './SimulationPage'
+import { loadPlaythrough } from '../../services/loadPlaythrough'
+
+vi.mock('../../services/loadPlaythrough', () => ({ loadPlaythrough: vi.fn() }))
+
+vi.mock('../../services/playthroughService', () => ({
+  createIndividualPlaythrough: vi.fn(),
+}))
 import { SetupProvider } from '../../state/SetupProvider'
 import { usdCents, type PublishedHouseholds } from '../../types/domain'
 
@@ -34,7 +48,18 @@ const households: PublishedHouseholds = {
 }
 
 function Location() {
-  return <span aria-label="Current path">{useLocation().pathname}</span>
+  const navigate = useNavigate()
+  return (
+    <>
+      <span aria-label="Current path">{useLocation().pathname}</span>
+      <button onClick={() => navigate('/simulation/review')}>
+        Revisit Review
+      </button>
+      <button onClick={() => navigate('/simulation/individual')}>
+        Revisit Household
+      </button>
+    </>
+  )
 }
 const renderFlow = (path = '/simulation/individual') =>
   render(
@@ -43,6 +68,7 @@ const renderFlow = (path = '/simulation/individual') =>
         <Routes>
           <Route path="/simulation/individual" element={<IndividualPage />} />
           <Route path="/simulation/review" element={<ReviewPage />} />
+          <Route path="/simulation" element={<SimulationPage />} />
         </Routes>
         <Location />
       </MemoryRouter>
@@ -58,6 +84,22 @@ const chooseCenter = async (user: ReturnType<typeof userEvent.setup>) => {
 
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.mocked(loadPlaythrough).mockImplementation(async (id) => ({
+    id,
+    personaId: 'p1',
+    versionId: 'v1',
+    ownerUserId: 'owner',
+    currentScenarioId: null,
+    currentBalance: usdCents(35000),
+    currentDay: 1,
+    supportEnabled: null,
+    status: 'active',
+    startedAt: null,
+    sessionId: null,
+    currentJobId: null,
+    employmentState: null,
+    persona: { id: 'p1', versionId: 'v1', name: 'Alex', description: null },
+  }))
   vi.mocked(contentService.loadHouseholds).mockResolvedValue(households)
 })
 
@@ -114,30 +156,81 @@ it('lets the player change the household and keeps the selection', async () => {
   )
   expect(await screen.findByRole('radio', { name: /Alex/ })).toBeChecked()
   await user.click(screen.getByRole('button', { name: 'Continue' }))
-  await user.click(await screen.findByRole('link', { name: 'Household' }))
+  await user.click(await screen.findByRole('link', { name: 'Back' }))
   expect(screen.getByLabelText('Current path')).toHaveTextContent(
     '/simulation/individual',
   )
 })
 
-it('confirming reports that no run exists yet and does not call the backend', async () => {
+it('creates the selected household, retains its ID, and opens the placeholder', async () => {
   const user = userEvent.setup()
-  const start = vi.spyOn(simulationService, 'start')
+  let complete!: (id: string) => void
+  vi.mocked(createIndividualPlaythrough).mockReturnValue(
+    new Promise((resolve) => {
+      complete = resolve
+    }),
+  )
+  renderFlow()
+  await chooseCenter(user)
+  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
+  await user.click(screen.getByRole('button', { name: 'Continue' }))
+  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
+  await user.dblClick(
+    await screen.findByRole('button', { name: 'Confirm selection' }),
+  )
+  expect(createIndividualPlaythrough).toHaveBeenCalledExactlyOnceWith('p1')
+  expect(
+    screen.getByRole('button', { name: 'Creating playthrough…' }),
+  ).toBeDisabled()
+  expect(
+    screen.queryByText(/Your playthrough was created/),
+  ).not.toBeInTheDocument()
+  complete('created-run-id')
+  expect(
+    await screen.findByText('Your playthrough has been loaded.'),
+  ).toBeInTheDocument()
+  expect(screen.getByText('Playthrough ID: created-run-id')).toBeInTheDocument()
+  expect(screen.getByLabelText('Current path')).toHaveTextContent('/simulation')
+  await user.click(screen.getByRole('button', { name: 'Revisit Review' }))
+  expect(
+    await screen.findByText('Your playthrough has been loaded.'),
+  ).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'Revisit Household' }))
+  expect(
+    await screen.findByText('Playthrough ID: created-run-id'),
+  ).toBeInTheDocument()
+  expect(createIndividualPlaythrough).toHaveBeenCalledOnce()
+})
+
+it('preserves the household after failure and allows retry', async () => {
+  const user = userEvent.setup()
+  vi.mocked(createIndividualPlaythrough)
+    .mockRejectedValueOnce(new Error('Unable to confirm creation.'))
+    .mockResolvedValueOnce('retry-run-id')
   renderFlow()
   await chooseCenter(user)
   await user.click(screen.getByRole('button', { name: 'Continue' }))
-  const confirm = await screen.findByRole('button', {
-    name: 'Confirm selection',
-  })
-  expect(screen.getByRole('status')).toBeEmptyDOMElement()
-  await user.click(confirm)
-  expect(screen.getByRole('status')).toHaveTextContent(
-    /not available yet. No simulation run has been created/,
+  await user.click(
+    await screen.findByRole('button', { name: 'Confirm selection' }),
   )
-  expect(start).not.toHaveBeenCalled()
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Unable to confirm creation.',
+  )
+  expect(screen.getByRole('region', { name: 'Alex' })).toBeInTheDocument()
   expect(screen.getByLabelText('Current path')).toHaveTextContent(
     '/simulation/review',
   )
+  await user.click(screen.getByRole('button', { name: 'Confirm selection' }))
+  expect(
+    await screen.findByText('Your playthrough has been loaded.'),
+  ).toBeInTheDocument()
+  expect(createIndividualPlaythrough).toHaveBeenNthCalledWith(2, 'p1')
+})
+
+it('does not claim creation on direct entry to the placeholder', () => {
+  renderFlow('/simulation')
+  expect(screen.getByText(/No newly created playthrough/)).toBeInTheDocument()
+  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
 })
 
 it('shows a safe error with retry when households cannot load on Review', async () => {

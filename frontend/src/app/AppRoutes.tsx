@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import { AppLayout } from '../layouts/AppLayout'
 import { AdminDashboardPage, AdminLoginPage } from '../pages/admin/AdminPages'
 import { HostPage, JoinPage } from '../pages/group/GroupPages'
+import { SimulationPage } from '../pages/individual/SimulationPage'
 import { ReviewPage } from '../pages/individual/ReviewPage'
 import {
   IndividualPage,
@@ -38,6 +39,7 @@ export function AppRoutes() {
           />
           <Route path={paths.individual} element={<IndividualPage />} />
           <Route path={paths.review} element={<ReviewPage />} />
+          <Route path={paths.simulation} element={<SimulationPage />} />
           <Route path={paths.results} element={<ResultsPage />} />
           <Route path={paths.host} element={<HostPage />} />
           <Route path={paths.join} element={<JoinPage />} />

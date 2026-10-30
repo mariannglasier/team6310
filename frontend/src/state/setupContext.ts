@@ -1,8 +1,14 @@
 import { createContext, useContext } from 'react'
 
-// Temporary UI selection shared by the setup screens. It is not a run: choosing
-// a household creates nothing, locks nothing, and changes no finances.
+// Creation receipt only; this is not a synchronized simulation snapshot.
+export interface CreatedPlaythrough {
+  readonly id: string
+  readonly householdName: string
+}
+
 export interface SetupSelection {
+  readonly createdPlaythrough: CreatedPlaythrough | null
+  readonly recordPlaythrough: (playthrough: CreatedPlaythrough) => void
   readonly selectedId: string | null
   readonly select: (personaId: string | null) => void
 }

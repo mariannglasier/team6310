@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router'
+import { useRef, useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router'
 import { PersonaAvatar } from '../../components/simulation/PersonaAvatar'
 import { avatarTone } from '../../components/simulation/avatars'
 import { splitDescription } from '../../components/simulation/householdText'
@@ -11,6 +11,7 @@ import { useHouseholds } from '../../hooks/useHouseholds'
 import { formatUsd } from '../../lib/money'
 import { paths } from '../../app/paths'
 import { useSetup } from '../../state/setupContext'
+import { createIndividualPlaythrough } from '../../services/playthroughService'
 import type { Persona } from '../../types/domain'
 import '../../components/simulation/household.css'
 import './review.css'
@@ -58,19 +59,42 @@ function ReviewSummary({ persona }: { persona: Persona }) {
   )
 }
 
-// Summarizes the temporary household selection. Confirming cannot start a run
-// until the protected run-creation operation is connected.
+// Confirmation creates a record only; gameplay remains a later feature.
 export function ReviewPage() {
-  const { selectedId } = useSetup()
+  const { selectedId, createdPlaythrough, recordPlaythrough } = useSetup()
+  const navigate = useNavigate()
+  const submitting = useRef(false)
+  const [pending, setPending] = useState(false)
   const { state, retry } = useHouseholds()
   const [notice, setNotice] = useState('')
   const [fitTarget, fitStyle] = useFitScale<HTMLDivElement>()
+  if (createdPlaythrough) return <Navigate to={paths.simulation} replace />
   if (selectedId === null) return <Navigate to={paths.individual} replace />
 
   const persona =
     state.status === 'ready'
       ? state.households.personas.find((item) => item.id === selectedId)
       : undefined
+
+  async function confirm() {
+    if (!persona || submitting.current) return
+    submitting.current = true
+    setPending(true)
+    setNotice('')
+    try {
+      const id = await createIndividualPlaythrough(persona.id)
+      recordPlaythrough({ id, householdName: persona.name })
+      navigate(paths.simulation, { replace: true })
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : 'Unable to create your playthrough. Please retry.',
+      )
+      submitting.current = false
+      setPending(false)
+    }
+  }
 
   let content
   if (state.status === 'loading')
@@ -107,22 +131,20 @@ export function ReviewPage() {
           Your household. One month of choices.
         </p>
         {content}
-        <p className="household-page__status" role="status">
+        <p
+          className="household-page__status"
+          role={notice ? 'alert' : undefined}
+        >
           {notice}
         </p>
         <div className="household-actions">
-          <ButtonLink to={paths.individual} variant="secondary">
-            Back
-          </ButtonLink>
-          <Button
-            disabled={!persona}
-            onClick={() =>
-              setNotice(
-                'Starting the simulation is not available yet. No simulation run has been created.',
-              )
-            }
-          >
-            Confirm selection
+          {!pending && (
+            <ButtonLink to={paths.individual} variant="secondary">
+              Back
+            </ButtonLink>
+          )}
+          <Button disabled={!persona} loading={pending} onClick={confirm}>
+            {pending ? 'Creating playthrough…' : 'Confirm selection'}
           </Button>
         </div>
       </PageSection>

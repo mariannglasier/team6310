@@ -78,6 +78,37 @@ Backend response validation, ownership, eligibility, edition validation, atomic 
 
 ### Individual simulation
 
+Implemented record-creation milestone: Review confirmation calls the existing
+`start_individual_playthrough` RPC through `services/playthroughService.ts`, after
+establishing or verifying the anonymous participant session. Only the persona ID
+is sent. The hosted RPC derives ownership, edition, and starting balance, starts
+at Day 1, and leaves support, scenario, and employment fields NULL. Its current
+contract is documented by the hosted schema export in `docs/database/`.
+
+The returned UUID and household name remain in memory in `SetupProvider`, and
+success navigates to `/simulation`, a read-only run display with no gameplay.
+Review prevents concurrent clicks and redirects to that placeholder once creation
+succeeds. Failure preserves the household selection. The RPC is not idempotent:
+an uncertain network result can still mean a row was created, so there is no
+automatic retry. Refresh restoration, gameplay, and backend idempotency are not
+implemented by this milestone. No schema or migration change is required.
+
+On entry, `services/loadPlaythrough.ts` verifies the existing anonymous session
+without creating a new identity, reads the retained run UUID under owner RLS,
+and retrieves persona display information using both persona ID and the saved
+`version_id`. It never substitutes the newest content edition. `LoadedPlaythrough`
+in `types/playthrough.ts` retains every current playthrough column in page state,
+converts the balance to integer USD cents, preserves nullable fields, and carries
+`employment_state` as an opaque value without defining it. The page displays the
+saved household name, balance, day, and status. Missing persona/version data is
+reported without inventing household information. Missing/inaccessible runs and
+request failures have separate messages; neither triggers creation or retry.
+The database remains authoritative; this initial read adds no write operation,
+gameplay calculation, or synchronization protocol. The retained UUID is still
+memory-only, so full browser refresh recovery remains unimplemented.
+
+The following describes the broader intended simulation behavior.
+
 Setup proceeds through Household and Review. The household selection is explicit. CAC support is deferred: the client will offer it as an option after players complete a regular run without it, so runs are currently without support. Review allows the household to be changed before confirmation; confirmation starts a new run and locks the setup. The household selection is temporary frontend state until a run is created.
 
 The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. Scheduled scenarios and income occurrences use one authoritative, idempotent charge/credit path. A required payable event that cannot be paid ends the run with its actual day and reason. The interface displays a successful inline recap only after commitment succeeds.
