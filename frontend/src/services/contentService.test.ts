@@ -59,6 +59,8 @@ it('maps an unemployed persona with starting money in cents', () => {
     name: 'Alex',
     description: 'Alex description',
     startingBalance: 35000,
+    hasEnglishSkills: null,
+    hasComputerSkills: null,
   })
 })
 

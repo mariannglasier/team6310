@@ -450,3 +450,20 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Local wage totals can be longer than the initial saved balance. */
+.financial-tracking--preview .finance-balance {
+  font-size: clamp(20px, 2.5vw, 32px);
+}
+.financial-tracking--preview .finance-confirmed {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .financial-tracking--preview .finance-totals div {
+    display: block;
+  }
+  .financial-tracking--preview .finance-totals dd {
+    text-align: left;
+  }
+}

@@ -6,6 +6,7 @@ import {
   loadPlaythrough,
   PlaythroughLoadError,
 } from '../../services/loadPlaythrough'
+import { EmploymentPanel } from './EmploymentPanel'
 import { FinancialTracking } from '../../components/simulation/FinancialTracking'
 import { loadHouseholdExpenses } from '../../services/householdExpenses'
 import type { ExpenseState } from '../../types/householdExpenses'
@@ -18,6 +19,7 @@ type LoadState =
   | { status: 'ready'; playthrough: LoadedPlaythrough; expenses: ExpenseState }
 
 function RecordedPlaythrough({ id }: { id: string }) {
+  const { employment } = useSetup()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   useEffect(() => {
     let current = true
@@ -73,9 +75,12 @@ function RecordedPlaythrough({ id }: { id: string }) {
     )
   const run = state.playthrough
   return (
-    <FinancialTracking run={run} expenses={state.expenses}>
-      <h2>Your simulation</h2>
-      <p>Gameplay is not available yet.</p>
+    <FinancialTracking
+      run={run}
+      expenses={state.expenses}
+      preview={employment?.runId === run.id ? employment.state : undefined}
+    >
+      <EmploymentPanel run={run} />
       {!run.persona && (
         <p role="alert">
           Household information for this content version is unavailable.

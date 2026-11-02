@@ -1,3 +1,5 @@
+> Phase 1 employment integration: `/simulation` now embeds a provisional employment walkthrough inside the existing financial tracking interface. Supabase creation/loading is retained; gameplay is local and unpersisted. See [behavior, database prerequisites and limitations](../docs/phase-1-employment.md). Older foundation-status descriptions below do not describe this new overlay.
+
 # CAC frontend foundation
 
 Use Node.js 24.x and npm. From this directory:

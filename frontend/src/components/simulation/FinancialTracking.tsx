@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { Walkthrough } from '../../state/employmentWalkthrough'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import type {
   ExpenseState,
@@ -67,16 +68,20 @@ function ExpenseList({
   )
 }
 
-// Pure presentation: balance/day come directly from the existing loaded run.
+// Pure presentation: retains confirmed run values alongside any explicit local overlay.
 export function FinancialTracking({
   run,
   expenses,
   children,
+  preview,
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
   children: ReactNode
+  preview?: Walkthrough
 }) {
+  const displayDay = preview?.day ?? run.currentDay
+  const displayBalance = preview?.balance ?? run.currentBalance
   const unpaid =
     expenses.status === 'ready'
       ? expenses.data.items.filter((item) => !item.paidAt)
@@ -88,13 +93,17 @@ export function FinancialTracking({
   const definitions =
     expenses.status === 'ready' && expenses.data.source === 'definitions'
   return (
-    <div className="financial-tracking">
+    <div
+      className={`financial-tracking${preview ? ' financial-tracking--preview' : ''}`}
+    >
       <div className="finance-top" aria-live="polite">
         <div>
           <h1 id="page-heading" tabIndex={-1}>
-            {run.currentDay === null
-              ? 'Current day unavailable'
-              : `Day ${run.currentDay} of 30`}
+            {preview?.day === 0
+              ? 'Before Day 1'
+              : displayDay === null
+                ? 'Current day unavailable'
+                : `Day ${displayDay} of 30`}
           </h1>
           <span>One choice at a time.</span>
         </div>
@@ -103,9 +112,9 @@ export function FinancialTracking({
         {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => (
           <li
             key={day}
-            aria-current={run.currentDay === day ? 'step' : undefined}
+            aria-current={displayDay === day ? 'step' : undefined}
             className={
-              run.currentDay !== null && day < run.currentDay
+              displayDay !== null && day < displayDay
                 ? 'finance-earlier'
                 : undefined
             }
@@ -126,15 +135,30 @@ export function FinancialTracking({
               )}
               <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
             </div>
-            <small>Status: {run.status ?? 'Unavailable'}</small>
+            <small>
+              {preview ? 'Server status' : 'Status'}:{' '}
+              {run.status ?? 'Unavailable'}
+            </small>
           </section>
           <section className="finance-money" aria-label="Current balance">
-            <span className="finance-label">Current balance</span>
+            <span className="finance-label">
+              {preview ? 'Provisional balance · not saved' : 'Current balance'}
+            </span>
             <strong className="finance-balance" aria-live="polite">
-              {run.currentBalance === null
+              {displayBalance === null
                 ? 'Unavailable'
-                : formatUsd(run.currentBalance)}
+                : formatUsd(displayBalance)}
             </strong>
+            {preview && (
+              <p className="finance-confirmed">
+                Server-confirmed balance:{' '}
+                {run.currentBalance === null
+                  ? 'Unavailable'
+                  : formatUsd(run.currentBalance)}
+                . Day {run.currentDay ?? 'unavailable'}. Gameplay progress is
+                local only.
+              </p>
+            )}
             <dl className="finance-totals">
               <div>
                 <dt>Starting balance</dt>

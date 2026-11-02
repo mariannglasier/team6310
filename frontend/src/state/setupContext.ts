@@ -1,4 +1,15 @@
-import { createContext, useContext } from 'react'
+import {
+  createContext,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
+import type { Walkthrough } from './employmentWalkthrough'
+
+export interface EmploymentOverlay {
+  readonly runId: string
+  readonly state: Walkthrough
+}
 
 // Creation receipt only; this is not a synchronized simulation snapshot.
 export interface CreatedPlaythrough {
@@ -7,6 +18,10 @@ export interface CreatedPlaythrough {
 }
 
 export interface SetupSelection {
+  readonly employment: EmploymentOverlay | null
+  readonly setEmployment: Dispatch<SetStateAction<EmploymentOverlay | null>>
+  readonly supportForNext: boolean
+  readonly replay: (support: boolean) => void
   readonly createdPlaythrough: CreatedPlaythrough | null
   readonly recordPlaythrough: (playthrough: CreatedPlaythrough) => void
   readonly selectedId: string | null

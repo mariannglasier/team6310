@@ -1,0 +1,203 @@
+.employment-game {
+  width: 100%;
+  min-width: 0;
+}
+.employment-content > h2 {
+  font-family: Georgia, serif;
+  margin-top: 0.5rem;
+}
+.employment-notice {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-surface);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+.employment-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+.employment-content {
+  min-width: 0;
+}
+.employment-board {
+  min-width: 0;
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 8px solid var(--primary);
+  border-radius: 0.5rem;
+  background: #cda778;
+  box-shadow: inset 0 0 0 2px var(--primary-hover);
+}
+.employment-board legend {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 0.25rem;
+  padding: 0.4rem 1rem;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.employment-board__postings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.employment-posting {
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.75rem 1rem 1rem;
+  color: var(--text);
+  background: #fffdf5;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 5px #0003;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.employment-posting:not(.is-locked):hover {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 3px var(--primary),
+    0 8px 16px #0005;
+}
+.employment-posting.is-locked {
+  background: #eee9df;
+  cursor: default;
+}
+.employment-posting__pin {
+  position: absolute;
+  top: 0.5rem;
+  left: calc(50% - 0.25rem);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 2px 2px #0005;
+}
+.employment-posting__status {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.employment-posting__title {
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.employment-posting__income {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+.employment-posting:focus-within,
+.employment-choice:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+.employment-choices {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.employment-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1.25rem;
+  min-height: 44px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.employment-choice:not(:disabled):hover {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 2px var(--primary),
+    0 4px 12px #0003;
+}
+.employment-choice span {
+  color: var(--text-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .employment-posting,
+  .employment-choice {
+    transition: none;
+  }
+}
+.employment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.employment-preparation,
+.employment-result,
+.employment-placeholder {
+  padding: clamp(1rem, 3vw, 2rem);
+  margin-block: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 0.75rem;
+}
+.employment-placeholder {
+  border-style: dashed;
+  background: var(--accent-surface);
+}
+.employment-facts {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--divider);
+}
+.employment-facts h3 {
+  font-size: 1rem;
+}
+.employment-history {
+  padding-left: 1.5rem;
+}
+.employment-history li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--divider);
+}
+@media (max-width: 35rem) {
+  .employment-board__postings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .employment-board {
+    padding: 0.75rem;
+    border-width: 5px;
+  }
+  .employment-actions .ui-button {
+    width: 100%;
+  }
+}
+
+.employment-posting:has(input:checked) {
+  border-color: var(--primary);
+}
+.employment-choice:focus-within {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+.employment-state {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}

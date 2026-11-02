@@ -51,6 +51,10 @@ function renderPage(
           select: vi.fn(),
           createdPlaythrough: receipt,
           recordPlaythrough: vi.fn(),
+          employment: null,
+          setEmployment: vi.fn(),
+          supportForNext: false,
+          replay: vi.fn(),
         }}
       >
         <SimulationPage />
