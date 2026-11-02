@@ -1,5 +1,12 @@
 # CAC frontend foundation
 
+The individual flow now continues from Review to `/simulation/play`, a local
+30-day employment walkthrough. Job titles/wages and qualification rules are read
+from Supabase; see [database setup and preview limits](../docs/employment-walkthrough.md).
+Browser-tab progress restores on refresh; replay starts fresh household selection.
+Other scenarios remain placeholders. A regular completion offers CAC replay.
+No protected playthrough or response rows are written by this preview.
+
 Use Node.js 24.x and npm. From this directory:
 
 ```sh

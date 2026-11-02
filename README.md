@@ -1,5 +1,14 @@
 ## Development Environment Setup
 
+### Employment walkthrough
+
+Start Vite, choose a household, review it, and confirm to open the local 30-day
+walkthrough. Jobs and wages come from Supabase. Eligibility uses only the two job
+skill requirements and the two household starting-skill flags. See [database setup](docs/employment-walkthrough.md).
+No copied edition or publication is needed for these four columns. Progress stays
+in this browser tab; protected production run storage is not connected. The approved
+clothing price is fixed at $60.
+
 ### Frontend foundation status
 
 React Router connects the responsive landing page and clearly labeled feature placeholders. The landing page links Start simulation, Join a group, and Host a group to existing routes; Learn/Donate use team-approved CAC websites. Explore Data reserves `/data`, which currently reaches the fallback page. Simulation, internal CAC information, and staff features remain scaffolding. Run `npm ci` in `frontend/` after pulling dependency changes.

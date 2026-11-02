@@ -1,5 +1,17 @@
 # CAC Poverty Simulation — User Flows
 
+**November 2, 2026 decision:** English and computer skills are the only job qualifications. Jobs store needs_english_skills / needs_computer_skills; households store has_english_skills / has_computer_skills. After failure, offer all other currently eligible jobs. At least two jobs require neither skill. This replaces the previous qualification-profile and fallback-tier model; no edition copying is needed for the four new columns. See [skill setup](../docs/employment-walkthrough.md).
+
+
+**Local walkthrough status, November 1, 2026:** Household → Review → Confirm
+selection loads the selected edition's jobs and opens `/simulation/play`.
+The first walkthrough is without CAC; finishing Day 30 offers an explicit CAC
+replay through fresh household selection. While a preview exists, returning to
+setup resumes it; Replay clears its active state and preserves a local archive.
+Refresh restores its current decision/recap and money without applying effects
+again. Other daily scenarios and facts are labeled placeholders, with a Next
+button for each remaining day. See [setup and limits](../docs/employment-walkthrough.md).
+
 ## Purpose and authority
 
 This standing specification defines user journeys and state transitions for individual play, group play, data exploration, and CAC administration. Use [UI specification](./ui-spec.md) for screen structure and interactions. Agents can use both files without external images or conversation history. Financial calculations, content schemas, API contracts, and authorization are governed by the corresponding technical specifications.
@@ -46,7 +58,7 @@ Setup Back actions preserve choices. Changing a household before confirmation us
 
 Before Day 1, show approved job options the persona qualifies for, their weekly incomes, and (when CAC is enabled) approved preparation choices. Preparation is recorded explicitly and does not itself grant assistance or employment. Show the pre-game result and the general fact, plus the CAC fact in CAC mode, before Day 1.
 
-On Day 2, offer the approved professional-clothing choices. The specified preparation-and-clothing combinations determine the first interview result; purchased or CAC-provided professional clothing becomes run state and is not charged again. After a failure, prompt the player to reapply for a lower-requirement job without skipping the Day 2 result. On Day 3, if required by the route, reuse owned professional clothing and show only the applicable clothing choice; the player gets the lower-requirement job regardless of the available clothing selection. The job catalog and preparation details remain unresolved; see [scenarios.md](../docs/scenarios.md).
+On Day 2, offer the approved professional-clothing choices. The specified preparation-and-clothing combinations determine the first interview result; purchased or CAC-provided professional clothing becomes run state and is not charged again. After a failure, prompt the player to reapply for a different eligible job without skipping the Day 2 result. On Day 3, if required by the route, reuse owned professional clothing and show only the applicable clothing choice; the player gets the different eligible job regardless of the available clothing selection. The job catalog and preparation details remain unresolved; see [scenarios.md](../docs/scenarios.md).
 
 After hiring, weekly income is paid seven days after the hiring day, not immediately. On an income due day, show a brief income notification and apply the credit before presenting scenarios. The tax-filing scenario is non-scheduled: “Try my best” has no refund or deduction; CAC assistance gives the specified $1,000 refund immediately; and the paid-preparer choice first checks whether the player can afford the fee. If not, end the run before applying any fee or refund consequence. The preparer fee amount remains unresolved.
 

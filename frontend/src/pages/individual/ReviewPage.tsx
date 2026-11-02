@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router'
+import { Link, Navigate, useNavigate } from 'react-router'
 import { PersonaAvatar } from '../../components/simulation/PersonaAvatar'
 import { avatarTone } from '../../components/simulation/avatars'
 import { splitDescription } from '../../components/simulation/householdText'
@@ -12,6 +12,8 @@ import { formatUsd } from '../../lib/money'
 import { paths } from '../../app/paths'
 import { useSetup } from '../../state/setupContext'
 import type { Persona } from '../../types/domain'
+import { contentService } from '../../services/contentService'
+import { validateSkillsCatalog } from '../../state/employmentWalkthrough'
 import '../../components/simulation/household.css'
 import './review.css'
 
@@ -58,19 +60,50 @@ function ReviewSummary({ persona }: { persona: Persona }) {
   )
 }
 
-// Summarizes the temporary household selection. Confirming cannot start a run
-// until the protected run-creation operation is connected.
+// This creates a local preview only, not a protected Supabase playthrough.
 export function ReviewPage() {
-  const { selectedId } = useSetup()
+  const { selectedId, walkthrough, startPreview, supportForNext } = useSetup()
+  const navigate = useNavigate()
   const { state, retry } = useHouseholds()
   const [notice, setNotice] = useState('')
+  const [starting, setStarting] = useState(false)
   const [fitTarget, fitStyle] = useFitScale<HTMLDivElement>()
+  if (walkthrough) return <Navigate to={paths.play} replace />
   if (selectedId === null) return <Navigate to={paths.individual} replace />
 
   const persona =
     state.status === 'ready'
       ? state.households.personas.find((item) => item.id === selectedId)
       : undefined
+
+  async function confirm() {
+    if (!persona || starting) return
+    setStarting(true)
+    setNotice('Loading jobs for your household’s content edition…')
+    try {
+      const jobs = await contentService.loadJobs(persona.versionId)
+      if (!jobs.length)
+        throw new Error(
+          'No approved jobs are available for this household’s content edition.',
+        )
+      if (jobs.some((job) => job.versionId !== persona.versionId))
+        throw new Error(
+          'Job content does not match your household’s edition. Please retry.',
+        )
+      const skillsError = validateSkillsCatalog(persona, jobs)
+      if (skillsError) throw new Error(skillsError)
+      startPreview(persona, jobs)
+      navigate(paths.play)
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : 'Unable to load jobs. Please retry.',
+      )
+    } finally {
+      setStarting(false)
+    }
+  }
 
   let content
   if (state.status === 'loading')
@@ -107,6 +140,13 @@ export function ReviewPage() {
           Your household. One month of choices.
         </p>
         {content}
+        <p className="employment-notice">
+          Local 30-day walkthrough · Employment decisions are simulated; other
+          scenarios are placeholders. Progress is saved in this browser tab.{' '}
+          {supportForNext
+            ? 'CAC support is enabled for this replay.'
+            : 'Your first walkthrough is without CAC support.'}
+        </p>
         <p className="household-page__status" role="status">
           {notice}
         </p>
@@ -116,11 +156,10 @@ export function ReviewPage() {
           </ButtonLink>
           <Button
             disabled={!persona}
-            onClick={() =>
-              setNotice(
-                'Starting the simulation is not available yet. No simulation run has been created.',
-              )
-            }
+            loading={starting}
+            onClick={() => {
+              void confirm()
+            }}
           >
             Confirm selection
           </Button>

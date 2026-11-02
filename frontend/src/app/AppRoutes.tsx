@@ -3,6 +3,7 @@ import { AppLayout } from '../layouts/AppLayout'
 import { AdminDashboardPage, AdminLoginPage } from '../pages/admin/AdminPages'
 import { HostPage, JoinPage } from '../pages/group/GroupPages'
 import { ReviewPage } from '../pages/individual/ReviewPage'
+import { EmploymentPage } from '../pages/individual/EmploymentPage'
 import {
   IndividualPage,
   ResultsPage,
@@ -38,6 +39,7 @@ export function AppRoutes() {
           />
           <Route path={paths.individual} element={<IndividualPage />} />
           <Route path={paths.review} element={<ReviewPage />} />
+          <Route path={paths.play} element={<EmploymentPage />} />
           <Route path={paths.results} element={<ResultsPage />} />
           <Route path={paths.host} element={<HostPage />} />
           <Route path={paths.join} element={<JoinPage />} />

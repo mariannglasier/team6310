@@ -1,5 +1,18 @@
 # CAC Poverty Simulation — UI Specification
 
+**November 2, 2026 decision:** English and computer skills are the only job qualifications. Jobs store needs_english_skills / needs_computer_skills; households store has_english_skills / has_computer_skills. After failure, offer all other currently eligible jobs. At least two jobs require neither skill. This replaces the previous qualification-profile and fallback-tier model; no edition copying is needed for the four new columns. See [skill setup](../docs/employment-walkthrough.md).
+
+
+**Local walkthrough status, November 1, 2026:** `/simulation/play` uses the shared
+scenic stage and controls. A responsive bulletin board displays Supabase job
+postings and weekly wages with native radio selection and an explicit Submit
+application action. Interview choice selection is separate from submission.
+Result screens retain the current day; income notices precede daily placeholders.
+The sidebar separates current balance, weekly pay, employment, preparation,
+clothing, CAC availability, and actual use. A local-preview notice distinguishes
+this flow from the protected production requirements below. Missing qualification
+rules fail closed; facts and other scenarios remain visible placeholders.
+
 ## Purpose and authority
 
 This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
@@ -19,7 +32,7 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Setup uses a two-step indicator: Household, Review. Show the current step and completed steps. CAC support is not a setup step for now; it returns later as an option offered after a regular run without it.
 - Every simulation page (`/simulation/*`) sits on the scenic stage: the supplied scenic illustration (`frontend/src/assets/scenic-simulation-background.jpg`) fills only the area between the shared header and footer, behind a white rounded content panel with an inset on every side so the scenery shows around it. The image is decorative (no alt text, no content on it); all text and controls stay on the solid white panel at the design tokens. The header and footer never sit on the image.
 - Setup pages fit one screen: header plus stage fill the viewport, the footer follows below the fold, and the page content scales down uniformly (not below 0.7) to fit without reflowing the layout. Below that scale the panel scrolls instead of shrinking text further.
-- Single-choice card sets behave as radio groups. Selecting a card does not advance the screen or commit a financial decision.
+- Household setup cards use radio groups. Gameplay job and scenario cards are native buttons; clicking or pressing Enter/Space submits immediately. Eligible job cards have a visible hover border/shadow, and unqualified cards are disabled without hover styling.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
 - On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
 
@@ -81,7 +94,7 @@ After confirmation, household and support settings are locked for that run. Acti
 
 ## 6. Pre-game and fixed employment sequence
 
-Before Day 1, show eligible approved jobs, weekly income, and CAC preparation where applicable. Preparation does not silently change state until its choice is submitted. On Day 2, present the approved professional-clothing choices and show the scripted first-interview result. Purchased or CAC-provided professional clothing is persistent run state and must not be charged again. After failure, show the lower-requirement reapplication prompt without skipping the result. On Day 3, reuse owned professional clothing and filter choices accordingly; the player gets the lower-requirement job regardless of the available clothing selection. The job catalog remains unresolved; do not invent it. Display weekly pay only on its scheduled due days, beginning seven days after hiring, with a brief income notification before that day's scenarios.
+Before Day 1, show eligible approved jobs, weekly income, and CAC preparation where applicable. Preparation does not silently change state until its choice is submitted. On Day 2, present the approved professional-clothing choices and show the scripted first-interview result. Purchased or CAC-provided professional clothing is persistent run state and must not be charged again. After failure, show the reapplication prompt for every other eligible job without skipping the result. On Day 3, reuse owned professional clothing and filter choices accordingly; the player gets the different eligible job regardless of the available clothing selection. The job catalog uses the two required-skill flags in Supabase. Display weekly pay only on its scheduled due days, beginning seven days after hiring, with a brief income notification before that day's scenarios.
 
 The non-scheduled Financial Literacy & Taxes scenario displays no refund or deduction for “Try my best.” For the paid-preparer choice, verify that the player can afford the approved fee before applying any consequence; if not, end the game before applying the fee or refund. If affordable, apply the fee and the specified $1,000 refund immediately. CAC assistance applies the specified $1,000 refund immediately without a player-paid fee. The approved preparer fee remains unresolved.
 

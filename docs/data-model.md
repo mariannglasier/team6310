@@ -1,5 +1,19 @@
 # Data Model
 
+## Employment skill columns ? November 2, 2026
+
+Jobs use needs_english_skills and needs_computer_skills. Households (personas)
+use has_english_skills and has_computer_skills. These are the only qualifications;
+null means unconfigured, never an inferred false. Job titles, wages, IDs, existing
+rows, JSON requirements, and editions stay unchanged. There is no separate
+lower-requirement or experience gate. A catalog needs at least two jobs requiring
+neither skill. See [setup](employment-walkthrough.md).
+
+Run-specific skills start from the household flags. CAC preparation updates the
+current run's skills without mutating the persona definition. Reapplication offers
+all other currently eligible jobs. The frontend action-log snapshot is local preview
+state, not an authoritative playthrough record.
+
 ## 1. Overview and evidence
 
 This relational model supports an educational financial decision game for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Players select a household persona, encounter scenarios, make choices, pay scheduled expenses, and compare outcomes with CAC assistance enabled or disabled. Statistics provide local and CAC-related educational context. Group sessions support facilitated play, and content versions identify the content used by each game.

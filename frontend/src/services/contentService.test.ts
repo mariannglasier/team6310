@@ -18,6 +18,8 @@ const personaRow = {
   general_starting_balance: 350,
   weekly_income: 0,
   starting_job_id: null,
+  has_english_skills: true,
+  has_computer_skills: false,
 }
 const jobRow = {
   job_id: 'j1',
@@ -31,6 +33,8 @@ const jobRow = {
   hours_per_week: '30.00',
   weekly_gross_income: 400.8,
   wage_source_url: 'https://data.bls.gov/timeseries/OEUM001206000000035302308',
+  needs_english_skills: false,
+  needs_computer_skills: false,
   simulation_requirements: { notes: 'Shift variability', schedule: 'x' },
 }
 
@@ -59,6 +63,8 @@ it('maps an unemployed persona with starting money in cents', () => {
     name: 'Alex',
     description: 'Alex description',
     startingBalance: 35000,
+    hasEnglishSkills: true,
+    hasComputerSkills: false,
   })
 })
 
@@ -77,6 +83,32 @@ it('maps a job using the database-generated weekly income', () => {
     requirementsNote: 'Shift variability',
   })
 })
+
+it('reads only the two job-skill columns and household-skill columns', () => {
+  expect(
+    toJob({
+      ...jobRow,
+      needs_english_skills: true,
+      needs_computer_skills: false,
+    }),
+  ).toMatchObject({ needsEnglishSkills: true, needsComputerSkills: false })
+  expect(toPersona(personaRow)).toMatchObject({
+    hasEnglishSkills: true,
+    hasComputerSkills: false,
+  })
+})
+it.each([undefined, null, 'false', 0])(
+  'does not infer missing or invalid skill flags (%s)',
+  (value) => {
+    expect(
+      toJob({ ...jobRow, needs_english_skills: value }).needsEnglishSkills,
+    ).toBeNull()
+    expect(
+      toPersona({ ...personaRow, has_computer_skills: value })
+        .hasComputerSkills,
+    ).toBeNull()
+  },
+)
 
 it('rejects jobs without a wage or year', () => {
   expect(() => toJob({ ...jobRow, median_hourly_wage: null })).toThrow()

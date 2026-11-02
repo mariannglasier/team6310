@@ -1,5 +1,15 @@
 # System Architecture — CAC Poverty Exercise
 
+**November 2, 2026 decision:** English and computer skills are the only job qualifications. Jobs store needs_english_skills / needs_computer_skills; households store has_english_skills / has_computer_skills. After failure, offer all other currently eligible jobs. At least two jobs require neither skill. This replaces the previous qualification-profile and fallback-tier model; no edition copying is needed for the four new columns. See [skill setup](employment-walkthrough.md).
+
+
+**Implemented preview update (November 1, 2026):** `/simulation/play` now connects
+household review to a local employment walkthrough and 30 placeholder days.
+Supabase supplies edition-pinned jobs, wages, and English/computer skill flags; a browser-tab
+action log restores preview progress. This is an explicit exception to the older
+foundation-only status below, not production protected financial persistence.
+See [employment walkthrough setup and limits](employment-walkthrough.md).
+
 ## 1. Purpose and scope
 
 The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a pre-game stage followed by Days 1–30 and make decisions involving approved scenario categories, housing, food, employment, and unexpected expenses. Multiple decisions may occur on one day. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.

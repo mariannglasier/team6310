@@ -28,6 +28,8 @@ const persona = (id: string, name: string, tagline: string, cents: number) => ({
   name,
   description: `${name} — ${tagline}. Age 30; single. ${name} is looking for work.`,
   startingBalance: usdCents(cents),
+  hasEnglishSkills: false,
+  hasComputerSkills: false,
 })
 
 const households: PublishedHouseholds = {

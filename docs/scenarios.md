@@ -1,5 +1,10 @@
 # Scenario Creation and Maintenance — CAC Poverty Exercise
 
+**November 2, 2026 decision:** English and computer skills are the only job qualifications. Jobs store needs_english_skills / needs_computer_skills; households store has_english_skills / has_computer_skills. After failure, offer all other currently eligible jobs. At least two jobs require neither skill. This replaces the previous qualification-profile and fallback-tier model; no edition copying is needed for the four new columns. See [skill setup](employment-walkthrough.md).
+
+
+The professional-clothing purchase is fixed at $60, approved November 1, 2026.
+
 ## 1. Purpose and authority
 
 This document directs the scenario-generation agent and the developers implementing its workflow. The agent creates one reviewable scenario per request, maintains source-backed amounts and facts, and helps staff keep the scenario library aligned with CAC services. Gameplay uses saved, approved content; it never requests a model-generated scenario during play.
@@ -219,13 +224,13 @@ Offer buying professional clothes, making current clothes work, or using the CAC
 
 This deliberately means every player in non-CAC mode fails the first interview. It is a scripted educational rule, not a real-world statistical claim. Explain simulated conditions respectfully; do not suggest that household hardship or clothing determines a person's worth.
 
-After failure, prompt the player immediately on Day 2 to reapply for a lower-requirement job. This additional decision must not advance to Day 3 automatically or skip the result screen.
+After failure, prompt the player immediately on Day 2 to reapply for a different eligible job. This additional decision must not advance to Day 3 automatically or skip the result screen.
 
 ### Day 3: follow-up interview after failure
 
 If the player already owns purchased or CAC professional clothes, offer only “Wear my professional clothes.” Otherwise offer the same clothing options as the first interview, filtered by CAC availability. Do not charge again for previously acquired clothes.
 
-The team has specified that the player gets the lower-requirement job after the Day 3 follow-up interview regardless of which available clothing choice is selected. Do not reuse the first interview's education gate. This is a scripted simulation rule, not a real-world employment claim.
+The team has specified that the player gets the different eligible job after the Day 3 follow-up interview regardless of which available clothing choice is selected. Do not reuse the first interview's education gate. This is a scripted simulation rule, not a real-world employment claim.
 
 ### Employment state and weekly income
 
@@ -271,8 +276,8 @@ These are implementation acceptance criteria, not tests claimed to have passed. 
 
 Resolve these before implementing or publishing the affected behavior; unrelated draft writing can continue.
 
-1. **Day 3 hiring:** Resolved: the player gets the lower-requirement job regardless of the available clothing selection. The job is recorded on Day 3 and weekly income begins on Day 10. The remaining clothing presentation and state-recording details follow the approved flow above.
-2. **Job catalog and preparation:** Exact jobs, weekly amounts, qualifications, persona mappings, and how the pre-game job selection and preparation choices fit together. Confirm which education qualifies the player for each first-interview job.
+1. **Day 3 hiring:** Resolved: the player gets the different eligible job regardless of the available clothing selection. The job is recorded on Day 3 and weekly income begins on Day 10. The remaining clothing presentation and state-recording details follow the approved flow above.
+2. **Job catalog and preparation:** Resolved November 2, 2026: only English and computer skills determine eligibility. Jobs store needs_english_skills and needs_computer_skills; households store has_english_skills and has_computer_skills. Alex and Jordan start with English only, Patricia with neither, Sofia with computer skills only. CAC preparation supplies both skills to the current run. Home Health requires English only; no experience requirement applies to any job. After failure, offer all other eligible jobs. At least two jobs must require neither skill.
 3. **Tax details:** Resolved: “Try my best” has no refund or deduction; the $1,000 refund is immediate; the player must afford the paid-preparer fee before any fee or refund consequence; an unaffordable choice ends the game before consequences; and the scenario is non-scheduled. The approved preparer fee remains to be supplied.
 4. **Daily ordering and payment failure:** Resolved: automatic income is credited with a brief notification before scenarios are presented; scheduled and non-scheduled payments, bills, and events use the same scenario flow at the end of the day; an unaffordable attempted optional choice ends the run, even if it is the only option; and a missed or unaffordable required payment ends the run.
 5. **Source selection:** Exact API variables, series, observation rules, geographies, quantities, conversions, baseline assumptions and supported formulas for each bound value. Verify model identifier availability before deployment.

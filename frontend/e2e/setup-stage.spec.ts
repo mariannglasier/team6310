@@ -133,7 +133,9 @@ test('household and review fit the screen on desktop and tablet and stay inside 
   await expect(
     page.getByRole('heading', { name: 'Review your setup.' }),
   ).toBeFocused()
-  await expect(page.getByText('CAC support')).toHaveCount(0)
+  await expect(
+    page.getByText(/first walkthrough is without CAC support/),
+  ).toBeVisible()
   await expect(page.getByText('$350.00')).toBeVisible()
   await page.waitForTimeout(400)
   measured = await fit()

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
 import { HouseholdCarousel } from '../../components/simulation/HouseholdCarousel'
 import { PlaceholderPage } from '../../components/PlaceholderPage'
 import { Button, ButtonLink } from '../../components/ui/Button'
@@ -11,7 +11,7 @@ import { useSetup } from '../../state/setupContext'
 
 // Household choices come from approved published content. Selecting one is
 // temporary UI state: it creates no run, locks nothing, and changes no finances.
-// Jobs are not chosen here; employment decisions start on Day 1.
+// Jobs are not chosen here; employment decisions start before Day 1.
 function HouseholdChoices({
   selectedId,
   onSelect,
@@ -43,9 +43,10 @@ function HouseholdChoices({
 }
 
 export function IndividualPage() {
-  const { selectedId, select } = useSetup()
+  const { selectedId, select, walkthrough } = useSetup()
   const navigate = useNavigate()
   const [fitTarget, fitStyle] = useFitScale<HTMLDivElement>()
+  if (walkthrough) return <Navigate to={paths.play} replace />
   return (
     <div ref={fitTarget} style={fitStyle} className="household-page">
       <PageSection
