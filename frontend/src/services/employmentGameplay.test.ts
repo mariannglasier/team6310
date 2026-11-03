@@ -61,6 +61,13 @@ it.each([
   { ...initial, stage: 'hacked' },
   { ...initial, receipts: [] },
   { ...initial, stage: 'board' },
+  { ...initial, schemaVersion: '1' },
+  { ...initial, revision: 1 },
+  { ...initial, prepared: false },
+  {
+    ...initial,
+    receipts: { bad: { action: { type: 'end' }, expectedRevision: 0 } },
+  },
 ])('rejects incompatible documents without initializing: %j', (value) => {
   expect(() => documentState(value)).toThrow()
 })

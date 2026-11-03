@@ -1,15 +1,103 @@
 -- Review-only additive migration. Never backfills or initializes existing runs.
 -- Deployment prerequisite: verify playthrough status CHECKs accept completed/ended.
 begin;
+-- Pin definer ownership to the existing playthrough table owner below, not the
+-- incidental migration runner. Abort if that owner cannot support this contract.
+do $$
+declare owner_name name;
+begin
+ if current_setting('cac.employment_security_reviewed',true) is distinct from 'on' then
+   raise exception 'Deployment blocked: review hosted owner, grants, INSERT policies and status/day constraints, then explicitly SET cac.employment_security_reviewed=on in the deployment session';
+ end if;
+ select r.rolname into owner_name from pg_class c join pg_roles r on r.oid=c.relowner
+ where c.oid='public.playthroughs'::regclass;
+ if (select relforcerowsecurity from pg_class where oid='public.playthroughs'::regclass) then
+   raise exception 'Review required: FORCE RLS needs an explicit function-owner policy design';
+ end if;
+ if not (select relrowsecurity from pg_class where oid='public.playthroughs'::regclass) then
+   raise exception 'Review required: playthrough RLS must be enabled';
+ end if;
+ if not has_table_privilege(owner_name,'public.personas','SELECT')
+    or not has_table_privilege(owner_name,'public.jobs','SELECT')
+    or not has_table_privilege(owner_name,'public.content_versions','SELECT') then
+   raise exception 'Review required: playthrough owner lacks required content reads';
+ end if;
+end $$;
+-- Pure shape validation, also used for replay references. No table access.
+create function public.valid_employment_document(s jsonb) returns boolean
+language plpgsql immutable security invoker set search_path = '' as $$
+declare e jsonb; k text; n integer;
+begin
+ if jsonb_typeof(s) is distinct from 'object' or s->>'engine' is distinct from 'employment-v1'
+    or s->'schemaVersion' is distinct from '1'::jsonb
+    or jsonb_typeof(s->'revision') is distinct from 'number' or s->>'revision' !~ '^[0-9]+$'
+    or jsonb_typeof(s->'receipts') is distinct from 'object'
+    or jsonb_typeof(s->'stage') is distinct from 'string' then return false; end if;
+ n:=(s->>'revision')::integer;
+ if exists(select 1 from jsonb_object_keys(s) key where key not in ('engine','schemaVersion','revision','stage','receipts','prepared','hasEnglishSkills','hasComputerSkills','clothing','targetId','initialTargetId','hiredDay','weeklyIncome','assistanceUsed','history','creditedDays','reason')) then return false; end if;
+ for e in select value from jsonb_each(s->'receipts') loop
+   if jsonb_typeof(e) is distinct from 'object' or not (e ?& array['action','expectedRevision','revision','day','change','stage'])
+      or jsonb_typeof(e->'action') is distinct from 'object'
+      or jsonb_typeof(e->'expectedRevision') is distinct from 'number' or e->>'expectedRevision' !~ '^[0-9]+$'
+      or jsonb_typeof(e->'revision') is distinct from 'number' or e->>'revision' !~ '^[0-9]+$'
+      or jsonb_typeof(e->'day') is distinct from 'number' or e->>'day' !~ '^[0-9]+$'
+      or jsonb_typeof(e->'change') is distinct from 'string' or e->>'change' !~ '^-?[0-9]+([.][0-9]{1,2})?$'
+      or jsonb_typeof(e->'stage') is distinct from 'string' then return false; end if;
+   if (e->>'revision')::integer <> (e->>'expectedRevision')::integer+1
+      or (e->>'revision')::integer>n or (e->>'day')::integer not between 1 and 30 then return false; end if;
+ end loop;
+ if s->>'stage'='uninitialized' then
+   return n=0 and s->'receipts'='{}'::jsonb and (select count(*) from jsonb_object_keys(s))=5;
+ end if;
+ if not (s ?& array['prepared','hasEnglishSkills','hasComputerSkills','assistanceUsed','clothing','targetId','initialTargetId','hiredDay','weeklyIncome','history','creditedDays','reason'])
+    or s->>'stage' not in ('board','preparation-result','application-result','day','interview','interview-result','reapply','reapply-result','income','complete','ended') then return false; end if;
+ foreach k in array array['prepared','hasEnglishSkills','hasComputerSkills','assistanceUsed'] loop
+   if jsonb_typeof(s->k) is distinct from 'boolean' then return false; end if;
+ end loop;
+ foreach k in array array['targetId','initialTargetId'] loop
+   if s->k <> 'null'::jsonb then
+     if jsonb_typeof(s->k) is distinct from 'string' then return false; end if;
+     perform (s->>k)::uuid;
+   end if;
+ end loop;
+ if s->'reason' <> 'null'::jsonb and jsonb_typeof(s->'reason') is distinct from 'string' then return false; end if;
+ if s->'hiredDay' <> 'null'::jsonb and s->'hiredDay' not in ('2'::jsonb,'3'::jsonb) then return false; end if;
+ if jsonb_typeof(s->'weeklyIncome') is distinct from 'string' or s->>'weeklyIncome' !~ '^[0-9]+([.][0-9]{1,2})?$'
+    or jsonb_typeof(s->'clothing') is distinct from 'string' or s->>'clothing' not in ('none','purchased','cac')
+    or jsonb_typeof(s->'history') is distinct from 'array' or jsonb_typeof(s->'creditedDays') is distinct from 'array' then return false; end if;
+ for e in select value from jsonb_array_elements(s->'history') loop
+   if jsonb_typeof(e) is distinct from 'object' or jsonb_typeof(e->'text') is distinct from 'string'
+      or jsonb_typeof(e->'day') is distinct from 'number' or e->>'day' !~ '^[0-9]+$'
+      or jsonb_typeof(e->'change') is distinct from 'string' or e->>'change' !~ '^-?[0-9]+([.][0-9]{1,2})?$' then return false; end if;
+   if (e->>'day')::integer not between 0 and 30 then return false; end if;
+ end loop;
+ for e in select value from jsonb_array_elements(s->'creditedDays') loop
+   if jsonb_typeof(e) is distinct from 'number' or e::text !~ '^[0-9]+$' then return false; end if;
+   if e::text::integer not between 1 and 30 then return false; end if;
+ end loop;
+ return true;
+exception when others then return false;
+end $$;
+revoke all on function public.valid_employment_document(jsonb) from public,anon,authenticated;
+
 create function public.mark_fresh_employment_run() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
+  -- Recheck the insertion invariants even for paths which bypass INSERT RLS.
+  -- Nonparticipant/maintenance inserts are left untouched, never auto-stamped.
+  if auth.uid() is null or new.owner_user_id is distinct from auth.uid()
+     or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) is not true
+     or new.started_at is null then return new; end if;
+  if not exists(select 1 from public.personas p join public.content_versions v on v.version_id=p.version_id
+      where p.persona_id=new.persona_id and p.version_id=new.version_id
+      and v.status='published' and v.published_at is not null
+      and new.current_balance=coalesce(p.general_starting_balance,0)) then return new; end if;
   if new.employment_state is null and new.status = 'active' and new.current_day = 1
      and new.current_job_id is null and new.current_scenario_id is null
      and new.session_id is null and new.cac_support_enabledabled is null then
     update public.playthroughs set employment_state = jsonb_build_object(
       'engine','employment-v1','schemaVersion',1,'revision',0,'stage','uninitialized','receipts','{}'::jsonb)
-    where playthrough_id = new.playthrough_id;
+    where playthrough_id = new.playthrough_id and owner_user_id=auth.uid();
   end if;
   return new;
 end $$;
@@ -31,14 +119,29 @@ begin
  if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) is not true then
    raise exception 'Participant authentication required';
  end if;
- select * into r from public.playthroughs where playthrough_id=p_run_id for update;
+ if p_run_id is null or p_request_id is null or p_revision is null or p_revision<0
+    or p_action is null or jsonb_typeof(p_action) is distinct from 'object'
+    or jsonb_typeof(p_action->'type') is distinct from 'string' then raise exception 'Invalid request'; end if;
+ a:=p_action->>'type';
+ if a not in ('initialize','prepare','apply','interview','continue','end') then raise exception 'Invalid action'; end if;
+ if exists(select 1 from jsonb_object_keys(p_action) k where k not in ('type',case a when 'initialize' then 'replayOf' when 'apply' then 'jobId' when 'interview' then 'choice' else 'type' end)) then raise exception 'Unexpected action fields'; end if;
+ if a='apply' then
+   if jsonb_typeof(p_action->'jobId') is distinct from 'string' then raise exception 'Invalid job ID'; end if;
+   perform (p_action->>'jobId')::uuid;
+ elsif a='initialize' and p_action ? 'replayOf' then
+   if jsonb_typeof(p_action->'replayOf') is distinct from 'string' then raise exception 'Invalid replay ID'; end if;
+   perform (p_action->>'replayOf')::uuid;
+ elsif a='interview' then
+   if jsonb_typeof(p_action->'choice') is distinct from 'string' or p_action->>'choice' not in ('purchase','current','cac','owned') then raise exception 'Invalid clothing choice'; end if;
+ end if;
+ select * into r from public.playthroughs where playthrough_id=p_run_id and owner_user_id=auth.uid() for update;
  if not found or r.owner_user_id is distinct from auth.uid() then raise exception 'Run unavailable'; end if;
  s := r.employment_state;
- if s is null or jsonb_typeof(s) <> 'object' or s->>'engine' is distinct from 'employment-v1' or s->>'schemaVersion' is distinct from '1'
+ if not public.valid_employment_document(s) then raise exception 'Unsupported employment document'; end if;
+ if s is null or jsonb_typeof(s) <> 'object' or s->>'engine' is distinct from 'employment-v1' or s->'schemaVersion' is distinct from '1'::jsonb
     or jsonb_typeof(s->'receipts') is distinct from 'object'
     or jsonb_typeof(s->'revision') is distinct from 'number'
     or (s->>'revision') !~ '^[0-9]+$' then raise exception 'Unsupported employment state; run unchanged'; end if;
- if p_request_id is null or p_revision is null or p_action is null or jsonb_typeof(p_action)<>'object' then raise exception 'Invalid request'; end if;
  if exists(select 1 from jsonb_object_keys(s) k where k not in ('engine','schemaVersion','revision','stage','receipts','prepared','hasEnglishSkills','hasComputerSkills','clothing','targetId','initialTargetId','hiredDay','weeklyIncome','assistanceUsed','history','creditedDays','reason')) then raise exception 'Unfamiliar employment document'; end if;
  if exists(select 1 from jsonb_each(s->'receipts') e where jsonb_typeof(e.value->'action') is distinct from 'object' or jsonb_typeof(e.value->'expectedRevision') is distinct from 'number') then raise exception 'Invalid receipts'; end if;
  receipt := s->'receipts'->p_request_id::text;
@@ -51,10 +154,8 @@ begin
  if revision <> p_revision then raise exception 'Stale revision'; end if;
  if r.status is distinct from 'active' or r.session_id is not null then raise exception 'Run is not active individual gameplay'; end if;
  st:=s->>'stage'; a:=p_action->>'type'; day:=r.current_day;
- if a is null or a not in ('initialize','prepare','apply','interview','continue','end') then raise exception 'Invalid action'; end if;
- if exists(select 1 from jsonb_object_keys(p_action) k where k not in ('type',case a when 'initialize' then 'replayOf' when 'apply' then 'jobId' when 'interview' then 'choice' else 'type' end)) then raise exception 'Unexpected action fields'; end if;
  if a='initialize' then
-   if st is distinct from 'uninitialized' or revision<>0 or day<>1 or r.current_balance is null
+   if st is distinct from 'uninitialized' or revision<>0 or day is distinct from 1 or r.current_balance is null
       or r.current_job_id is not null or r.current_scenario_id is not null
       or r.cac_support_enabledabled is not null then raise exception 'Not a fresh run'; end if;
    select * into persona from public.personas where persona_id=r.persona_id and version_id=r.version_id;
@@ -64,12 +165,13 @@ begin
    support:=false;
    if p_action->>'replayOf' is not null then
      if (p_action->>'replayOf')::uuid=p_run_id then raise exception 'Invalid replay'; end if;
-     select * into prev from public.playthroughs where playthrough_id=(p_action->>'replayOf')::uuid;
+     select * into prev from public.playthroughs where playthrough_id=(p_action->>'replayOf')::uuid and owner_user_id=auth.uid();
      if not found or prev.owner_user_id is distinct from auth.uid() or prev.status is distinct from 'completed'
         or prev.cac_support_enabledabled is distinct from false
+        or not public.valid_employment_document(prev.employment_state)
         or prev.employment_state->>'engine' is distinct from 'employment-v1'
-        or prev.employment_state->>'schemaVersion' is distinct from '1'
-        or prev.employment_state->>'stage' is distinct from 'complete' or prev.current_day<>30 then raise exception 'Replay not eligible'; end if;
+        or prev.employment_state->'schemaVersion' is distinct from '1'::jsonb
+        or prev.employment_state->>'stage' is distinct from 'complete' or prev.current_day is distinct from 30 then raise exception 'Replay not eligible'; end if;
      support:=true;
    end if;
    r.cac_support_enabledabled:=support;
@@ -155,9 +257,31 @@ begin
  s:=s || jsonb_build_object('revision',revision+1,'receipts',(s->'receipts')||jsonb_build_object(p_request_id::text,receipt));
  update public.playthroughs set employment_state=s,current_balance=r.current_balance,current_day=r.current_day,
    current_job_id=r.current_job_id,cac_support_enabledabled=r.cac_support_enabledabled,status=r.status
- where playthrough_id=p_run_id returning * into r;
+ where playthrough_id=p_run_id and owner_user_id=auth.uid() returning * into r;
+ if not found then raise exception 'Run unavailable'; end if;
  return jsonb_build_object('run',to_jsonb(r),'receipt',receipt);
 end $$;
 revoke all on function public.submit_employment_action(uuid,uuid,integer,jsonb) from public,anon;
 grant execute on function public.submit_employment_action(uuid,uuid,integer,jsonb) to authenticated;
+-- Explicit owner assignment and ACL normalization. Object identifiers come only
+-- from trusted system catalogs, never gameplay arguments.
+do $$
+declare owner_name name; f regprocedure; grantee_name name; grant_row record;
+begin
+ select r.rolname into owner_name from pg_class c join pg_roles r on r.oid=c.relowner
+ where c.oid='public.playthroughs'::regclass;
+ foreach f in array array['public.valid_employment_document(jsonb)'::regprocedure,'public.mark_fresh_employment_run()'::regprocedure,
+   'public.submit_employment_action(uuid,uuid,integer,jsonb)'::regprocedure] loop
+   execute format('alter function %s owner to %I',f,owner_name);
+   execute format('revoke all on function %s from public',f);
+   for grant_row in select distinct x.grantee from pg_proc p,
+      lateral aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x
+      where p.oid=f and x.grantee<>p.proowner and x.grantee<>0 loop
+     select rolname into grantee_name from pg_roles where oid=grant_row.grantee;
+     execute format('revoke all on function %s from %I cascade',f,grantee_name);
+   end loop;
+ end loop;
+ grant execute on function public.submit_employment_action(uuid,uuid,integer,jsonb) to authenticated;
+end $$;
+
 commit;

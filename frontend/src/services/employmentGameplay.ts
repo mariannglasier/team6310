@@ -97,6 +97,35 @@ export function documentState(value: unknown): Record<string, unknown> {
     throw new UnsupportedEmploymentDocumentError(
       'Unfamiliar employment document',
     )
+  for (const value of Object.values(s.receipts as Record<string, unknown>)) {
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+      throw new UnsupportedEmploymentDocumentError()
+    const r = value as Record<string, unknown>
+    if (
+      !r.action ||
+      typeof r.action !== 'object' ||
+      Array.isArray(r.action) ||
+      !Number.isSafeInteger(r.expectedRevision) ||
+      Number(r.expectedRevision) < 0 ||
+      !Number.isSafeInteger(r.revision) ||
+      r.revision !== Number(r.expectedRevision) + 1 ||
+      Number(r.revision) > Number(s.revision) ||
+      !Number.isInteger(r.day) ||
+      Number(r.day) < 1 ||
+      Number(r.day) > 30 ||
+      typeof r.stage !== 'string' ||
+      typeof r.change !== 'string' ||
+      !/^-?\d+(?:\.\d{1,2})?$/.test(r.change)
+    )
+      throw new UnsupportedEmploymentDocumentError()
+  }
+  if (
+    s.stage === 'uninitialized' &&
+    (Object.keys(s).length !== 5 ||
+      s.revision !== 0 ||
+      Object.keys(s.receipts as object).length !== 0)
+  )
+    throw new UnsupportedEmploymentDocumentError()
   if (s.stage !== 'uninitialized') {
     for (const k of [
       'prepared',
@@ -125,6 +154,25 @@ export function documentState(value: unknown): Record<string, unknown> {
         throw new UnsupportedEmploymentDocumentError(
           'Invalid employment document',
         )
+    if (
+      typeof s.weeklyIncome !== 'string' ||
+      !/^\d+(?:\.\d{1,2})?$/.test(s.weeklyIncome) ||
+      (s.creditedDays as unknown[]).some(
+        (d) => !Number.isInteger(d) || Number(d) < 1 || Number(d) > 30,
+      )
+    )
+      throw new UnsupportedEmploymentDocumentError()
+    for (const e of s.history as Record<string, unknown>[])
+      if (
+        !e ||
+        typeof e.text !== 'string' ||
+        !Number.isInteger(e.day) ||
+        Number(e.day) < 0 ||
+        Number(e.day) > 30 ||
+        typeof e.change !== 'string' ||
+        !/^-?\d+(?:\.\d{1,2})?$/.test(e.change)
+      )
+        throw new UnsupportedEmploymentDocumentError()
     parseUsdCents(s.weeklyIncome, 'weeklyIncome')
   }
   return s
