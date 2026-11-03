@@ -104,7 +104,7 @@ One game attempt and its current financial and scenario state.
 | playthrough_id | uuid | Unique attempt identifier. | Specified PK. |
 | persona_id | uuid | Selected household profile. | Specified FK → personas.persona_id. |
 | current_scenario_id | uuid | Current scenario. | Specified FK → scenarios.scenario_id; nullability at start/end unresolved. |
-| current_balance | numeric(12,2) | Current available balance in USD. | Exact decimal or integer-cent arithmetic; signed changes. A required payable event that cannot be paid ends the run without recording an unaffordable charge. |
+| current_balance | numeric(12,2) | Current available balance in USD. | Exact decimal or integer-cent arithmetic; signed changes. Ignored bill principal/fees remain liabilities separate from cash. An unaffordable attempted paid choice or non-deferrable required payable event ends the run without recording a successful charge; bill Ignore allows continuation. |
 | current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; multiple decisions can occur on one day. |
 | cac_support_enabled | boolean | Whether CAC assistance applies. | Default and requiredness unresolved. |
 | status | text | Game progress state. | Allowed values and transitions unresolved (C4). |
@@ -126,6 +126,10 @@ Individual bill occurrences, including recurring charges and payment state.
 | amount_due | numeric(12,2) | Amount charged for this occurrence. | Range and snapshot behavior unresolved (C2, C1). |
 | paid_at | timestamptz | Actual payment timestamp. | Specified optional; NULL represents no recorded payment. |
 | version_id | uuid | Content version associated with this bill. | Specified FK → content_versions.version_id; C1. |
+
+**Approved unpaid-bill extension, November 2, 2026 (schema pending):** run-specific bill occurrences must distinguish principal, outstanding principal, fee components, total outstanding and settlement status. Ignore records a liability plus an approved late fee, not a cash deduction; it completes the original scenario response. Bills may remain unpaid through Day 30. A separate protected sidebar Pay operation settles the current outstanding total once, removes the item from the unpaid list and preserves payment history and the original Ignore response. It neither advances the day nor changes response counts. Fee timing/repetition and any partial-payment policy remain unresolved; draft library examples assume one fee only for review, not an approved recurrence rule. Final storage names, composite edition references, fee/settlement idempotency keys and transaction design must be approved before implementation. No financial or state effect is implemented by this note.
+
+End summaries retain each remaining bill's principal, fees and outstanding total separately from available cash, plus approved possible future-consequence text. Pay history and unpaid state restore on refresh. Do not reconstruct liabilities by charging the bill again or infer them solely from `paid_at` without the approved state model.
 
 ### `player_responses`
 
@@ -264,7 +268,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | --- | --- | --- |
 | C1 | Content versions | Resolved design: stable logical IDs with edition-scoped rows; published editions are immutable; pending edits are separate; every playthrough retains its starting version_id. Final DDL and publication transaction remain pending. |
 | C2 | Money | Resolved design: USD, exact decimal/integer-cent arithmetic, final rounding once to cents with half-cent ties away from zero, signed balance changes, and capped assistance. |
-| C3 | Simulation time | Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
+| C3 | Simulation time | Revised November 2, 2026: pre-game plus Days 1–30; one ordinary event per day, with no ordinary scenario on job-event days. Preserve the original Day 2 interview/result/immediate reapplication exception and conditional Day 3 interview. Recap precedes Continue to next day. Automatic income occurs first, seven days after hiring. Sidebar settlement is not a scenario/day advance. Bill Ignore allows unpaid debt through Day 30; unaffordable attempted paid choices and non-deferrable required payments retain ending behavior. |
 | C4 | States and nullability | Define playthrough statuses and transitions; confirm group/content status vocabularies. Decide required text, FKs, timestamps, and version fields; decide whether current_scenario_id may be NULL while waiting or after completion. |
 | C5 | Decision/payment consistency | Validate scenario, choice, ownership, eligibility, support, and edition in protected operations. Commit response, state changes, and payment/income idempotency atomically. Prevent duplicate scheduled/scenario charges. |
 | C6 | Group participation | Define join-code uniqueness (global or active sessions only), expiration, membership identity, participant visibility, deadline enforcement, and how group answers advance each attempt. No round identifier or vote aggregation rule is supplied. |

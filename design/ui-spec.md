@@ -85,7 +85,7 @@ Before Day 1, show eligible approved jobs, weekly income, and CAC preparation wh
 
 The non-scheduled Financial Literacy & Taxes scenario displays no refund or deduction for “Try my best.” For the paid-preparer choice, verify that the player can afford the approved fee before applying any consequence; if not, end the game before applying the fee or refund. If affordable, apply the fee and the specified $1,000 refund immediately. CAC assistance applies the specified $1,000 refund immediately without a player-paid fee. The approved preparer fee remains unresolved.
 
-If an optional choice is attempted and unaffordable, end the run even if it is the only available choice. If a required payment is missed or unaffordable, end the run. In both cases, do not display a successful deduction or invent a loan.
+If a paid choice is attempted and unaffordable, end the run even if it is the only available choice. Non-deferrable required payments retain the early-ending rule. Bill Ignore is the approved exception: record unpaid principal plus a late fee, show it in the sidebar and allow continuation through Day 30. Do not display a successful deduction or invent a loan. See the unpaid-bill interface below; fee values/timing/repetition and any partial-payment policy remain unresolved.
 
 ## 7. Simulation decision screen
 
@@ -94,13 +94,16 @@ Display:
 - Pre-game state or current day and progress through 30 days.
 - Household's available balance.
 - Upcoming expenses with amounts and due dates.
+- Unpaid bills, separately labeled from upcoming projections and current cash; each shows principal, late fees, total outstanding and a Pay button.
 - Scenario heading and explanation.
 - Available decision cards with relevant immediate costs or support labels.
 - Submit Decision and End Simulation actions.
 
 Render options from scenario content and the selected support setting; do not assume a fixed number of options. Submit Decision remains unavailable until a valid option is selected. Selection alone does not change finances.
 
-Submitting commits the choice and its defined effects once. Disable repeated submission while processing and after success. Multiple decisions may occur on one day; completing a question does not inherently advance the calendar. Process scheduled income and required payable events through the simulation model, and end early when a required event cannot be paid. Normal completion occurs after Day 30. Do not introduce an automatic early-ending rule based only on balance.
+Submitting commits the choice and its defined effects once. Every displayed answer resolves the scenario; informational review controls are outside the answer list. Disable repeated submission while processing and after success. Ordinary scenarios and job events occupy separate days. Preserve the existing Day 2 interview/result/immediate reapplication exception and conditional Day 3 interview; no unrelated event shares an interview day. After an ordinary committed result, Continue advances to the next day. Income notices occur first and do not consume another scenario. Ignoring a bill continues play with unpaid debt; unaffordable attempted paid choices/non-deferrable required payments retain ending behavior. Normal completion occurs after Day 30 even with unpaid bills. Do not introduce an automatic ending based only on balance or outstanding debt.
+
+**Unpaid-bill interface (approved November 2, 2026; implementation pending):** Ignore records a liability plus the approved late fee with no cash deduction. Pay on an unpaid item submits a separate protected settlement, disables duplicate activation while pending, and removes the item only after successful payment; preserve its original decision and history. It does not advance the day or replace the day's scenario. Errors must not falsely mark a bill paid or erase debt; an unaffordable attempted payment follows the existing ending rule. Use semantic keyboard-operable buttons with a bill-specific accessible name and visible focus. Announce successful settlement and retain sensible focus after removing an item. Stack/expand unpaid items on narrow screens with every amount and action accessible. Do not silently compound fees or infer partial-payment controls.
 
 Use financial outcomes and expense schedules supplied by the simulation model. Do not invent amounts, income dates, affordability rules, or consequences in presentation components.
 
@@ -118,7 +121,7 @@ Individual players use Continue Simulation to advance. Group participants see th
 
 Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run.
 
-Include days completed, ending/current balance, completed decisions and consequences, CAC support availability and actual use, and applicable comparisons. Do not fabricate results for unanswered questions.
+Include days completed, ending/current balance, completed decisions and consequences, CAC support availability and actual use, and applicable comparisons. List remaining unpaid principal, late fees and total debt separately from available cash, plus approved possible future consequences for each outstanding bill. Completing the month with debt is allowed; do not imply it was paid, erase it, or subtract it from cash as a new transaction. End-screen text is explanatory, not an automatic within-month eviction, shutoff or legal outcome. Ended runs cannot make sidebar payments. Do not fabricate results for unanswered questions.
 
 Provide Replay, View Data Visualization, Donate to CAC, Visit CAC Site, and Return Home. Replay returns to household setup so the player can choose a household and support setting again. A new run resets balance, day, decision history, circumstances, and expense state.
 
@@ -177,4 +180,4 @@ Show loading feedback during content retrieval and submission. If required conte
 
 ## Verification criteria
 
-Verify explicit household/support choices, editable Review, locked active setup, pre-game employment and clothing flow, both support modes, same-day decisions, scheduled weekly income, Day 30 completion, inability-to-pay early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard and narrow-screen use throughout.
+Verify explicit household/support choices, editable Review, locked active setup, pre-game employment and clothing flow, both support modes, separated ordinary/job-event days with the unchanged Day 2 exception, scheduled weekly income, ignored bills/fees/sidebar settlement, Day 30 completion with debt and future-consequence explanations, unaffordable-attempt/non-deferrable-payment early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard and narrow-screen use throughout.

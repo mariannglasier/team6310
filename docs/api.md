@@ -326,6 +326,8 @@ The reference mechanism must be defined during architecture and implementation. 
 
 ### Calculating Simulation Values 
 
+**November 2, 2026 content revision:** ordinary scenarios may represent hardship without a CAC service. The proposed amounts in the offline draft library are unapproved simulation assumptions, not retrieved prices or benefits. Ignored bills require edition-scoped principal and late-fee bindings and approved fee timing/repetition; do not derive fees from annual CAC totals or add them during a source refresh without approval. Remaining liabilities are separate from cash deductions. Future-consequence text requires approved context and must not be presented as a legal prediction. See [scenarios.md](scenarios.md), section 12. This documentation does not implement liability storage or payment processing.
+
 Some simulation expenses will require calculations using sourced values and scenario-specific inputs. 
 
 For example: 

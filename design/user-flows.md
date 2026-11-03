@@ -69,10 +69,20 @@ flowchart TD
 3. Submit Decision records the option under its question and applies the approved financial/situational effects exactly once. Block repeated commits from clicks, retries, or refreshes.
 4. Show the inline recap beneath the cards, preserving the selected option. Include immediate consequence, financial breakdown, projected balance after upcoming expenses, and circumstance changes.
 5. Submitted choices become read-only. Include an approved question-linked comparison when available.
-6. Individual players select Continue Simulation after reviewing the recap. Multiple decisions may occur on the same day; completing a question does not inherently advance the calendar. Advance only after required same-day events and recaps are handled. Advancing does not reapply the previous choice.
+6. Individual players select Continue Simulation after the committed recap to advance to the next day. Ordinary scenarios and job events must not share a day. Preserve the existing exception: after a failed Day 2 interview, show its result and immediate same-day reapplication, then advance to the conditional Day 3 interview. No unrelated scenario shares either interview day. Automatic payday notifications are not scenarios. Advancing never reapplies the previous choice.
 7. Completion of the Day 30 question leads to the results summary after its recap. The day counter remains within the 30-day month.
 
-The UI consumes balances, scheduled income, end-of-day scenarios, and consequences from the simulation model. Upcoming-expense projections are separate from actual deductions. Automatic income is credited in a brief notification before that day's scenarios; scheduled and non-scheduled scenarios use the same scenario interaction flow. An attempted unaffordable optional choice or an unaffordable/missed required payment ends the run without recording an unaffordable charge. Do not use player identity to calculate finances or introduce new financial policies in the frontend. Normal completion is Day 30; players can also choose End Simulation.
+The UI consumes balances, scheduled income, end-of-day scenarios, and consequences from the simulation model. Upcoming-expense projections and unpaid liabilities are separate from actual deductions. Automatic income is credited in a brief notification before that day's scenario; scheduled and non-scheduled scenarios use the same interaction flow. Every displayed gameplay answer resolves its scenario; reviewing information belongs outside the answer list. An attempted unaffordable paid choice or non-deferrable required payment ends the run without recording a successful charge. Bill Ignore is the approved continuation path described below. Do not use player identity to calculate finances or introduce financial policies in the frontend. Normal completion is Day 30; players can also choose End Simulation.
+
+## Unpaid bills and sidebar settlement
+
+Approved November 2, 2026; content/specification requirements, not implemented UI:
+
+1. A bill offers Pay, Ignore, and CAC help only if applicable. Ignore is a complete submitted answer, not an unanswered bill or a reason to end play.
+2. Ignore deducts no cash, records principal plus the approved late fee once, shows the unpaid total in the sidebar, and opens the decision recap. Continue proceeds normally.
+3. Each unpaid item shows principal, fees, total and a Pay button. Pay uses the separate protected settlement operation; successful payment removes it from unpaid and retains history. It does not change the original Ignore answer, submit a new scenario, or advance the day. Failed payment never removes the bill or claims success; the existing unaffordable-attempt ending rule remains.
+4. Unpaid items may remain through Day 30. The end screen lists remaining debt and approved possible future consequences separately from cash. Do not impose new within-month consequences from end-screen explanatory text.
+5. Refresh restores balances, fees and settlement history without reapplying effects. Fee amount/timing/repetition and partial-settlement policy are unresolved; no compounded or recurring fee is authorized by the draft examples.
 
 ## CAC support
 
@@ -94,7 +104,7 @@ On refresh, restore the latest committed state. A committed decision returns to 
 | Player selects End Simulation | Partial results with actual progress and completed decisions |
 | Host ends the group early | Each participant receives results for their completed work |
 
-An ended run no longer accepts decisions. Partial summaries must be labeled as early endings and must not imply the player completed the month. Include balance, decisions/consequences, support availability/use, and applicable comparisons. Unanswered questions have no invented choices or outcomes.
+An ended run no longer accepts decisions or bill settlements. Partial summaries must be labeled as early endings and must not imply the player completed the month. Include balance, decisions/consequences, support availability/use, and applicable comparisons. Day 30 completion is permitted with unpaid bills: list their remaining principal, fees and total debt, and approved possible future consequences separately from available cash. Unanswered questions have no invented choices or outcomes.
 
 Replay returns to household selection with no household selected. The player chooses a household and support setting again, reviews, and confirms. A new run uses the saved content available when it starts and resets finances, day, expense state, circumstances, and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
 
@@ -162,4 +172,4 @@ Staff authentication does not require player authentication. Public players rema
 
 ## Verification criteria
 
-Verify setup validation, Review edits and confirmation, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, same-day decisions, scheduled income, refresh recovery, duplicate-safe submission, required-event early endings, Day 30 summaries, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.
+Verify setup validation, Review edits and confirmation, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, separated ordinary/job-event days with the unchanged Day 2 exception, scheduled income, refresh recovery, duplicate-safe submission, unpaid bill/fee creation, sidebar payment and access denial, non-deferrable/attempted-payment early endings, Day 30 summaries with debt, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.

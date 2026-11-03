@@ -48,6 +48,8 @@ For a decision submission, validate that the run belongs to the caller, is activ
 
 After confirmation, clients cannot change household or support setting. Ended runs and ended group sessions reject further submissions. Host advancement cannot fabricate answers or override a participant's decision.
 
+**Unpaid bills and settlement (approved design November 2, 2026; implementation pending):** Ignore must atomically record the response and authorized principal/late-fee liability without a cash deduction. Validate bill ownership, current scenario, edition and approved fee policy; retries cannot duplicate debt or fees. The separate sidebar Pay operation must validate the caller owns the active run and outstanding bill, derive the current amount from trusted records, check affordability, and commit payment/settlement/history atomically. Reject cross-player, stale, already-settled and ended-run mutations or safely return the already committed result for a matching retry. Neither operation accepts client-supplied amounts, advances a day as a side effect, nor rewrites the original submitted answer. The normal explicit Continue action controls advancement. Preserve unpaid debt at completion for the player's own summary; public content/aggregate access does not expose raw bill histories. Unsuccessful payment never erases debt or claims a successful deduction. Fee recurrence and partial settlement require separate approved rules.
+
 ## Group session security
 
 Generate nonsequential, difficult-to-guess join codes and validate them server-side. A join code permits participant enrollment in an active session; it does not confer host access or expose existing participants' data.
