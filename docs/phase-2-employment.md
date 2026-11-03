@@ -1,0 +1,98 @@
+# Phase 2 implementation and migration review
+
+## Deployment boundary
+
+`supabase/migrations/20261103000000_employment_gameplay.sql` is prepared for review
+only. It has not been applied to hosted Supabase. No hosted writes, publication
+changes, old migration rewrites or database resets were performed.
+
+The verified 13-column inventory supplies existing JSONB employment storage and
+financial/job/day/support fields. The migration reuses these fields, adds two
+functions and one AFTER INSERT trigger, and grants only action-RPC execution.
+It does not rely on service_role table grants or grant participant UPDATE access.
+
+**Deployment blocker:** the hosted CHECK constraints were not provided. Review
+`pg_get_constraintdef` for public.playthroughs and confirm statuses `completed`
+and `ended` are allowed before deployment. No constraint is changed by this
+migration. If they are disallowed, propose a separate amendment preserving all
+existing permitted values; do not apply this migration until reviewed. Also
+verify that the migration owner can update playthroughs and that the existing
+ownership RLS is enabled. Hosted skill configuration is not certified here.
+
+## Fresh and legacy runs
+
+The AFTER INSERT trigger stamps only new, initially empty individual runs with
+an engine/version marker and an uninitialized stage, after the existing INSERT
+policy checks. This preserves the existing invoker start RPC and UUID return.
+The trigger never backfills or updates earlier runs. Existing null employment
+states and unknown documents are read-only recovery failures, never candidates
+for initialization. Other nonempty documents are not overwritten.
+
+Pre-game is represented by stage while current_day remains 1; the UI shows
+Before Day 1. Initialize loads skills/catalog and locks support. Non-CAC runs
+start without assistance. A CAC initialization references an owned completed
+non-CAC Phase 2 run at Day 30. The same predecessor may qualify multiple fresh
+replays: the existing gameplay specifies no one-use eligibility restriction.
+Retries on a single run are idempotent; replay references never modify the prior
+run. Local Phase 1 progress is not imported or treated as server completion.
+
+## Authoritative actions and restoration
+
+submit_employment_action locks the owned playthrough, checks an existing request
+receipt before revision/terminal checks, validates stage/intent/content and
+calculates exact numeric changes. It commits JSONB progress/history/receipts,
+balance, day, hired job, support and status in one transaction. Clothing is $60;
+hiring and weekly pay preserve Phase 1 rules. Wage day identities under the same
+row lock prevent repeat credits. Recap stages survive refresh; acknowledgment
+never reapplies a financial consequence. No fake choices/player_responses or
+expense records are generated for this employment-only flow.
+
+The client displays the returned committed run and decodes validated employment
+state. It retains selection only while awaiting confirmation and blocks actions
+while a request is pending/uncertain. Owner-scoped local storage contains the
+run locator and pending intent/request ID, never authoritative finances. A lost
+response retries the identical persisted request. A known server rejection
+clears that pending request and instructs refresh before another attempt.
+Storage failure prevents submitting an action whose retry identity cannot be
+persisted. Missing/invalid recovery never creates a replacement automatically.
+A user can explicitly list and choose owned saved runs; multiple matches are
+never resolved by silently picking the newest.
+
+Creation persists the locator before returning its UUID. If storage is unavailable,
+the existing owned-run chooser remains the recovery path. Creation retains its
+non-idempotent uncertain-result warning and is never automatically retried.
+
+## Local verification
+
+The standalone `supabase/tests/employment.test.mjs` runs against an isolated
+PGlite PostgreSQL schema fixture, not a reconstruction of the hosted database.
+Install @electric-sql/pglite outside the repository and set PGLITE_MODULE to its
+module path to run it. It verifies PL/pgSQL, ownership/permissions, legacy
+preservation, exact deductions, receipt retries, stale revisions, both wage
+schedules, CAC references, terminal guards and insufficient funds. PGlite queues
+one connection; these tests do not prove real multi-session lock behavior or
+hosted schema compatibility. Run concurrent-transaction tests on a disposable
+PostgreSQL environment before hosted deployment.
+
+Frontend tests cover incompatible documents, participant-scoped locators,
+lost-response retries and rejection without local financial mutation. Browser
+Supabase mocks model committed snapshots; database assertions are separate.
+The full poverty simulation, approved facts and ordinary bills remain absent.
+
+## Newly created run rejected before backend deployment
+
+The existing creation RPC returns a UUID and inserts null employment_state.
+Only the prepared AFTER INSERT trigger adds the Phase 2 initialization marker.
+With the migration intentionally unapplied, successful creation therefore does
+not imply employment-backend readiness. The client formerly masked this as
+"This run cannot be resumed by this version." It now distinguishes missing
+markers from unsupported documents and unrelated restoration failures. It never
+fabricates a marker or initializes a null document. Even a recognized marker is
+rejected when the run is progressed, ended, or otherwise not fresh.
+
+A component regression exercises the actual creation and loading services with
+the unmodified RPC response. The isolated SQL regression runs the recorded RPC
+before/after the prepared migration and confirms the old null-state run remains
+untouched. Applying the migration later does not unlock already-created unmarked
+runs; only eligible runs created after deployment receive the server marker.
+This is a deployment prerequisite, not a client-side validation bypass.

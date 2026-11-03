@@ -74,10 +74,12 @@ export function FinancialTracking({
   expenses,
   children,
   preview,
+  pregame = false,
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
   children: ReactNode
+  pregame?: boolean
   preview?: Walkthrough
 }) {
   const displayDay = preview?.day ?? run.currentDay
@@ -94,12 +96,12 @@ export function FinancialTracking({
     expenses.status === 'ready' && expenses.data.source === 'definitions'
   return (
     <div
-      className={`financial-tracking${preview ? ' financial-tracking--preview' : ''}`}
+      className={`financial-tracking${preview || run.employmentState ? ' financial-tracking--preview' : ''}`}
     >
       <div className="finance-top" aria-live="polite">
         <div>
           <h1 id="page-heading" tabIndex={-1}>
-            {preview?.day === 0
+            {pregame || preview?.day === 0
               ? 'Before Day 1'
               : displayDay === null
                 ? 'Current day unavailable'

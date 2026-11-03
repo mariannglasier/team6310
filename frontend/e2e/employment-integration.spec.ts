@@ -1,3 +1,10 @@
+import {
+  createWalkthrough,
+  walkthroughJobs,
+  walkthroughReducer,
+  type Walkthrough,
+} from '../src/state/employmentWalkthrough'
+import { usdCents, type Job } from '../src/types/domain'
 import { expect, test } from '@playwright/test'
 
 test('integrated employment keeps saved finances and supports a full local month and CAC replay', async ({
@@ -23,7 +30,54 @@ test('integrated employment keeps saved finances and supports a full local month
     has_english_skills: false,
     has_computer_skills: false,
   }
+  const jobs: Job[] = ['First job', 'Second job', 'Office job'].map(
+    (title, i) => ({
+      id: `j${i}`,
+      versionId: 'version',
+      title,
+      description: 'Test posting',
+      socCode: '00-0000',
+      hoursPerWeek: 40,
+      medianHourlyWage: usdCents(1000),
+      weeklyGrossIncome: usdCents(40000),
+      wageYear: 2025,
+      areaName: 'Test',
+      wageSourceUrl: 'https://www.bls.gov/',
+      requirementsNote: null,
+      needsEnglishSkills: i === 2,
+      needsComputerSkills: i === 2,
+    }),
+  )
+  let gameplay: Walkthrough | null = null
+  let doc: Record<string, unknown> = {
+    engine: 'employment-v1',
+    schemaVersion: 1,
+    revision: 0,
+    stage: 'uninitialized',
+    receipts: {},
+  }
+  let revision = 0
   let inserts = 0
+  const savedRow = () => ({
+    playthrough_id: `run-${inserts}`,
+    persona_id: 'persona',
+    version_id: 'version',
+    owner_user_id: 'owner',
+    current_balance: gameplay ? gameplay.balance / 100 : 200,
+    current_day: gameplay ? Math.max(1, gameplay.day) : 1,
+    cac_support_enabledabled: gameplay?.support ?? null,
+    status:
+      gameplay?.stage === 'complete'
+        ? 'completed'
+        : gameplay?.stage === 'ended'
+          ? 'ended'
+          : 'active',
+    current_job_id: gameplay?.hiredDay ? gameplay.targetId : null,
+    employment_state: doc,
+    current_scenario_id: null,
+    started_at: null,
+    session_id: null,
+  })
   await page.route(`${api}/**`, async (route) => {
     const url = route.request().url()
     const headers = {
@@ -55,6 +109,59 @@ test('integrated employment keeps saved finances and supports a full local month
       })
       body = `run-${inserts + 1}`
       inserts++
+      gameplay = null
+      revision = 0
+      doc = {
+        engine: 'employment-v1',
+        schemaVersion: 1,
+        revision: 0,
+        stage: 'uninitialized',
+        receipts: {},
+      }
+    } else if (url.includes('/rpc/submit_employment_action')) {
+      const payload = route.request().postDataJSON()
+      if (payload.p_action.type === 'initialize')
+        gameplay = createWalkthrough(
+          {
+            id: 'persona',
+            versionId: 'version',
+            name: 'Alex',
+            description: 'Test',
+            startingBalance: usdCents(20000),
+            hasEnglishSkills: false,
+            hasComputerSkills: false,
+          },
+          walkthroughJobs(jobs),
+          !!payload.p_action.replayOf,
+          usdCents(6000),
+        )
+      else if (gameplay)
+        gameplay = walkthroughReducer(gameplay, payload.p_action)
+      revision++
+      if (!gameplay) throw new Error('No server state')
+      doc = {
+        stage: gameplay.stage,
+        prepared: gameplay.prepared,
+        hasEnglishSkills: gameplay.hasEnglishSkills,
+        hasComputerSkills: gameplay.hasComputerSkills,
+        clothing: gameplay.clothing,
+        targetId: gameplay.targetId,
+        initialTargetId: gameplay.initialTargetId,
+        hiredDay: gameplay.hiredDay,
+        assistanceUsed: gameplay.assistanceUsed,
+        reason: gameplay.reason,
+        engine: 'employment-v1',
+        schemaVersion: 1,
+        revision,
+        receipts: {},
+        weeklyIncome: (gameplay.weeklyIncome / 100).toFixed(2),
+        creditedDays: [],
+        history: gameplay.history.map((e) => ({
+          ...e,
+          change: (e.change / 100).toFixed(2),
+        })),
+      }
+      body = { run: savedRow(), receipt: { revision } }
     } else if (url.includes('/content_versions'))
       body = [{ version_id: 'version', version_number: 1 }]
     else if (url.includes('/playthrough_expenses')) body = []
@@ -70,24 +177,7 @@ test('integrated employment keeps saved finances and supports a full local month
         },
         { expense_id: 'rent', name: 'Rent', amount: 500, first_due_day: 4 },
       ]
-    } else if (url.includes('/playthroughs'))
-      body = [
-        {
-          playthrough_id: `run-${inserts}`,
-          persona_id: 'persona',
-          version_id: 'version',
-          owner_user_id: 'owner',
-          current_scenario_id: null,
-          current_balance: 200,
-          current_day: 1,
-          cac_support_enabledabled: null,
-          status: 'active',
-          started_at: null,
-          session_id: null,
-          current_job_id: null,
-          employment_state: null,
-        },
-      ]
+    } else if (url.includes('/playthroughs')) body = [savedRow()]
     else if (url.includes('/jobs'))
       body = ['First job', 'Second job', 'Office job'].map((title, i) => ({
         job_id: `j${i}`,
@@ -123,12 +213,6 @@ test('integrated employment keeps saved finances and supports a full local month
       .getByRole('button', { name: 'Start employment walkthrough' })
       .click()
     await expect(page.getByText('Before Day 1', { exact: true })).toBeVisible()
-    await expect(
-      page.getByText('Provisional balance · not saved'),
-    ).toBeVisible()
-    await expect(
-      page.getByText('Server-confirmed balance:', { exact: false }),
-    ).toContainText('$200.00')
   }
   const apply = async (title: string) => {
     await page
@@ -152,6 +236,7 @@ test('integrated employment keeps saved finances and supports a full local month
     .click()
   await page.goBack()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
+  await page.reload()
   await page.getByRole('button', { name: 'Reapply today' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Day 2 of 30',
@@ -182,7 +267,6 @@ test('integrated employment keeps saved finances and supports a full local month
     page.getByRole('heading', { name: 'You reached Day 30.' }),
   ).toBeVisible()
   await expect(page.locator('.finance-balance')).toHaveText('$1,340.00')
-  await expect(page.locator('.finance-confirmed')).toContainText('$200.00')
   await expect(
     page.getByRole('complementary', { name: 'Upcoming household expenses' }),
   ).toContainText('Rent')
@@ -229,7 +313,7 @@ test('integrated employment keeps saved finances and supports a full local month
   ).toBeVisible()
   await page.reload()
   await expect(
-    page.getByText('No newly created playthrough', { exact: false }),
+    page.getByRole('heading', { name: 'Your walkthrough ended early.' }),
   ).toBeVisible()
   expect(inserts).toBe(2)
 })

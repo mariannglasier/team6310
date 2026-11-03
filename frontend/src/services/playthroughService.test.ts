@@ -16,9 +16,15 @@ const rpc = vi.fn()
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(ensureParticipantSession).mockResolvedValue(undefined)
-  vi.mocked(getSupabaseClient).mockResolvedValue({ rpc } as unknown as Awaited<
-    ReturnType<typeof getSupabaseClient>
-  >)
+  vi.mocked(getSupabaseClient).mockResolvedValue({
+    rpc,
+    auth: {
+      getUser: async () => ({
+        data: { user: { id: 'owner', is_anonymous: true } },
+        error: null,
+      }),
+    },
+  } as unknown as Awaited<ReturnType<typeof getSupabaseClient>>)
   rpc.mockResolvedValue({ data: 'new-playthrough-id', error: null })
 })
 

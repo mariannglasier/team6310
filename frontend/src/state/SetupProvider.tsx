@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { rememberRun, rememberedRun } from '../services/employmentGameplay'
 import {
   SetupContext,
   type CreatedPlaythrough,
@@ -10,6 +11,23 @@ export function SetupProvider({ children }: { children: ReactNode }) {
   const [createdPlaythrough, recordPlaythrough] =
     useState<CreatedPlaythrough | null>(null)
   const [employment, setEmployment] = useState<EmploymentOverlay | null>(null)
+  const [replayOf, setReplayOf] = useState<string | undefined>()
+  useEffect(() => {
+    let active = true
+    void rememberedRun()
+      .then((id) => {
+        if (active && id)
+          recordPlaythrough((current) => current ?? { id, householdName: '' })
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
+  const saveReceipt = (receipt: CreatedPlaythrough) => {
+    recordPlaythrough(receipt)
+    void rememberRun(receipt.id).catch(() => {})
+  }
   const [supportForNext, setSupportForNext] = useState(false)
   function replay(support: boolean) {
     if (
@@ -22,6 +40,7 @@ export function SetupProvider({ children }: { children: ReactNode }) {
       (employment.state.stage !== 'complete' || employment.state.support)
     )
       return
+    setReplayOf(support ? employment.runId : undefined)
     setEmployment(null)
     recordPlaythrough(null)
     select(null)
@@ -33,7 +52,8 @@ export function SetupProvider({ children }: { children: ReactNode }) {
         selectedId,
         select,
         createdPlaythrough,
-        recordPlaythrough,
+        recordPlaythrough: saveReceipt,
+        replayOf,
         employment,
         setEmployment,
         supportForNext,

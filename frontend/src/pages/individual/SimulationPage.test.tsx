@@ -120,9 +120,11 @@ it('renders null display fields as unavailable, not zero or a default stage', as
   expect(await screen.findByText('Current day unavailable')).toBeInTheDocument()
   expect(screen.getByText('Household unavailable')).toBeInTheDocument()
   expect(screen.queryByText('$0.00')).not.toBeInTheDocument()
-  expect(screen.getByRole('alert')).toHaveTextContent(
-    'this content version is unavailable',
-  )
+  expect(
+    screen.getByText(
+      'Household information for this content version is unavailable.',
+    ),
+  ).toBeInTheDocument()
 })
 it('makes no request without the retained UUID', () => {
   renderPage(null)

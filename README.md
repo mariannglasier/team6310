@@ -1,3 +1,5 @@
+> Phase 2 server-backed employment is implemented locally, pending migration review and deployment. See [migration effects, recovery and verification limits](docs/phase-2-employment.md). Phase 1 local-only descriptions below are historical.
+
 > Phase 1 employment integration: `/simulation` now embeds a provisional employment walkthrough inside the existing financial tracking interface. Supabase creation/loading is retained; gameplay is local and unpersisted. See [behavior, database prerequisites and limitations](docs/phase-1-employment.md). Older foundation-status descriptions below do not describe this new overlay.
 
 ## Development Environment Setup

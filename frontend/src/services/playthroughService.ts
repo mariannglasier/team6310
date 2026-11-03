@@ -11,11 +11,19 @@ export async function createIndividualPlaythrough(
   try {
     await ensureParticipantSession()
     const client = await getSupabaseClient()
+    const { data: identity, error: identityError } = await client.auth.getUser()
+    if (identityError || !identity.user?.is_anonymous)
+      throw new ParticipantSessionError('Verified participant session required')
     const { data, error } = await client.rpc('start_individual_playthrough', {
       p_persona_id: personaId,
     })
     if (error || typeof data !== 'string' || !data.trim())
       throw new Error('Creation failed', { cause: error })
+    try {
+      localStorage.setItem(`cac-employment-v1:${identity.user.id}:run`, data)
+    } catch {
+      /* Recovery chooser can recover this run without creating another. */
+    }
     return data
   } catch (error) {
     if (error instanceof ParticipantSessionError) throw error

@@ -1,3 +1,5 @@
+> Phase 2 server-backed employment is implemented locally, pending migration review and deployment. See [migration effects, recovery and verification limits](phase-2-employment.md). Phase 1 local-only descriptions below are historical.
+
 # Phase 1 employment integration
 
 This integration uses `playthrough-setup` (`96bc7ec`) as its foundation and ports

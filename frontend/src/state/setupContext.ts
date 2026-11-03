@@ -18,6 +18,7 @@ export interface CreatedPlaythrough {
 }
 
 export interface SetupSelection {
+  readonly replayOf?: string
   readonly employment: EmploymentOverlay | null
   readonly setEmployment: Dispatch<SetStateAction<EmploymentOverlay | null>>
   readonly supportForNext: boolean

@@ -78,9 +78,8 @@ export function EmploymentGame({
   return (
     <div className="employment-game">
       <p className="employment-notice">
-        Provisional employment gameplay · Changes are not saved to Supabase.
-        Refresh discards local progress. Other scenarios, bills and approved
-        facts are placeholders.
+        Employment walkthrough · Decisions are saved after server confirmation.
+        Other scenarios, bills and approved facts remain placeholders.
       </p>
       <p className="employment-state">
         {state.hiredDay === null
