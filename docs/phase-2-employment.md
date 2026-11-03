@@ -1,3 +1,5 @@
+> Hosted-schema reconciliation now supersedes the earlier missing-schema status below. See [compatibility, real local verification and deployment recommendation](hosted-schema-compatibility.md).
+
 # Phase 2 implementation and migration review
 
 ## Deployment boundary
@@ -11,13 +13,14 @@ financial/job/day/support fields. The migration reuses these fields, adds three
 functions and one AFTER INSERT trigger, and grants only action-RPC execution.
 It does not rely on service_role table grants or grant participant UPDATE access.
 
-**Deployment blocker:** the hosted CHECK constraints were not provided. Review
-`pg_get_constraintdef` for public.playthroughs and confirm statuses `completed`
-and `ended` are allowed before deployment. No constraint is changed by this
-migration. If they are disallowed, propose a separate amendment preserving all
-existing permitted values; do not apply this migration until reviewed. Also
-verify that the migration owner can update playthroughs and that the existing
-ownership RLS is enabled. Hosted skill configuration is not certified here.
+**Preflight resolved:** the hosted structural export lists no playthrough status/day
+CHECK constraint, so `completed` and `ended` require no constraint amendment.
+The final hosted preflight confirms postgres execution/ownership privileges,
+nonprivileged participant roles without owner membership, and configured skill
+flags for published personas. The supplied fallback result contains three
+eligible no-skill jobs. The tested migration is ready for hosted deployment
+review; it remains unapplied. See the reconciliation report for evidence hashes,
+local integration results, the deployment sequence and rollback procedure.
 
 ## Fresh and legacy runs
 

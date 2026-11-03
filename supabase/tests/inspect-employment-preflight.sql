@@ -29,3 +29,22 @@ select p.oid::regprocedure as function,p.proowner::regrole as owner,
  p.prosecdef,p.proconfig,p.proacl
 from pg_proc p where p.pronamespace='public'::regnamespace
 and p.proname in ('mark_fresh_employment_run','submit_employment_action','valid_employment_document');
+
+-- Required before hosted deployment: not present in database-schema.csv.
+select current_user,session_user;
+select rolname,rolsuper,rolbypassrls,rolinherit,rolcanlogin
+from pg_roles where rolname in ('postgres','anon','authenticated','service_role','authenticator');
+select granted.rolname as granted_role, member.rolname as member_role, m.admin_option
+from pg_auth_members m join pg_roles granted on granted.oid=m.roleid
+join pg_roles member on member.oid=m.member
+where granted.rolname in ('postgres','anon','authenticated','service_role','authenticator')
+   or member.rolname in ('postgres','anon','authenticated','service_role','authenticator');
+-- Readiness only; no data repair or publication is performed.
+select v.version_id, count(*) filter(where j.is_approved and j.is_active
+ and j.needs_english_skills=false and j.needs_computer_skills=false) as fallback_jobs
+from public.content_versions v left join public.jobs j on j.version_id=v.version_id
+where v.status='published' and v.published_at is not null group by v.version_id;
+select p.persona_id,p.version_id,p.has_english_skills,p.has_computer_skills
+from public.personas p join public.content_versions v on v.version_id=p.version_id
+where v.status='published' and v.published_at is not null
+ and (p.has_english_skills is null or p.has_computer_skills is null);

@@ -55,8 +55,11 @@ export function useFitScale<T extends HTMLElement = HTMLElement>(
         if (target <= 0) return
         setScale((current) => {
           // The small bias keeps the result on the safe (not overflowing) side.
+          // CSS zoom also changes line wrapping. Growing again in response to
+          // our own ResizeObserver can alternate between two layouts forever.
+          // Only shrink during a fit cycle; a real viewport resize starts fresh.
           const next = Math.min(
-            1,
+            current,
             Math.max(min, (current * target * 0.995) / own),
           )
           // Ignore tiny changes unless the block currently overflows.
@@ -67,11 +70,17 @@ export function useFitScale<T extends HTMLElement = HTMLElement>(
       })
     }
 
+    const resized = () => {
+      setScale(1)
+      fit()
+    }
+    window.addEventListener('resize', resized)
     const observer = new ResizeObserver(fit)
     observer.observe(element)
     if (panel) observer.observe(panel)
     fit()
     return () => {
+      window.removeEventListener('resize', resized)
       observer.disconnect()
       cancelAnimationFrame(frame.current)
     }
