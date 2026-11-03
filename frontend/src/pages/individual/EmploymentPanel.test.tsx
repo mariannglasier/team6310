@@ -101,7 +101,7 @@ it('explains the missing backend marker after successful fresh creation, without
     'Phase 2 backend deployment',
   )
   expect(screen.getByRole('alert')).toHaveTextContent(
-    'do not create another run',
+    'saved run will remain unchanged',
   )
   expect(
     screen.queryByText('This run cannot be resumed by this version.', {

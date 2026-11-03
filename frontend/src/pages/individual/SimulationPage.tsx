@@ -8,6 +8,7 @@ import {
 } from '../../services/loadPlaythrough'
 import { findOwnedRuns } from '../../services/employmentGameplay'
 import { EmploymentPanel } from './EmploymentPanel'
+import { PlaythroughRecovery } from './PlaythroughRecovery'
 import { FinancialTracking } from '../../components/simulation/FinancialTracking'
 import { loadHouseholdExpenses } from '../../services/householdExpenses'
 import type { ExpenseState } from '../../types/householdExpenses'
@@ -69,10 +70,13 @@ function RecordedPlaythrough({ id }: { id: string }) {
     return <p role="alert">{new PlaythroughLoadError().message}</p>
   if (state.status === 'unavailable')
     return (
-      <p role="alert">
-        This playthrough is missing or is not accessible with your participant
-        session.
-      </p>
+      <>
+        <p role="alert">
+          This playthrough is missing or is not accessible with your participant
+          session.
+        </p>
+        <PlaythroughRecovery />
+      </>
     )
   const run = state.playthrough
   return (

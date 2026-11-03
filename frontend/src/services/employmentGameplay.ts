@@ -29,7 +29,7 @@ const stages = [
 export class MissingEmploymentMarkerError extends Error {
   constructor() {
     super(
-      'This playthrough has no server employment initialization marker and cannot safely start gameplay. If it was just created, ask the facilitator to verify the Phase 2 backend deployment. This run is unchanged; do not create another run to retry.',
+      'This playthrough has no server employment initialization marker and cannot safely start gameplay. Older runs cannot be upgraded here. You can choose a household for a new run; this saved run will remain unchanged. If a newly confirmed run also has this problem, ask the facilitator to verify the Phase 2 backend deployment.',
     )
     this.name = 'MissingEmploymentMarkerError'
   }
@@ -273,6 +273,10 @@ export async function rememberRun(id: string) {
 }
 export async function rememberedRun() {
   return localStorage.getItem(key(await participantId(), 'run'))
+}
+export async function forgetRun(id: string) {
+  const locator = key(await participantId(), 'run')
+  if (localStorage.getItem(locator) === id) localStorage.removeItem(locator)
 }
 export async function submitEmployment(
   run: LoadedPlaythrough,

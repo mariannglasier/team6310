@@ -55,6 +55,7 @@ function renderPage(
           setEmployment: vi.fn(),
           supportForNext: false,
           replay: vi.fn(),
+          leavePlaythrough: vi.fn(),
         }}
       >
         <SimulationPage />

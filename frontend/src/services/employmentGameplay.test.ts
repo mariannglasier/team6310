@@ -3,6 +3,7 @@ import {
   documentState,
   rememberedRun,
   rememberRun,
+  forgetRun,
   submitEmployment,
 } from './employmentGameplay'
 import { getSupabaseClient } from './supabase'
@@ -76,6 +77,16 @@ it('scopes the run locator to the verified participant', async () => {
   expect(await rememberedRun()).toBe('run')
   owner = 'another'
   expect(await rememberedRun()).toBeNull()
+})
+it('does not forget a different run or another participant locator', async () => {
+  await rememberRun('newer-run')
+  await forgetRun('old-run')
+  expect(await rememberedRun()).toBe('newer-run')
+  owner = 'another'
+  await forgetRun('newer-run')
+  owner = 'owner'
+  expect(await rememberedRun()).toBe('newer-run')
+  expect(rpc).not.toHaveBeenCalled()
 })
 it('retries the identical persisted request after a lost response', async () => {
   rpc

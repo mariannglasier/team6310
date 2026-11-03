@@ -61,6 +61,13 @@ persisted. Missing/invalid recovery never creates a replacement automatically.
 A user can explicitly list and choose owned saved runs; multiple matches are
 never resolved by silently picking the newest.
 
+Missing/inaccessible runs and unsupported employment documents offer an explicit
+“Choose a household for a new run” recovery action. It removes only the matching,
+participant-scoped browser run locator and clears temporary setup/replay state.
+Auth, pending submission receipts, and server records are preserved. A fresh run
+is created only after a new Review confirmation. Storage failures keep the current
+selection and show an error; transient load failures do not offer replacement runs.
+
 Creation persists the locator before returning its UUID. If storage is unavailable,
 the existing owned-run chooser remains the recovery path. Creation retains its
 non-idempotent uncertain-result warning and is never automatically retried.

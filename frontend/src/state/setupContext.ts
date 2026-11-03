@@ -23,6 +23,7 @@ export interface SetupSelection {
   readonly setEmployment: Dispatch<SetStateAction<EmploymentOverlay | null>>
   readonly supportForNext: boolean
   readonly replay: (support: boolean) => void
+  readonly leavePlaythrough: () => Promise<void>
   readonly createdPlaythrough: CreatedPlaythrough | null
   readonly recordPlaythrough: (playthrough: CreatedPlaythrough) => void
   readonly selectedId: string | null

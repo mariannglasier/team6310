@@ -35,4 +35,6 @@ Seems important but you probably dont need it
 
 - Volume: supabase_db_team6310-phase2-verification
 - Inside the container: /var/lib/postgresql/data
-- Local database address: 127.0.0.1:55322
+- Studio: http://127.0.0.1:55323
+- API: http://127.0.0.1:55321
+- PostgreSQL database address: 127.0.0.1:55322

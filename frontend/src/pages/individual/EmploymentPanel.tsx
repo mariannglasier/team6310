@@ -7,12 +7,15 @@ import {
   employmentRestoreMessage,
   submitEmployment,
   hasPending,
+  MissingEmploymentMarkerError,
+  UnsupportedEmploymentDocumentError,
   type EmploymentAction,
   type CommittedEmployment,
 } from '../../services/employmentGameplay'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import { paths } from '../../app/paths'
 import { EmploymentGame } from './EmploymentGame'
+import { PlaythroughRecovery } from './PlaythroughRecovery'
 
 export function EmploymentPanel({
   run,
@@ -25,6 +28,7 @@ export function EmploymentPanel({
   const navigate = useNavigate()
   const [snapshot, setSnapshot] = useState<CommittedEmployment | null>(null)
   const [error, setError] = useState('')
+  const [recoverable, setRecoverable] = useState(false)
   const [uncertain, setUncertain] = useState(false)
   const [pending, setPending] = useState(false)
   const busy = useRef(false)
@@ -39,7 +43,13 @@ export function EmploymentPanel({
         }
       },
       (cause) => {
-        if (current) setError(employmentRestoreMessage(cause))
+        if (current) {
+          setError(employmentRestoreMessage(cause))
+          setRecoverable(
+            cause instanceof MissingEmploymentMarkerError ||
+              cause instanceof UnsupportedEmploymentDocumentError,
+          )
+        }
       },
     )
     return () => {
@@ -72,6 +82,7 @@ export function EmploymentPanel({
   return (
     <>
       {error && <p role="alert">{error}</p>}
+      {recoverable && <PlaythroughRecovery />}
       {uncertain && (
         <Button
           loading={pending}
