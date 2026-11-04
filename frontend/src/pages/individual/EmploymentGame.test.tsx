@@ -69,11 +69,11 @@ it('keeps unqualified jobs disabled and submits an eligible job from the keyboar
       <EmploymentGame state={state} dispatch={dispatch} onReplay={vi.fn()} />
     </MemoryRouter>,
   )
-  const locked = screen.getByRole('radio', { name: 'Choose Locked job' })
+  const locked = screen.getByRole('button', { name: 'Choose Locked job' })
   expect(locked).toBeDisabled()
   await user.click(locked)
   expect(dispatch).not.toHaveBeenCalled()
-  screen.getByRole('radio', { name: 'Choose First job' }).focus()
+  screen.getByRole('button', { name: 'Choose First job' }).focus()
   await user.keyboard(' ')
   expect(dispatch).not.toHaveBeenCalled()
   await user.click(screen.getByRole('button', { name: 'Submit application' }))
@@ -90,11 +90,11 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
       <Game replay={replay} />
     </MemoryRouter>,
   )
-  expect(screen.getAllByRole('radio')).toHaveLength(2)
+  expect(screen.getAllByRole('button', { name: /^Choose / })).toHaveLength(2)
   expect(
     screen.getByRole('button', { name: 'Submit application' }),
   ).toBeDisabled()
-  await user.click(screen.getByRole('radio', { name: 'Choose First job' }))
+  await user.click(screen.getByRole('button', { name: 'Choose First job' }))
   expect(
     screen.getByRole('heading', { name: 'Find your next opportunity.' }),
   ).toBeInTheDocument()
@@ -106,7 +106,7 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
   await user.click(screen.getByRole('button', { name: 'Start Day 1' }))
   await user.click(screen.getByRole('button', { name: 'Next' }))
   await user.click(
-    screen.getByRole('radio', { name: /Make my current clothes work/ }),
+    screen.getByRole('button', { name: /Make my current clothes work/ }),
   )
   await user.click(
     screen.getByRole('button', { name: 'Submit clothing decision' }),
@@ -114,28 +114,27 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
   expect(screen.getAllByRole('heading')[0]).toHaveTextContent(
     'Your interview result.',
   )
-  await user.click(screen.getByRole('button', { name: 'Reapply today' }))
+  await user.click(screen.getByRole('button', { name: 'Search open jobs' }))
   expect(screen.getByText('Day 2 of 30 · Reapply')).toBeInTheDocument()
-  await user.click(screen.getByRole('radio', { name: 'Choose Fallback job' }))
+  await user.click(screen.getByRole('button', { name: 'Choose Fallback job' }))
   await user.click(screen.getByRole('button', { name: 'Submit application' }))
-  await user.click(screen.getByRole('button', { name: 'Continue Day 2' }))
+  await user.click(screen.getByRole('button', { name: 'Continue to Day 3' }))
   await user.click(screen.getByRole('button', { name: 'Next' }))
   await user.click(
-    screen.getByRole('radio', { name: /Make my current clothes work/ }),
+    screen.getByRole('button', { name: /Make my current clothes work/ }),
   )
   await user.click(
     screen.getByRole('button', { name: 'Submit clothing decision' }),
   )
-  expect(screen.getByText(/First payday: Day 10/)).toBeInTheDocument()
-  await user.click(screen.getByRole('button', { name: 'Continue Day 3' }))
+  expect(screen.getByText('Weekly pay: $40.00.')).toBeInTheDocument()
+  expect(screen.queryByText(/First payday:/)).toBeNull()
+  await user.click(screen.getByRole('button', { name: 'Continue to Day 4' }))
   for (let day = 3; day <= 30; day++) {
     if ([10, 17, 24].includes(day)) {
       expect(screen.getAllByRole('heading')[0]).toHaveTextContent(
         'Your weekly pay has arrived.',
       )
-      await user.click(
-        screen.getByRole('button', { name: 'Continue to today’s scenarios' }),
-      )
+      await user.click(screen.getByRole('button', { name: 'Next' }))
     }
     expect(
       screen.getByRole('heading', { name: 'Placeholder' }),
@@ -150,6 +149,9 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
     'You reached Day 30.',
   )
   expect(screen.getByText('$220.00')).toBeInTheDocument()
+  expect(
+    screen.queryByRole('heading', { name: 'Employment and financial history' }),
+  ).toBeNull()
   await user.click(
     screen.getByRole('button', { name: 'Try again with CAC support' }),
   )

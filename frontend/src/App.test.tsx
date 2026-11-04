@@ -36,9 +36,7 @@ test('legacy introduction URL redirects to the individual placeholder without th
     screen.queryByText(/introduction and mode selection experience/i),
   ).not.toBeInTheDocument()
   // Setup begins at household selection; there is no Introduction step.
-  expect(
-    screen.getByRole('list', { name: 'Setup step 1 of 2' }),
-  ).toBeInTheDocument()
+  expect(screen.queryByRole('list', { name: 'Setup step 1 of 2' })).toBeNull()
   expect(screen.queryByText('Introduction')).not.toBeInTheDocument()
 })
 test.each([

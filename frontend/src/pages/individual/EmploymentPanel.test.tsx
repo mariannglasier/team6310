@@ -109,7 +109,7 @@ it('explains the missing backend marker after successful fresh creation, without
     }),
   ).not.toBeInTheDocument()
   expect(
-    screen.queryByRole('button', { name: 'Start employment walkthrough' }),
+    screen.queryByRole('button', { name: "See who's hiring" }),
   ).not.toBeInTheDocument()
   expect(run.employmentState).toBeNull()
   expect(run.currentBalance).toBe(35000)
@@ -123,7 +123,7 @@ it('allows the fresh server-stamped document to reach the initialization screen 
   employment = marker
   await createAndRender()
   expect(
-    await screen.findByRole('button', { name: 'Start employment walkthrough' }),
+    await screen.findByRole('button', { name: "See who's hiring" }),
   ).toBeEnabled()
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect(rpc).toHaveBeenCalledOnce()
@@ -146,7 +146,7 @@ it.each([
     expect(run.employmentState).toEqual(value)
     expect(run.currentDay).toBe(savedDay)
     expect(
-      screen.queryByRole('button', { name: 'Start employment walkthrough' }),
+      screen.queryByRole('button', { name: "See who's hiring" }),
     ).not.toBeInTheDocument()
     expect(rpc).toHaveBeenCalledOnce()
     expect(mutate).not.toHaveBeenCalled()

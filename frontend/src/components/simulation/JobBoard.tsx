@@ -20,13 +20,32 @@ export function JobBoard({
   const [selected, select] = useState<string | null>(null)
   return (
     <>
-      <p>
-        {reapplying
-          ? 'Choose another job you qualify for. Your follow-up interview is on Day 3.'
-          : 'Explore the postings. Choose a job to apply.'}
-      </p>
-      <fieldset className="employment-board">
-        <legend>Job bulletin board</legend>
+      {reapplying && (
+        <p>
+          Choose another job you qualify for. Your follow-up interview is on Day
+          3.
+        </p>
+      )}
+      {onPrepare && (
+        <section
+          className="employment-preparation"
+          aria-label="Build skills with CAC"
+        >
+          <Button variant="secondary" onClick={onPrepare}>
+            Join CAC Adult Education classes
+          </Button>
+          <p>
+            The CAC offers a variety of adult education programs. English as a
+            Second or Other Language classes or computer skills classes could
+            help you be more qualified for jobs.
+          </p>
+        </section>
+      )}
+      <div
+        className="employment-board"
+        role="group"
+        aria-label="Available jobs"
+      >
         <div className="employment-board__postings">
           {jobs.map(({ job }) => {
             const eligible = eligibleIds.includes(job.id)
@@ -39,21 +58,26 @@ export function JobBoard({
                 : []),
             ]
             return (
-              <label
+              <button
+                type="button"
+                aria-label={`Choose ${job.title}`}
+                aria-description={job.description ?? undefined}
+                title={job.description ?? undefined}
+                aria-pressed={selected === job.id}
+                disabled={!eligible}
+                onClick={() => select(job.id)}
                 key={job.id}
                 className={`employment-posting${eligible ? '' : ' is-locked'}`}
               >
-                <input
-                  type="radio"
-                  name="job-posting"
-                  aria-label={`Choose ${job.title}`}
-                  disabled={!eligible}
-                  checked={selected === job.id}
-                  onChange={() => select(job.id)}
-                />
                 <span className="employment-posting__pin" aria-hidden="true" />
                 <span className="employment-posting__status">
-                  {eligible ? 'Now hiring' : 'Qualifications not met'}
+                  {selected === job.id
+                    ? 'Selected'
+                    : eligible
+                      ? 'Now hiring'
+                      : reapplying
+                        ? 'Unavailable for this application'
+                        : 'Qualifications not met'}
                 </span>
                 <strong className="employment-posting__title">
                   {job.title}
@@ -62,15 +86,19 @@ export function JobBoard({
                   {formatUsd(job.weeklyGrossIncome)} / week
                 </strong>
                 <span>{job.hoursPerWeek} hours per week</span>
-                {job.description && <span>{job.description}</span>}
+                {job.description && (
+                  <span className="employment-posting__description">
+                    {job.description}
+                  </span>
+                )}
                 {requiredSkills.length > 0 && (
                   <span>{requiredSkills.join(' · ')}</span>
                 )}
-              </label>
+              </button>
             )
           })}
         </div>
-      </fieldset>
+      </div>
       <Button
         disabled={selected === null || !eligibleIds.includes(selected)}
         onClick={() => {
@@ -84,19 +112,6 @@ export function JobBoard({
           No eligible jobs are available for this step. Check the household’s
           skills and job requirements.
         </p>
-      )}
-      {onPrepare && (
-        <section className="employment-preparation">
-          <h2>Build skills with CAC</h2>
-          <p>
-            Choose relevant English or computer-skills preparation before Day 1.
-            This compressed simulation does not imply that real programs take no
-            time or guarantee work.
-          </p>
-          <Button variant="secondary" onClick={onPrepare}>
-            Complete CAC preparation
-          </Button>
-        </section>
       )}
     </>
   )

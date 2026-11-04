@@ -21,7 +21,7 @@ type LoadState =
   | { status: 'ready'; playthrough: LoadedPlaythrough; expenses: ExpenseState }
 
 function RecordedPlaythrough({ id }: { id: string }) {
-  const { setEmployment } = useSetup()
+  const { setEmployment, employment } = useSetup()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   useEffect(() => {
     let current = true
@@ -83,6 +83,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
     <FinancialTracking
       run={run}
       expenses={state.expenses}
+      employment={employment?.runId === run.id ? employment.state : undefined}
       pregame={['board', 'preparation-result', 'application-result'].includes(
         String((run.employmentState as { stage?: string } | null)?.stage),
       )}
@@ -105,7 +106,6 @@ function RecordedPlaythrough({ id }: { id: string }) {
           Household information for this content version is unavailable.
         </p>
       )}
-      <p className="finance-run-id">Playthrough ID: {run.id}</p>
     </FinancialTracking>
   )
 }

@@ -135,11 +135,11 @@
   border-color: var(--accent);
   background: var(--accent-surface);
 }
-.ui-radio-card:has(input:focus-visible) {
+.ui-radio-card:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
-.ui-radio-card:has(input:disabled) {
+.ui-radio-card:disabled {
   color: var(--text-muted);
   cursor: not-allowed;
 }
@@ -221,4 +221,16 @@
   .ui-dialog__actions .ui-button {
     width: 100%;
   }
+}
+button.ui-radio-card {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  border-width: 1px;
+  box-shadow: 0 3px 12px #00000010;
+}
+button.ui-radio-card:not(:disabled):hover {
+  background: #fbebed;
+  box-shadow: 0 4px 12px #00000018;
 }

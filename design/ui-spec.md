@@ -16,30 +16,30 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Show selection through a control or text label as well as a border. Keyboard focus must remain distinct from selection.
 - Use semantic headings, labeled inputs, keyboard-operable controls, visible focus, sufficient contrast, and readable error messages. Never rely on color alone.
 - All application routes, including placeholders and future pages, use the same shared header: CAC logo on the left and Learn About CAC, Explore Data, and Donate on the right. Both the header and footer CAC logos link to the application landing route `/`. Learn and Donate use configured CAC-approved external destinations.
-- Setup uses a two-step indicator: Household, Review. Show the current step and completed steps. CAC support is not a setup step for now; it returns later as an option offered after a regular run without it.
+- Setup confirms the selected household with Start simulation on the household page; there is no Review page or multi-step indicator. CAC support is offered after a completed regular run.
 - Every simulation page (`/simulation/*`) sits on the scenic stage: the supplied scenic illustration (`frontend/src/assets/scenic-simulation-background.jpg`) fills only the area between the shared header and footer, behind a white rounded content panel with an inset on every side so the scenery shows around it. The image is decorative (no alt text, no content on it); all text and controls stay on the solid white panel at the design tokens. The header and footer never sit on the image.
 - Setup pages fit one screen: header plus stage fill the viewport, the footer follows below the fold, and the page content scales down uniformly (not below 0.7) to fit without reflowing the layout. Below that scale the panel scrolls instead of shrinking text further.
-- Single-choice card sets behave as radio groups. Selecting a card does not advance the screen or commit a financial decision.
+- Single-choice card sets use keyboard-operable buttons with `aria-pressed`, one selected option, and visible focus. Selecting a card does not advance the screen or commit a financial decision.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
 - On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
 
 ### Color tokens
 
-| Token | Hex | Use |
-| --- | --- | --- |
-| `primary` | `#B3261E` | CAC branding, primary buttons, destructive action accents |
-| `primary-hover` | `#8F1E18` | Primary button hover/pressed state |
-| `accent` | `#245F8A` | Selected card borders, data accents, links |
-| `accent-hover` | `#194767` | Accent hover/pressed state |
-| `accent-surface` | `#EAF2F8` | Selected cards and recap surfaces; use primary text on this surface |
-| `text` | `#111111` | Primary text and headings |
-| `text-muted` | `#595959` | Supporting copy and secondary labels |
-| `surface` | `#FFFFFF` | Cards, header, input surfaces, text on filled red/blue buttons |
-| `background` | `#F5F5F5` | Page background |
-| `border` | `#767676` | Input and interactive-control boundaries |
-| `divider` | `#D9D9D9` | Decorative separators; not the sole control boundary |
-| `disabled-surface` | `#E0E0E0` | Disabled buttons, with muted text and disabled semantics |
-| `focus` | `#245F8A` | Visible focus ring with a white separation gap on filled controls |
+| Token              | Hex       | Use                                                                 |
+| ------------------ | --------- | ------------------------------------------------------------------- |
+| `primary`          | `#B3261E` | CAC branding, primary buttons, destructive action accents           |
+| `primary-hover`    | `#8F1E18` | Primary button hover/pressed state                                  |
+| `accent`           | `#245F8A` | Selected card borders, data accents, links                          |
+| `accent-hover`     | `#194767` | Accent hover/pressed state                                          |
+| `accent-surface`   | `#EAF2F8` | Selected cards and recap surfaces; use primary text on this surface |
+| `text`             | `#111111` | Primary text and headings                                           |
+| `text-muted`       | `#595959` | Supporting copy and secondary labels                                |
+| `surface`          | `#FFFFFF` | Cards, header, input surfaces, text on filled red/blue buttons      |
+| `background`       | `#F5F5F5` | Page background                                                     |
+| `border`           | `#767676` | Input and interactive-control boundaries                            |
+| `divider`          | `#D9D9D9` | Decorative separators; not the sole control boundary                |
+| `disabled-surface` | `#E0E0E0` | Disabled buttons, with muted text and disabled semantics            |
+| `focus`            | `#245F8A` | Visible focus ring with a white separation gap on filled controls   |
 
 White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a blue border plus a selected label/control; keyboard focus uses a separate outer ring. Charts use blue and red with direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
 
@@ -63,7 +63,7 @@ The legacy `/simulation/introduction` URL redirects to `/simulation/individual`.
 
 Display household cards with name, description, household composition, housing, transportation, and starting money from approved persona content. No household is selected by default. The player must choose one before continuing. Category and scenario availability are determined by approved persona-category and scenario-persona links.
 
-Continue opens Review. Back returns to the landing page. The page heading block (step indicator, label, title, introduction) is centered above the carousel. Example names and amounts are illustrative; production values come from approved content.
+Start simulation confirms the explicit household selection, creates the run through the protected start operation, and opens the pre-game job search. Disable setup controls while creation is pending; retain the selection and show an error if creation fails. Back returns to the landing page. The heading, label and introduction are centered above the carousel. Production values come from approved content.
 
 ## 4. CAC support selection (deferred)
 
@@ -71,11 +71,11 @@ Not part of setup for now. The client will offer CAC support as an option after 
 
 Display With CAC Support and Without CAC Support as mutually exclusive options. Require an explicit selection before continuing. Explain that support may appear during relevant situations and actual assistance depends on eligibility and availability.
 
-Choosing with support enables relevant assistance choices during gameplay, such as visiting the CAC market when food is low. It does not automatically grant cash or assistance. Without support excludes those assistance choices. Continue opens Review.
+Choosing with support enables relevant assistance choices during gameplay, such as visiting the CAC market when food is low. It does not automatically grant cash or assistance. Without support excludes those assistance choices. Any later support-selection design must preserve direct household confirmation.
 
-## 5. Review and confirmation
+## 5. Direct confirmation (approved November 4, 2026)
 
-Show the selected household (illustration, name, tagline, starting money, and story) and a short "what happens next" panel. Provide a Change action that returns to household selection and preserves the choice, a Household back button, and Confirm Selection to start the simulation. Until the protected start operation exists, Confirm Selection reports that no run was created. Review redirects to household selection when nothing is selected. The "what happens next" wording is prototype copy pending approval; no CAC support setting is shown while support is deferred.
+The household page contains the illustration, name, starting money and story. Its Start simulation button is the sole confirmation action. Legacy Review URLs redirect to household selection, or to gameplay when a run is already active. A navigation revisit must not create another run.
 
 After confirmation, household and support settings are locked for that run. Active gameplay must not expose setup inspection, setup editing, or Back to Review. Replace that navigation with End Simulation.
 
@@ -88,6 +88,14 @@ The non-scheduled Financial Literacy & Taxes scenario displays no refund or dedu
 If an optional choice is attempted and unaffordable, end the run even if it is the only available choice. If a required payment is missed or unaffordable, end the run. In both cases, do not display a successful deduction or invent a loan.
 
 ## 7. Simulation decision screen
+
+The CAC preparation action reads “Join CAC Adult Education classes”. Show this smaller text directly beneath/beside it, without a dropdown: “The CAC offers a variety of adult education programs. English as a Second or Other Language classes or computer skills classes could help you be more qualified for jobs.” Keep gameplay copy immersive; omit unsolicited real-world disclaimers and explanations of scripted rules. Put review and implementation caveats in staff documentation. Hiring recaps omit first-payday/no-pay-on-hiring-day commentary, and end screens omit the employment and financial history list. Retain committed history for restoration and financial totals.
+
+November 4 presentation revision: use native button cards with explicit selected states and keyboard focus, rather than radio controls. Selection still requires a separate submission. Use thin borders, soft gray shadows and a subtle red hover background. Keep unavailable jobs visible and disabled during reapplication. Place CAC preparation above the job board. The initial job-search prompt is “It's time to start your job search” with “See who's hiring”. Application recaps show “You got an interview!” and the interview day.
+
+Show employment title, weekly income and simulated CAC enrollment under the household profile. Starting balance, received income and charged expenses come from the validated committed employment history; schedules are projections only. Hide the run ID and redundant top day/status strips. Show future paydays with translucent red dollar signs on the timeline. Use a translucent header background with readable controls. Keep primary actions within a standard desktop viewport, except on job bulletin boards: these may scroll so every job description remains fully readable, with no line clamping, clipping or ellipsis. Preserve scrolling access on smaller screens and for expanded facts.
+
+Automatic weekly pay uses a fading received-income notification and a display-only balance animation over the day's scenario, with reduced-motion support. No separate income confirmation screen is shown. Keep Day 2's failed result and same-day reapplication; after successful Day 2 hiring or the reapplication recap, Continue opens Day 3. After the Day 3 interview recap, Continue opens Day 4. Skip redundant placeholder scenarios on interview days. These transitions use existing protected actions and retain refresh and pending-submission recovery.
 
 Display:
 
@@ -128,12 +136,12 @@ View Data Visualization opens a separate page that provides an interactive educa
 
 ### Measures and visualizations
 
-| Measure | Display | Population and calculation |
-| --- | --- | --- |
-| Decision distribution | Horizontal bars labeled with each choice, count, and percentage | Count one committed response per run for the selected question. Divide each option count by all valid responses to that question under the active filters. Responses from early-ended runs remain eligible. |
-| Ending balance distribution | Balance distribution by CAC support setting, with the current player's balance marked when eligible | Use completed Day 30 runs for the same household. Show dollar units and separate with/without-support groups. Exclude early-ended runs; their balance remains visible in their own summary. |
-| CAC support use | Labeled used/unused counts and percentages | Use completed, support-enabled runs under the household filter. Used means at least one assistance choice was committed. Divide used runs by all eligible completed support-enabled runs. |
-| Community context | Source-backed statistic cards beside relevant question context | Show approved figures separately from simulation aggregates, including value, unit, geography, data period, and source. Do not place unrelated real-world metrics on a shared numeric scale. |
+| Measure                     | Display                                                                                             | Population and calculation                                                                                                                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Decision distribution       | Horizontal bars labeled with each choice, count, and percentage                                     | Count one committed response per run for the selected question. Divide each option count by all valid responses to that question under the active filters. Responses from early-ended runs remain eligible. |
+| Ending balance distribution | Balance distribution by CAC support setting, with the current player's balance marked when eligible | Use completed Day 30 runs for the same household. Show dollar units and separate with/without-support groups. Exclude early-ended runs; their balance remains visible in their own summary.                 |
+| CAC support use             | Labeled used/unused counts and percentages                                                          | Use completed, support-enabled runs under the household filter. Used means at least one assistance choice was committed. Divide used runs by all eligible completed support-enabled runs.                   |
+| Community context           | Source-backed statistic cards beside relevant question context                                      | Show approved figures separately from simulation aggregates, including value, unit, geography, data period, and source. Do not place unrelated real-world metrics on a shared numeric scale.                |
 
 ### Filters and sample sizes
 
@@ -177,4 +185,4 @@ Show loading feedback during content retrieval and submission. If required conte
 
 ## Verification criteria
 
-Verify explicit household/support choices, editable Review, locked active setup, pre-game employment and clothing flow, both support modes, same-day decisions, scheduled weekly income, Day 30 completion, inability-to-pay early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard and narrow-screen use throughout.
+Verify explicit household/support choices, direct confirmation and legacy Review redirects, locked active setup, pre-game employment and clothing flow, both support modes, same-day decisions, scheduled weekly income and animated notifications, Day 30 completion, inability-to-pay early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard, desktop fit and narrow-screen use throughout.

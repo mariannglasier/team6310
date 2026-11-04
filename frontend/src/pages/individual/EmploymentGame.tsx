@@ -14,7 +14,8 @@ import '../../components/simulation/employment.css'
 
 function Facts({ support }: { support: boolean }) {
   return (
-    <aside className="employment-facts" aria-label="Scenario facts">
+    <details className="employment-facts">
+      <summary>Scenario facts</summary>
       <h3>General fact</h3>
       <p>Placeholder — approved employment fact and source pending.</p>
       {support && (
@@ -25,7 +26,7 @@ function Facts({ support }: { support: boolean }) {
           </p>
         </>
       )}
-    </aside>
+    </details>
   )
 }
 
@@ -37,7 +38,7 @@ const headings = {
   interview: 'What will you wear to the interview?',
   'interview-result': 'Your interview result.',
   reapply: 'A different opportunity.',
-  'reapply-result': 'Your follow-up application is in.',
+  'reapply-result': 'Your application is in.',
   income: 'Your weekly pay has arrived.',
   complete: 'You reached Day 30.',
   ended: 'Your walkthrough ended early.',
@@ -77,35 +78,31 @@ export function EmploymentGame({
   }
   return (
     <div className="employment-game">
-      <p className="employment-notice">
-        Employment walkthrough · Decisions are saved after server confirmation.
-        Other scenarios, bills and approved facts remain placeholders.
-      </p>
-      <p className="employment-state">
-        {state.hiredDay === null
-          ? 'Not employed'
-          : `Hired Day ${state.hiredDay}`}{' '}
-        · Weekly income: {formatUsd(state.weeklyIncome)} · CAC{' '}
-        {state.support ? 'available' : 'unavailable'} · Assistance{' '}
-        {state.assistanceUsed ? 'used' : 'not used'}
-      </p>
       <div className="employment-layout">
         <section className="employment-content" aria-labelledby="page-heading">
-          <p className="placeholder-label">
-            {state.day === 0
-              ? 'Before Day 1 · Job search'
-              : `Day ${state.day} of 30`}
-            {state.stage === 'reapply' && ' · Reapply'}
-          </p>
-          <h2 ref={heading} tabIndex={-1}>
+          {state.stage !== 'day' && state.stage !== 'income' && (
+            <p className="placeholder-label">
+              {state.day === 0
+                ? 'Before Day 1 · Job search'
+                : `Day ${state.day} of 30`}
+              {state.stage === 'reapply' && ' · Reapply'}
+            </p>
+          )}
+          <h2
+            className={
+              state.stage === 'day' || state.stage === 'income'
+                ? 'sr-only'
+                : undefined
+            }
+            ref={heading}
+            tabIndex={-1}
+          >
             {headings[state.stage]}
           </h2>
           {(state.stage === 'board' || state.stage === 'reapply') && (
             <JobBoard
               key={state.stage}
-              jobs={
-                state.stage === 'reapply' ? availableJobs(state) : state.jobs
-              }
+              jobs={state.jobs}
               eligibleIds={availableJobs(state).map((item) => item.job.id)}
               reapplying={state.stage === 'reapply'}
               onApply={(jobId) => dispatch({ type: 'apply', jobId })}
@@ -120,19 +117,18 @@ export function EmploymentGame({
             <div className="employment-result">
               <h2>CAC preparation completed</h2>
               <p>
-                You chose simulated preparation. Return to the bulletin board to
-                review eligible opportunities. Real programs take time and do
-                not guarantee employment.
+                You completed CAC Adult Education classes. Return to the job
+                board to explore more opportunities.
               </p>
               <Button onClick={advance}>Return to job board</Button>
             </div>
           )}
           {state.stage === 'application-result' && (
             <div className="employment-result">
-              <h2>Target job: {target?.title}</h2>
+              <h2>You got an interview!</h2>
               <p>
-                Your first interview takes place on Day 2. You are not employed
-                yet; weekly income remains $0.
+                You received an email asking to come in-person for your
+                interview on Day 2.
               </p>
               <Button onClick={advance}>Start Day 1</Button>
             </div>
@@ -164,53 +160,29 @@ export function EmploymentGame({
               <h2>
                 {state.hiredDay !== null
                   ? `You got the ${target?.title} job.`
-                  : 'The first interview did not lead to an offer.'}
+                  : 'The interview did not lead to an offer'}
               </h2>
-              <p>
-                {state.hiredDay === 3
-                  ? 'The follow-up employer offered you the new job, regardless of your clothing choice.'
-                  : state.hiredDay === 2
-                    ? 'You completed CAC preparation and used professional clothing, meeting this simulation’s scripted conditions.'
-                    : 'This scripted first interview requires both the specified CAC preparation and professional clothing. You can reapply today.'}
-              </p>
-              <p>
-                These educational rules are not a real-world prediction or a
-                judgment of a person’s worth.
-              </p>
               {state.hiredDay !== null && (
-                <p>
-                  Weekly pay: {formatUsd(state.weeklyIncome)}. First payday: Day{' '}
-                  {state.hiredDay + 7}. No pay is credited on hiring day.
-                </p>
+                <p>Weekly pay: {formatUsd(state.weeklyIncome)}.</p>
               )}
               <Button onClick={advance}>
                 {state.hiredDay === null
-                  ? 'Reapply today'
-                  : `Continue Day ${state.day}`}
+                  ? 'Search open jobs'
+                  : `Continue to Day ${state.day + 1}`}
               </Button>
             </div>
           )}
           {state.stage === 'reapply-result' && (
             <div className="employment-result">
-              <h2>Applied for {target?.title}</h2>
+              <h2>You got an interview!</h2>
               <p>
-                Your follow-up interview is scheduled for Day 3. You are still
-                on Day 2.
+                You received an email asking to come in-person for your
+                interview on Day 3.
               </p>
-              <Button onClick={advance}>Continue Day 2</Button>
+              <Button onClick={advance}>Continue to Day 3</Button>
             </div>
           )}
-          {state.stage === 'income' && (
-            <div className="employment-result" role="status">
-              <h2>+{formatUsd(state.weeklyIncome)} received</h2>
-              <p>
-                Weekly pay has been added once, before today’s scenarios. The
-                simulation does not deduct income taxes from wages.
-              </p>
-              <Button onClick={advance}>Continue to today’s scenarios</Button>
-            </div>
-          )}
-          {state.stage === 'day' && (
+          {(state.stage === 'day' || state.stage === 'income') && (
             <div className="employment-placeholder">
               <span className="placeholder-label">
                 Day {state.day} · End-of-day scenario
@@ -236,17 +208,6 @@ export function EmploymentGame({
               <p>
                 Ending balance: <strong>{formatUsd(state.balance)}</strong>
               </p>
-              <h2>Employment and financial history</h2>
-              <ol className="employment-history">
-                {state.history.map((entry, index) => (
-                  <li key={index}>
-                    {entry.day === 0 ? 'Pre-game' : `Day ${entry.day}`} ·{' '}
-                    {entry.text}
-                    {entry.change !== 0 &&
-                      ` · ${entry.change > 0 ? '+' : ''}${formatUsd(entry.change)}`}
-                  </li>
-                ))}
-              </ol>
               <div className="employment-actions">
                 <Button onClick={() => onReplay(false)}>
                   Replay from household selection
@@ -286,22 +247,27 @@ function ClothingDecision({
   return (
     <>
       {clothingOptions(state).map((choice) => (
-        <label key={choice} className="employment-choice">
-          <input
-            type="radio"
-            name="interview-clothing"
-            checked={selected === choice}
-            onChange={() => select(choice)}
-          />
-          <strong>{labels[choice]}</strong>
+        <button
+          type="button"
+          key={choice}
+          className="employment-choice"
+          aria-pressed={selected === choice}
+          onClick={() => select(choice)}
+        >
+          <strong>
+            {labels[choice]}
+            {selected === choice && (
+              <span className="employment-selected"> · Selected</span>
+            )}
+          </strong>
           <span>
             {choice === 'purchase'
-              ? `${formatUsd(state.clothingCost)} · keep the outfit for later interviews`
+              ? formatUsd(state.clothingCost)
               : choice === 'owned'
                 ? 'Reuse your outfit. No additional charge.'
                 : 'No cost'}
           </span>
-        </label>
+        </button>
       ))}
       <Button
         disabled={selected === null}

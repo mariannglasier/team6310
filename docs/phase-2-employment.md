@@ -65,7 +65,7 @@ Missing/inaccessible runs and unsupported employment documents offer an explicit
 “Choose a household for a new run” recovery action. It removes only the matching,
 participant-scoped browser run locator and clears temporary setup/replay state.
 Auth, pending submission receipts, and server records are preserved. A fresh run
-is created only after a new Review confirmation. Storage failures keep the current
+is created only after Start simulation confirms a new household selection. Storage failures keep the current
 selection and show an error; transient load failures do not offer replacement runs.
 
 Creation persists the locator before returning its UUID. If storage is unavailable,

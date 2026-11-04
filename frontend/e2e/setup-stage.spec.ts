@@ -92,7 +92,7 @@ test('simulation pages show the scenic stage between the header and footer', asy
   }
 })
 
-test('household and review fit the screen on desktop and tablet and stay inside it on phones', async ({
+test('household fits desktop and tablet, and legacy Review redirects without creating a run', async ({
   page,
 }, testInfo) => {
   await mockHouseholds(page)
@@ -117,7 +117,7 @@ test('household and review fit the screen on desktop and tablet and stay inside 
     'center',
   )
   await page.waitForTimeout(400)
-  let measured = await fit()
+  const measured = await fit()
   expect(measured.overflowX).toBeLessThanOrEqual(0)
   expect(measured.bottom).toBeLessThanOrEqual(measured.viewport + 0.5)
   await page.screenshot({ path: testInfo.outputPath('household.png') })
@@ -126,26 +126,19 @@ test('household and review fit the screen on desktop and tablet and stay inside 
       .poll(async () => (await fit()).panelOverflow, { timeout: 5000 })
       .toBeLessThanOrEqual(2)
 
-  await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled()
-  await page.locator('.is-center .household-choice').click()
-  await page.getByRole('button', { name: 'Continue' }).click()
-  await expect(page).toHaveURL(/\/simulation\/review$/)
   await expect(
-    page.getByRole('heading', { name: 'Review your setup.' }),
-  ).toBeFocused()
-  await expect(page.getByText('CAC support')).toHaveCount(0)
-  await expect(page.getByText('$350.00')).toBeVisible()
-  await page.waitForTimeout(400)
-  measured = await fit()
-  expect(measured.overflowX).toBeLessThanOrEqual(0)
-  expect(measured.bottom).toBeLessThanOrEqual(measured.viewport + 0.5)
-  if (roomy)
-    await expect
-      .poll(async () => (await fit()).panelOverflow, { timeout: 5000 })
-      .toBeLessThanOrEqual(2)
-  await page.screenshot({ path: testInfo.outputPath('review.png') })
-
-  await page.getByRole('link', { name: 'Change household' }).click()
+    page.getByRole('button', { name: 'Start simulation' }),
+  ).toBeDisabled()
+  await page.locator('.is-center .household-choice').click()
+  await expect(
+    page.getByRole('button', { name: 'Start simulation' }),
+  ).toBeEnabled()
+  await expect(
+    page.getByRole('button', { name: 'Choose Alex' }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await page.goto('/simulation/review')
   await expect(page).toHaveURL(/\/simulation\/individual$/)
-  await expect(page.getByRole('radio', { name: /Alex/ })).toBeChecked()
+  await expect(
+    page.getByRole('button', { name: 'Start simulation' }),
+  ).toBeDisabled()
 })

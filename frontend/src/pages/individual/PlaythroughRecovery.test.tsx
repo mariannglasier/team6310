@@ -109,7 +109,7 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks())
 
 it.each(['missing', 'legacy', 'unsupported'])(
-  'recovers a %s run in the same session and creates nothing until Review confirmation',
+  'recovers a %s run in the same session and creates nothing until Start simulation',
   async (kind) => {
     vi.mocked(loadPlaythrough).mockResolvedValue(
       kind === 'missing'
@@ -131,7 +131,9 @@ it.each(['missing', 'legacy', 'unsupported'])(
         name: 'Every household has a story.',
       }),
     ).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Start simulation' }),
+    ).toBeDisabled()
     expect(localStorage.getItem(locator)).toBeNull()
     expect(localStorage.getItem('sb-example-auth-token')).toBe(
       'existing-session',
@@ -149,10 +151,11 @@ it.each(['missing', 'legacy', 'unsupported'])(
     // A refresh/remount must not restore the discarded locator and redirect back.
     page.unmount()
     renderFlow('/simulation/individual')
-    await user.click(await screen.findByRole('radio', { name: /Alex/ }))
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    await user.click(
+      await screen.findByRole('button', { name: /^Choose Alex/ }),
+    )
     expect(
-      await screen.findByRole('button', { name: 'Confirm selection' }),
+      await screen.findByRole('button', { name: 'Start simulation' }),
     ).toBeEnabled()
     expect(createIndividualPlaythrough).not.toHaveBeenCalled()
 
@@ -168,10 +171,10 @@ it.each(['missing', 'legacy', 'unsupported'])(
         receipts: {},
       },
     })
-    await user.click(screen.getByRole('button', { name: 'Confirm selection' }))
+    await user.click(screen.getByRole('button', { name: 'Start simulation' }))
     expect(
       await screen.findByRole('button', {
-        name: 'Start employment walkthrough',
+        name: "See who's hiring",
       }),
     ).toBeEnabled()
     expect(createIndividualPlaythrough).toHaveBeenCalledExactlyOnceWith(

@@ -40,20 +40,16 @@ export function RadioGroup({
       </legend>
       <div className="ui-radio-options">
         {options.map((option) => (
-          <label
+          <button
+            type="button"
+            data-group={name}
+            aria-pressed={value === option.value}
+            disabled={option.disabled}
+            aria-invalid={error ? true : undefined}
+            onClick={() => onChange(option.value)}
             key={option.value}
             className={`ui-radio-card${value === option.value ? ' is-selected' : ''}`}
           >
-            <input
-              type="radio"
-              name={name}
-              value={option.value}
-              checked={value === option.value}
-              disabled={option.disabled}
-              required={required}
-              aria-invalid={error ? true : undefined}
-              onChange={() => onChange(option.value)}
-            />
             <span>
               <strong>{option.label}</strong>
               {option.description && (
@@ -63,7 +59,7 @@ export function RadioGroup({
                 {value === option.value ? 'Selected' : 'Select option'}
               </span>
             </span>
-          </label>
+          </button>
         ))}
       </div>
       {error && (

@@ -88,7 +88,7 @@ it('shows loading then the saved household, exact balance, day, and status', asy
     'Day 1 of 30',
   )
   expect(screen.getByText('1')).toBeInTheDocument()
-  expect(screen.getByText('Status: active')).toBeInTheDocument()
+  expect(screen.queryByText('Status: active')).toBeNull()
   expect(screen.queryByText('Temporary name')).not.toBeInTheDocument()
   expect(loadPlaythrough).toHaveBeenCalledExactlyOnceWith('run')
 })

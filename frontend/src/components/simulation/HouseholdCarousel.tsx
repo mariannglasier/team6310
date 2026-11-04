@@ -34,7 +34,7 @@ export function HouseholdCarousel({
       personas.findIndex((persona) => persona.id === selectedId),
     ),
   )
-  const radios = useRef<(HTMLInputElement | null)[]>([])
+  const radios = useRef<(HTMLButtonElement | null)[]>([])
   const refocus = useRef(false)
   const touchStart = useRef<number | null>(null)
 
@@ -52,7 +52,7 @@ export function HouseholdCarousel({
   function onKeyDown(event: KeyboardEvent<HTMLFieldSetElement>) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
     event.preventDefault()
-    refocus.current = event.target instanceof HTMLInputElement
+    refocus.current = event.target instanceof HTMLButtonElement
     show(active + (event.key === 'ArrowRight' ? 1 : -1))
   }
 
@@ -92,26 +92,22 @@ export function HouseholdCarousel({
                 aria-label={`${index + 1} of ${total}: ${persona.name}`}
                 aria-hidden={position === 'center' ? undefined : true}
               >
-                <label
+                <button
+                  type="button"
+                  aria-pressed={selected}
+                  aria-label={`Choose ${persona.name}`}
+                  tabIndex={position === 'center' ? 0 : -1}
+                  ref={(node) => {
+                    radios.current[index] = node
+                  }}
                   className={`household-card${selected ? ' is-selected' : ''}`}
                   onClick={(event) => {
                     if (position !== 'center') {
                       event.preventDefault()
                       show(index)
-                    }
+                    } else onSelect(persona.id)
                   }}
                 >
-                  <input
-                    ref={(node) => {
-                      radios.current[index] = node
-                    }}
-                    type="radio"
-                    name="household"
-                    value={persona.id}
-                    checked={selected}
-                    disabled={position !== 'center'}
-                    onChange={() => onSelect(persona.id)}
-                  />
                   <span
                     className={`household-photo household-photo--${avatarTone(persona.name)}`}
                   >
@@ -139,7 +135,7 @@ export function HouseholdCarousel({
                       {selected ? 'Selected' : 'Choose this household'}
                     </span>
                   </span>
-                </label>
+                </button>
               </div>
             )
           })}

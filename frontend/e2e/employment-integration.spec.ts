@@ -30,24 +30,32 @@ test('integrated employment keeps saved finances and supports a full local month
     has_english_skills: false,
     has_computer_skills: false,
   }
-  const jobs: Job[] = ['First job', 'Second job', 'Office job'].map(
-    (title, i) => ({
-      id: `j${i}`,
-      versionId: 'version',
-      title,
-      description: 'Test posting',
-      socCode: '00-0000',
-      hoursPerWeek: 40,
-      medianHourlyWage: usdCents(1000),
-      weeklyGrossIncome: usdCents(40000),
-      wageYear: 2025,
-      areaName: 'Test',
-      wageSourceUrl: 'https://www.bls.gov/',
-      requirementsNote: null,
-      needsEnglishSkills: i === 2,
-      needsComputerSkills: i === 2,
-    }),
-  )
+  const jobs: Job[] = [
+    'First job',
+    'Second job',
+    'Office job',
+    'Customer service representative',
+    'Food preparation worker',
+    'Retail sales associate',
+    'Office administrative assistant',
+    'Computer user support specialist',
+  ].map((title, i) => ({
+    id: `j${i}`,
+    versionId: 'version',
+    title,
+    description:
+      'Assist customers with purchases, answer questions, organize merchandise, and keep the work area clean. Work with coworkers and follow daily procedures throughout each shift.',
+    socCode: '00-0000',
+    hoursPerWeek: 40,
+    medianHourlyWage: usdCents(1000),
+    weeklyGrossIncome: usdCents(40000),
+    wageYear: 2025,
+    areaName: 'Test',
+    wageSourceUrl: 'https://www.bls.gov/',
+    requirementsNote: null,
+    needsEnglishSkills: i === 2,
+    needsComputerSkills: i === 2,
+  }))
   let gameplay: Walkthrough | null = null
   let doc: Record<string, unknown> = {
     engine: 'employment-v1',
@@ -179,11 +187,11 @@ test('integrated employment keeps saved finances and supports a full local month
       ]
     } else if (url.includes('/playthroughs')) body = [savedRow()]
     else if (url.includes('/jobs'))
-      body = ['First job', 'Second job', 'Office job'].map((title, i) => ({
+      body = jobs.map((job, i) => ({
         job_id: `j${i}`,
         version_id: 'version',
-        title,
-        description: 'Test posting',
+        title: job.title,
+        description: job.description,
         soc_code: '00-0000',
         hours_per_week: 40,
         median_hourly_wage: 10,
@@ -206,28 +214,55 @@ test('integrated employment keeps saved finances and supports a full local month
   })
   await page.goto('/simulation/individual')
   await page.getByText('Choose this household').first().click()
-  await page.getByRole('button', { name: 'Continue' }).click()
-  await page.getByRole('button', { name: 'Confirm selection' }).click()
+  await page.getByRole('button', { name: 'Start simulation' }).click()
   const setupPreview = async () => {
-    await page
-      .getByRole('button', { name: 'Start employment walkthrough' })
-      .click()
-    await expect(page.getByText('Before Day 1', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: "See who's hiring" }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Find your next opportunity.' }),
+    ).toBeVisible()
   }
   const apply = async (title: string) => {
     await page
-      .getByRole('radio', { name: `Choose ${title}`, exact: true })
-      .check()
+      .getByRole('button', { name: `Choose ${title}`, exact: true })
+      .click()
     await page.getByRole('button', { name: 'Submit application' }).click()
   }
   await setupPreview()
+  const checkBoardReadability = async (name: string) => {
+    if (testInfo.project.name !== 'desktop') return
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport)
+      const descriptions = page.locator('.employment-posting__description')
+      await expect(descriptions).toHaveCount(jobs.length)
+      for (const description of await descriptions.all()) {
+        expect(
+          await description.evaluate(
+            (node) =>
+              node.scrollHeight <= node.clientHeight + 1 &&
+              node.scrollWidth <= node.clientWidth + 1,
+          ),
+        ).toBe(true)
+      }
+      await page
+        .getByRole('button', { name: 'Submit application' })
+        .scrollIntoViewIfNeeded()
+      await page.screenshot({
+        path: testInfo.outputPath(`${name}-${viewport.width}.png`),
+      })
+    }
+    await page.setViewportSize({ width: 1366, height: 768 })
+  }
+  await checkBoardReadability('job-board')
   await expect(
-    page.getByRole('radio', { name: 'Choose Office job' }),
+    page.getByRole('button', { name: 'Choose Office job' }),
   ).toBeDisabled()
   await apply('First job')
   await page.getByRole('button', { name: 'Start Day 1' }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
-  await page.getByRole('radio', { name: /Buy professional clothes/ }).check()
+  await page.getByRole('button', { name: /Buy professional clothes/ }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$200.00')
   await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
@@ -237,25 +272,45 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.goBack()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
   await page.reload()
-  await page.getByRole('button', { name: 'Reapply today' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Day 2 of 30',
-  )
+  if (testInfo.project.name === 'desktop') {
+    const action = await page
+      .getByRole('button', { name: 'Search open jobs' })
+      .boundingBox()
+    expect(action!.y + action!.height).toBeLessThanOrEqual(768)
+  }
+  await page.getByRole('button', { name: 'Search open jobs' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, includeHidden: true }),
+  ).toHaveText('Day 2 of 30')
+  await expect(
+    page.getByRole('button', { name: 'Choose First job' }),
+  ).toBeDisabled()
+  await expect(
+    page.getByRole('button', { name: 'Choose Office job' }),
+  ).toBeDisabled()
   await apply('Second job')
-  await page.getByRole('button', { name: 'Continue Day 2' }).click()
-  await page.getByRole('button', { name: 'Next', exact: true }).click()
-  await expect(page.getByRole('radio')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Continue to Day 3' }).click()
+  await expect(
+    page.getByRole('button', { name: /Wear my professional clothes/ }),
+  ).toBeEnabled()
   await page
-    .getByRole('radio', { name: /Wear my professional clothes/ })
-    .check()
+    .getByRole('button', { name: /Wear my professional clothes/ })
+    .click()
   await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
-  await page.getByRole('button', { name: 'Continue Day 3' }).click()
-  for (let day = 3; day <= 30; day++) {
-    if ([10, 17, 24].includes(day))
-      await page
-        .getByRole('button', { name: 'Continue to today’s scenarios' })
-        .click()
+  await page.getByRole('button', { name: 'Continue to Day 4' }).click()
+  for (let day = 4; day <= 30; day++) {
+    await expect(
+      page.locator('.finance-timeline [aria-current="step"]'),
+    ).toHaveText(String(day))
+    if ([10, 17, 24].includes(day)) {
+      await expect(
+        page.getByText('+$400.00 received', { exact: true }),
+      ).toBeVisible()
+      await expect(
+        page.getByRole('button', { name: /Continue to today/ }),
+      ).toHaveCount(0)
+    }
     await page
       .getByRole('button', {
         name: day === 30 ? 'Finish Day 30' : 'Next',
@@ -278,7 +333,7 @@ test('integrated employment keeps saved finances and supports a full local month
   expect(
     await page.locator('.finance-balance').evaluate((node) => {
       const range = document.createRange()
-      range.selectNodeContents(node)
+      range.selectNodeContents(node.querySelector('span') ?? node)
       return range.getClientRects().length
     }),
   ).toBe(1)
@@ -287,21 +342,35 @@ test('integrated employment keeps saved finances and supports a full local month
   })
   await page.getByRole('button', { name: 'Try again with CAC support' }).click()
   await page.getByText('Choose this household').first().click()
-  await page.getByRole('button', { name: 'Continue', exact: true }).click()
-  await page.getByRole('button', { name: 'Confirm selection' }).click()
+  await page.getByRole('button', { name: 'Start simulation' }).click()
   await setupPreview()
   expect(inserts).toBe(2)
-  await page.getByRole('button', { name: 'Complete CAC preparation' }).click()
+  await expect(page.locator('.employment-preparation p')).toHaveText(
+    'The CAC offers a variety of adult education programs. English as a Second or Other Language classes or computer skills classes could help you be more qualified for jobs.',
+  )
+  await expect(page.locator('.employment-preparation summary')).toHaveCount(0)
+  await checkBoardReadability('cac-preparation-board')
+  await page
+    .getByRole('button', { name: 'Join CAC Adult Education classes' })
+    .click()
   await page.getByRole('button', { name: 'Return to job board' }).click()
+  await checkBoardReadability('cac-job-board')
   await apply('Office job')
   await page.getByRole('button', { name: 'Start Day 1' }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
-  await page.getByRole('radio', { name: /Use the CAC clothing closet/ }).check()
+  await page
+    .getByRole('button', { name: /Use the CAC clothing closet/ })
+    .click()
   await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(
     page.getByRole('heading', { name: 'You got the Office job job.' }),
   ).toBeVisible()
   await expect(page.locator('.finance-balance')).toHaveText('$200.00')
+  await page.getByRole('button', { name: 'Continue to Day 3' }).click()
+  await expect(
+    page.locator('.finance-timeline [aria-current="step"]'),
+  ).toHaveText('3')
+  await expect(page.getByRole('heading', { name: 'Placeholder' })).toBeVisible()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
