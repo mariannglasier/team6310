@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
 import { HouseholdCarousel } from '../../components/simulation/HouseholdCarousel'
 import { PlaceholderPage } from '../../components/PlaceholderPage'
 import { Button, ButtonLink } from '../../components/ui/Button'
@@ -43,9 +43,10 @@ function HouseholdChoices({
 }
 
 export function IndividualPage() {
-  const { selectedId, select } = useSetup()
+  const { selectedId, select, createdPlaythrough } = useSetup()
   const navigate = useNavigate()
   const [fitTarget, fitStyle] = useFitScale<HTMLDivElement>()
+  if (createdPlaythrough) return <Navigate to={paths.simulation} replace />
   return (
     <div ref={fitTarget} style={fitStyle} className="household-page">
       <PageSection

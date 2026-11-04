@@ -1,3 +1,7 @@
+> Phase 2 server-backed employment is implemented locally, pending migration review and deployment. See [migration effects, recovery and verification limits](phase-2-employment.md). Phase 1 local-only descriptions below are historical.
+
+> Phase 1 employment integration: `/simulation` now embeds a provisional employment walkthrough inside the existing financial tracking interface. Supabase creation/loading is retained; gameplay is local and unpersisted. See [behavior, database prerequisites and limitations](phase-1-employment.md). Older foundation-status descriptions below do not describe this new overlay.
+
 # System Architecture — CAC Poverty Exercise
 
 ## 1. Purpose and scope
@@ -77,6 +81,72 @@ unverified until the [manual checks](integration-test.md) are performed.
 Backend response validation, ownership, eligibility, edition validation, atomic commitment, idempotency, results retention, and database authorization remain future feature work. Component and reducer tests establish frontend scaffolding behavior only; native dialog browser behavior, responsive visual rendering, deployed deep links, and backend security require their own verification.
 
 ### Individual simulation
+
+Implemented record-creation milestone: Review confirmation calls the existing
+`start_individual_playthrough` RPC through `services/playthroughService.ts`, after
+establishing or verifying the anonymous participant session. Only the persona ID
+is sent. The hosted RPC derives ownership, edition, and starting balance, starts
+at Day 1, and leaves support, scenario, and employment fields NULL. Its current
+contract is documented by the hosted schema export in `docs/database/`.
+
+The returned UUID and household name remain in memory in `SetupProvider`, and
+success navigates to `/simulation`, a read-only run display with no gameplay.
+Review prevents concurrent clicks and redirects to that placeholder once creation
+succeeds. Failure preserves the household selection. The RPC is not idempotent:
+an uncertain network result can still mean a row was created, so there is no
+automatic retry. Refresh restoration, gameplay, and backend idempotency are not
+implemented by this milestone. No schema or migration change is required.
+
+On entry, `services/loadPlaythrough.ts` verifies the existing anonymous session
+without creating a new identity, reads the retained run UUID under owner RLS,
+and retrieves persona display information using both persona ID and the saved
+`version_id`. It never substitutes the newest content edition. `LoadedPlaythrough`
+in `types/playthrough.ts` retains every current playthrough column in page state,
+converts the balance to integer USD cents, preserves nullable fields, and carries
+`employment_state` as an opaque value without defining it. The page displays the
+saved household name, balance, day, and status. Missing persona/version data is
+reported without inventing household information. Missing/inaccessible runs and
+request failures have separate messages; neither triggers creation or retry.
+The database remains authoritative; this initial read adds no write operation,
+gameplay calculation, or synchronization protocol. The retained UUID is still
+memory-only, so full browser refresh recovery remains unimplemented.
+
+The financial tracking interface follows the Figma Make `GameSession.tsx` and
+`game-session.css` reference: day timeline, household/balance sidebar, central
+simulation placeholder, and upcoming-expense panel. `FinancialTracking` renders
+the loaded playthrough and expense resource from the existing page state; it
+maintains no duplicate balance/day state. The `/simulation` route omits the shared
+setup-page wrapper: only the central content has `stage__panel`, with the financial
+panels as siblings and the day header/timeline above the grid. All content scrolls
+with the document; the center has no independent scroll container. The redundant
+page title and loaded notification are omitted. Other setup routes retain their
+existing layout.
+
+The gameplay CSS uses the Figma reference's responsive ranges: at 1151px and above,
+three columns use `.75fr / 4.5fr / 1fr` with 180px/220px sidebar minimums and 16px
+gaps; at 761–1150px, two columns use `.8fr / 2.5fr` with upcoming information below
+the center and a one-row timeline. At 760px and below, household/balance, center,
+and upcoming panels stack in that order, with a two-row, 15-column timeline. At
+480px and below, center padding tightens to 20px and upcoming content is one column.
+The 12px outer margins, 8px main padding, panel sizes, typography, and separators
+come from `design/figma-prototype/src/game-session.css`. Existing precise monetary
+formatting, unavailable-data messages, and run identifiers remain functional.
+The existing application header/footer and avatar artwork are preserved.
+
+After the owned run loads, `services/householdExpenses.ts` reads its pinned-edition
+persona expense definitions and run-specific expense occurrences. Available
+occurrences supply their own amount, due day, and payment timestamp; names come
+only from the selected household's definitions. Recorded payments are displayed
+separately. With no occurrences, the UI explicitly labels the saved household
+schedule and its first due dates; it does not expand recurrence or infer payment
+status. Lists are ordered by due day, with unknown dates last. Expense read
+failures do not hide the run's balance or substitute mock data. No runtime mock
+financial values are used. Starting-balance, income-received, and expenses-charged
+totals remain unavailable because the current loaded state does not supply those
+historical totals. This milestone adds reads and presentation only, with no
+financial calculations, payment processing, or state synchronization.
+
+The following describes the broader intended simulation behavior.
 
 Setup proceeds through Household and Review. The household selection is explicit. CAC support is deferred: the client will offer it as an option after players complete a regular run without it, so runs are currently without support. Review allows the household to be changed before confirmation; confirmation starts a new run and locks the setup. The household selection is temporary frontend state until a run is created.
 

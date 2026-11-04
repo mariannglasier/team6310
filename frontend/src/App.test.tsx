@@ -304,3 +304,14 @@ test.each(['/', '/learn', '/group/host', '/unknown/path'])(
     expect(container.querySelector('.stage, .stage__panel')).toBeNull()
   },
 )
+
+test('simulation direct entry has no redundant page title', () => {
+  renderRoute('/simulation')
+  expect(
+    screen.queryByRole('heading', { name: 'Individual simulation' }),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.getByRole('region', { name: 'Individual simulation' }),
+  ).toBeInTheDocument()
+  expect(document.title).toBe('Individual simulation | CAC Poverty Simulation')
+})

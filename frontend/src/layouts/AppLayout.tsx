@@ -8,16 +8,18 @@ import './AppLayout.css'
 
 export function AppLayout() {
   const { pathname } = useLocation()
+  const isGameplay = pathname === paths.simulation
   const isLanding = pathname === paths.home
   // Every simulation page sits on the scenic stage between header and footer.
   const isStage = isStagePath(pathname)
   const previousPath = useRef(pathname)
   useEffect(() => {
     const heading = document.querySelector<HTMLHeadingElement>('#page-heading')
-    document.title = `${heading?.textContent ?? 'Page'} | CAC Poverty Simulation`
-    if (previousPath.current !== pathname) heading?.focus()
+    document.title = `${isGameplay ? 'Individual simulation' : (heading?.textContent ?? 'Page')} | CAC Poverty Simulation`
+    if (previousPath.current !== pathname)
+      (heading ?? document.querySelector<HTMLElement>('#main-content'))?.focus()
     previousPath.current = pathname
-  }, [pathname])
+  }, [pathname, isGameplay])
 
   return (
     <div
@@ -25,6 +27,7 @@ export function AppLayout() {
         'app-shell',
         isLanding && 'landing-shell',
         isStage && 'app-shell--stage',
+        isGameplay && 'app-shell--gameplay',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -64,7 +67,7 @@ export function AppLayout() {
           tabIndex={-1}
           className={isStage ? 'stage' : undefined}
         >
-          {isStage ? (
+          {isStage && !isGameplay ? (
             <div className="stage__panel">
               <Outlet />
             </div>

@@ -1,8 +1,31 @@
-import { createContext, useContext } from 'react'
+import {
+  createContext,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
+import type { Walkthrough } from './employmentWalkthrough'
 
-// Temporary UI selection shared by the setup screens. It is not a run: choosing
-// a household creates nothing, locks nothing, and changes no finances.
+export interface EmploymentOverlay {
+  readonly runId: string
+  readonly state: Walkthrough
+}
+
+// Creation receipt only; this is not a synchronized simulation snapshot.
+export interface CreatedPlaythrough {
+  readonly id: string
+  readonly householdName: string
+}
+
 export interface SetupSelection {
+  readonly replayOf?: string
+  readonly employment: EmploymentOverlay | null
+  readonly setEmployment: Dispatch<SetStateAction<EmploymentOverlay | null>>
+  readonly supportForNext: boolean
+  readonly replay: (support: boolean) => void
+  readonly leavePlaythrough: () => Promise<void>
+  readonly createdPlaythrough: CreatedPlaythrough | null
+  readonly recordPlaythrough: (playthrough: CreatedPlaythrough) => void
   readonly selectedId: string | null
   readonly select: (personaId: string | null) => void
 }
