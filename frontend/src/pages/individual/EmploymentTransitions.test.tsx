@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
@@ -73,6 +73,37 @@ function show(state: Walkthrough) {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(hasPending).mockResolvedValue(false)
+})
+
+it('keeps pending decisions quiet and prevents duplicate submission before showing the committed next screen', async () => {
+  let finish!: (value: CommittedEmployment) => void
+  vi.mocked(submitEmployment).mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve
+    }),
+  )
+  show({ ...base, stage: 'day', day: 1 })
+  const next = await screen.findByRole('button', { name: 'Next' })
+  await userEvent.click(next)
+  expect(next).toBeDisabled()
+  expect(next.closest('fieldset')).toHaveAttribute('aria-busy', 'true')
+  expect(screen.queryByText(/Saving your decision/)).toBeNull()
+  await userEvent.click(next)
+  expect(submitEmployment).toHaveBeenCalledOnce()
+  expect(commit).not.toHaveBeenCalled()
+  await act(async () => {
+    finish(snapshot({ ...base, stage: 'interview', day: 2 }, 2))
+  })
+  expect(
+    await screen.findByRole('heading', {
+      name: 'What will you wear to the interview?',
+    }),
+  ).toBeInTheDocument()
+  expect(
+    screen
+      .getByRole('group', { name: 'Interview clothing' })
+      .closest('fieldset'),
+  ).toHaveAttribute('aria-busy', 'false')
 })
 
 it.each([

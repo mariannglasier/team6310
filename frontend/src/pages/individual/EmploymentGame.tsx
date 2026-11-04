@@ -77,7 +77,10 @@ export function EmploymentGame({
     owned: 'Wear my professional clothes',
   }
   return (
-    <div className="employment-game">
+    <div
+      key={`${state.stage}:${state.day}:${state.targetId ?? ''}`}
+      className="employment-game"
+    >
       <div className="employment-layout">
         <section className="employment-content" aria-labelledby="page-heading">
           {state.stage !== 'day' && state.stage !== 'income' && (

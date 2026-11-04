@@ -113,13 +113,15 @@ export function EmploymentPanel({
           Reconcile pending submission
         </Button>
       )}
-      {pending && <p role="status">Saving your decision…</p>}
       <fieldset
         disabled={pending || uncertain || automatic}
+        aria-busy={pending || automatic}
         className="employment-controls"
       >
         {skipInterviewDay ? (
-          <p role="status">Opening Day {state.day + 1}…</p>
+          <p className="sr-only" role="status">
+            Opening Day {state.day + 1}…
+          </p>
         ) : snapshot?.state ? (
           <EmploymentGame
             state={
@@ -137,8 +139,8 @@ export function EmploymentPanel({
           />
         ) : (
           snapshot && (
-            <>
-              <h2>It's time to start your job search</h2>
+            <div className="employment-intro">
+              <h2>It's time to start your job search!</h2>
               <Button
                 onClick={() => {
                   void send(
@@ -150,7 +152,7 @@ export function EmploymentPanel({
               >
                 See who's hiring
               </Button>
-            </>
+            </div>
           )
         )}
       </fieldset>
