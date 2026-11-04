@@ -139,29 +139,38 @@ export function FinancialTracking({
         </div>
       </div>
       <ol className="finance-timeline" aria-label="30-day month progress">
-        {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => (
-          <li
-            key={day}
-            aria-current={displayDay === day ? 'step' : undefined}
-            className={
-              displayDay !== null && day < displayDay
-                ? 'finance-earlier'
-                : undefined
-            }
-          >
-            <span>
-              {day}
-              {committed?.hiredDay != null &&
-                day > (displayDay ?? 0) &&
-                day > committed.hiredDay &&
-                (day - committed.hiredDay) % 7 === 0 && (
-                  <i className="finance-payday" role="img" aria-label="Payday">
+        {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => {
+          const payday =
+            committed?.hiredDay != null &&
+            day > (displayDay ?? 0) &&
+            day > committed.hiredDay &&
+            (day - committed.hiredDay) % 7 === 0
+          return (
+            <li
+              key={day}
+              aria-current={displayDay === day ? 'step' : undefined}
+              className={
+                displayDay !== null && day < displayDay
+                  ? 'finance-earlier'
+                  : undefined
+              }
+            >
+              <span className={payday ? 'finance-payday-circle' : undefined}>
+                {payday ? (
+                  <i
+                    className="finance-payday"
+                    role="img"
+                    aria-label={`Payday on Day ${day}`}
+                  >
                     $
                   </i>
+                ) : (
+                  day
                 )}
-            </span>
-          </li>
-        ))}
+              </span>
+            </li>
+          )
+        })}
       </ol>
       <div className="finance-layout">
         <aside className="finance-sidebar" aria-label="Household and balance">

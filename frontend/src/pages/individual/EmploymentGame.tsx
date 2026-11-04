@@ -179,7 +179,7 @@ export function EmploymentGame({
             <div className="employment-result">
               <h2>You got an interview!</h2>
               <p>
-                You received an email asking to come in-person for your
+                You received an email asking you to come in-person for your
                 interview on Day 3.
               </p>
               <Button onClick={advance}>Continue to Day 3</Button>

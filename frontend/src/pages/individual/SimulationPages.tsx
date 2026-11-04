@@ -81,10 +81,7 @@ export function IndividualPage() {
   if (createdPlaythrough) return <Navigate to={paths.simulation} replace />
   return (
     <div ref={fitTarget} style={fitStyle} className="household-page">
-      <PageSection
-        title="Every household has a story."
-        eyebrow="Individual simulation"
-      >
+      <PageSection title="Every household has a story.">
         <p className="household-page__intro">
           Choose the household whose finances you will manage for 30 days. Start
           simulation confirms your selection and begins your job search.

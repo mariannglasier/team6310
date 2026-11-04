@@ -299,6 +299,36 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
   await page.getByRole('button', { name: 'Continue to Day 4' }).click()
+  await page.locator('.finance-timeline').scrollIntoViewIfNeeded()
+  const paydayMarkers = page.getByRole('img', { name: /^Payday on Day/ })
+  await expect(paydayMarkers).toHaveCount(3)
+  for (const marker of await paydayMarkers.all()) {
+    expect(
+      await marker.evaluate((node) => {
+        const circle = node.parentElement!.getBoundingClientRect()
+        const icon = node.getBoundingClientRect()
+        const text = document.createRange()
+        text.selectNodeContents(node)
+        const glyph = text.getBoundingClientRect()
+        return (
+          Math.abs(icon.x + icon.width / 2 - circle.x - circle.width / 2) <=
+            1 &&
+          Math.abs(icon.y + icon.height / 2 - circle.y - circle.height / 2) <=
+            1 &&
+          glyph.left >= circle.left &&
+          glyph.right <= circle.right &&
+          glyph.top >= circle.top &&
+          glyph.bottom <= circle.bottom &&
+          Number(getComputedStyle(node).opacity) === 1 &&
+          getComputedStyle(node).color === 'rgb(255, 255, 255)' &&
+          getComputedStyle(node.parentElement!).backgroundColor ===
+            'rgb(181, 9, 53)' &&
+          node.parentElement!.textContent?.trim() === '$'
+        )
+      }),
+    ).toBe(true)
+  }
+  await page.screenshot({ path: testInfo.outputPath('payday-markers.png') })
   for (let day = 4; day <= 30; day++) {
     await expect(
       page.locator('.finance-timeline [aria-current="step"]'),

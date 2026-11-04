@@ -76,8 +76,10 @@ it('derives exact totals and future paydays from the committed history without c
   expect(within(totals).getByText('$350.00')).toBeInTheDocument()
   expect(within(totals).getByText('$800.00')).toBeInTheDocument()
   expect(within(totals).getByText('$60.00')).toBeInTheDocument()
-  expect(screen.getAllByLabelText('Payday')).toHaveLength(1)
-  expect(screen.getByLabelText('Payday').parentElement).toHaveTextContent('24')
+  expect(screen.getAllByRole('img', { name: /^Payday on Day/ })).toHaveLength(1)
+  expect(
+    screen.getByLabelText('Payday on Day 24').parentElement,
+  ).toHaveTextContent(/^\$$/)
   expect(
     screen.getByText(/CAC enrollment status: not a client/),
   ).toBeInTheDocument()

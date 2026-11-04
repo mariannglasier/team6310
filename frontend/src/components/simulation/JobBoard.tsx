@@ -20,12 +20,7 @@ export function JobBoard({
   const [selected, select] = useState<string | null>(null)
   return (
     <>
-      {reapplying && (
-        <p>
-          Choose another job you qualify for. Your follow-up interview is on Day
-          3.
-        </p>
-      )}
+      {reapplying && <p>Choose another job you qualify for.</p>}
       {onPrepare && (
         <section
           className="employment-preparation"

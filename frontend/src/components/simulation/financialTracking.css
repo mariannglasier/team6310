@@ -469,14 +469,21 @@
   display: block;
   margin-top: 6px;
 }
+.finance-timeline .finance-payday-circle {
+  background: var(--finance-accent);
+  border-color: var(--finance-accent);
+  color: white;
+}
 .finance-timeline .finance-payday {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  color: #b50935;
-  opacity: 0.25;
-  font-size: 32px;
+  color: inherit;
+  font-size: 1.5em;
+  line-height: 1;
+  border-radius: inherit;
+  overflow: hidden;
   font-style: normal;
   pointer-events: none;
 }
