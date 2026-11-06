@@ -8,6 +8,14 @@ import { loadPlaythrough } from '../../services/loadPlaythrough'
 import { usdCents } from '../../types/domain'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 
+vi.mock('../../services/supabase', () => ({
+  getSupabaseClient: async () => ({
+    from: () => ({
+      select: () => ({ eq: async () => ({ data: [], error: null }) }),
+    }),
+  }),
+}))
+
 vi.mock('../../services/householdExpenses', () => ({
   loadHouseholdExpenses: vi.fn(),
 }))

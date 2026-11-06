@@ -7,6 +7,9 @@ import {
   loadPlaythrough,
   PlaythroughLoadError,
 } from '../../services/loadPlaythrough'
+import { getSupabaseClient } from '../../services/supabase'
+import { parseUsdCents } from '../../services/contentService'
+import type { UsdCents } from '../../types/domain'
 import { findOwnedRuns } from '../../services/employmentGameplay'
 import { EmploymentPanel } from './EmploymentPanel'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
@@ -24,6 +27,32 @@ type LoadState =
 function RecordedPlaythrough({ id }: { id: string }) {
   const { setEmployment, employment } = useSetup()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  const [scenarioChanges, setScenarioChanges] = useState<{
+    balance: UsdCents | null
+    changes: readonly UsdCents[]
+  } | null>(null)
+  const balance =
+    state.status === 'ready' ? state.playthrough.currentBalance : null
+  useEffect(() => {
+    let active = true
+    void getSupabaseClient()
+      .then(async (client) => {
+        const { data, error } = await client
+          .from('player_responses')
+          .select('balance_change_applied')
+          .eq('playthrough_id', id)
+        if (error) throw error
+        const changes = (data ?? []).map((row) =>
+          parseUsdCents(row.balance_change_applied, 'balance_change_applied'),
+        )
+        if (active) setScenarioChanges({ balance, changes })
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [id, balance])
+
   useEffect(() => {
     let current = true
     loadPlaythrough(id).then(
@@ -84,6 +113,9 @@ function RecordedPlaythrough({ id }: { id: string }) {
     <FinancialTracking
       run={run}
       expenses={state.expenses}
+      scenarioChanges={
+        scenarioChanges?.balance === balance ? scenarioChanges.changes : null
+      }
       employment={employment?.runId === run.id ? employment.state : undefined}
       pregame={['board', 'preparation-result', 'application-result'].includes(
         String((run.employmentState as { stage?: string } | null)?.stage),

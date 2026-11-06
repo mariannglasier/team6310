@@ -15,6 +15,7 @@ import {
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import { paths } from '../../app/paths'
 import { EmploymentGame } from './EmploymentGame'
+import { ScenarioPanel } from '../../components/simulation/ScenarioPanel'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
 
 export function EmploymentPanel({
@@ -122,6 +123,26 @@ export function EmploymentPanel({
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
           </p>
+        ) : snapshot?.state &&
+          snapshot.state.stage === 'day' &&
+          snapshot.run.currentScenarioId ? (
+          <ScenarioPanel
+            key={`${snapshot.run.id}:${snapshot.run.currentScenarioId}`}
+            run={snapshot.run}
+            onCommit={(run) => {
+              void employmentSnapshot(run).then(
+                (value) => {
+                  setSnapshot(value)
+                  onCommit(value)
+                },
+                () =>
+                  setError(
+                    'Unable to restore saved progress. Reload to retry.',
+                  ),
+              )
+            }}
+            onContinue={() => void send({ type: 'continue' })}
+          />
         ) : snapshot?.state ? (
           <EmploymentGame
             state={

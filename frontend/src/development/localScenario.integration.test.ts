@@ -32,3 +32,34 @@ it.skipIf(import.meta.env.VITE_RUN_LOCAL_SCENARIO !== '1')(
     ).toBe(true)
   },
 )
+
+it.skipIf(import.meta.env.VITE_RUN_LOCAL_SCENARIO !== '1')(
+  'persists through the real frontend service and restores after service recreation',
+  async () => {
+    if (import.meta.env.VITE_SUPABASE_URL !== 'http://127.0.0.1:55321')
+      throw new Error('Local only')
+    const { getSupabaseClient } = await import('../services/supabase')
+    const { createLocalScenarioService } = await import('./localScenario')
+    const client = await getSupabaseClient()
+    const { data, error } = await client.auth.signInAnonymously()
+    expect(error).toBeNull()
+    expect(data.user?.is_anonymous).toBe(true)
+    const service = createLocalScenarioService()
+    const content = await service.load()
+    expect(await service.restore()).toBeNull()
+    const opened = await service.open()
+    expect(opened.run.currentBalance).toBe(20000)
+    const committed = await service.submit(content!.choices[0].id)
+    expect(committed.run.currentBalance).toBe(22500)
+    expect(committed.decision?.balanceChangeApplied).toBe(2500)
+    const restoredService = createLocalScenarioService()
+    await restoredService.load()
+    const restored = await restoredService.restore()
+    expect(restored).toEqual(committed)
+    expect(
+      (await restoredService.submit(content!.choices[0].id)).decision,
+    ).toEqual(committed.decision)
+    expect(restored?.run.employmentState).toBeNull()
+    expect(restored?.run.currentDay).toBe(4)
+  },
+)

@@ -8,7 +8,7 @@ import type {
 import { formatUsd } from '../../lib/money'
 import { PersonaAvatar } from './PersonaAvatar'
 import { BalanceDisplay } from './BalanceDisplay'
-import { usdCents } from '../../types/domain'
+import { usdCents, type UsdCents } from '../../types/domain'
 import './financialTracking.css'
 
 function CalendarIcon() {
@@ -78,10 +78,12 @@ export function FinancialTracking({
   preview,
   employment,
   pregame = false,
+  scenarioChanges = [],
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
   children: ReactNode
+  scenarioChanges?: readonly UsdCents[] | null
   pregame?: boolean
   preview?: Walkthrough
   employment?: Walkthrough
@@ -92,16 +94,26 @@ export function FinancialTracking({
   const displayBalance =
     committed?.balance ?? preview?.balance ?? run.currentBalance
   const history = committed?.history
-  const income = history
-    ? usdCents(
-        history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0),
-      )
-    : null
-  const charged = history
-    ? usdCents(
-        history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0),
-      )
-    : null
+  const income =
+    history && scenarioChanges
+      ? usdCents(
+          history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0) +
+            scenarioChanges.reduce(
+              (sum, change) => sum + Math.max(0, change),
+              0,
+            ),
+        )
+      : null
+  const charged =
+    history && scenarioChanges
+      ? usdCents(
+          history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0) +
+            scenarioChanges.reduce(
+              (sum, change) => sum + Math.max(0, -change),
+              0,
+            ),
+        )
+      : null
   const starting =
     committed && income !== null && charged !== null
       ? usdCents(committed.balance - income + charged)

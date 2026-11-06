@@ -116,3 +116,52 @@ VITE_RUN_LOCAL_SCENARIO=1 npm test -- --mode verification src/development/localS
 Ordinary `npm test` skips that opt-in test and runs mocked read/error validation
 and preview component tests without requiring local services. Persistent decision
 submission, restoration, and advancement integration remain separate tasks.
+
+## Persistent Day 4 decisions (supersedes mock-submission instructions above)
+
+The local preview now saves responses and balances in the verification database.
+Install the local functions once (or reapply their definitions after a reviewed
+change), without resets or repository migrations:
+
+```bash
+python3 tools/install_scenario_submission.py
+cd frontend
+npm run dev -- --mode verification --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open http://127.0.0.1:5173/simulation?localScenario=day4 . Select **Start local
+scenario run** to prepare/reuse anonymous Auth and create an isolated owned Day 4
+run. The balance comes from the saved run. Selecting changes nothing; Submit
+records the answer and displays the saved outcome. Refresh restores it and keeps
+submission disabled. Test another choice in a separate browser profile. No next-day
+advancement or replay is implemented. Normal `/simulation` employment is unchanged.
+
+See [local decision implementation and test commands](phase-3-local-decisions.md).
+No hosted operation is part of this workflow.
+
+## Day 4 in the individual simulation
+
+With the fixture and local submission functions installed, run from repo root:
+
+```bash
+python3 tools/install_scenario_progression.py
+cd frontend
+npm run dev -- --mode verification --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open http://127.0.0.1:5173/simulation/individual and start a fresh `[LOCAL TEST] Alex`
+run using normal setup. Complete the existing employment sequence. Ordinary Day 4
+shows the fixture automatically; no `localScenario` query parameter is needed.
+Select, submit, refresh to confirm the saved recap, then Continue simulation to
+Day 5. Employment state and payday timing are preserved; ordinary financial
+changes appear in the existing balance and totals. Existing runs already on/past
+Day 4 are not rewritten. Other households have no new scenario assigned.
+
+Run the actual-flow browser tests with:
+
+```bash
+LOCAL_CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e -- --config=playwright.local.config.ts individual-scenario.spec.ts
+```
+
+This local-only integration installs no hosted SQL. The development preview is
+still available independently.
