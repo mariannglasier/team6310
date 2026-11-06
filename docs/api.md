@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+>
+> **Current implementation boundary:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The local scenario preview retrieves actual scenarios and choices from local Supabase; submission remains an in-memory mock. Persistent ordinary decision submission, saved outcomes and day advancement integration are not implemented. Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # External Data and API Integration
 
 Scenario maintenance and gameplay use the approved relational content model in [scenarios.md](scenarios.md). External sources provide provenance-backed inputs and facts; they do not generate authoritative financial rules or player outcomes.
@@ -325,6 +331,8 @@ This represents a proposed placeholder format, not a finalized implementation re
 The reference mechanism must be defined during architecture and implementation. Regular expressions could help identify placeholders in text, but they would not replace the logic needed to retrieve, validate, and apply the referenced values. 
 
 ### Calculating Simulation Values 
+
+**Recovered content guidance:** Ordinary scenarios may represent hardship without a CAC service. Offline draft amounts are unapproved assumptions, not retrieved prices or benefits; annual CAC totals do not establish household amounts. Optional bill concepts in the draft library do not require new bindings or payment processing. Future-consequence text requires independent content review if ever selected for use.
 
 Some simulation expenses will require calculations using sourced values and scenario-specific inputs. 
 

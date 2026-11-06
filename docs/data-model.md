@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+>
+> **Current implementation boundary:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The local scenario preview retrieves actual scenarios and choices from local Supabase; submission remains an in-memory mock. Persistent ordinary decision submission, saved outcomes and day advancement integration are not implemented. Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # Data Model
 
 ## 1. Overview and evidence
@@ -105,7 +111,7 @@ One game attempt and its current financial and scenario state.
 | persona_id | uuid | Selected household profile. | Specified FK → personas.persona_id. |
 | current_scenario_id | uuid | Current scenario. | Specified FK → scenarios.scenario_id; nullability at start/end unresolved. |
 | current_balance | numeric(12,2) | Current available balance in USD. | Exact decimal or integer-cent arithmetic; signed changes. A required payable event that cannot be paid ends the run without recording an unaffordable charge. |
-| current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; multiple decisions can occur on one day. |
+| current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; ordinary/employment event days are separate, preserving the Day 2 interview/result/reapplication exception. |
 | cac_support_enabled | boolean | Whether CAC assistance applies. | Default and requiredness unresolved. |
 | status | text | Game progress state. | Allowed values and transitions unresolved (C4). |
 | started_at | timestamptz | Attempt start timestamp. | Default and requiredness unresolved. |
@@ -264,7 +270,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | --- | --- | --- |
 | C1 | Content versions | Resolved design: stable logical IDs with edition-scoped rows; published editions are immutable; pending edits are separate; every playthrough retains its starting version_id. Final DDL and publication transaction remain pending. |
 | C2 | Money | Resolved design: USD, exact decimal/integer-cent arithmetic, final rounding once to cents with half-cent ties away from zero, signed balance changes, and capped assistance. |
-| C3 | Simulation time | Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
+| C3 | Simulation time | Approved event-day design: separate ordinary/employment days, preserving the Day 2 interview/result/immediate reapplication exception. Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
 | C4 | States and nullability | Define playthrough statuses and transitions; confirm group/content status vocabularies. Decide required text, FKs, timestamps, and version fields; decide whether current_scenario_id may be NULL while waiting or after completion. |
 | C5 | Decision/payment consistency | Validate scenario, choice, ownership, eligibility, support, and edition in protected operations. Commit response, state changes, and payment/income idempotency atomically. Prevent duplicate scheduled/scenario charges. |
 | C6 | Group participation | Define join-code uniqueness (global or active sessions only), expiration, membership identity, participant visibility, deadline enforcement, and how group answers advance each attempt. No round identifier or vote aggregation rule is supplied. |

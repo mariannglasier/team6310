@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+>
+> **Current implementation boundary:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The local scenario preview retrieves actual scenarios and choices from local Supabase; submission remains an in-memory mock. Persistent ordinary decision submission, saved outcomes and day advancement integration are not implemented. Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 > Phase 2 server-backed employment is implemented locally, pending migration review and deployment. See [migration effects, recovery and verification limits](phase-2-employment.md). Phase 1 local-only descriptions below are historical.
 
 > Phase 1 employment integration: `/simulation` now embeds a provisional employment walkthrough inside the existing financial tracking interface. Supabase creation/loading is retained; gameplay is local and unpersisted. See [behavior, database prerequisites and limitations](phase-1-employment.md). Older foundation-status descriptions below do not describe this new overlay.
@@ -6,7 +12,7 @@
 
 ## 1. Purpose and scope
 
-The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a pre-game stage followed by Days 1–30 and make decisions involving approved scenario categories, housing, food, employment, and unexpected expenses. Multiple decisions may occur on one day. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources.
+The CAC Poverty Exercise is an educational web application developed by Georgia Tech Team 6310 for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Participants navigate a pre-game stage followed by Days 1–30 and make decisions involving approved scenario categories, housing, food, employment, and unexpected expenses. Ordinary scenarios and job events occupy separate days; the existing Day 2 interview/result/immediate reapplication sequence is the sole same-day exception. The experience demonstrates financial trade-offs and connects simulated outcomes with community statistics and CAC resources. Scenarios need not represent a CAC service; support options require a confirmed applicable service.
 
 Sprint 1 prioritizes the individual simulation. The broader application also includes facilitated group play, interactive data exploration, and an administrative portal for authorized CAC employees.
 
@@ -152,7 +158,7 @@ Setup proceeds through Household and Review. The household selection is explicit
 
 The decision screen displays the current day, balance, upcoming expenses, scenario, and applicable choices. Selecting an option changes temporary interface state only. Submitting records the decision and applies its approved consequences once. Scheduled scenarios and income occurrences use one authoritative, idempotent charge/credit path. A required payable event that cannot be paid ends the run with its actual day and reason. The interface displays a successful inline recap only after commitment succeeds.
 
-The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players continue after the recap; completing a question does not inherently advance the calendar, so same-day decisions and required events are processed before advancing. Normal completion follows Day 30. End Simulation and inability to pay produce clearly labeled partial summaries. Replay returns to household selection and creates a separate run with fresh state.
+The recap shows balance before, cost today, balance after, projected balance after upcoming expenses, and circumstance changes. Projected expenses remain distinct from deductions already applied. Individual players Continue after the committed recap to the next day. Ordinary and employment events occupy separate days; after a failed Day 2 interview, its result and immediate reapplication remain on Day 2 before advancing. Automatic income notices do not consume another scenario. Normal completion follows Day 30. End Simulation and inability to pay produce clearly labeled partial summaries. Replay returns to household selection and creates a separate run with fresh state.
 
 CAC support availability and actual assistance use are separate. Enabling support during setup allows relevant assistance choices; it does not automatically grant financial benefits.
 

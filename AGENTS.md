@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+>
+> **Current implementation boundary:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The local scenario preview retrieves actual scenarios and choices from local Supabase; submission remains an in-memory mock. Persistent ordinary decision submission, saved outcomes and day advancement integration are not implemented. Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # AGENTS.md — CAC Poverty Exercise
 
 ## 1. Role and project authority
@@ -51,7 +57,8 @@ Keep rendering and temporary UI selection state separate from protected operatio
 - Selecting an option does not change finances or response counts. Submission applies approved effects once and displays success only after commitment.
 - Validate current scenario, choice relationships, ownership, support eligibility, and content version in protected operations. Commit response and state changes atomically.
 - Keep upcoming-expense projections separate from actual deductions. Use the simulation model's approved amounts and schedules.
-- Use a pre-game stage followed by Days 1–30. Multiple decisions may occur on one day; completing a question does not inherently advance the calendar. Complete normally after Day 30; a required payable event that cannot be paid ends the run with actual progress. Do not invent an automatic ending based only on balance.
+- Use a pre-game stage followed by Days 1–30. Ordinary scenarios and employment events occupy separate days, preserving the Day 2 interview/result/immediate reapplication exception; show the committed recap before Continue advances. Complete normally after Day 30; a required payable event that cannot be paid ends the run with actual progress. Do not invent an automatic ending based only on balance.
+- Scenarios need not represent a CAC service, and review-only controls are not gameplay answers.
 - Use USD, exact money calculations, signed balance changes, capped assistance, idempotent charges/credits, scheduled versus non-scheduled scenarios, and weekly income initialized at zero. Weekly pay starts seven days after hiring.
 - Preserve stable logical IDs in immutable published edition records; keep pending edits separate and pin every playthrough to its starting `version_id`. Monthly source checks stage updates for staff approval.
 - Track CAC assistance availability separately from actual use. Support selection alone grants no benefit.
@@ -120,7 +127,7 @@ The frontend CI workflow runs the same verification checks on pushes and pull re
 
 Add meaningful tests for implemented behavior. The frontend foundation tests cover routes, shared controls, and UI state/service scaffolding; they do not cover implemented poverty simulation or database behavior.
 
-For individual simulation changes, test the relevant setup validation, selection-versus-submission behavior, financial results, support availability/use, duplicate and failed submissions, recaps, same-day decisions, scheduled income, day advancement, required-event early/full endings, refresh restoration, and replay. Check missing-data states, keyboard use, and responsive layout where affected.
+For individual simulation changes, test the relevant setup validation, selection-versus-submission behavior, financial results, support availability/use, duplicate and failed submissions, recaps, separated ordinary/employment event days with the Day 2 exception, scheduled income, day advancement, required-event early/full endings, refresh restoration, and replay. Check missing-data states, keyboard use, and responsive layout where affected.
 
 For database and security changes, verify allow/deny behavior directly at the API/database boundary, including cross-player access, unauthorized content changes, duplicate/stale submissions, and protected aggregate responses. For later features, verify host/participant boundaries, independent group state, staff authorization, and active-run content isolation.
 
