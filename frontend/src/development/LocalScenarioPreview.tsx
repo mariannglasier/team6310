@@ -34,7 +34,9 @@ export default function LocalScenarioPreview({
       },
       () => {
         if (active) {
-          setError('Unable to load the scenario. Reload to retry.')
+          setError(
+            'Unable to load the local scenario. Check the verification server, local environment and fixture, then reload.',
+          )
           setLoading(false)
         }
       },
@@ -68,7 +70,8 @@ export default function LocalScenarioPreview({
         expenses={{ status: 'unavailable' }}
       >
         <p>
-          Local test preview · Mock outcomes only · Refresh resets this preview.
+          Local database content · Mock outcomes only · Refresh resets this
+          preview.
         </p>
         {loading ? (
           <p role="status">Loading scenario…</p>

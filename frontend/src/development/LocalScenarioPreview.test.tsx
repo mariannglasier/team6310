@@ -1,15 +1,18 @@
+import { localScenario } from './scenarioTestFixture'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, it, vi } from 'vitest'
 import LocalScenarioPreview from './LocalScenarioPreview'
 import {
   createLocalScenarioService,
-  localScenario,
   type ScenarioPresentationService,
 } from './localScenario'
 
 function show(overrides: Partial<ScenarioPresentationService> = {}) {
-  const service = { ...createLocalScenarioService(), ...overrides }
+  const service = {
+    ...createLocalScenarioService(async () => localScenario),
+    ...overrides,
+  }
   render(<LocalScenarioPreview service={service} />)
   return service
 }
@@ -83,13 +86,16 @@ it('disables controls while pending and waits for the result before changing mon
   expect(button.closest('fieldset')).toHaveAttribute('aria-busy', 'true')
   expect(screen.getByLabelText('Current balance $200.00')).toBeVisible()
   expect(
-    screen.queryByRole('region', { name: 'Mock decision outcome' }),
+    screen.queryByRole('status', { name: 'Mock decision outcome' }),
   ).toBeNull()
-  finish(await createLocalScenarioService().submit('receive'))
+  const mock = createLocalScenarioService(async () => localScenario)
+  await mock.load()
+  finish(await mock.submit('receive'))
   expect(await screen.findByText('Your household received $25.')).toBeVisible()
 })
 it('preserves selection on failure and allows retry', async () => {
-  const mock = createLocalScenarioService()
+  const mock = createLocalScenarioService(async () => localScenario)
+  await mock.load()
   const submit = vi
     .fn()
     .mockRejectedValueOnce(new Error('offline'))
@@ -125,6 +131,6 @@ it('handles scenario loading failure', async () => {
     },
   })
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Unable to load the scenario',
+    'Unable to load the local scenario',
   )
 })

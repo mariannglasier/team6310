@@ -3,15 +3,20 @@ import {
   type Scenario,
   type CommittedDecision,
 } from '../types/domain'
+import {
+  loadLocalScenario,
+  LOCAL_SCENARIO_ID,
+  LOCAL_VERSION_ID,
+} from './loadLocalScenario'
 import type { LoadedPlaythrough } from '../types/playthrough'
 
-// Synthetic presentation fixtures only. Never imported by database services.
+// In-memory preview shell only; scenario/choice content comes from local Supabase.
 export const localRun: LoadedPlaythrough = {
   id: 'local-scenario-preview',
-  personaId: 'local-test-household',
-  versionId: 'local-test-edition',
+  personaId: 'cfe33068-d657-482f-b770-ef3918a87e03',
+  versionId: LOCAL_VERSION_ID,
   ownerUserId: null,
-  currentScenarioId: 'local-day4',
+  currentScenarioId: LOCAL_SCENARIO_ID,
   currentBalance: usdCents(20000),
   currentDay: 4,
   supportEnabled: false,
@@ -21,62 +26,34 @@ export const localRun: LoadedPlaythrough = {
   currentJobId: null,
   employmentState: null,
   persona: {
-    id: 'local-test-household',
-    versionId: 'local-test-edition',
-    name: 'Local test household',
+    id: 'cfe33068-d657-482f-b770-ef3918a87e03',
+    versionId: LOCAL_VERSION_ID,
+    name: '[LOCAL TEST] Alex',
     description: 'Synthetic frontend fixture',
   },
-}
-export const localScenario: Scenario = {
-  id: 'local-day4',
-  versionId: 'local-test-edition',
-  categoryId: 'local-test-category',
-  title: 'A decision for today',
-  description: 'Choose how your household responds to this test situation.',
-  scheduleType: 'non_scheduled',
-  choices: [
-    {
-      id: 'receive',
-      text: 'Receive assistance',
-      balanceChange: usdCents(2500),
-      responseText: 'Your household received $25.',
-    },
-    {
-      id: 'pay',
-      text: 'Pay an unexpected fee',
-      balanceChange: usdCents(-1500),
-      responseText: 'Your household paid the $15 fee.',
-    },
-    {
-      id: 'decline',
-      text: 'Decline assistance',
-      balanceChange: usdCents(0),
-      responseText: 'You declined assistance. Your balance is unchanged.',
-    },
-  ].map((choice) => ({
-    ...choice,
-    scenarioId: 'local-day4',
-    versionId: 'local-test-edition',
-  })),
 }
 export interface ScenarioPresentationService {
   load(): Promise<Scenario | null>
   submit(choiceId: string): Promise<CommittedDecision>
 }
-// In-memory mock, recreated on refresh. No Auth, storage, or network operations.
-export function createLocalScenarioService(): ScenarioPresentationService {
+// Retrieval uses local Supabase. Submission is in-memory only and resets on refresh.
+export function createLocalScenarioService(
+  load: () => Promise<Scenario | null> = loadLocalScenario,
+): ScenarioPresentationService {
+  let scenario: Scenario | null = null
   let result: CommittedDecision | null = null
   return {
     async load() {
-      return localScenario
+      scenario = await load()
+      return scenario
     },
     async submit(choiceId) {
       await new Promise((resolve) => setTimeout(resolve, 400))
       if (result) return result
-      const choice = localScenario.choices.find((item) => item.id === choiceId)
+      const choice = scenario?.choices.find((item) => item.id === choiceId)
       if (!choice) throw new Error('Choice unavailable')
       result = {
-        scenarioId: localScenario.id,
+        scenarioId: scenario!.id,
         choiceId,
         balanceChangeApplied: choice.balanceChange,
         balanceAfter: usdCents(localRun.currentBalance! + choice.balanceChange),
