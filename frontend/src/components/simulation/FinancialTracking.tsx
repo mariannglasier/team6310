@@ -7,6 +7,8 @@ import type {
 } from '../../types/householdExpenses'
 import { formatUsd } from '../../lib/money'
 import { PersonaAvatar } from './PersonaAvatar'
+import { BalanceDisplay } from './BalanceDisplay'
+import { usdCents } from '../../types/domain'
 import './financialTracking.css'
 
 function CalendarIcon() {
@@ -74,6 +76,7 @@ export function FinancialTracking({
   expenses,
   children,
   preview,
+  employment,
   pregame = false,
 }: {
   run: LoadedPlaythrough
@@ -81,9 +84,35 @@ export function FinancialTracking({
   children: ReactNode
   pregame?: boolean
   preview?: Walkthrough
+  employment?: Walkthrough
 }) {
-  const displayDay = preview?.day ?? run.currentDay
-  const displayBalance = preview?.balance ?? run.currentBalance
+  const committed =
+    employment?.balance === run.currentBalance ? employment : undefined
+  const displayDay = committed?.day ?? preview?.day ?? run.currentDay
+  const displayBalance =
+    committed?.balance ?? preview?.balance ?? run.currentBalance
+  const history = committed?.history
+  const income = history
+    ? usdCents(
+        history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0),
+      )
+    : null
+  const charged = history
+    ? usdCents(
+        history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0),
+      )
+    : null
+  const starting =
+    committed && income !== null && charged !== null
+      ? usdCents(committed.balance - income + charged)
+      : null
+  const lastPay = history?.findLast((entry) => entry.change > 0)
+  const employed =
+    committed?.hiredDay !== null && committed?.hiredDay !== undefined
+  const job = employed
+    ? committed.jobs.find((item) => item.job.id === committed.targetId)?.job
+    : undefined
+  const support = committed?.support ?? run.supportEnabled
   const unpaid =
     expenses.status === 'ready'
       ? expenses.data.items.filter((item) => !item.paidAt)
@@ -98,7 +127,7 @@ export function FinancialTracking({
     <div
       className={`financial-tracking${preview || run.employmentState ? ' financial-tracking--preview' : ''}`}
     >
-      <div className="finance-top" aria-live="polite">
+      <div className="sr-only" aria-live="polite">
         <div>
           <h1 id="page-heading" tabIndex={-1}>
             {pregame || preview?.day === 0
@@ -107,23 +136,41 @@ export function FinancialTracking({
                 ? 'Current day unavailable'
                 : `Day ${displayDay} of 30`}
           </h1>
-          <span>One choice at a time.</span>
         </div>
       </div>
       <ol className="finance-timeline" aria-label="30-day month progress">
-        {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => (
-          <li
-            key={day}
-            aria-current={displayDay === day ? 'step' : undefined}
-            className={
-              displayDay !== null && day < displayDay
-                ? 'finance-earlier'
-                : undefined
-            }
-          >
-            <span>{day}</span>
-          </li>
-        ))}
+        {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => {
+          const payday =
+            committed?.hiredDay != null &&
+            day > (displayDay ?? 0) &&
+            day > committed.hiredDay &&
+            (day - committed.hiredDay) % 7 === 0
+          return (
+            <li
+              key={day}
+              aria-current={displayDay === day ? 'step' : undefined}
+              className={
+                displayDay !== null && day < displayDay
+                  ? 'finance-earlier'
+                  : undefined
+              }
+            >
+              <span className={payday ? 'finance-payday-circle' : undefined}>
+                {payday ? (
+                  <i
+                    className="finance-payday"
+                    role="img"
+                    aria-label={`Payday on Day ${day}`}
+                  >
+                    $
+                  </i>
+                ) : (
+                  day
+                )}
+              </span>
+            </li>
+          )
+        })}
       </ol>
       <div className="finance-layout">
         <aside className="finance-sidebar" aria-label="Household and balance">
@@ -138,19 +185,40 @@ export function FinancialTracking({
               <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
             </div>
             <small>
-              {preview ? 'Server status' : 'Status'}:{' '}
-              {run.status ?? 'Unavailable'}
+              Employment:{' '}
+              {committed
+                ? employed
+                  ? (job?.title ?? 'Job unavailable')
+                  : 'Not employed'
+                : 'Unavailable'}
+            </small>
+            <small className="finance-profile-detail">
+              Weekly income:{' '}
+              {committed ? formatUsd(committed.weeklyIncome) : 'Unavailable'}
+            </small>
+            <small className="finance-profile-detail">
+              CAC enrollment status:{' '}
+              {support === null
+                ? 'Unavailable'
+                : support
+                  ? 'client of the CAC'
+                  : 'not a client'}
             </small>
           </section>
           <section className="finance-money" aria-label="Current balance">
             <span className="finance-label">
               {preview ? 'Provisional balance · not saved' : 'Current balance'}
             </span>
-            <strong className="finance-balance" aria-live="polite">
-              {displayBalance === null
-                ? 'Unavailable'
-                : formatUsd(displayBalance)}
-            </strong>
+            <BalanceDisplay
+              key={run.id}
+              balance={displayBalance}
+              incomeKey={
+                lastPay && lastPay.day === committed?.day
+                  ? `${run.id}:${lastPay.day}`
+                  : undefined
+              }
+              income={committed?.weeklyIncome ?? usdCents(0)}
+            />
             {preview && (
               <p className="finance-confirmed">
                 Server-confirmed balance:{' '}
@@ -164,15 +232,17 @@ export function FinancialTracking({
             <dl className="finance-totals">
               <div>
                 <dt>Starting balance</dt>
-                <dd>Unavailable</dd>
+                <dd>
+                  {starting === null ? 'Unavailable' : formatUsd(starting)}
+                </dd>
               </div>
               <div>
                 <dt>Total income received</dt>
-                <dd>Unavailable</dd>
+                <dd>{income === null ? 'Unavailable' : formatUsd(income)}</dd>
               </div>
               <div>
                 <dt>Total expenses charged</dt>
-                <dd>Unavailable</dd>
+                <dd>{charged === null ? 'Unavailable' : formatUsd(charged)}</dd>
               </div>
             </dl>
           </section>

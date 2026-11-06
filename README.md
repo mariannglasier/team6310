@@ -14,9 +14,9 @@ React Router connects the responsive landing page and clearly labeled feature pl
 | `/learn` | CAC information; approved content/destination pending |
 | `/donate` | Donation; approved external destination pending |
 | `/simulation/introduction` | Legacy URL redirects to `/simulation/individual` |
-| `/simulation/individual` | Persona (household) selection, the first setup step; reads approved households from the published edition (read-only, no run is created). Job selection happens later on Day 1 |
-| `/simulation/review` | Review household; confirm to create an individual playthrough using the existing RPC |
-| `/simulation` | Loads the created playthrough and pinned-edition household; displays saved balance, day, and status; no gameplay |
+| `/simulation/individual` | Select an approved published household; Start simulation confirms it through the existing protected start RPC and opens pre-game job search |
+| `/simulation/review` | Legacy bookmark redirects to household selection or the existing active run |
+| `/simulation` | Server-backed employment flow, saved balance and history totals, automatic payday feedback, and placeholder ordinary scenarios; backend deployment prerequisites still apply |
 | `/simulation/results` | Results/summary |
 | `/group/host`, `/group/join` | Host and participant entry |
 | `/admin/login` | Employee sign-in; no credential collection yet |

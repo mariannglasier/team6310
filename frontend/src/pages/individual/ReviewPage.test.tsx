@@ -11,10 +11,7 @@ import {
 import { beforeEach, expect, it, vi } from 'vitest'
 import { ReviewPage } from './ReviewPage'
 import { IndividualPage } from './SimulationPages'
-import {
-  contentService,
-  ContentUnavailableError,
-} from '../../services/contentService'
+import { contentService } from '../../services/contentService'
 import { createIndividualPlaythrough } from '../../services/playthroughService'
 import { SimulationPage } from './SimulationPage'
 import { loadPlaythrough } from '../../services/loadPlaythrough'
@@ -112,66 +109,17 @@ beforeEach(() => {
   vi.mocked(contentService.loadHouseholds).mockResolvedValue(households)
 })
 
-it('returns to household selection when nothing has been chosen', async () => {
+it('redirects legacy Review bookmarks to household selection without creating a run', async () => {
   renderFlow('/simulation/review')
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/individual',
-  )
   expect(
-    screen.getByRole('heading', { name: 'Every household has a story.' }),
-  ).toBeInTheDocument()
-})
-
-it('summarizes the chosen household and starting money without a support step', async () => {
-  const user = userEvent.setup()
-  renderFlow()
-  await chooseCenter(user)
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/review',
-  )
-  expect(
-    screen.getByRole('heading', { level: 1, name: 'Review your setup.' }),
-  ).toBeInTheDocument()
-  expect(
-    screen.getByRole('list', { name: 'Setup step 2 of 2' }),
-  ).toBeInTheDocument()
-  const profile = within(await screen.findByRole('region', { name: 'Alex' }))
-  expect(profile.getByText('Finding His Footing')).toBeInTheDocument()
-  expect(profile.getByText('Available starting balance')).toBeInTheDocument()
-  expect(profile.getByText('$350.00')).toBeInTheDocument()
-  expect(profile.getByText(/Alex is looking for work/)).toBeInTheDocument()
-  expect(screen.getByText('Household selected')).toBeInTheDocument()
-  expect(
-    screen.getByRole('heading', {
-      name: 'Your first day starts with a choice.',
+    await screen.findByRole('heading', {
+      name: 'Every household has a story.',
     }),
-  ).toBeInTheDocument()
-  expect(screen.queryByText(/CAC support/)).not.toBeInTheDocument()
+  ).toBeVisible()
+  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
 })
 
-it('lets the player change the household and keeps the selection', async () => {
-  const user = userEvent.setup()
-  renderFlow()
-  await chooseCenter(user)
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  await user.click(
-    await screen.findByRole('link', { name: 'Change household' }),
-  )
-
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/individual',
-  )
-  expect(await screen.findByRole('radio', { name: /Alex/ })).toBeChecked()
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  await user.click(await screen.findByRole('link', { name: 'Back' }))
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/individual',
-  )
-})
-
-it('creates the selected household, retains its ID, and opens the placeholder', async () => {
+it('starts directly, prevents duplicate creation, and locks an active run on return', async () => {
   const user = userEvent.setup()
   let complete!: (id: string) => void
   vi.mocked(createIndividualPlaythrough).mockReturnValue(
@@ -182,95 +130,36 @@ it('creates the selected household, retains its ID, and opens the placeholder', 
   renderFlow()
   await chooseCenter(user)
   expect(createIndividualPlaythrough).not.toHaveBeenCalled()
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
-  await user.dblClick(
-    await screen.findByRole('button', { name: 'Confirm selection' }),
-  )
+  await user.dblClick(screen.getByRole('button', { name: 'Start simulation' }))
   expect(createIndividualPlaythrough).toHaveBeenCalledExactlyOnceWith('p1')
   expect(
-    screen.getByRole('button', { name: 'Creating playthrough…' }),
+    screen.getByRole('button', { name: 'Start simulation' }),
   ).toBeDisabled()
-  expect(
-    screen.queryByText(/Your playthrough was created/),
-  ).not.toBeInTheDocument()
-  complete('created-run-id')
+  expect(screen.getByRole('button', { name: 'Choose Alex' })).toBeDisabled()
+  complete('created-run')
   expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
-  expect(screen.getByText('Playthrough ID: created-run-id')).toBeInTheDocument()
-  expect(screen.getByLabelText('Current path')).toHaveTextContent('/simulation')
+  expect(screen.queryByText(/Playthrough ID:/)).toBeNull()
   await user.click(screen.getByRole('button', { name: 'Revisit Review' }))
   expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Revisit Household' }))
-  expect(
-    await screen.findByText('Playthrough ID: created-run-id'),
-  ).toBeInTheDocument()
+  expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
   expect(createIndividualPlaythrough).toHaveBeenCalledOnce()
 })
 
-it('preserves the household after failure and allows retry', async () => {
+it('preserves selection after a creation error and allows explicit retry', async () => {
   const user = userEvent.setup()
   vi.mocked(createIndividualPlaythrough)
-    .mockRejectedValueOnce(new Error('Unable to confirm creation.'))
-    .mockResolvedValueOnce('retry-run-id')
+    .mockRejectedValueOnce(new Error('Creation failed'))
+    .mockResolvedValueOnce('retry-run')
   renderFlow()
   await chooseCenter(user)
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  await user.click(
-    await screen.findByRole('button', { name: 'Confirm selection' }),
+  await user.click(screen.getByRole('button', { name: 'Start simulation' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Creation failed')
+  expect(screen.getByRole('button', { name: 'Choose Alex' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
   )
-  expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Unable to confirm creation.',
-  )
-  expect(screen.getByRole('region', { name: 'Alex' })).toBeInTheDocument()
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/review',
-  )
-  await user.click(screen.getByRole('button', { name: 'Confirm selection' }))
+  await user.click(screen.getByRole('button', { name: 'Start simulation' }))
   expect(await screen.findByText('Day 1 of 30')).toBeInTheDocument()
-  expect(createIndividualPlaythrough).toHaveBeenNthCalledWith(2, 'p1')
-})
-
-it('does not claim creation on direct entry to the placeholder', () => {
-  renderFlow('/simulation')
-  expect(screen.getByText(/No newly created playthrough/)).toBeInTheDocument()
-  expect(createIndividualPlaythrough).not.toHaveBeenCalled()
-})
-
-it('shows a safe error with retry when households cannot load on Review', async () => {
-  const user = userEvent.setup()
-  renderFlow()
-  await chooseCenter(user)
-  vi.mocked(contentService.loadHouseholds)
-    .mockRejectedValueOnce(new ContentUnavailableError())
-    .mockResolvedValueOnce(households)
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Unable to load households and jobs',
-  )
-  expect(
-    screen.getByRole('button', { name: 'Confirm selection' }),
-  ).toBeDisabled()
-  await user.click(
-    screen.getByRole('button', { name: 'Retry loading households' }),
-  )
-  expect(
-    await screen.findByRole('region', { name: 'Alex' }),
-  ).toBeInTheDocument()
-})
-
-it('explains when the selected household is no longer published', async () => {
-  const user = userEvent.setup()
-  renderFlow()
-  await chooseCenter(user)
-  vi.mocked(contentService.loadHouseholds).mockResolvedValue({
-    ...households,
-    personas: [households.personas[1]],
-  })
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
-  expect(
-    await screen.findByText(/selected household is no longer available/),
-  ).toBeInTheDocument()
-  expect(
-    screen.getByRole('button', { name: 'Confirm selection' }),
-  ).toBeDisabled()
+  expect(createIndividualPlaythrough).toHaveBeenCalledTimes(2)
 })

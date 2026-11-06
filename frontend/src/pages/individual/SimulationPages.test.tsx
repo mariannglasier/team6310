@@ -15,6 +15,9 @@ vi.mock('../../services/contentService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../services/contentService')>()),
   contentService: { loadHouseholds: vi.fn(), loadJobs: vi.fn() },
 }))
+vi.mock('../../services/playthroughService', () => ({
+  createIndividualPlaythrough: vi.fn().mockResolvedValue('new-run'),
+}))
 vi.mock('../../services/participantSession', async (importOriginal) => ({
   ...(await importOriginal<
     typeof import('../../services/participantSession')
@@ -50,13 +53,14 @@ const renderPage = () =>
       <MemoryRouter initialEntries={['/simulation/individual']}>
         <Routes>
           <Route path="/simulation/individual" element={<IndividualPage />} />
-          <Route path="/simulation/review" element={<p>Review page</p>} />
+          <Route path="/simulation" element={<p>Job search</p>} />
         </Routes>
         <Location />
       </MemoryRouter>
     </SetupProvider>,
   )
-const radios = () => screen.getAllByRole('radio', { hidden: true })
+const radios = () =>
+  screen.getAllByRole('button', { hidden: true, name: /^Choose / })
 
 beforeEach(() => {
   vi.resetAllMocks()
@@ -70,9 +74,9 @@ it('shows approved households with no default selection and no jobs, without sta
   ).toBeInTheDocument()
   expect(await screen.findByText('Finding His Footing')).toBeInTheDocument()
   expect(radios()).toHaveLength(4)
-  expect(radios().some((radio) => (radio as HTMLInputElement).checked)).toBe(
-    false,
-  )
+  expect(
+    radios().some((radio) => radio.getAttribute('aria-pressed') === 'true'),
+  ).toBe(false)
   expect(screen.getByText('$350.00')).toBeInTheDocument()
   expect(screen.getByText('$850.00', { selector: 'b' })).toBeInTheDocument()
   // Job selection belongs to Day 1, not this page.
@@ -80,7 +84,7 @@ it('shows approved households with no default selection and no jobs, without sta
   expect(screen.queryByText(/Fast Food/)).not.toBeInTheDocument()
   expect(screen.queryByText(/Prepare participant session/)).toBeNull()
   expect(ensureParticipantSession).not.toHaveBeenCalled()
-  expect(screen.getByRole('list', { name: 'Setup step 1 of 2' })).toBeVisible()
+  expect(screen.queryByRole('radio')).toBeNull()
 })
 
 it('renders an illustrated avatar for each household', async () => {
@@ -99,10 +103,13 @@ it('keeps Continue disabled until a household is chosen, then opens Review witho
   const user = userEvent.setup()
   renderPage()
   await screen.findByText('Finding His Footing')
-  const next = screen.getByRole('button', { name: 'Continue' })
+  const next = screen.getByRole('button', { name: 'Start simulation' })
   expect(next).toBeDisabled()
-  await user.click(screen.getByRole('radio', { name: /Alex/ }))
-  expect(screen.getByRole('radio', { name: /Alex/ })).toBeChecked()
+  await user.click(screen.getByRole('button', { name: /^Choose Alex/ }))
+  expect(screen.getByRole('button', { name: /^Choose Alex/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
   expect(next).toBeEnabled()
   expect(screen.queryByText(/CAC support/)).not.toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Back' })).toHaveAttribute(
@@ -110,38 +117,36 @@ it('keeps Continue disabled until a household is chosen, then opens Review witho
     '/',
   )
   await user.click(next)
-  expect(screen.getByLabelText('Current path')).toHaveTextContent(
-    '/simulation/review',
-  )
-  expect(screen.getByText('Review page')).toBeInTheDocument()
+  expect(screen.getByLabelText('Current path')).toHaveTextContent('/simulation')
+  expect(screen.getByText('Job search')).toBeInTheDocument()
 })
 
 it('moves between households with arrows, dots, and keyboard while keeping focus', async () => {
   const user = userEvent.setup()
   renderPage()
   await screen.findByText('Finding His Footing')
-  expect(screen.getByRole('radio', { name: /Alex/ })).toBeEnabled()
+  expect(screen.getByRole('button', { name: /^Choose Alex/ })).toBeEnabled()
   await user.click(screen.getByRole('button', { name: 'Show next household' }))
-  expect(screen.getByRole('radio', { name: /Jordan/ })).toBeEnabled()
+  expect(screen.getByRole('button', { name: /^Choose Jordan/ })).toBeEnabled()
   expect(
-    radios().filter((radio) => !(radio as HTMLInputElement).disabled),
+    radios().filter((radio) => (radio as HTMLButtonElement).tabIndex === 0),
   ).toHaveLength(1)
 
   await user.click(screen.getByRole('button', { name: 'Show Sofia' }))
-  const sofia = screen.getByRole('radio', { name: /Sofia/ })
+  const sofia = screen.getByRole('button', { name: /^Choose Sofia/ })
   expect(sofia).toBeEnabled()
   sofia.focus()
   await user.keyboard('{ArrowRight}')
   // Wraps to the first household and the new radio keeps keyboard focus.
-  const alex = screen.getByRole('radio', { name: /Alex/ })
+  const alex = screen.getByRole('button', { name: /^Choose Alex/ })
   expect(alex).toBeEnabled()
   expect(alex).toHaveFocus()
   await user.keyboard('{ArrowLeft}')
-  expect(screen.getByRole('radio', { name: /Sofia/ })).toHaveFocus()
+  expect(screen.getByRole('button', { name: /^Choose Sofia/ })).toHaveFocus()
   // Moving never selects.
-  expect(radios().some((radio) => (radio as HTMLInputElement).checked)).toBe(
-    false,
-  )
+  expect(
+    radios().some((radio) => radio.getAttribute('aria-pressed') === 'true'),
+  ).toBe(false)
 })
 
 it('selects a household that was brought to the center by clicking its neighbour', async () => {
@@ -149,16 +154,14 @@ it('selects a household that was brought to the center by clicking its neighbour
   renderPage()
   const jordan = (await screen.findAllByText('Jordan & Maya'))[0]
   await user.click(jordan)
-  expect(screen.getByRole('radio', { name: /Jordan/ })).toBeEnabled()
-  expect(radios().some((radio) => (radio as HTMLInputElement).checked)).toBe(
-    false,
-  )
-  await user.click(screen.getByRole('radio', { name: /Jordan/ }))
-  const selected = screen.getByRole('radio', { name: /Jordan/ })
-  expect(selected).toBeChecked()
+  expect(screen.getByRole('button', { name: /^Choose Jordan/ })).toBeEnabled()
   expect(
-    within(selected.closest('label') as HTMLElement).getByText('Selected'),
-  ).toBeInTheDocument()
+    radios().some((radio) => radio.getAttribute('aria-pressed') === 'true'),
+  ).toBe(false)
+  await user.click(screen.getByRole('button', { name: /^Choose Jordan/ }))
+  const selected = screen.getByRole('button', { name: /^Choose Jordan/ })
+  expect(selected).toHaveAttribute('aria-pressed', 'true')
+  expect(within(selected).getByText('Selected')).toBeInTheDocument()
 })
 
 it('shows a safe error with retry when households cannot load', async () => {
@@ -169,7 +172,9 @@ it('shows a safe error with retry when households cannot load', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent(
     'Unable to load households and jobs',
   )
-  expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  expect(
+    screen.getByRole('button', { name: 'Start simulation' }),
+  ).toBeDisabled()
   await userEvent.click(
     screen.getByRole('button', { name: 'Retry loading households' }),
   )

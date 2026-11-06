@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '../../components/ui/Button'
 import { useSetup } from '../../state/setupContext'
@@ -79,6 +79,26 @@ export function EmploymentPanel({
       setPending(false)
     }
   }
+  const advanceAutomatically = useEffectEvent(() => {
+    void send({ type: 'continue' })
+  })
+  useEffect(() => {
+    const state = snapshot?.state
+    if (!state || pending || uncertain || error) return
+    if (
+      state.stage === 'income' ||
+      (state.stage === 'day' &&
+        (state.day === 2 || (state.day === 3 && state.hiredDay === 3)))
+    ) {
+      const timer = window.setTimeout(() => advanceAutomatically(), 0)
+      return () => window.clearTimeout(timer)
+    }
+  }, [snapshot, pending, uncertain, error])
+  const state = snapshot?.state
+  const skipInterviewDay =
+    state?.stage === 'day' &&
+    (state.day === 2 || (state.day === 3 && state.hiredDay === 3))
+  const automatic = skipInterviewDay || state?.stage === 'income'
   return (
     <>
       {error && <p role="alert">{error}</p>}
@@ -93,11 +113,22 @@ export function EmploymentPanel({
           Reconcile pending submission
         </Button>
       )}
-      {pending && <p role="status">Saving your decision…</p>}
-      <fieldset disabled={pending || uncertain} className="employment-controls">
-        {snapshot?.state ? (
+      <fieldset
+        disabled={pending || uncertain || automatic}
+        aria-busy={pending || automatic}
+        className="employment-controls"
+      >
+        {skipInterviewDay ? (
+          <p className="sr-only" role="status">
+            Opening Day {state.day + 1}…
+          </p>
+        ) : snapshot?.state ? (
           <EmploymentGame
-            state={snapshot.state}
+            state={
+              snapshot.state.stage === 'income'
+                ? { ...snapshot.state, stage: 'day' }
+                : snapshot.state
+            }
             dispatch={(a) => {
               void send(a)
             }}
@@ -108,12 +139,8 @@ export function EmploymentPanel({
           />
         ) : (
           snapshot && (
-            <>
-              <h2>Your employment walkthrough</h2>
-              <p>
-                Employment decisions and weekly pay will be saved to this
-                playthrough. Other scenarios and bills remain placeholders.
-              </p>
+            <div className="employment-intro">
+              <h2>It's time to start your job search!</h2>
               <Button
                 onClick={() => {
                   void send(
@@ -123,9 +150,9 @@ export function EmploymentPanel({
                   )
                 }}
               >
-                Start employment walkthrough
+                See who's hiring
               </Button>
-            </>
+            </div>
           )
         )}
       </fieldset>

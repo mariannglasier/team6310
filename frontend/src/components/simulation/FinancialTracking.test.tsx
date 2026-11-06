@@ -4,6 +4,7 @@ import { FinancialTracking } from './FinancialTracking'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import type { ExpenseState } from '../../types/householdExpenses'
 import { usdCents } from '../../types/domain'
+import { createWalkthrough } from '../../state/employmentWalkthrough'
 const run = {
   id: 'run',
   currentBalance: usdCents(35000),
@@ -34,6 +35,55 @@ const expenses: ExpenseState = {
     ],
   },
 }
+it('derives exact totals and future paydays from the committed history without counting projected bills', () => {
+  const employment = {
+    ...createWalkthrough(
+      {
+        id: 'p',
+        versionId: 'v',
+        name: 'Alex',
+        description: '',
+        startingBalance: usdCents(35000),
+        hasEnglishSkills: false,
+        hasComputerSkills: false,
+      },
+      [],
+      false,
+      usdCents(6000),
+    ),
+    day: 17,
+    hiredDay: 3,
+    balance: usdCents(109000),
+    weeklyIncome: usdCents(40000),
+    history: [
+      { day: 2, text: 'Clothes', change: usdCents(-6000) },
+      { day: 10, text: 'Pay', change: usdCents(40000) },
+      { day: 17, text: 'Pay', change: usdCents(40000) },
+    ],
+  }
+  render(
+    <FinancialTracking
+      run={{ ...run, currentBalance: employment.balance, currentDay: 17 }}
+      expenses={expenses}
+      employment={employment}
+    >
+      Today's scenario
+    </FinancialTracking>,
+  )
+  const totals = screen.getByRole('complementary', {
+    name: 'Household and balance',
+  })
+  expect(within(totals).getByText('$350.00')).toBeInTheDocument()
+  expect(within(totals).getByText('$800.00')).toBeInTheDocument()
+  expect(within(totals).getByText('$60.00')).toBeInTheDocument()
+  expect(screen.getAllByRole('img', { name: /^Payday on Day/ })).toHaveLength(1)
+  expect(
+    screen.getByLabelText('Payday on Day 24').parentElement,
+  ).toHaveTextContent(/^\$$/)
+  expect(
+    screen.getByText(/CAC enrollment status: not a client/),
+  ).toBeInTheDocument()
+})
 it('renders balance/day and sorts definitions without claiming generated or paid occurrences', () => {
   render(
     <FinancialTracking run={run} expenses={expenses}>

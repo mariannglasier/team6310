@@ -1,0 +1,163 @@
+import { act, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
+import { beforeEach, expect, it, vi } from 'vitest'
+import { EmploymentPanel } from './EmploymentPanel'
+import { SetupProvider } from '../../state/SetupProvider'
+import {
+  createWalkthrough,
+  type Walkthrough,
+} from '../../state/employmentWalkthrough'
+import {
+  employmentSnapshot,
+  submitEmployment,
+  hasPending,
+  type CommittedEmployment,
+} from '../../services/employmentGameplay'
+import type { LoadedPlaythrough } from '../../types/playthrough'
+import { usdCents } from '../../types/domain'
+
+vi.mock('../../services/employmentGameplay', async (original) => ({
+  ...(await original<typeof import('../../services/employmentGameplay')>()),
+  employmentSnapshot: vi.fn(),
+  submitEmployment: vi.fn(),
+  hasPending: vi.fn(),
+  rememberedRun: vi.fn().mockResolvedValue(null),
+}))
+const base = createWalkthrough(
+  {
+    id: 'p',
+    versionId: 'v',
+    name: 'Alex',
+    description: '',
+    startingBalance: usdCents(20000),
+    hasEnglishSkills: false,
+    hasComputerSkills: false,
+  },
+  [],
+  false,
+  usdCents(6000),
+)
+const run: LoadedPlaythrough = {
+  id: 'run',
+  personaId: 'p',
+  versionId: 'v',
+  ownerUserId: 'owner',
+  currentScenarioId: null,
+  currentBalance: usdCents(60000),
+  currentDay: 10,
+  supportEnabled: false,
+  status: 'active',
+  startedAt: null,
+  sessionId: null,
+  currentJobId: null,
+  employmentState: {},
+  persona: { id: 'p', versionId: 'v', name: 'Alex', description: '' },
+}
+const snapshot = (state: Walkthrough, revision = 1): CommittedEmployment => ({
+  run: { ...run, currentDay: state.day, currentBalance: state.balance },
+  state,
+  revision,
+})
+const commit = vi.fn()
+function show(state: Walkthrough) {
+  vi.mocked(employmentSnapshot).mockResolvedValue(snapshot(state))
+  render(
+    <MemoryRouter>
+      <SetupProvider>
+        <EmploymentPanel run={run} onCommit={commit} />
+      </SetupProvider>
+    </MemoryRouter>,
+  )
+}
+beforeEach(() => {
+  vi.clearAllMocks()
+  vi.mocked(hasPending).mockResolvedValue(false)
+})
+
+it('keeps pending decisions quiet and prevents duplicate submission before showing the committed next screen', async () => {
+  let finish!: (value: CommittedEmployment) => void
+  vi.mocked(submitEmployment).mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve
+    }),
+  )
+  show({ ...base, stage: 'day', day: 1 })
+  const next = await screen.findByRole('button', { name: 'Next' })
+  await userEvent.click(next)
+  expect(next).toBeDisabled()
+  expect(next.closest('fieldset')).toHaveAttribute('aria-busy', 'true')
+  expect(screen.queryByText(/Saving your decision/)).toBeNull()
+  await userEvent.click(next)
+  expect(submitEmployment).toHaveBeenCalledOnce()
+  expect(commit).not.toHaveBeenCalled()
+  await act(async () => {
+    finish(snapshot({ ...base, stage: 'interview', day: 2 }, 2))
+  })
+  expect(
+    await screen.findByRole('heading', {
+      name: 'What will you wear to the interview?',
+    }),
+  ).toBeInTheDocument()
+  expect(
+    screen
+      .getByRole('group', { name: 'Interview clothing' })
+      .closest('fieldset'),
+  ).toHaveAttribute('aria-busy', 'false')
+})
+
+it.each([
+  { day: 2, hiredDay: 2, stage: 'day' as const, nextDay: 3 },
+  { day: 3, hiredDay: 3, stage: 'day' as const, nextDay: 4 },
+  { day: 10, hiredDay: 3, stage: 'income' as const, nextDay: 10 },
+])(
+  'automatically acknowledges $stage on Day $day with the protected action',
+  async ({ day, hiredDay, stage, nextDay }) => {
+    const state = { ...base, day, hiredDay, stage }
+    const next = snapshot({ ...state, stage: 'day', day: nextDay }, 2)
+    vi.mocked(submitEmployment).mockResolvedValue(next)
+    show(state)
+    await waitFor(() => expect(commit).toHaveBeenCalledWith(next))
+    expect(submitEmployment).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ id: 'run' }),
+      1,
+      { type: 'continue' },
+      false,
+    )
+    expect(
+      screen.queryByRole('button', { name: /Continue to today/ }),
+    ).toBeNull()
+  },
+)
+
+it('stops an uncertain automatic submission and reconciles it explicitly without another credit', async () => {
+  const state = {
+    ...base,
+    stage: 'income' as const,
+    day: 10,
+    hiredDay: 3,
+    balance: usdCents(60000),
+    weeklyIncome: usdCents(40000),
+  }
+  const next = snapshot({ ...state, stage: 'day' }, 2)
+  vi.mocked(hasPending).mockResolvedValueOnce(false).mockResolvedValue(true)
+  vi.mocked(submitEmployment)
+    .mockRejectedValueOnce(new Error('Submission is not confirmed'))
+    .mockResolvedValueOnce(next)
+  show(state)
+  const retry = await screen.findByRole('button', {
+    name: 'Reconcile pending submission',
+  })
+  expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  expect(commit).not.toHaveBeenCalled()
+  await userEvent.click(retry)
+  await waitFor(() => expect(commit).toHaveBeenCalledExactlyOnceWith(next))
+  expect(submitEmployment).toHaveBeenCalledTimes(2)
+  expect(submitEmployment).toHaveBeenLastCalledWith(
+    expect.objectContaining({ id: 'run' }),
+    1,
+    { type: 'continue' },
+    true,
+  )
+  expect(next.state?.balance).toBe(60000)
+})
