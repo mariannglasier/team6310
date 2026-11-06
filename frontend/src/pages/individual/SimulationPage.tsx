@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { paths } from '../../app/paths'
 import { useSetup } from '../../state/setupContext'
@@ -110,7 +111,23 @@ function RecordedPlaythrough({ id }: { id: string }) {
   )
 }
 
+const LocalScenarioPreview = import.meta.env.DEV
+  ? lazy(() => import('../../development/LocalScenarioPreview'))
+  : null
+
 export function SimulationPage() {
+  const [params] = useSearchParams()
+  if (LocalScenarioPreview && params.get('localScenario') === 'day4') {
+    return (
+      <Suspense fallback={<p role="status">Loading local preview…</p>}>
+        <LocalScenarioPreview />
+      </Suspense>
+    )
+  }
+  return <SavedSimulationPage />
+}
+
+function SavedSimulationPage() {
   const { createdPlaythrough, recordPlaythrough } = useSetup()
   const [runs, setRuns] = useState<Awaited<ReturnType<typeof findOwnedRuns>>>(
     [],
