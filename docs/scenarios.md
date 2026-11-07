@@ -2,7 +2,7 @@
 >
 > **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
 >
-> **Current implementation boundary:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The local scenario preview retrieves actual scenarios and choices from local Supabase; submission remains an in-memory mock. Persistent ordinary decision submission, saved outcomes and day advancement integration are not implemented. Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+> **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
 
 > Historical Phase 1 milestone (superseded by server-backed employment; retained for context): Phase 1 integration retains the job branch’s English/computer skill eligibility and all-other-eligible-job reapplication rule. Employment runs locally over a Supabase-loaded playthrough, with explicit provisional labels; it does not implement the protected operations specified below. See [Phase 1 behavior and limits](phase-1-employment.md).
 
@@ -16,7 +16,7 @@ This document directs the scenario-generation agent and the developers implement
 
 These requirements record the team's October 21, 2026 decisions. They extend the relational entities in `docs/data-model.md`, rather than replacing them with an unrelated card format. New storage names and fields identified below are required design additions or recommended implementation details, not claims about implemented functionality.
 
-The initial SQL migration is empty. Database implementation and cross-table enforcement remain pending. No implemented scenario class was found; the documented relational entities define the starting structure.
+The initial migration is empty, but later scenario SQL and frontend services now exist. See the current implementation boundary above and the reconciliation report. The broader edition/publication/content model below remains a specification; it is not all implemented.
 
 For scenario behavior, these decisions supersede older conflicting statements about monthly income, unspecified money signs, undefined early termination, and advancing one day per question. Other documents must be reconciled before implementation. This document does not itself implement those changes.
 
@@ -59,6 +59,26 @@ Individual scenarios do not need to represent a CAC service. Cover unexpected fi
 Add persona-category links and scenario-persona links, scoped to an edition. A scenario without at least one persona link is invalid. Link a scenario only to personas whose category links include that scenario's category and whose circumstances satisfy its eligibility conditions. Validate that each selectable persona has a viable route covering every category to which that persona is eligible before publication. If none exists, block publication or that persona's availability and report the gap; do not silently omit an eligible category or show a child-related scenario to a household without children.
 
 ## 4. Current CAC source: 2025 Outcomes
+
+**November 6, 2026 fact-pairing handoff:** the current `cac_service_facts`
+and `cac_services` records were read from the shared database and captured in
+[the 2025 fact snapshot](data/cac-service-facts-2025.json). The updated
+[draft library](scenario-draft-library.md) and [pairing review](scenario-cac-fact-pairings.md)
+identify 30 relevant primary CAC fact pairings and 30 explicit evidence gaps
+across all 60 drafts. References include the actual fact UUID, service key,
+fact key and reporting year. These documentation references do not create
+scenario/edition links, set benefit amounts or prices, or publish content.
+The user confirmed CAC eviction prevention covers rent and utilities; the draft
+library now includes conditional CAC choices for electricity, water/sewer,
+internet and gas bills (D007, D008, D010, D018), in addition to rent. Eligibility,
+availability and exact coverage bindings remain pending implementation.
+Context-only facts may appear on cards without a CAC choice; they never grant
+coverage for that card's expense. General facts remain unresolved.
+
+The client has since confirmed that the Coats for Kids figures are actual
+outcomes and that the Hope for the Holidays in-kind value uses Dollars. The
+source-format cautions below remain historical context for future imports;
+they are not unresolved blockers for those two clarified facts.
 
 The initial client source is `2025 Outcomes(2025 Outcomes).csv`. It has columns `CAC PROGRAM`, `2025`, and `Unit`; program and subsection labels appear in rows. A future service may appear as a new row or section, not merely a new column. A new year column usually represents a reporting-period change, not a new service.
 
@@ -298,4 +318,23 @@ Resolve these before implementing or publishing the affected behavior; unrelated
 10. **Full service inventory:** Staff confirmation of client-facing services, ambiguous labels such as TCC, and household relevance of Teacher's Closet and workforce-specific benefits. Do not treat the source mapping above as confirmed eligibility policy.
 11. **Hardship library:** Approve ordinary amounts, new circumstance transitions, eligibility and route difficulty. General hardship scenarios need relevant facts under section 5 even where no CAC option exists. Do not force a service link or treat missing CAC facts as waived.
 
-Update `docs/data-model.md`, `docs/api.md`, `docs/architecture.md`, `design/user-flows.md`, `design/ui-spec.md`, and conflicting `AGENTS.md` rules when implementation begins. Required schema work includes categories, persona/category and scenario/persona links, service coverage, fact roles, request tracking, bindings, edition keys, employment state, weekly income, scheduled income occurrences, and decision/payment idempotency. The current empty migration implements none of these.
+Update `docs/data-model.md`, `docs/api.md`, `docs/architecture.md`, `design/user-flows.md`, `design/ui-spec.md`, and conflicting `AGENTS.md` rules when implementation begins. Required schema work includes categories, persona/category and scenario/persona links, service coverage, fact roles, request tracking, bindings, edition keys, employment state, weekly income, scheduled income occurrences, and decision/payment idempotency. The empty initial migration does not establish these features; later employment and scenario implementation exists, as described above. Assess each remaining requirement against current code before planning work.
+
+
+### Confirmed free CAC assistance - November 6, 2026
+
+CAC assistance services and approved in-kind item receipts carry no player-paid fee.
+Food, clothing credits, coats, school supplies, seasonal baskets, meals and gifts
+change available cash by USD 0.00; record actual approved items received, not a
+retail charge, cash award or unpaid remainder. Eligibility, quantities and
+availability still apply. CAC preparation/classes and VITA are free. Bill
+assistance reduces the eligible obligation; any uncovered bill portion is a
+provider balance, not a CAC fee. Only the separately approved tax-refund event
+creates a tax credit to available cash; classes and in-kind assistance do not.
+Earned wages remain separate income. See the draft library for sources and
+updated receipt copy. This documentation does not implement game effects.
+
+
+D044 now concerns general household-appointment travel, replacing the rarely
+used Workforce Development transportation pathway at the user’s request.
+It has no CAC choice; its CAC fact slot remains pending.
