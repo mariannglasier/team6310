@@ -165,3 +165,31 @@ LOCAL_CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e -- --config=playwright.lo
 
 This local-only integration installs no hosted SQL. The development preview is
 still available independently.
+
+## Additional scheduled test scenarios: Days 5–7
+
+Loaded locally with `python3 tools/load_scenario_test_days.py` (insert-only,
+repeatable, rejects conflicting fixture IDs). Local progression was updated with
+`python3 tools/install_scenario_progression.py`. The selector now looks up
+`scheduled` content using `default_day`, the run's edition and persona; it has
+no fixed day/scenario-ID mapping. Multiple eligible scenarios on one day fail
+with a content-collision error instead of being selected arbitrarily. Employment
+days remain excluded, including the conditional Day 3 interview.
+
+For a fresh local Alex run, continue through these distinct titles:
+
+| Day | Title | Scenario UUID |
+| --- | --- | --- |
+| 5 | [LOCAL TEST] Day 5 - An opportunity | `63100000-0000-4000-8000-000000000005` |
+| 6 | [LOCAL TEST] Day 6 - An unexpected expense | `63100000-0000-4000-8000-000000000006` |
+| 7 | [LOCAL TEST] Day 7 - A household tradeoff | `63100000-0000-4000-8000-000000000007` |
+
+Each copies the three Day 4 effects (+$25, -$15, $0), preserves its existing test
+persona/edition/category relationships, and prefixes response text with its day.
+Choice UUID suffixes are 051/052/053, 061/062/063, and 071/072/073 respectively,
+using the same `63100000-0000-4000-8000-` prefix and twelve-digit suffix padding.
+All branching destinations are NULL. Existing Day 4 content is unchanged.
+
+Submit and review each recap, then Continue. Refresh should restore the current
+recap; after Day 7, Day 8 retains the existing placeholder. Existing saved runs
+are not backfilled. No hosted database changes or repetition model are involved.

@@ -107,6 +107,39 @@ for (const [label, amount] of [
     await expect(
       page.getByRole('heading', { name: 'Day 5 of 30', includeHidden: true }),
     ).toBeAttached()
+    for (const [day, title] of [
+      [5, 'An opportunity'],
+      [6, 'An unexpected expense'],
+      [7, 'A household tradeoff'],
+    ] as const) {
+      await expect(
+        page.getByRole('heading', {
+          name: `[LOCAL TEST] Day ${day} - ${title}`,
+          exact: true,
+        }),
+      ).toBeVisible()
+      await page.getByRole('button', { name: /No financial change/ }).click()
+      await page
+        .getByRole('button', { name: 'Submit decision', exact: true })
+        .click()
+      await expect(
+        page.getByText(`Day ${day}: Your balance is unchanged.`, {
+          exact: true,
+        }),
+      ).toBeVisible()
+      await page.reload()
+      await expect(
+        page.getByText(`Day ${day}: Your balance is unchanged.`, {
+          exact: true,
+        }),
+      ).toBeVisible()
+      await page
+        .getByRole('button', { name: 'Continue simulation', exact: true })
+        .click()
+    }
+    await expect(
+      page.getByRole('heading', { name: 'Day 8 of 30', includeHidden: true }),
+    ).toBeAttached()
     await expect(
       page.getByRole('button', { name: 'Next', exact: true }),
     ).toBeVisible()

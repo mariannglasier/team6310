@@ -30,7 +30,9 @@ def main():
             with urllib.request.urlopen(req,timeout=20) as response:return response.status,json.load(response)
         except urllib.error.HTTPError as error:return error.code,json.loads(error.read())
     def sql(statement):
-        return subprocess.run(DOCKER+['exec','-i',CONTAINER,'psql','--host','/var/run/postgresql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=statement,text=True,capture_output=True,check=True).stdout.strip()
+        result=subprocess.run(DOCKER+['exec','-i',CONTAINER,'psql','--host','/var/run/postgresql','-U','postgres','-d','postgres','-At','-v','ON_ERROR_STOP=1'],input=statement,text=True,capture_output=True)
+        if result.returncode: raise AssertionError(result.stderr)
+        return result.stdout.strip()
     original_ids=sql("select coalesce(string_agg(quote_literal(playthrough_id::text),','),'NULL') from public.playthroughs;")
     preservation=f"""select md5(coalesce(jsonb_agg(to_jsonb(p) order by playthrough_id)::text,'')) from public.playthroughs p where playthrough_id in ({original_ids});
 select md5(string_agg(pg_get_functiondef(oid),'' order by proname)) from pg_proc where pronamespace='public'::regnamespace and proname in ('submit_employment_action','mark_fresh_employment_run','valid_employment_document');"""
@@ -102,7 +104,8 @@ IF EXISTS(SELECT 1 FROM public.player_responses WHERE playthrough_id='%s') THEN 
 INSERT INTO public.scenarios(scenario_id,title,default_day,version_id,persona_intent,schedule_type) VALUES('{scenario_id}','[LOCAL TEST] Day 3',3,'3c463a7f-7036-4e0c-9c1b-1f5db7c502f3','cfe33068-d657-482f-b770-ef3918a87e03','scheduled');
 INSERT INTO public.choices(choice_id,scenario_id,choice_text,balance_change,response_text,next_scenario_id,version_id) VALUES('{choice_id}','{scenario_id}','Zero',0,'Recorded',null,'3c463a7f-7036-4e0c-9c1b-1f5db7c502f3');
 UPDATE public.playthroughs SET current_scenario_id=NULL WHERE playthrough_id='{run}';
-UPDATE public.playthroughs SET current_day=3,current_scenario_id='{scenario_id}',employment_state='{document}'::jsonb WHERE playthrough_id='{run}';
+UPDATE public.playthroughs SET current_day=3,employment_state='{document}'::jsonb WHERE playthrough_id='{run}';
+UPDATE public.playthroughs SET current_scenario_id='{scenario_id}' WHERE playthrough_id='{run}';
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claims','{{"sub":"{uid}","is_anonymous":true}}',true);
 DO $$ BEGIN {expected} END $$;
@@ -200,15 +203,20 @@ ROLLBACK;"""
     for _ in range(65):
         if state(employment)['employment_state']['stage']=='complete':break
         current=state(employment)
-        if current['current_scenario_id']==SCENARIO and count(employment)==0:
+        sid=current['current_scenario_id']
+        answered=int(sql(f"select count(*) from public.player_responses pr join public.choices c on c.choice_id=pr.choice_id where pr.playthrough_id='{employment}' and c.scenario_id='{sid}';")) if sid else 0
+        if sid and answered==0:
+            assert int(sql(f"select default_day from public.scenarios where scenario_id='{sid}';"))==current['current_day']
             status,_=request('/rest/v1/rpc/submit_employment_action',{'p_run_id':employment,'p_request_id':str(uuid.uuid4()),'p_revision':current['employment_state']['revision'],'p_action':{'type':'continue'}},token)
             assert status>=400 and state(employment)==current
-            assert submit(token,employment,CHOICES[0])[0]==200
+            choice=CHOICES[0] if sid==SCENARIO else sql(f"select choice_id from public.choices where scenario_id='{sid}' and balance_change=0;")
+            status,result=request('/rest/v1/rpc/submit_scenario_decision',{'p_run_id':employment,'p_scenario_id':sid,'p_choice_id':choice},token)
+            assert status==200
             assert state(employment)['employment_state']==current['employment_state']
         employment_action('continue')
     completed=state(employment)
     assert completed['status']=='completed' and completed['current_day']==30
-    assert completed['employment_state']['creditedDays']==[10,17,24] and count(employment)==1
+    assert completed['employment_state']['creditedDays']==[10,17,24] and count(employment)==4
     print('PASS: unchanged employment RPC completes Day 2 failure/reapplication, Day 3 hiring and Day 10/17/24 paydays.')
     assert before==sql(preservation)
     print('PASS: response INSERT failure rolls back balance; retry succeeds; original employment data/functions preserved.')

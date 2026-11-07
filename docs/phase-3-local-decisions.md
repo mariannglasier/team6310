@@ -142,3 +142,13 @@ fresh runs through protected employment actions, then tests all three answers in
 the actual simulation, saved recap after refresh, financial totals and Continue
 into Day 5. Scenario component tests cover selection/commit/continue separation,
 restoration, and missing required content.
+
+### Scheduled fixture extension
+
+The local selector now uses scheduled scenario records' `default_day`, matching
+persona and pinned published edition, instead of hardcoded Day 4 assignment.
+The original trigger/function names remain for installation compatibility. Days
+5–7 have distinct synthetic records, each answerable once per run. The guard now
+checks the assigned scenario rather than a fixed UUID. Ambiguous same-day content
+is rejected. Non-scheduled selection and repeat occurrences remain unimplemented.
+No employment RPC, table definitions, or hosted data were changed.
