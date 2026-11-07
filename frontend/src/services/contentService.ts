@@ -82,6 +82,14 @@ export function toPersona(row: Row): Persona {
     versionId: requireString(row.version_id, 'version_id'),
     name: requireString(row.name, 'name'),
     description: requireString(row.description, 'description'),
+    hasEnglishSkills:
+      typeof row.has_english_skills === 'boolean'
+        ? row.has_english_skills
+        : null,
+    hasComputerSkills:
+      typeof row.has_computer_skills === 'boolean'
+        ? row.has_computer_skills
+        : null,
     startingBalance: parseUsdCents(
       row.general_starting_balance,
       'general_starting_balance',
@@ -115,6 +123,14 @@ export function toJob(row: Row): Job {
     areaName: requireString(row.area_name, 'area_name'),
     wageSourceUrl: requireString(row.wage_source_url, 'wage_source_url'),
     requirementsNote: requirementsNote(row.simulation_requirements),
+    needsEnglishSkills:
+      typeof row.needs_english_skills === 'boolean'
+        ? row.needs_english_skills
+        : null,
+    needsComputerSkills:
+      typeof row.needs_computer_skills === 'boolean'
+        ? row.needs_computer_skills
+        : null,
   }
 }
 
@@ -158,7 +174,7 @@ async function loadJobs(versionId: string): Promise<readonly Job[]> {
     const jobs = await supabase
       .from('jobs')
       .select(
-        'job_id,version_id,soc_code,title,description,area_name,wage_year,median_hourly_wage,hours_per_week,weekly_gross_income,wage_source_url,simulation_requirements',
+        'job_id,version_id,soc_code,title,description,area_name,wage_year,median_hourly_wage,hours_per_week,weekly_gross_income,wage_source_url,simulation_requirements,needs_english_skills,needs_computer_skills',
       )
       .eq('version_id', versionId)
       .order('title')

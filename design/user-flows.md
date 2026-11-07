@@ -6,20 +6,21 @@ This standing specification defines user journeys and state transitions for indi
 
 ## Roles
 
-| Role | Responsibilities |
-| --- | --- |
-| Individual player | Set up an anonymous household run, make decisions, review results, replay |
-| Group participant | Manage an independent household in a host-controlled session |
-| Group host | Create a session, advance participants individually, end the session, facilitate comparison/debrief |
-| CAC administrator | Authenticate and edit statistics and scenario questions |
+| Role              | Responsibilities                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| Individual player | Set up an anonymous household run, make decisions, review results, replay                           |
+| Group participant | Manage an independent household in a host-controlled session                                        |
+| Group host        | Create a session, advance participants individually, end the session, facilitate comparison/debrief |
+| CAC administrator | Authenticate and edit statistics and scenario questions                                             |
 
 ## Individual journey
 
 ```mermaid
 flowchart TD
     L["Landing"] --> H["Choose household"]
-    H --> R["Review and confirm"]
-    R --> D["Make a scenario decision"]
+    H --> R["Start simulation: confirm and create run"]
+    R --> J["Pre-game job search"]
+    J --> D["Make a scenario decision"]
     D --> A["Review inline recap"]
     A --> N{"Day 30 completed?"}
     N -->|No: Continue| D
@@ -34,10 +35,10 @@ flowchart TD
 ## Setup
 
 1. Start simulation on the landing page opens household/persona selection directly. Until that screen is implemented, it opens the Individual simulation placeholder. No intermediate Introduction page is shown; the legacy introduction URL redirects to the individual route.
-2. No household is selected by default. Select one approved profile to enable Continue.
-3. Continue opens Review directly. CAC support is not a setup step for now: the client decided it will be offered as an option after players complete a regular run without it, and its design is a later task. Until then every run is without support (assistance choices are not offered).
-4. Review displays the selected household, starting money, and its story, with a Change action that returns to household selection while preserving the choice. Review has no run-creation behavior until the protected start operation is connected; Confirm Selection reports that no run was created.
-5. Confirm Selection initializes a fresh run in the pre-game stage with the selected persona, the run's support setting (currently without support), and approved published `version_id`. The run's weekly income starts at $0; changing employment and income state is run-specific.
+2. No household is selected by default. Select one approved profile to enable Start simulation.
+3. Start simulation confirms the household and creates a fresh run through the protected start operation, then opens pre-game job search. No Review screen intervenes. Lock controls during creation; show errors without claiming success and retain the selection for explicit retry.
+4. Legacy Review URLs redirect to household selection, or to the existing active run. Revisiting setup must not create another run.
+5. The new run uses the selected persona and approved published `version_id`. Weekly income starts at $0. Regular runs start without support; a completed regular run may offer a fresh CAC replay. Employment and assistance state belong to the run.
 6. Once started, the player cannot inspect or edit setup. The active run offers End Simulation rather than Back to Review.
 
 Setup Back actions preserve choices. Changing a household before confirmation uses that household's starting values when the run is initialized; it does not create a financial transaction.
@@ -51,6 +52,8 @@ On Day 2, offer the approved professional-clothing choices. The specified prepar
 After hiring, weekly income is paid seven days after the hiring day, not immediately. On an income due day, show a brief income notification and apply the credit before presenting scenarios. The tax-filing scenario is non-scheduled: “Try my best” has no refund or deduction; CAC assistance gives the specified $1,000 refund immediately; and the paid-preparer choice first checks whether the player can afford the fee. If not, end the run before applying any fee or refund consequence. The preparer fee amount remains unresolved.
 
 ## Daily decision and recap
+
+Approved November 4, 2026: income notifications overlay the day's scenario and require no extra click. Animate only the displayed balance after the server confirms its credit. Preserve same-day Day 2 failure/result/reapplication, then continue to Day 3; successful Day 2 hiring also continues to Day 3. The Day 3 interview recap continues to Day 4. No redundant ordinary placeholder appears on either interview day. Refresh resumes committed state, including automatic transitions, without repeating financial effects. See the UI specification for the revised copy, button cards, profile, timeline and desktop-fit requirements.
 
 ```mermaid
 flowchart TD
@@ -98,15 +101,15 @@ On refresh, restore the latest committed state. A committed decision returns to 
 
 ## Ending and replay
 
-| Trigger | Result |
-| --- | --- |
-| Day 30 question completed | Full results with 30 days completed |
+| Trigger                       | Result                                                       |
+| ----------------------------- | ------------------------------------------------------------ |
+| Day 30 question completed     | Full results with 30 days completed                          |
 | Player selects End Simulation | Partial results with actual progress and completed decisions |
-| Host ends the group early | Each participant receives results for their completed work |
+| Host ends the group early     | Each participant receives results for their completed work   |
 
 An ended run no longer accepts decisions or bill settlements. Partial summaries must be labeled as early endings and must not imply the player completed the month. Include balance, decisions/consequences, support availability/use, and applicable comparisons. Day 30 completion is permitted with unpaid bills: list their remaining principal, fees and total debt, and approved possible future consequences separately from available cash. Unanswered questions have no invented choices or outcomes.
 
-Replay returns to household selection with no household selected. The player chooses a household and support setting again, reviews, and confirms. A new run uses the saved content available when it starts and resets finances, day, expense state, circumstances, and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
+Replay returns to household selection with no household selected. The player chooses a household and confirms with Start simulation. Preserve the chosen replay mode. A new run uses the published content available when it starts and resets finances, day, expense state, circumstances and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
 
 Return Home opens the landing page. Donate to CAC and Visit CAC Site use configured CAC-approved links. View Data Visualization opens a separate interactive data page.
 
@@ -157,19 +160,21 @@ Staff authentication does not require player authentication. Public players rema
 
 ## Errors and recovery
 
-| Condition | Behavior |
-| --- | --- |
-| Missing household/support choice | Keep Continue unavailable; identify the required selection |
-| Required content retrieval fails | Show Retry and prevent advancement using incomplete content |
-| Decision submission fails | Preserve selection, show error, and do not display a successful recap |
-| Repeated submission or restored recap | Reuse committed result; do not repeat effects or response counts |
-| Comparison data is missing | Show unavailable state or omit comparison; continue gameplay |
-| Browser refresh | Restore the existing run and its current screen state |
-| Invalid group code | Explain failure and allow correction |
-| Group session ended | Show applicable results; disallow further submission |
-| Unauthorized staff access | Keep protected records inaccessible and show readable feedback |
-| Admin save fails | Retain edits and do not apply them to newly started simulations |
+| Condition                             | Behavior                                                              |
+| ------------------------------------- | --------------------------------------------------------------------- |
+| Missing household/support choice      | Keep Continue unavailable; identify the required selection            |
+| Required content retrieval fails      | Show Retry and prevent advancement using incomplete content           |
+| Decision submission fails             | Preserve selection, show error, and do not display a successful recap |
+| Repeated submission or restored recap | Reuse committed result; do not repeat effects or response counts      |
+| Comparison data is missing            | Show unavailable state or omit comparison; continue gameplay          |
+| Browser refresh                       | Restore the existing run and its current screen state                 |
+| Invalid group code                    | Explain failure and allow correction                                  |
+| Group session ended                   | Show applicable results; disallow further submission                  |
+| Unauthorized staff access             | Keep protected records inaccessible and show readable feedback        |
+| Admin save fails                      | Retain edits and do not apply them to newly started simulations       |
 
 ## Verification criteria
 
-Verify setup validation, Review edits and confirmation, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, separated ordinary/job-event days with the unchanged Day 2 exception, scheduled income, refresh recovery, duplicate-safe submission, unpaid bill/fee creation, sidebar payment and access denial, non-deferrable/attempted-payment early endings, Day 30 summaries with debt, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.
+Verify setup validation, direct household confirmation, legacy Review redirects, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, same-day decisions, automatic payday feedback, scheduled income, refresh recovery, duplicate-safe submission, required-event early endings, Day 30 summaries, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.
+
+For the proposed draft-library expansion, additionally verify separated ordinary/job-event days with the Day 2 exception, ignored bill liabilities and fees, protected sidebar settlement, and Day 30 summaries with unpaid debt. These ordinary-scenario mechanics remain future implementation work.

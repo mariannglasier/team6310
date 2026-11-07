@@ -92,7 +92,7 @@ test('fields have unique labels, required semantics, linked hints/errors, and na
   expect(select).toHaveValue('food')
 })
 
-test('radio cards require an explicit choice and support arrow-key selection', async () => {
+test('choice cards require explicit selection and support Tab and Space', async () => {
   const user = userEvent.setup()
   function Example() {
     const [value, setValue] = useState<string | null>(null)
@@ -111,14 +111,17 @@ test('radio cards require an explicit choice and support arrow-key selection', a
     )
   }
   render(<Example />)
-  const radios = screen.getAllByRole('radio')
-  radios.forEach((radio) => expect(radio).not.toBeChecked())
+  const radios = screen.getAllByRole('button')
+  radios.forEach((radio) =>
+    expect(radio).toHaveAttribute('aria-pressed', 'false'),
+  )
   await user.tab()
   await user.keyboard(' ')
-  expect(radios[0]).toBeChecked()
-  await user.keyboard('{ArrowRight}')
-  expect(radios[1]).toBeChecked()
-  expect(radios[0]).not.toBeChecked()
+  expect(radios[0]).toHaveAttribute('aria-pressed', 'true')
+  await user.tab()
+  await user.keyboard(' ')
+  expect(radios[1]).toHaveAttribute('aria-pressed', 'true')
+  expect(radios[0]).toHaveAttribute('aria-pressed', 'false')
   expect(screen.getByText('Selected')).toBeInTheDocument()
 })
 
@@ -135,7 +138,7 @@ test('disabled radio groups do not permit selection', async () => {
       options={[{ value: 'with', label: 'With support' }]}
     />,
   )
-  await user.click(screen.getByRole('radio'))
+  await user.click(screen.getByRole('button'))
   expect(onChange).not.toHaveBeenCalled()
 })
 

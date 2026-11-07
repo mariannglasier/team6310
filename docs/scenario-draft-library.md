@@ -6,11 +6,11 @@
 
 27 scenarios now have one proposed CAC fact paired to an existing database record; 33 retain a specific evidence gap. See the [60-scenario pairing review](scenario-cac-fact-pairings.md) and [read-only fact snapshot](data/cac-service-facts-2025.json). References use real fact IDs plus service key, fact key and reporting year. These are documentation pairings for review; no scenario rows, game effects, general facts, or publication state were changed. The attached revised library was checked against this branch and matched before editing.
 
-The original November 2 employment handoff below is retained as historical branch context. This fact-pairing update does not reconcile or implement its employment prerequisites.
+## Combined branch status ? November 6, 2026
 
-## Branch handoff: employment prerequisites
+This branch now includes GitHub main?s application code through `a0d9383`, alongside the scenario drafts and CAC fact pairings. Main?s Phase 1 and Phase 2 employment implementation is present; see [Phase 2 employment](phase-2-employment.md). The earlier handoff stating that employment implementation was excluded is superseded by this merge.
 
-This content branch is based on main and excludes the earlier job-selection implementation commits. The fixed-flow drafts retain the source branch's approved English/computer skill model, different-eligible-job reapplication rule, and USD 60.00 clothing assumption. Main's existing employment specifications may still describe an older qualification/fallback model. Reconcile those prerequisite content decisions before database mapping or publication; this branch does not port the earlier implementation or claim the employment specifications are fully synchronized. Day 2 interview/result/immediate reapplication timing remains unchanged.
+The draft library remains proposed content. Combining branches does not implement ordinary scenarios, ignored bills, sidebar settlements, fact display, or publication. Reconcile draft-specific employment bindings and eligibility with the implemented employment catalog before mapping or publishing these cards. The approved draft choices and fact pairings below are preserved.
 
 ## Approved direction and unresolved details
 

@@ -1,3 +1,7 @@
+> Phase 2 server-backed employment is implemented locally, pending migration review and deployment. See [migration effects, recovery and verification limits](../docs/phase-2-employment.md). Phase 1 local-only descriptions below are historical.
+
+> Phase 1 employment integration: `/simulation` now embeds a provisional employment walkthrough inside the existing financial tracking interface. Supabase creation/loading is retained; gameplay is local and unpersisted. See [behavior, database prerequisites and limitations](../docs/phase-1-employment.md). Older foundation-status descriptions below do not describe this new overlay.
+
 # CAC frontend foundation
 
 Use Node.js 24.x and npm. From this directory:
@@ -111,7 +115,7 @@ The field components present caller-provided validation errors; they do not impl
 - `state/simulationState.ts`: a pure UI reducer with restoration status, selected choice, error, and committed snapshot. Selection does not change money, decisions, assistance use, or progress. Loading/errors prevent selection; unknown choices and selections in ended runs are ignored. Request IDs prevent stale restore results from replacing newer state.
 - `hooks/useSimulation.ts`: explicit restore and select callbacks; no automatic network calls or local-storage persistence. Restoration clears temporary choices on success and preserves the prior committed snapshot on failure.
 - `services/simulationService.ts`: initial start/restore/submit interface. The default implementation raises `ServiceUnavailableError`; no method fabricates a successful run. Submit accepts IDs, edition, and request ID, never a client balance.
-- `services/contentService.ts`: read-only loaders for the newest published edition: `loadHouseholds()` (personas; used by the persona-selection page) and `loadJobs(versionId)` (approved jobs; reserved for the Day 1 job step, not called by setup). Explicit columns, money converted to integer cents, validation, safe errors. `hooks/useHouseholds.ts` loads households on mount for `components/simulation/HouseholdCarousel`, a responsive stacked carousel (arrows, dots, ArrowLeft/ArrowRight, swipe; single card on phones) of radio cards with illustrated `PersonaAvatar` artwork chosen by household name (unknown names get a neutral fallback). Selecting a household is temporary UI state: it creates no run and changes no finances; Continue is disabled until a household is chosen and does not yet advance because CAC support selection is not built. `JobCatalog` is retained for the Day 1 step. The service relies on database Row Level Security for exposure; hiring and pay remain future protected operations.
+- `services/contentService.ts`: read-only loaders for the newest published edition: `loadHouseholds()` (personas; used by the persona-selection page) and `loadJobs(versionId)` (approved jobs; reserved for the Day 1 job step, not called by setup). Explicit columns, money converted to integer cents, validation, safe errors. `hooks/useHouseholds.ts` loads households on mount for `components/simulation/HouseholdCarousel`, a responsive stacked carousel (arrows, dots, ArrowLeft/ArrowRight, swipe; single card on phones) of radio cards with illustrated `PersonaAvatar` artwork chosen by household name (unknown names get a neutral fallback). Selecting a household is temporary UI state: it creates no run and changes no finances; Continue is disabled until a household is chosen, then advances to Review. Confirmation uses `services/playthroughService.ts` to establish the anonymous participant session and call the existing `start_individual_playthrough` RPC. The returned UUID and household name are retained in memory in `SetupProvider`; success opens `/simulation`, which loads the recorded run and its pinned-edition persona through `services/loadPlaythrough.ts`. The page displays saved household, balance, day, and status; `types/playthrough.ts` retains all run fields, nullable values, and opaque employment data in page state. Loading uses the existing verified anonymous session and owner RLS; it neither creates a replacement session/run nor retries automatically. Missing or inaccessible records and request failures are displayed separately. Pending clicks are blocked and failure preserves selection. No gameplay, refresh restoration, or backend idempotency is implemented. `JobCatalog` is retained for the Day 1 step. The service relies on database Row Level Security for exposure; hiring and pay remain future protected operations.
 - `services/supabase.ts`: centralized lazy client entry point. Final RPC names, DTO validation, content relationships, and error mapping belong in future adapters here.
 
 The read models and service contract are scaffolding, not finalized SQL/API schemas. Day ranges, edition/choice relationships, ownership, current scenario, support eligibility, affordability, and atomic/idempotent updates must be validated at the protected backend boundary. Extend the types from approved specifications as that work is implemented; never treat prototype fixtures as approved inputs. Browser state or a run ID alone is not authorization.
@@ -129,3 +133,30 @@ Tests cover route loading/history, keyboard navigation, the closed dashboard bou
 The original export remains unchanged in `design/figma-prototype/`. It is outside the frontend build and supplies basic layout reference only.
 
 The footer in `layouts/AppLayout.tsx` is shared by every route, including placeholders. Its complete responsive styling lives in `layouts/AppLayout.css`; future pages inherit the same CAC logo, tagline, contact links, future resource links, and Tax ID automatically.
+
+### Simulation financial tracking
+
+`components/simulation/FinancialTracking.tsx` adapts the approved Figma Make
+financial panels and timeline. It receives the loaded run and expense resource
+from the existing page state rather than owning another balance or day.
+`services/householdExpenses.ts` reads the selected household's expense definitions
+and the run's occurrences, both pinned to the run's edition. Occurrences use saved
+amounts and payment timestamps; paid items are separate. Without occurrences,
+definitions show explicitly labeled first due dates and unknown payment status.
+Recurrence is never expanded. Missing dates sort last; missing amounts are never
+replaced with zero. Expense failures leave the balance/day visible. Runtime mock
+data, financial calculations, payment actions, and synchronization are absent.
+Figma historical totals remain unavailable until supplied by authoritative state.
+
+Run `npm run test:e2e -- financial-tracking.spec.ts` for mocked desktop, tablet,
+mobile, and narrow-mobile layout checks. These tests never contact hosted Supabase.
+
+Gameplay layout refinement: `/simulation` renders financial sidebars outside the
+central `stage__panel`, with the day heading/timeline above it. Content uses normal
+document scrolling; the panel is not independently scrollable. The Figma gameplay
+breakpoints are 1151px (three columns), 761–1150px (two columns), 481–760px
+(single column, 15-column timeline), and up to 480px (tighter center padding).
+Financial state, reads, ordering, and unavailable-data handling are unchanged.
+The financial browser spec compares layout dimensions against the source Figma
+CSS at 12 viewport widths, including both sides of each breakpoint, and verifies
+panel order, overflow, and absence of nested scrolling.

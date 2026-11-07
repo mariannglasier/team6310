@@ -6,6 +6,7 @@ export const paths = {
   introduction: '/simulation/introduction',
   individual: '/simulation/individual',
   review: '/simulation/review',
+  simulation: '/simulation',
   results: '/simulation/results',
   host: '/group/host',
   join: '/group/join',

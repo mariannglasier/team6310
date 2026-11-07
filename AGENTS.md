@@ -6,6 +6,10 @@ Assist Georgia Tech Team 6310 in developing the CAC Poverty Exercise for the Com
 
 Use repository requirements and approved team decisions. Distinguish specified behavior, proposed design, and implemented functionality. Do not invent financial rules, production content, or requirements, and do not treat illustrative prototype values as approved data.
 
+### Player-facing writing
+
+Keep gameplay copy immersive and focused on the household's decisions and outcomes. Do not add unsolicited disclaimers, real-world comparisons, or explanations of scripted simulation rules, such as "Real programs take time and do not guarantee employment." The user explicitly prefers these statements omitted. Put implementation caveats, source limitations, and review notes in staff/developer documentation. Add this kind of explanatory gameplay copy only when the user explicitly requests it. Preserve clear, actionable loading, error, and recovery messages.
+
 Read the documents relevant to the task:
 
 | Source | Use |

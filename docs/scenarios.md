@@ -1,3 +1,5 @@
+> Phase 1 integration retains the job branch’s English/computer skill eligibility and all-other-eligible-job reapplication rule. Employment runs locally over a Supabase-loaded playthrough, with explicit provisional labels; it does not implement the protected operations specified below. See [Phase 1 behavior and limits](phase-1-employment.md).
+
 # Scenario Creation and Maintenance — CAC Poverty Exercise
 
 **November 2, 2026 approved content revision:** scenarios may be hard household choices without a CAC service or assistance option. Every displayed gameplay choice must resolve its scenario when submitted; informational review controls are not answers. Ordinary scenarios and job events occupy separate days, except the existing Day 2 interview/result/immediate reapplication sequence, which remains unchanged. Ignored bills become unpaid sidebar obligations with an added late fee and a Pay action; they may remain unpaid through Day 30, with remaining debt and possible future consequences explained at the end. See section 12. These are approved design changes, not implemented features. The revised [offline library](scenario-draft-library.md) contains unapproved amounts and proposed consequences, not published content.
@@ -245,13 +247,13 @@ Offer buying professional clothes, making current clothes work, or using the CAC
 
 This deliberately means every player in non-CAC mode fails the first interview. It is a scripted educational rule, not a real-world statistical claim. Explain simulated conditions respectfully; do not suggest that household hardship or clothing determines a person's worth.
 
-After failure, prompt the player immediately on Day 2 to reapply for a lower-requirement job. This additional decision must not advance to Day 3 automatically or skip the result screen.
+After failure, prompt the player immediately on Day 2 to reapply for a different eligible job. This additional decision must not advance to Day 3 automatically or skip the result screen.
 
 ### Day 3: follow-up interview after failure
 
 If the player already owns purchased or CAC professional clothes, offer only “Wear my professional clothes.” Otherwise offer the same clothing options as the first interview, filtered by CAC availability. Do not charge again for previously acquired clothes.
 
-The team has specified that the player gets the lower-requirement job after the Day 3 follow-up interview regardless of which available clothing choice is selected. Do not reuse the first interview's education gate. This is a scripted simulation rule, not a real-world employment claim.
+The team has specified that the player gets the different eligible job after the Day 3 follow-up interview regardless of which available clothing choice is selected. Do not reuse the first interview's education gate. This is a scripted simulation rule, not a real-world employment claim.
 
 ### Employment state and weekly income
 
@@ -299,7 +301,7 @@ These are implementation acceptance criteria, not tests claimed to have passed. 
 
 Resolve these before implementing or publishing the affected behavior; unrelated draft writing can continue.
 
-1. **Day 3 hiring:** Resolved: the player gets the lower-requirement job regardless of the available clothing selection. The job is recorded on Day 3 and weekly income begins on Day 10. The remaining clothing presentation and state-recording details follow the approved flow above.
+1. **Day 3 hiring:** Resolved: the player gets the different eligible job regardless of the available clothing selection. The job is recorded on Day 3 and weekly income begins on Day 10. The remaining clothing presentation and state-recording details follow the approved flow above.
 2. **Job catalog and preparation:** Exact jobs, weekly amounts, qualifications, persona mappings, and how the pre-game job selection and preparation choices fit together. Confirm which education qualifies the player for each first-interview job.
 3. **Tax details:** Resolved: “Try my best” has no refund or deduction; the $1,000 refund is immediate; the player must afford the paid-preparer fee before any fee or refund consequence; an unaffordable choice ends the game before consequences; and the scenario is non-scheduled. The approved preparer fee remains to be supplied.
 4. **Daily ordering and payment failure:** Revised November 2, 2026: ordinary scenarios and job events occupy separate days; retain the original Day 2 interview/result/immediate reapplication exception. Automatic income occurs first and is not another scenario. Bill Ignore records unpaid principal plus a late fee and allows continuation through Day 30; sidebar Pay settles the obligation without advancing the day. Unaffordable attempted paid choices and non-deferrable required payments retain the existing ending behavior. See section 12.

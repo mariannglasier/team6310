@@ -36,9 +36,7 @@ test('legacy introduction URL redirects to the individual placeholder without th
     screen.queryByText(/introduction and mode selection experience/i),
   ).not.toBeInTheDocument()
   // Setup begins at household selection; there is no Introduction step.
-  expect(
-    screen.getByRole('list', { name: 'Setup step 1 of 2' }),
-  ).toBeInTheDocument()
+  expect(screen.queryByRole('list', { name: 'Setup step 1 of 2' })).toBeNull()
   expect(screen.queryByText('Introduction')).not.toBeInTheDocument()
 })
 test.each([
@@ -304,3 +302,14 @@ test.each(['/', '/learn', '/group/host', '/unknown/path'])(
     expect(container.querySelector('.stage, .stage__panel')).toBeNull()
   },
 )
+
+test('simulation direct entry has no redundant page title', () => {
+  renderRoute('/simulation')
+  expect(
+    screen.queryByRole('heading', { name: 'Individual simulation' }),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.getByRole('region', { name: 'Individual simulation' }),
+  ).toBeInTheDocument()
+  expect(document.title).toBe('Individual simulation | CAC Poverty Simulation')
+})

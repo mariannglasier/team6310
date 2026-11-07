@@ -13,3 +13,4 @@ integrations/**/.env
 
 # Downloaded BLS source files
 integrations/bls_oews/data/
+/docs/local
