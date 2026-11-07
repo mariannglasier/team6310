@@ -1,5 +1,38 @@
 > Phase 1 integration retains the job branch’s English/computer skill eligibility and all-other-eligible-job reapplication rule. Employment runs locally over a Supabase-loaded playthrough, with explicit provisional labels; it does not implement the protected operations specified below. See [Phase 1 behavior and limits](phase-1-employment.md).
 
+**November 7 baseline correction:** Historical scenario dollar examples are not verified market prices. The [online baseline audit](scenario-data-sourcing.md#online-baseline-evidence---november-7-2026) records checked evidence and replacement proposals for rent and other costs, renewed API candidates, and unresolved components across all 60 cards. In particular, $650 is unsupported as full-apartment Sandy Springs monthly rent. Complete the specified housing/product/service quantities and all-in charges before publication; CPI cannot validate an unsupported baseline. This is documentation, not a gameplay price change.
+
+## Required tax scenario and combined VITA fact - November 7, 2026
+
+**Required occurrence - user decision, November 7, 2026:** D005 is mandatory once in every playthrough, in both support modes and for every persona. Reserve a scheduled ordinary-day slot; it must not be omitted by random selection, selected again, or collide with employment events. This supersedes earlier non-scheduled/optional sampling instructions for D005. The exact due day remains to be configured; the earlier Day 18 is a proposal, not a newly approved day. Early-ended runs cannot show later days: they may end before reaching the reserved tax event, but every complete route must include it. Existing early-ending rules are unchanged. If literal display before every possible early ending is required, its placement needs a separate explicit change; no new pre-game event is inferred. Verify exactly-once inclusion, all personas/modes, routing and refresh restoration. This is a documentation requirement; scheduling is not implemented here.
+
+D005 may use one composite CAC fact passage combining return count and federal/state refunds. See [the sourcing record](scenario-data-sourcing.md) for all three observation IDs, reporting scope and total formula. This supersedes any requirement that this single passage have only one underlying observation.
+
+
+## Fact variety within a playthrough - November 7, 2026
+
+General facts must not repeat within the same playthrough. CAC facts may repeat when the relevant available pool is exhausted, but prefer unused relevant observations, especially across multiple food scenarios. Changing an introduction, rounding, observation date or provider does not make the same measure/population/geography a different general fact. Different measures from one source can be distinct facts.
+
+Use stable semantic fact keys alongside edition-specific observation IDs. Persist committed fact-display history per playthrough and restore it on refresh; redisplaying the current recap is not a new selection. New runs start a fresh history. Relevance takes priority over variety: never substitute an unrelated statistic or imply new assistance.
+
+At edition construction, assign exactly one general and one CAC fact per scenario under the existing content contract. Automated validation must ensure scenarios reachable together have distinct general semantic fact keys. Shared general bindings are allowed only for mutually exclusive scenarios. Otherwise source another relevant observation or explicitly constrain routing before publication. Route selection must preserve uniqueness. Unresolved conflicts block automated publication rather than repeat or omit a required general fact.
+
+Distribute distinct suitable CAC observations across scenarios that can appear together. Prefer unused candidates, then the least-used relevant fact if a repeat is necessary; break ties by least-recently shown, then stable ID. This requirement does not change eligibility or benefits. Routine data refresh preserves semantic identities and validates variety without monthly human approval.
+
+Current status: scenario-data-sourcing.md assigns 60 distinct general fact measures and replaces the duplicate D046 household-count proposal with a donated-food observation. Initial source bindings and numerical observations still require validation. Gameplay uniqueness enforcement is not implemented.
+
+## Automatic publication of data refreshes - November 7, 2026
+
+User decision: routine source-driven price, wage, refund, fee, assistance-cap and numerical-fact updates automatically produce and publish a new immutable edition after automated validation, with no human review or CAC approval step. This supersedes earlier monthly review/approval gates. Configure sources, baseline evidence, formulas, fact templates and validation rules during initial setup; routine updates reuse those definitions. New scenarios, new service/eligibility mappings and changes to gameplay rules remain a separate content workflow, not a prerequisite for publishing routine data updates. Do not regenerate free-form claims or infer new services from changed data.
+
+Monthly maintenance fetches/imports observations, validates units/geography/period/schema and required bindings, calculates dependent amounts/fact text, and atomically publishes the validated edition for new games. Keep an audit diff and machine validation results for traceability, not approval. Unchanged inputs are a no-op. Failed or missing inputs retain their last usable values and flag source status; if a complete valid edition cannot be built, retain the current published edition. No monthly review queue or approval request is created. Active/completed games and recorded obligations retain their original version. This documents required behavior; automation is not yet implemented.
+
+
+## Monetary update requirement - November 7, 2026
+
+The user superseded all earlier fixed-monetary-value exceptions: no price or other monetary value may be hard coded without an automatic update plan. This includes the former $60 interview-clothing amount and $1,000 simulation refund. Earlier fixed-value language and historical dollar examples below do not authorize permanent constants. Each binding requires an automatic source retrieval/import or recalculation method, schedule, formula/baseline as applicable, failure handling and automatic validated edition publication. See [scenario-data-sourcing.md](scenario-data-sourcing.md#automatic-update-coverage-for-every-monetary-value). Missing plans remain publication blockers. Active runs and already-recorded transactions retain their originating edition. This decision is documentation only; automatic updates are not implemented.
+
+
 # Scenario Creation and Maintenance — CAC Poverty Exercise
 
 **November 2, 2026 approved content revision:** scenarios may be hard household choices without a CAC service or assistance option. Every displayed gameplay choice must resolve its scenario when submitted; informational review controls are not answers. Ordinary scenarios and job events occupy separate days, except the existing Day 2 interview/result/immediate reapplication sequence, which remains unchanged. Ignored bills become unpaid sidebar obligations with an added late fee and a Pay action; they may remain unpaid through Day 30, with remaining debt and possible future consequences explained at the end. See section 12. These are approved design changes, not implemented features. The revised [offline library](scenario-draft-library.md) contains unapproved amounts and proposed consequences, not published content.
@@ -128,8 +161,8 @@ The workflow is:
 2. Validate source format, units, geography, reporting period, missing values and revisions. Store observations immutably, including revised observations for the same period. Retain the last approved usable values when a source fails; flag stale data for staff.
 3. Compare source observations and service mappings against the last approved set. A number change is a value update; a schema/label change is a candidate mapping change; neither by itself confirms a new service.
 4. Recalculate only dependent amounts and refresh dependent facts in a draft edition. Produce a before/after diff, affected narrative, formulas, observations and validation results. Update repeated amounts in descriptions and results consistently with their authoritative money fields.
-5. Ask staff to confirm candidate new services and mappings. For each newly confirmed service, create one pending draft if approved coverage is missing. Reuse an existing pending request or draft rather than creating duplicates on subsequent monthly checks. A rejected draft may be replaced by a new deliberate request.
-6. Validate and submit the edition for review. Publish only after staff approval. Monthly checks stage changes; they do not bypass approval or mutate active games.
+5. Keep candidate new services and mappings in a separate content workflow; they must not block routine data publication. Ask staff to confirm candidate new services and mappings. For each newly confirmed service, create one pending draft if approved coverage is missing. Reuse an existing pending request or draft rather than creating duplicates on subsequent monthly checks. A rejected draft may be replaced by a new deliberate request.
+6. Automatically validate and atomically publish the complete updated edition for new games, without human review or staff approval. Preserve active games. Retain the existing published edition if required validation fails.
 
 A new annual CAC report can be imported by staff when received; the next maintenance check processes it, or staff can explicitly start maintenance sooner. Do not assume the CSV updates itself or that a CAC feed exists. Detect removed or renamed services for review without automatically deleting historical content.
 
@@ -277,7 +310,7 @@ Include a Financial Literacy & Taxes scenario with these choices:
 | Pay someone to prepare taxes | First verify that the player can afford the approved filing fee; if not, end the game before applying any consequence of this choice. If affordable, charge the fee and award the specified $1,000 refund immediately once |
 | Get CAC assistance | Available only in CAC mode; free eligible tax preparation and the specified $1,000 refund immediately once |
 
-The $1,000 amount is a fixed simulation rule supplied by the team, not an API estimate, an average derived from CAC totals, or a guaranteed real refund. It remains fixed across monthly refreshes unless staff approve a rule change in another edition. The filing fee requires an approved source or explicit assumption. This scenario is non-scheduled. The paid-preparer affordability check occurs before either the fee or refund is applied; an unaffordable choice records no successful payment or refund consequence.
+The former $1,000 amount is a historical simulation assumption, not an API estimate, an average derived from CAC totals, or a guaranteed real refund. Under the November 7 decision it requires an automatic update plan and may not remain a permanent constant; see scenario-data-sourcing.md. The filing fee requires an approved source or explicit assumption. This scenario is non-scheduled. The paid-preparer affordability check occurs before either the fee or refund is applied; an unaffordable choice records no successful payment or refund consequence.
 
 Model the fee and refund as distinct components even if the existing choice ultimately records their net balance change. A refund is not a second financial assistance effect. Do not silently use a net positive balance change to bypass affordability validation.
 

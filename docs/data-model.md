@@ -1,5 +1,12 @@
 # Data Model
 
+## Automatic publication of data refreshes - November 7, 2026
+
+User decision: routine source-driven price, wage, refund, fee, assistance-cap and numerical-fact updates automatically produce and publish a new immutable edition after automated validation, with no human review or CAC approval step. This supersedes earlier monthly review/approval gates. Configure sources, baseline evidence, formulas, fact templates and validation rules during initial setup; routine updates reuse those definitions. New scenarios, new service/eligibility mappings and changes to gameplay rules remain a separate content workflow, not a prerequisite for publishing routine data updates. Do not regenerate free-form claims or infer new services from changed data.
+
+Monthly maintenance fetches/imports observations, validates units/geography/period/schema and required bindings, calculates dependent amounts/fact text, and atomically publishes the validated edition for new games. Keep an audit diff and machine validation results for traceability, not approval. Unchanged inputs are a no-op. Failed or missing inputs retain their last usable values and flag source status; if a complete valid edition cannot be built, retain the current published edition. No monthly review queue or approval request is created. Active/completed games and recorded obligations retain their original version. This documents required behavior; automation is not yet implemented.
+
+
 ## 1. Overview and evidence
 
 This relational model supports an educational financial decision game for the Community Assistance Center (CAC) in Sandy Springs, Georgia. Players select a household persona, encounter scenarios, make choices, pay scheduled expenses, and compare outcomes with CAC assistance enabled or disabled. Statistics provide local and CAC-related educational context. Group sessions support facilitated play, and content versions identify the content used by each game.
