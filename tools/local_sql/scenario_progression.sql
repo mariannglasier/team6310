@@ -1,6 +1,15 @@
 -- Local scheduled-scenario integration; original employment RPC is unchanged.
 BEGIN;
-CREATE OR REPLACE FUNCTION public.integrate_local_day4_scenario() RETURNS trigger
+-- Naming-only upgrade for verification databases installed before this rename.
+DO $$ BEGIN
+ IF to_regprocedure('public.integrate_local_day4_scenario()') IS NOT NULL THEN
+   ALTER FUNCTION public.integrate_local_day4_scenario() RENAME TO manage_scheduled_scenario_progression;
+ END IF;
+ IF EXISTS(SELECT 1 FROM pg_trigger WHERE tgrelid='public.playthroughs'::regclass AND tgname='integrate_local_day4_scenario') THEN
+   ALTER TRIGGER integrate_local_day4_scenario ON public.playthroughs RENAME TO playthroughs_manage_scheduled_scenario_progression;
+ END IF;
+END $$;
+CREATE OR REPLACE FUNCTION public.manage_scheduled_scenario_progression() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE candidates integer; selected_id uuid;
 BEGIN
@@ -23,9 +32,9 @@ BEGIN
  END IF;
  RETURN NEW;
 END $$;
-ALTER FUNCTION public.integrate_local_day4_scenario() OWNER TO postgres;
-REVOKE ALL ON FUNCTION public.integrate_local_day4_scenario() FROM PUBLIC,anon,authenticated,service_role;
-CREATE OR REPLACE TRIGGER integrate_local_day4_scenario BEFORE UPDATE ON public.playthroughs
-FOR EACH ROW EXECUTE FUNCTION public.integrate_local_day4_scenario();
+ALTER FUNCTION public.manage_scheduled_scenario_progression() OWNER TO postgres;
+REVOKE ALL ON FUNCTION public.manage_scheduled_scenario_progression() FROM PUBLIC,anon,authenticated,service_role;
+CREATE OR REPLACE TRIGGER playthroughs_manage_scheduled_scenario_progression BEFORE UPDATE ON public.playthroughs
+FOR EACH ROW EXECUTE FUNCTION public.manage_scheduled_scenario_progression();
 NOTIFY pgrst,'reload schema';
 COMMIT;

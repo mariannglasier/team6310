@@ -147,8 +147,25 @@ restoration, and missing required content.
 
 The local selector now uses scheduled scenario records' `default_day`, matching
 persona and pinned published edition, instead of hardcoded Day 4 assignment.
-The original trigger/function names remain for installation compatibility. Days
+The function is `manage_scheduled_scenario_progression()` and its trigger is
+`playthroughs_manage_scheduled_scenario_progression`; the installer upgrades
+the former Day 4-specific names without changing behavior. Days
 5–7 have distinct synthetic records, each answerable once per run. The guard now
 checks the assigned scenario rather than a fixed UUID. Ambiguous same-day content
 is rejected. Non-scheduled selection and repeat occurrences remain unimplemented.
 No employment RPC, table definitions, or hosted data were changed.
+
+### Scheduling object names
+
+The former `integrate_local_day4_scenario()` trigger function is now named
+`manage_scheduled_scenario_progression()`. Its BEFORE UPDATE trigger on
+`playthroughs` is `playthroughs_manage_scheduled_scenario_progression`. Neither
+is a browser RPC: PostgreSQL invokes the function through the trigger. They assign
+scheduled scenarios by day/persona/edition, guard unanswered scenarios before
+advancement/completion, clear the prior day's assignment, and reject collisions.
+The rename preserved the installed function OID, body, owner, grants, security
+configuration and existing run/response records. Hosted migration remains
+unapproved and no hosted changes were made.
+
+`open_local_day4_run()` remains a separate fixture-only RPC. It still provisions
+or resumes the isolated Day 4 test run and must be excluded from production.

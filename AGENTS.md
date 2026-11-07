@@ -123,6 +123,8 @@ npm run build
 
 The frontend CI workflow runs the same verification checks on pushes and pull requests. Inspect actual run results before claiming CI passed. Frontend checks do not establish database policy enforcement or successful deployment.
 
+Make sure to also check for any avaliable Model Context Protocols (MCPs) on startup. Because this project interacts with a cloud hosted Supabase, project members may have included a Supabase MCP in your working environment to aid in database related tasks. If it is not avaliable at all for database related tasks, it is recommended to ask to connect to the Supabase project through a proper MCP connection. If the OAuth Token has expired or has not been enabled while the MCP connection still exists, request directly for the project member to perform a manual reconnection with the relevent MCP login command for the current Agentic model.
+
 ## 7. Verification and completion
 
 Add meaningful tests for implemented behavior. The frontend foundation tests cover routes, shared controls, and UI state/service scaffolding; they do not cover implemented poverty simulation or database behavior.
