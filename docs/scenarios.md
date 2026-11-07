@@ -52,6 +52,22 @@ Add persona-category links and scenario-persona links, scoped to an edition. A s
 
 ## 4. Current CAC source: 2025 Outcomes
 
+**November 6, 2026 fact-pairing handoff:** the current `cac_service_facts`
+and `cac_services` records were read from the shared database and captured in
+[the 2025 fact snapshot](data/cac-service-facts-2025.json). The updated
+[draft library](scenario-draft-library.md) and [pairing review](scenario-cac-fact-pairings.md)
+identify 27 relevant primary CAC fact pairings and 33 explicit evidence gaps
+across all 60 drafts. References include the actual fact UUID, service key,
+fact key and reporting year. These documentation references do not create
+scenario/edition links, change assistance or prices, or publish content.
+Context-only facts may appear on cards without a CAC choice; they never grant
+coverage for that card's expense. General facts remain unresolved.
+
+The client has since confirmed that the Coats for Kids figures are actual
+outcomes and that the Hope for the Holidays in-kind value uses Dollars. The
+source-format cautions below remain historical context for future imports;
+they are not unresolved blockers for those two clarified facts.
+
 The initial client source is `2025 Outcomes(2025 Outcomes).csv`. It has columns `CAC PROGRAM`, `2025`, and `Unit`; program and subsection labels appear in rows. A future service may appear as a new row or section, not merely a new column. A new year column usually represents a reporting-period change, not a new service.
 
 Preserve the original file, reporting year, row/section path, imported value and unit, import timestamp, and import identity or content hash. Normalize commas, currency symbols and surrounding whitespace using decimal parsing. Retain raw labels alongside normalized labels. Blank section headings are not zero-valued observations. Units such as `Punds`, `Valuie In-kind`, and the missing unit on the holiday in-kind row require explicit normalization or review rather than silent assumptions.

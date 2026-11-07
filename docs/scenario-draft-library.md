@@ -2,6 +2,12 @@
 
 **November 2, 2026 · Content and specification handoff · Pending staff review.** This revision replaces the earlier service-centered draft library. No application, database or financial engine has been changed.
 
+## CAC fact pairing update — November 6, 2026
+
+27 scenarios now have one proposed CAC fact paired to an existing database record; 33 retain a specific evidence gap. See the [60-scenario pairing review](scenario-cac-fact-pairings.md) and [read-only fact snapshot](data/cac-service-facts-2025.json). References use real fact IDs plus service key, fact key and reporting year. These are documentation pairings for review; no scenario rows, game effects, general facts, or publication state were changed. The attached revised library was checked against this branch and matched before editing.
+
+The original November 2 employment handoff below is retained as historical branch context. This fact-pairing update does not reconcile or implement its employment prerequisites.
+
 ## Branch handoff: employment prerequisites
 
 This content branch is based on main and excludes the earlier job-selection implementation commits. The fixed-flow drafts retain the source branch's approved English/computer skill model, different-eligible-job reapplication rule, and USD 60.00 clothing assumption. Main's existing employment specifications may still describe an older qualification/fallback model. Reconcile those prerequisite content decisions before database mapping or publication; this branch does not port the earlier implementation or claim the employment specifications are fully synchronized. Day 2 interview/result/immediate reapplication timing remains unchanged.
@@ -24,7 +30,7 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 - Exactly 60 drafts: **5 fixed-flow/tax, 15 bill alternatives, 15 major shocks, 25 everyday/family/work tradeoffs**. Categories are the six approved names. Ten per category is no longer a constraint. A run selects a compatible subset, not all 60.
 - ALL means candidate links to Alex, Jordan, Patricia and Sofia; JORDAN is child-related content only; SOFIA is the configured shared household. CAR means an explicitly approved car-owning subset of those personas; EMPLOYED means a current run hired into an applicable job; WORKFORCE requires an explicitly approved workforce-program subset. No circumstance is inferred merely from a name or category. Actual persona/category/edition links remain unresolved for every card.
 - Keys D001–D060, choice suffixes, state labels and C-fact aliases are document references, not actual database IDs. No published logical IDs are replaced by these reference keys. State labels describe **proposed structured outcomes**, never working engine code.
-- Every scenario has exactly one general fact slot and one CAC fact slot, as the unchanged publication rule requires. All general facts remain UNRESOLVED; a topic sourcing brief appears per card. Where a relevant CAC observation is available, its slot references the registry. A scenario with no relevant CAC observation keeps that slot UNRESOLVED; do not force an unrelated CAC service onto it or imply CAC can cover the expense. Fact-policy exceptions have not been approved. This is an explicit publication blocker for unsupported topics.
+- Every scenario has exactly one general fact slot and one CAC fact slot, as the unchanged publication rule requires. All general facts remain UNRESOLVED; a topic sourcing brief appears per card. Where a relevant CAC observation is available, its slot now references the current database-backed registry and a proposed display sentence. A context-only pairing does not add a CAC choice or assistance effect. A scenario with no relevant CAC observation keeps that slot UNRESOLVED; do not force an unrelated CAC service onto it or imply CAC can cover the expense. Fact-policy exceptions have not been approved. This is an explicit publication blocker for unsupported topics.
 - No CAC option is offered unless listed on that card and mode, actual service/item eligibility, availability and edition mapping validate. Cards without CAC support stay without it in both modes. A financial effect is capped at eligible expense remaining; no cash from in-kind coverage, no stacking. CAC impact facts do not mean support was available or used.
 - Selection alone changes nothing. Protected submission atomically records the selected answer, authorized effects and actual assistance use; retries/refresh never repeat charges, fees, wages, refunds or choices. Show success only after commitment. Expensive unselected alternatives do not end play. The existing rule that an attempted unaffordable paid option ends the run remains unchanged; bill Ignore offers the separate approved no-cash continuation path. An unsuccessful sidebar Pay must never erase debt or record payment; existing unaffordable-attempt ending behavior still applies unless separately changed by the team.
 - Deferral creates debt only on bill cards. “Wait,” “decline” or “buy less” on ordinary cards leaves the stated need unmet; it does not fabricate a bill or late fee. No loan, negative-balance permission, score, automatic illness, eviction, job loss or additional charge is implied. Any proposed future mechanic must be approved and explicitly implemented.
@@ -113,7 +119,13 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 These are complete submitted pathways, not a reading action. Exact UI substeps remain an integration detail. Preparation financial treatment is UNRESOLVED; do not invent a fee or credit. Skills are English/computer only: Alex and Jordan start with English only, Patricia with neither, Sofia with computer only. No experience gate; at least two jobs require neither skill. Approved wages/IDs remain unresolved and are displayed from the edition, never from generated values. Preparation does not hire or promise real-world success.
 
 
-**Facts:** general `G-D001` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D001` = candidate C07 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D001` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D001` = paired C24 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported 610 total students in Adult Education programs.”
+
+**CAC fact reference:** `cac_service_facts` · service `adult_education` · fact `total_students_in_adult_education_programs` · year 2025 · `fact_id=7cb64039-5726-43da-8f15-fbf8b63e8f83`. [Pairing rationale](scenario-cac-fact-pairings.md#d001).
+
+**Pairing scope:** The choice explicitly includes adult English/computer preparation before selecting a job. Existing conditional preparation pathway; course totals do not define skill flags or job eligibility.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
@@ -134,7 +146,13 @@ These are complete submitted pathways, not a reading action. Exact UI substeps r
 **Approved transition:** specified CAC preparation completed + BUY/CAC → hire selected job on Day 2. Any choice without that preparation fails; CURRENT fails even with preparation. First pay for a Day 2 hire is Day 9, then 16/23/30. Failed interview → show its result, then D003 immediately on Day 2, exactly as before. Preserve acquired clothes after failure. The USD 60.00 expense is covered in kind on CAC, not deposited as cash. An unaffordable BUY ends before purchase/hiring.
 
 
-**Facts:** general `G-D002` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D002` = candidate C08 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D002` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D002` = paired C15 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, clients used $206,768.67 in credits at CAC Canopy Thrift.”
+
+**CAC fact reference:** `cac_service_facts` · service `canopy_thrift` · fact `dollar_amount_of_client_credits_used_at_cac_canopy_thrift` · year 2025 · `fact_id=859b8cec-1e1c-4887-9f55-fd55f1bb349c`. [Pairing rationale](scenario-cac-fact-pairings.md#d002).
+
+**Pairing scope:** Professional-clothing costs connect directly to the client-credit program. Existing conditional clothing pathway; annual credit does not set its amount.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
@@ -153,7 +171,13 @@ These are complete submitted pathways, not a reading action. Exact UI substeps r
 Expand to every other currently eligible job, excluding the first target, with no fallback tier or wage-rank gate. If no different eligible job exists, this is a catalog gap that blocks the route, not permission to fabricate a job. After the committed reapplication and recap, Continue advances to Day 3. No unrelated Day 2 event, immediate hiring or early paycheck.
 
 
-**Facts:** general `G-D003` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D003` = candidate C07 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D003` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D003` = paired C07 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, Career Services helped 229 people.”
+
+**CAC fact reference:** `cac_service_facts` · service `career_services` · fact `people_helped_by_career_services` · year 2025 · `fact_id=db12c137-fad7-4277-b4ca-6a203b344e38`. [Pairing rationale](scenario-cac-fact-pairings.md#d003).
+
+**Pairing scope:** Reapplying after an unsuccessful interview is directly relevant to career support. Context only; retain no CAC choice and no automatic job placement.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
@@ -175,7 +199,13 @@ Expand to every other currently eligible job, excluding the first target, with n
 Any available valid submitted choice hires the different job on Day 3, regardless of preparation. First pay Day 10, then 17/24. Do not repeat the Day 2 success gate. An unaffordable BUY ends before purchase/hiring. If hired on Day 2, omit this event and select an eligible ordinary Day 3 scenario instead.
 
 
-**Facts:** general `G-D004` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D004` = candidate C08 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D004` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D004` = paired C08 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported 80 job placements.”
+
+**CAC fact reference:** `cac_service_facts` · service `career_services` · fact `job_placements` · year 2025 · `fact_id=2675ebbd-e014-4506-a0fd-1130a9ffe692`. [Pairing rationale](scenario-cac-fact-pairings.md#d004).
+
+**Pairing scope:** A follow-up interview is relevant to the reported job-placement outcome. Existing conditional clothing pathway is unchanged; placements do not determine scripted hiring.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
@@ -196,7 +226,13 @@ Any available valid submitted choice hires the different job on Day 3, regardles
 Fee and refund remain separate components, even if their net is stored on the response. The refund cannot fund the prerequisite fee. An unaffordable PAID attempt ends before fee/refund consequences. Filing is not an unpaid bill and cannot be moved to the sidebar. The refund is an explicit simulation credit, not a CAC annual average or guaranteed real refund. Fee, VITA eligibility and binding IDs remain unresolved.
 
 
-**Facts:** general `G-D005` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D005` = candidate C21 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D005` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D005` = paired C21 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported 503 tax returns through the VITA program.”
+
+**CAC fact reference:** `cac_service_facts` · service `vita` · fact `tax_returns_through_the_vita_program` · year 2025 · `fact_id=5b9132c2-90d6-4dea-9dc0-f2de13a89e2f`. [Pairing rationale](scenario-cac-fact-pairings.md#d005).
+
+**Pairing scope:** The scenario is tax filing, and the fact measures returns through VITA. Existing conditional VITA pathway; no change to the approved fixed simulation refund.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
@@ -224,7 +260,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D006` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D006` = candidate C01 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D006` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D006` = paired C01 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported preventing evictions for 1,108 households.”
+
+**CAC fact reference:** `cac_service_facts` · service `eviction_prevention` · fact `evictions_prevented` · year 2025 · `fact_id=5fa2bac7-6016-4db8-b705-fc593f6b75ec`. [Pairing rationale](scenario-cac-fact-pairings.md#d006).
+
+**Pairing scope:** The obligation is rent and the fact is specifically about eviction prevention. Existing conditional rent pathway; no eligibility or coverage amount inferred.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Rent; adjust share and amount for each persona..
 
@@ -253,6 +295,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D007` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D007` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No electricity-payment fact. General financial-assistance totals do not establish utility coverage. [Gap review](scenario-cac-fact-pairings.md#d007).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Utility coverage by CAC is unconfirmed; no CAC choice..
 
 ## D008 — Water and sewer bill
@@ -279,6 +323,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D008` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D008` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No water/sewer-payment fact. General housing-assistance totals are insufficient. [Gap review](scenario-cac-fact-pairings.md#d008).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only for households with a separately billed water obligation..
 
@@ -307,6 +353,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D009` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D009` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No phone-plan or telecommunications-service fact. [Gap review](scenario-cac-fact-pairings.md#d009).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires a modeled plan that allows an unpaid billed balance; not a prepaid top-up..
 
 ## D010 — Home internet bill
@@ -334,6 +382,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D010` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D010` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No home-internet payment or connectivity-service fact; computer classes are a different service. [Gap review](scenario-cac-fact-pairings.md#d010).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only if the persona has separately billed home internet..
 
 ## D011 — Car insurance installment
@@ -359,7 +409,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D011` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D011` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D011` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D011` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d011).
+
+**Pairing scope:** Choosing how to handle an insurance installment is a financial-literacy/budget tradeoff. Context only; no CAC car-insurance payment or insurance service inferred.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires approved car ownership and insurance installment terms. No modeled driving or legal penalty..
 
@@ -388,6 +444,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D012` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D012` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No clinic-cost or medical-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d012).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires an edition-approved prior invoice, not a new medical event or diagnosis..
 
 ## D013 — Childcare invoice
@@ -415,6 +473,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D013` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D013` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No daycare/childcare-payment fact; Meals for Kids measures food support. [Gap review](scenario-cac-fact-pairings.md#d013).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires approved care arrangement and terms. CAC daycare payments are not established..
 
 ## D014 — School meal account
@@ -440,7 +500,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D014` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D014` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D014` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D014` = paired C16 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, Meals for Kids served 1,097 children.”
+
+**CAC fact reference:** `cac_service_facts` · service `meals_for_kids` · fact `children_served_by_meals_for_kids` · year 2025 · `fact_id=9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`. [Pairing rationale](scenario-cac-fact-pairings.md#d014).
+
+**Pairing scope:** The child’s meal-account decision has relevant child-food-access context. Context only; Meals for Kids is not represented as paying the school account.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires actual fictional school-account applicability; no claim about local fee practices..
 
@@ -469,6 +535,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D015` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D015` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No vehicle-repair invoice or automotive-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d015).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Mutually exclusive with charging the same repair in D021/D026/D031..
 
 ## D016 — Prescription account invoice
@@ -496,6 +564,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D016` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D016` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No prescription-payment or medicine-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d016).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only if a billed pharmacy arrangement is explicitly configured; do not assume pharmacies extend credit..
 
 ## D017 — An existing repayment installment
@@ -521,7 +591,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D017` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D017` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D017` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D017` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d017).
+
+**Pairing scope:** Managing an existing repayment installment is a financial-literacy decision. Context only; CAC does not pay or restructure this debt in the draft.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Staff must approve existence, terms and persona linkage; do not create an automatic loan..
 
@@ -550,6 +626,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D018` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D018` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No household-gas-payment fact or confirmed utility-coverage measure. [Gap review](scenario-cac-fact-pairings.md#d018).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only gas-service households; avoid including gas costs twice in electricity or rent..
 
 ## D019 — Rent while rebuilding a buffer
@@ -576,7 +654,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D019` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D019` = candidate C01 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D019` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D019` = paired C02 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported $796,416.64 in total financial assistance to prevent homelessness.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_assistance` · fact `amount_paid_through_financial_assistance` · year 2025 · `fact_id=b697ae84-1fd2-4bae-83da-7a10c983ac24`. [Pairing rationale](scenario-cac-fact-pairings.md#d019).
+
+**Pairing scope:** The scenario concerns rent pressure and preserving housing stability. Existing conditional rent pathway; annual spending is not the household’s benefit amount.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Alternative to D006 for the same monthly rent occurrence, never a second rent charge..
 
@@ -605,6 +689,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D020` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D020` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No medical-bill assistance fact. [Gap review](scenario-cac-fact-pairings.md#d020).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Alternative medical-invoice variant; do not select with D012 for the same invoice..
 
 ## D021 — The car will not start
@@ -628,6 +714,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D021` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D021` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No vehicle repair or roadside-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d021).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Route requires an approved feasible transit alternative; do not invent lost wages or repair failure..
 
 ## D022 — Urgent dental expense
@@ -650,6 +738,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D022` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D022` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No dental-care cost or dental-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d022).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No treatment advice, predicted deterioration or automatic future charge; care alternatives and costs need review..
 
@@ -675,6 +765,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D023` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D023` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No phone replacement or device-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d023).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
 ## D024 — A family emergency out of town
@@ -697,6 +789,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D024` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D024` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No emergency family-travel assistance fact; targeted workforce transportation is not a general travel benefit. [Gap review](scenario-cac-fact-pairings.md#d024).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No bereavement probability, wage loss or judged family-relationship score..
 
@@ -721,6 +815,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D025` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D025` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No replacement-childcare or daycare-access fact. [Gap review](scenario-cac-fact-pairings.md#d025).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Both alternatives must be feasible; never imply unsupervised care is acceptable. No CAC daycare benefit..
 
 ## D026 — Four tires need replacement
@@ -743,6 +839,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D026` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D026` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No tire replacement or automotive-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d026).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Safety and suitability of both options need staff review; price does not imply a predicted failure rate..
 
@@ -768,6 +866,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D027` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D027` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No vision-care or glasses-replacement assistance fact. [Gap review](scenario-cac-fact-pairings.md#d027).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
 ## D028 — A plumbing expense you are responsible for
@@ -791,6 +891,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D028` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D028` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No plumbing/home-repair assistance fact. [Gap review](scenario-cac-fact-pairings.md#d028).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Liability, habitability and feasible alternatives require review; no claim about landlord law..
 
 ## D029 — A child’s unexpected care expense
@@ -813,6 +915,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D029` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D029` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No child healthcare/appointment assistance fact. [Gap review](scenario-cac-fact-pairings.md#d029).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Not medical advice or a recommendation to postpone necessary care; alternatives need domain/content review..
 
@@ -838,6 +942,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D030` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D030` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** Computer Classes measures education, not laptop repair or replacement. [Gap review](scenario-cac-fact-pairings.md#d030).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; CAC computer classes are not a laptop replacement benefit..
 
 ## D031 — A towing expense
@@ -860,6 +966,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D031` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D031` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No towing or vehicle-recovery assistance fact. [Gap review](scenario-cac-fact-pairings.md#d031).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Both destinations must be feasible; no impound rules, storage fees or later repair costs without approval..
 
@@ -884,6 +992,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D032` = UNRESOLVED. Source an approved housing-cost or utility-burden observation matching the obligation and geography; do not present a rent benchmark as a measured bill. CAC `K-D032` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** The shared household purchase is unspecified. Define the actual goods before selecting a relevant program fact. [Gap review](scenario-cac-fact-pairings.md#d032).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; This is a proposed agreed purchase, not partial bill payment or invented spouse wages; specify actual goods before publication..
 
 ## D033 — A required work item is damaged
@@ -906,6 +1016,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D033` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D033` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** The damaged work item is unspecified; clothing and computer classes do not establish equipment coverage. [Gap review](scenario-cac-fact-pairings.md#d033).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Not a new job qualification or a universal worker obligation; item ownership/employer responsibility needs approval..
 
@@ -931,6 +1043,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D034` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D034` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No bed/furniture assistance fact; the clothing program is not evidence of furniture coverage. [Gap review](scenario-cac-fact-pairings.md#d034).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; The source does not establish a CAC furniture benefit..
 
 ## D035 — A refrigerator failure spoils your groceries
@@ -953,7 +1067,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D035` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D035` = candidate C04 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D035` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D035` = paired C25 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, the CAC Mini-Market reported 1,160,328 pounds of food available.”
+
+**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `pounds_of_food_available_from_the_cac_mini_market` · year 2025 · `fact_id=efaf231b-3db3-4c4d-b276-758006af8aab`. [Pairing rationale](scenario-cac-fact-pairings.md#d035).
+
+**Pairing scope:** The expense here is replacement groceries, not repairing the refrigerator. Existing conditional food pathway; no CAC appliance service or value-per-pound calculation.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; CAC option may cover the approved replacement basket in kind; no appliance-repair service is implied..
 
@@ -977,7 +1097,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D036` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D036` = candidate C04 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D036` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D036` = paired C04 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, there were 36,521 visits to the CAC Mini-Market.”
+
+**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `visits_to_the_cac_mini_market` · year 2025 · `fact_id=94210a01-4766-46ad-beba-d7400c9fd31e`. [Pairing rationale](scenario-cac-fact-pairings.md#d036).
+
+**Pairing scope:** The decision is grocery access and choosing a food basket. Existing conditional food pathway; visits do not create an entitlement.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1002,6 +1128,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D037` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D037` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** The transportation measure is workforce-program-specific; this card applies to employed people generally. [Gap review](scenario-cac-fact-pairings.md#d037).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Do not invent lateness, wage loss or dismissal..
 
 ## D038 — Laundry before the workweek
@@ -1024,6 +1152,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
 **Facts:** general `G-D038` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D038` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+
+**CAC fact gap:** No laundry-service or laundry-fee assistance fact; clothing distribution is a different activity. [Gap review](scenario-cac-fact-pairings.md#d038).
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1048,6 +1178,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D039` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D039` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** Tools for School concerns supplies, not school-trip participation or fees. [Gap review](scenario-cac-fact-pairings.md#d039).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
 ## D040 — Worn shoes
@@ -1070,7 +1202,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D040` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D040` = candidate C14 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D040` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D040` = paired C14 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC Canopy Thrift served 2,152 households.”
+
+**CAC fact reference:** `cac_service_facts` · service `canopy_thrift` · fact `households_served_by_cac_canopy_thrift` · year 2025 · `fact_id=5d6bc795-8a41-49ca-862f-9aaf73405b49`. [Pairing rationale](scenario-cac-fact-pairings.md#d040).
+
+**Pairing scope:** Replacing everyday shoes connects to the clothing program’s household reach. Existing conditional item pathway; approval of the specific shoe/item scope is still required.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Coverage for the specific item requires approval; professional-clothing ownership is unaffected..
 
@@ -1093,7 +1231,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D041` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D041` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D041` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D041` = paired C05 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, the CAC Mini-Market served 2,995 households.”
+
+**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `households_served_by_the_cac_mini_market` · year 2025 · `fact_id=ec44118c-3be1-46b1-9585-8f34d638bbd9`. [Pairing rationale](scenario-cac-fact-pairings.md#d041).
+
+**Pairing scope:** Buying meal ingredients has relevant household food-access context. Context only; no restaurant, prepared-meal reimbursement or new CAC option.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No nutrition score or assumed cooking facilities; route requires a usable kitchen for COOK..
 
@@ -1117,7 +1261,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D042` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D042` = candidate C17 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D042` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D042` = paired C17 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, Tools for School served 1,090 children.”
+
+**CAC fact reference:** `cac_service_facts` · service `tools_for_school` · fact `children_served_by_tools_for_school` · year 2025 · `fact_id=c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`. [Pairing rationale](scenario-cac-fact-pairings.md#d042).
+
+**Pairing scope:** The decision is specifically school supplies for a child. Existing conditional school-supply pathway; no item list or per-child amount inferred.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1143,6 +1293,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D043` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D043` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** Hope for the Holidays is seasonal holiday support, not general birthday gifts. [Gap review](scenario-cac-fact-pairings.md#d043).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
 ## D044 — A workforce-program travel cost
@@ -1165,7 +1317,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D044` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D044` = candidate C13 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D044` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D044` = paired C13 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “The 2025 Workforce Development facts list 1 for transportation.”
+
+**CAC fact reference:** `cac_service_facts` · service `workforce_development` · fact `transportation_through_workforce_development` · year 2025 · `fact_id=5ff54cca-96b1-4638-b1a2-18b473b93329`. [Pairing rationale](scenario-cac-fact-pairings.md#d044).
+
+**Pairing scope:** The draft explicitly restricts this travel cost to workforce-program participants. Existing conditional workforce pathway; keep Number as an unspecified counting unit until clarified.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; CAC workforce transportation is program-specific. Assistance covers only the approved eligible trip, not universal transport..
 
@@ -1189,9 +1347,15 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D045` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D045` = candidate C18 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D045` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D045` = paired C18 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
 
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Confirm whether the source’s goal label represents achieved outcomes. No child-coat event outside its season..
+**CAC fact text:** “In 2025, Coats for Kids served 623 children.”
+
+**CAC fact reference:** `cac_service_facts` · service `coats_for_kids` · fact `children_served_by_coats_for_kids` · year 2025 · `fact_id=e8473e58-6338-4855-93be-7608f27696ab`. [Pairing rationale](scenario-cac-fact-pairings.md#d045).
+
+**Pairing scope:** The need is a child’s warm coat in the program’s season. Existing conditional coat pathway; the client has resolved the source goal-versus-actual ambiguity.
+
+**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; The client confirmed the Coats for Kids figures are achieved outcomes. No child-coat event outside its season..
 
 ## D046 — Lunches for the next work stretch
 
@@ -1212,7 +1376,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D046` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D046` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D046` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D046` = paired C05 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, the CAC Mini-Market served 2,995 households.”
+
+**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `households_served_by_the_cac_mini_market` · year 2025 · `fact_id=ec44118c-3be1-46b1-9585-8f34d638bbd9`. [Pairing rationale](scenario-cac-fact-pairings.md#d046).
+
+**Pairing scope:** Ingredients for work lunches connect to household food access. Context only; no workplace-lunch subsidy or new CAC choice.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1237,6 +1407,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D047` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D047` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No fact establishes bag replacement/repair; the general clothing program is insufficient. [Gap review](scenario-cac-fact-pairings.md#d047).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No CAC coverage assumed for bags from a general clothing label..
 
 ## D048 — Meals for Maya during a program period
@@ -1259,7 +1431,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D048` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D048` = candidate C16 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D048` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D048` = paired C16 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, Meals for Kids served 1,097 children.”
+
+**CAC fact reference:** `cac_service_facts` · service `meals_for_kids` · fact `children_served_by_meals_for_kids` · year 2025 · `fact_id=9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`. [Pairing rationale](scenario-cac-fact-pairings.md#d048).
+
+**Pairing scope:** The scenario explicitly covers meals for a child during the program period. Existing conditional child-food pathway; no childcare payment inferred.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No childcare payments; eliminate overlap with the ordinary grocery basket..
 
@@ -1282,7 +1460,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D049` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D049` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D049` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D049` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d049).
+
+**Pairing scope:** Comparing a fee-charging money-access route with a free route is financial-literacy context. Context only; no claim that CAC pays fees or offers the payment instrument.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Exact payment instrument, timing and feasibility unresolved. Do not credit wages twice or move a locked paycheck..
 
@@ -1307,6 +1491,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D050` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D050` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No hygiene-supply assistance fact. [Gap review](scenario-cac-fact-pairings.md#d050).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No unverified CAC hygiene benefit or automatic repeat purchase..
 
 ## D051 — An optional skills workshop
@@ -1328,7 +1514,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D051` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D051` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D051` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D051` = paired C24 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, CAC reported 610 total students in Adult Education programs.”
+
+**CAC fact reference:** `cac_service_facts` · service `adult_education` · fact `total_students_in_adult_education_programs` · year 2025 · `fact_id=7cb64039-5726-43da-8f15-fbf8b63e8f83`. [Pairing rationale](scenario-cac-fact-pairings.md#d051).
+
+**Pairing scope:** The card asks whether to invest money and time in optional learning. Context only; CAC does not fund the private workshop or grant a qualification in this draft.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Not the fixed CAC preparation; content value and fee need review..
 
@@ -1353,6 +1545,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D052` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D052` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** Holiday-program facts do not establish birthday-party support. [Gap review](scenario-cac-fact-pairings.md#d052).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No happiness score or judgment about parenting..
 
 ## D053 — A holiday meal
@@ -1375,7 +1569,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D053` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D053` = candidate C06 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D053` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D053` = paired C06 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 984 households received Holiday Food Baskets.”
+
+**CAC fact reference:** `cac_service_facts` · service `holiday_food_baskets` · fact `households_who_received_holiday_food_baskets` · year 2025 · `fact_id=1eec83c9-41ca-4aef-be22-1e36289d9d95`. [Pairing rationale](scenario-cac-fact-pairings.md#d053).
+
+**Pairing scope:** The need is a distinct seasonal holiday food basket. Existing conditional seasonal food pathway; no automatic current availability.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Seasonal availability and duplicate grocery coverage need approval..
 
@@ -1399,7 +1599,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D054` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D054` = candidate C15 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D054` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D054` = paired C15 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, clients used $206,768.67 in credits at CAC Canopy Thrift.”
+
+**CAC fact reference:** `cac_service_facts` · service `canopy_thrift` · fact `dollar_amount_of_client_credits_used_at_cac_canopy_thrift` · year 2025 · `fact_id=859b8cec-1e1c-4887-9f55-fd55f1bb349c`. [Pairing rationale](scenario-cac-fact-pairings.md#d054).
+
+**Pairing scope:** The decision concerns replacement clothing and a lower-cost alternative. Existing conditional clothing pathway; no cash allocation or interview-state change.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only one clothing effect; no interview outcome change or thrift-credit cash allocation..
 
@@ -1423,7 +1629,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D055` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D055` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D055` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D055` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d055).
+
+**Pairing scope:** Balancing help for another person against one’s own budget is financial-literacy context. Context only; no CAC reimbursement, loan, or moral score.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1448,7 +1660,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D056` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D056` = candidate C19 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D056` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D056` = paired C19 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, Hope for the Holidays served 614 households.”
+
+**CAC fact reference:** `cac_service_facts` · service `hope_for_the_holidays` · fact `households_served_by_hope_for_the_holidays` · year 2025 · `fact_id=18b975be-96cb-49ec-901b-ccd04c6c6a5c`. [Pairing rationale](scenario-cac-fact-pairings.md#d056).
+
+**Pairing scope:** The card explicitly concerns the named holiday program and a child’s holiday gift. Existing conditional holiday pathway; approved items and eligibility remain necessary.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Program-supported items and eligibility must be confirmed; no cash benefit..
 
@@ -1473,6 +1691,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D057` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D057` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No general bus-pass/fare fact; workforce-specific transportation cannot be generalized to all personas. [Gap review](scenario-cac-fact-pairings.md#d057).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Pass duration, trip coverage and route needs must be configured; no automatic savings invented..
 
 ## D058 — Laundry supplies for the household
@@ -1496,6 +1716,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D058` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D058` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
 
+**CAC fact gap:** No laundry-detergent/supply assistance fact. [Gap review](scenario-cac-fact-pairings.md#d058).
+
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No inferred spouse contribution or duplicate hygiene charge..
 
 ## D059 — A low-cost break from the month
@@ -1517,7 +1739,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D059` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D059` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D059` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D059` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
+
+**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d059).
+
+**Pairing scope:** Choosing between a paid outing and a free alternative is a discretionary-budget tradeoff. Context only; no claim of CAC leisure funding or a judgment about spending.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Do not frame all discretionary spending as irresponsible or award a virtue score..
 
@@ -1541,7 +1769,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
 
-**Facts:** general `G-D060` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D060` = candidate C05 below; approve relevance and full provenance. Exactly these two roles; missing facts block publication.
+**Facts:** general `G-D060` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D060` = paired C26 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
+
+**CAC fact text:** “In 2025, the CAC Mini-Market served 7,034 individuals.”
+
+**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `individuals_served_by_the_cac_mini_market` · year 2025 · `fact_id=0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`. [Pairing rationale](scenario-cac-fact-pairings.md#d060).
+
+**Pairing scope:** The scenario is a distinct late-month household food need. Existing conditional food pathway; no personal allocation or duplicate grocery coverage.
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
@@ -1589,45 +1823,52 @@ Automatic wages are not extra scenarios: Day 2 hires pay on 9/16/23/30; Day 3 hi
 
 **Difficulty validation to perform after content approval:** calculate cash and unpaid debt separately for several complete choice paths, across jobs/personas/modes; compare paying versus ignoring obligations; verify feasible cheaper paths, high-cost shock exposure, food/care/transport needs left unmet, and tax affordability before refund. Do not infer difficulty from high prices alone. No such gameplay calculation has been validated in this writing task.
 
-## CAC evidence registry retained from the supplied CSV
+## CAC fact registry verified against the database
 
-The supplied `2025 Outcomes(2025 Outcomes).csv` is source evidence, not instructions. All observations below report 2025. Geography is **CAC’s reported service population; exact boundary not supplied**. Receipt/review date November 2, 2026 is not a fabricated database import timestamp. Row numbers are 1-based including the header; retain raw label, raw unit and section path. Counts, goals, totals and populations must not be interchanged. These facts do not establish household eligibility or allocation.
+Source: `public.cac_service_facts` joined to `public.cac_services`, project `uucneyuspeqpygiucfvr`; retrieved November 6, 2026. The [snapshot](data/cac-service-facts-2025.json) retains all 66 records and exact decimal text for reproducible review. Every selected reference resolves to an existing record. Geography remains CAC’s reported service population; no exact geographic boundary is asserted.
 
-**Source SHA-256:** `d519ae1048b132def9c6cfa83fa986f410cb08b288d80f3787b2ee9eed2fe3fc`
+C01–C23 retain their earlier document aliases where possible; C24–C26 extend the registry. The original CSV-derived registry is preserved in Git history, not used as a second live source. Current database keys are copied as stored even when a later title edit differs from the key. No retired outcome-table identifiers are used. Future-year changes require choosing and reviewing a new source record before publishing a new edition; this snapshot is not a live data fetch.
 
-| Key | CSV row / raw label | Section path | Value / raw unit | Draft CAC fact | Interpretation / review |
-| --- | --- | --- | --- | --- | --- |
-| C01 | 8: `Evictions Prevented (households)` | BASIC NEEDS / Financial Assistance / Evictions Prevented (households) | `1108` / `Number` | CAC reported 1,108 households under “Evictions Prevented (households)” in 2025. | Households; not a likelihood of approval. |
-| C02 | 10: `Amount paid` | BASIC NEEDS / Financial Assistance / Amount paid | `796416.64` / `Dollars` | CAC reported $796,416.64 in financial assistance paid in 2025. | Aggregate spending; does not confirm utility coverage or an individual allowance. |
-| C03 | 61: `Rent Assistance` | EMPOWERMENT CENTER / Workforce Development / Rent Assistance | `4` / `Number` | The 2025 workforce-development section lists 4 for Rent Assistance. | Counting unit/audience needs review; do not label this as four households. |
-| C04 | 14: `Visits to Mini-Market` | BASIC NEEDS / Food / Visits to Mini-Market | `36521` / `Number` | CAC reported 36,521 Mini-Market visits in 2025. | Visits, not unique clients or household visit entitlements. |
-| C05 | 12: `Households ` | BASIC NEEDS / Food / Households | `2995` / `Number` | The 2025 Food section reports 2,995 households. | Do not combine with visit counts or assume unique counts across programs. |
-| C06 | 51: `Households` | SPECIAL PROGRAMS / Holiday Basket / Households | `984` / `Number` | CAC reported 984 households in the 2025 Holiday Basket section. | Does not establish current seasonal availability. |
-| C07 | 55: `Career Services` | EMPOWERMENT CENTER / Career Services | `229` / `Number` | The 2025 outcomes file lists 229 for Career Services. | Counting unit needs confirmation; not a placement rate. |
-| C08 | 56: `Job placement` | EMPOWERMENT CENTER / Job placement | `80` / `Number` | The 2025 outcomes file lists 80 for Job placement. | Counting unit needs confirmation; not a success probability. |
-| C09 | 65: `ESOL` | EMPOWERMENT CENTER / Adult Education - # students / ESOL | `521` / `Number` | CAC reported 521 ESOL students in 2025. | Students; no job guarantee or course-duration claim. |
-| C10 | 66: `Computers` | EMPOWERMENT CENTER / Adult Education - # students / Computers | `42` / `Number` | CAC reported 42 computer-education students in 2025. | Students; not a credential or employment outcome. |
-| C11 | 59: `Thrive participants - Workforce development` | EMPOWERMENT CENTER / Workforce Development / Thrive participants - Workforce development | `9` / `Number` | The 2025 file reports 9 Thrive workforce-development participants. | Not an eligibility rule or benefit amount. |
-| C12 | 60: `TCC/Scholarships` | EMPOWERMENT CENTER / Workforce Development / TCC/Scholarships | `4` / `Number` | The 2025 file lists 4 for TCC/Scholarships. | Meaning of TCC, counting unit and eligible audience remain unresolved. |
-| C13 | 62: `Transportation` | EMPOWERMENT CENTER / Workforce Development / Transportation | `1` / `Number` | The 2025 workforce-development section lists 1 for Transportation. | Counting unit needs review; not universal transportation assistance. |
-| C14 | 23: `Households (Undup)` | BASIC NEEDS / Clothing / Households (Undup) | `2152` / `Number` | CAC reported 2,152 unduplicated clothing-service households in 2025. | Unduplicated within this reported measure; no personal allocation implied. |
-| C15 | 26: `Thrift Credit (clients)` | BASIC NEEDS / Clothing / Thrift Credit (clients) | `206768.67` / `Dollars` | CAC reported $206,768.67 in client thrift credit in 2025. | Aggregate credit, not a household allowance. |
-| C16 | 29: `Children` | SPECIAL PROGRAMS / Meals for kids / Children | `1097` / `Number` | CAC reported 1,097 children in the 2025 Meals for Kids section. | Food program; does not imply childcare payments. |
-| C17 | 35: `Children` | SPECIAL PROGRAMS / School Supply / Children | `1090` / `Number` | CAC reported 1,090 children in the 2025 School Supply section. | No per-child allocation or item list implied. |
-| C18 | 43: `Children` | SPECIAL PROGRAMS / Coats for Kids # clients goal / Children | `623` / `Number` | The 2025 Coats for Kids section lists 623 children. | Raw heading contains “# clients goal”; confirm whether this is an achieved outcome or goal before publication. |
-| C19 | 46: `Households` | SPECIAL PROGRAMS / Hope for the Holidays / Households | `614` / `Number` | The 2025 Hope for the Holidays section lists 614 households. | No gift allowance inferred; separate in-kind row has a missing unit and misspelled label. |
-| C20 | 38: `Requests` | SPECIAL PROGRAMS / Teacher's Closet / Requests | `222` / `Number` | The 2025 Teacher’s Closet section lists 222 requests. | Requests, not household recipients; household relevance remains unapproved. |
-| C21 | 71: `Returns` | EMPOWERMENT CENTER / Volunteer Income Tax Assistance - VITA / Returns | `503` / `Number` | The 2025 VITA section lists 503 returns. | Distinct from the separately reported 590 federal returns prepared. |
-| C22 | 67: `Financial Goals` | EMPOWERMENT CENTER / Adult Education - # students / Financial Goals | `218` / `Number` | The 2025 adult-education section lists 218 Financial Goals students. | No measured savings, debt reduction, or graduation outcome implied. |
-| C23 | 73: `Federal Refund` | EMPOWERMENT CENTER / Volunteer Income Tax Assistance - VITA / Federal Refund | `582083.00` / `Dollars` | CAC reported $582,083.00 in federal refunds in the 2025 VITA section. | Aggregate refunds; not the exercise’s fixed $1,000 rule or an individual forecast. |
+The client has confirmed the Coats for Kids figures are actual outcomes and the holiday in-kind unit is Dollars. Financial Assistance and Empowerment Center are now separate confirmed service records. Those clarifications do not create new assistance eligibility or cost rules.
+
+| Alias | Service / fact key | Fact ID | Year | Exact value / unit | Proposed CAC fact text | Interpretation limit |
+|---|---|---|---|---|---|---|
+| C01 | `eviction_prevention` / `evictions_prevented` | `5fa2bac7-6016-4db8-b705-fc593f6b75ec` | 2025 | `1108` / Number | In 2025, CAC reported preventing evictions for 1,108 households. | Households; not an individual approval probability. |
+| C02 | `financial_assistance` / `amount_paid_through_financial_assistance` | `b697ae84-1fd2-4bae-83da-7a10c983ac24` | 2025 | `796416.64` / Dollars | In 2025, CAC reported $796,416.64 in total financial assistance to prevent homelessness. | Aggregate spending; not an individual allowance or proof of utility coverage. |
+| C03 | `workforce_development` / `rent_assistance_through_workforce_development` | `8c32e385-bc00-44c0-a60f-fa09b6016e66` | 2025 | `4` / Number | The 2025 Workforce Development facts list 4 for rent assistance. | The counting unit is Number; do not infer four households or a dollar amount. |
+| C04 | `mini_market` / `visits_to_the_cac_mini_market` | `94210a01-4766-46ad-beba-d7400c9fd31e` | 2025 | `36521` / Number | In 2025, there were 36,521 visits to the CAC Mini-Market. | Visits, not unique clients or a household visit entitlement. |
+| C05 | `mini_market` / `households_served_by_the_cac_mini_market` | `ec44118c-3be1-46b1-9585-8f34d638bbd9` | 2025 | `2995` / Number | In 2025, the CAC Mini-Market served 2,995 households. | Annual households; do not add overlapping populations or infer a food allocation. |
+| C06 | `holiday_food_baskets` / `households_who_received_holiday_food_baskets` | `1eec83c9-41ca-4aef-be22-1e36289d9d95` | 2025 | `984` / Number | In 2025, 984 households received Holiday Food Baskets. | Seasonal program context; current availability and eligibility remain separate. |
+| C07 | `career_services` / `people_helped_by_career_services` | `db12c137-fad7-4277-b4ca-6a203b344e38` | 2025 | `229` / Number | In 2025, Career Services helped 229 people. | People helped; not a placement rate or a guarantee that an applicant gets a job. |
+| C08 | `career_services` / `job_placements` | `2675ebbd-e014-4506-a0fd-1130a9ffe692` | 2025 | `80` / Number | In 2025, CAC reported 80 job placements. | Annual placements; not the probability of passing an interview. |
+| C09 | `esol` / `students_enrolled_in_esol_classes` | `2baa9c38-09b0-476d-9d02-5015a37443e5` | 2025 | `521` / Number | In 2025, 521 students enrolled in ESOL classes. | Students; not a course-completion count or employment guarantee. |
+| C10 | `computer_classes` / `students_in_computer_classes` | `1431705b-90b7-4a17-87d6-3c6fbdad30e5` | 2025 | `42` / Number | In 2025, CAC reported 42 students in Computer Classes. | Classes, not laptop repair, replacement or a credential guarantee. |
+| C11 | `workforce_development` / `thrive_participants_in_workforce_development` | `730b31fa-554a-4d51-8ae7-eae50126ceaa` | 2025 | `9` / Number | In 2025, CAC reported 9 Thrive participants in Workforce Development. | Workforce-program population; not universal assistance. |
+| C12 | `workforce_development` / `tcc_scholarships_through_workforce_development` | `0077c68e-1c89-43b8-835c-4e90348a8b6d` | 2025 | `4` / Number | The 2025 Workforce Development facts list 4 for TCC/scholarships. | TCC meaning, counting population and eligibility require clarification. |
+| C13 | `workforce_development` / `transportation_through_workforce_development` | `5ff54cca-96b1-4638-b1a2-18b473b93329` | 2025 | `1` / Number | The 2025 Workforce Development facts list 1 for transportation. | Source unit is Number; do not call this one person, pass, ride or dollar. Workforce scope only. |
+| C14 | `canopy_thrift` / `households_served_by_cac_canopy_thrift` | `5d6bc795-8a41-49ca-862f-9aaf73405b49` | 2025 | `2152` / Number | In 2025, CAC Canopy Thrift served 2,152 households. | Clothing-program context; specific item coverage and availability require approval. |
+| C15 | `canopy_thrift` / `dollar_amount_of_client_credits_used_at_cac_canopy_thrift` | `859b8cec-1e1c-4887-9f55-fd55f1bb349c` | 2025 | `206768.67` / Dollars | In 2025, clients used $206,768.67 in credits at CAC Canopy Thrift. | Aggregate credits; not an individual credit balance or cash allowance. |
+| C16 | `meals_for_kids` / `children_served_by_meals_for_kids` | `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01` | 2025 | `1097` / Number | In 2025, Meals for Kids served 1,097 children. | Food-program context; not daycare or school-account bill payment. |
+| C17 | `tools_for_school` / `children_served_by_tools_for_school` | `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4` | 2025 | `1090` / Number | In 2025, Tools for School served 1,090 children. | School-supply context; not trip fees or a per-child allowance. |
+| C18 | `coats_for_kids` / `children_served_by_coats_for_kids` | `e8473e58-6338-4855-93be-7608f27696ab` | 2025 | `623` / Number | In 2025, Coats for Kids served 623 children. | The client confirmed these are actual outcomes despite the original goal heading. Seasonal eligibility remains separate. |
+| C19 | `hope_for_the_holidays` / `households_served_by_hope_for_the_holidays` | `18b975be-96cb-49ec-901b-ccd04c6c6a5c` | 2025 | `614` / Number | In 2025, Hope for the Holidays served 614 households. | Holiday-program context; no birthday benefit or cash gift allowance inferred. |
+| C20 | `teachers_closet` / `requests_for_the_teachers_closet_program` | `e4b80614-48ce-475e-a4c1-d49c74c86fec` | 2025 | `222` / Number | In 2025, CAC reported 222 requests for the Teacher’s Closet program. | Requests, not household recipients; no teacher persona is specified in this library. |
+| C21 | `vita` / `tax_returns_through_the_vita_program` | `5b9132c2-90d6-4dea-9dc0-f2de13a89e2f` | 2025 | `503` / Number | In 2025, CAC reported 503 tax returns through the VITA program. | Keep distinct from the separate 590 federal returns prepared; no individual refund promise. |
+| C22 | `financial_literacy_classes` / `students_enrolled_in_financial_literacy_classes` | `d32689c8-067a-4f59-aa48-2424384b7116` | 2025 | `218` / Number | In 2025, 218 students enrolled in Financial Literacy Classes. | Education context only; no evidence of debt repayment, bank-fee coverage or measured savings. |
+| C23 | `vita` / `federal_refunds_through_the_vita_program` | `7f25dabd-f5a5-4a54-9201-fd5f3ccd173d` | 2025 | `582083` / Dollars | In 2025, CAC reported $582,083 in federal refunds through the VITA program. | Aggregate refunds; does not set the exercise’s fixed refund or a household entitlement. |
+| C24 | `adult_education` / `total_students_in_adult_education_programs` | `7cb64039-5726-43da-8f15-fbf8b63e8f83` | 2025 | `610` / Number | In 2025, CAC reported 610 total students in Adult Education programs. | Do not sum overlapping course enrollments or infer completion, skill gains or employment. |
+| C25 | `mini_market` / `pounds_of_food_available_from_the_cac_mini_market` | `efaf231b-3db3-4c4d-b276-758006af8aab` | 2025 | `1160328` / Pounds | In 2025, the CAC Mini-Market reported 1,160,328 pounds of food available. | Food available, not food actually distributed, replacement value or appliance repair. |
+| C26 | `mini_market` / `individuals_served_by_the_cac_mini_market` | `0a3f963a-b2c5-47d6-8b9d-e0d396da6a66` | 2025 | `7034` / Number | In 2025, the CAC Mini-Market served 7,034 individuals. | Annual individuals; not a household allocation, meal count or combined-program total. |
 
 ## Service coverage and fact-policy gaps
 
-Most of these drafts intentionally have no CAC choice. The CSV supports references for rent assistance, groceries, clothing, workforce-specific travel, youth services and VITA; it does not establish help for vehicle repairs, healthcare, phones, furniture, daycare, or every utility. Relevant C-facts are linked only where applicable. The fact registry is not a promise that all listed services appear in the revised gameplay library.
+27 scenarios have proposed pairings and 33 have no sufficiently relevant fact; each decision is explained in the [pairing review](scenario-cac-fact-pairings.md). Some cards without a CAC option now carry food-access, learning, or financial-literacy context. Their choices, eligibility, dollar amounts and absence of CAC support remain unchanged. A relevant annual statistic is educational context, not proof that CAC pays that scenario’s particular expense.
 
-Career services/job-placement context accompanies the fixed flow. ESOL and computer preparation may be represented in D001 only after staff approve that mapping; one pre-game scenario still has just one CAC fact role. Financial Goals, Thrive, TCC/Scholarships, workforce rent support, Teacher’s Closet, and events labeled SSC/BC need a coverage or applicability review. Do not add filler “read about the service” cards just to claim full coverage. Teacher’s Closet audience, TCC meaning, workforce eligibility, and the Coats for Kids goal label remain unresolved. Events SSC/BC has reported 432 participants but no approved service interpretation in this handoff.
+Do not force health, vehicle repair, phones, furniture, daycare, laundry, birthday gifts, or general utility facts from unrelated services. Do not generalize the Workforce Development transportation measure to every employed/transit-using persona. Unspecified household/work purchases need item definitions before a program match. Broader budget/learning context on D011, D017, D049, D051, D055 and D059 is explicitly identified for editorial review.
 
-The requirement for one topic-relevant CAC fact on every scenario still exists. General hardship cards without matching evidence are explicitly blocked, rather than assigned unrelated facts. Staff may source suitable facts or separately revise that policy; this document does not approve omitting required facts. General-fact observations, URLs, periods, units and populations likewise need sourcing.
+Teacher’s Closet audience, TCC meaning and workforce counting units still need clarification for any future scenario designed around them. Coats for Kids goal-versus-actual and Hope for the Holidays in-kind units are resolved by the client and current facts. Empowerment Center event participants and CAC General totals are available in the snapshot, but are not substituted for topic-specific evidence. No service is forced into the library just to claim coverage.
+
+The requirement for exactly one relevant CAC fact plus one general fact remains unchanged. All 60 general fact slots remain unsourced. The 33 unmatched CAC slots remain publication blockers until suitable facts or a separately approved policy revision exist. Pairing existing CAC records does not publish this draft library or approve its illustrative prices.
 
 ## Database handoff
 
@@ -1638,7 +1879,7 @@ The requirement for one topic-relevant CAC fact on every scenario still exists. 
 | Choice key, label, result | `choices` | Actual choice ID, parent scenario and edition; every displayed choice is submittable |
 | Proposed costs and outcomes | Choice/expense bindings and structured transition definitions | Approved exact money, supported state, affordability checks, no executable narrative |
 | CAC option when present | `cac_support_effects`, service coverage | One capped effect at most; confirmed service/item/household eligibility; real service ID |
-| Fact slots | `statistics`, `scenario_statistics` | Exactly one approved general and CAC fact per scenario in same edition |
+| Fact slots | Proposed CAC source: `cac_service_facts`; edition linkage: `statistics`, `scenario_statistics` | Use the referenced real fact record as source; resolve actual scenario/edition IDs and exactly one approved general/CAC role. No database link was created by this documentation edit. |
 | Ignored bill | Run-specific bill occurrence plus liability/fee tracking | Original principal, outstanding principal, fee components, paid status, version, source response and idempotency; exact schema still to be designed |
 | Sidebar Pay | Separate protected settlement operation/history | Caller ownership, active run, owned outstanding bill, current total, affordability, atomic payment and debt settlement; never replace the original scenario answer |
 | Deferred effects / needs | Run-specific circumstance definitions | Approve mechanics and route predicates before implementation; no extra charge inferred from prose |
