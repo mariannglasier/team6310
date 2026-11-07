@@ -58,10 +58,14 @@ Add persona-category links and scenario-persona links, scoped to an edition. A s
 and `cac_services` records were read from the shared database and captured in
 [the 2025 fact snapshot](data/cac-service-facts-2025.json). The updated
 [draft library](scenario-draft-library.md) and [pairing review](scenario-cac-fact-pairings.md)
-identify 27 relevant primary CAC fact pairings and 33 explicit evidence gaps
+identify 30 relevant primary CAC fact pairings and 30 explicit evidence gaps
 across all 60 drafts. References include the actual fact UUID, service key,
 fact key and reporting year. These documentation references do not create
-scenario/edition links, change assistance or prices, or publish content.
+scenario/edition links, set benefit amounts or prices, or publish content.
+The user confirmed CAC eviction prevention covers rent and utilities; the draft
+library now includes conditional CAC choices for electricity, water/sewer,
+internet and gas bills (D007, D008, D010, D018), in addition to rent. Eligibility,
+availability and exact coverage bindings remain pending implementation.
 Context-only facts may appear on cards without a CAC choice; they never grant
 coverage for that card's expense. General facts remain unresolved.
 
@@ -315,3 +319,22 @@ Resolve these before implementing or publishing the affected behavior; unrelated
 12. **Hardship library:** Approve ordinary amounts, new circumstance transitions, eligibility and route difficulty. General hardship scenarios need relevant facts under section 5 even where no CAC option exists. Do not force a service link or treat missing CAC facts as waived.
 
 Update `docs/data-model.md`, `docs/api.md`, `docs/architecture.md`, `design/user-flows.md`, `design/ui-spec.md`, and conflicting `AGENTS.md` rules when implementation begins. Required schema work includes categories, persona/category and scenario/persona links, service coverage, fact roles, request tracking, bindings, edition keys, employment state, weekly income, scheduled income occurrences, and decision/payment idempotency. The current empty migration implements none of these.
+
+
+### Confirmed free CAC assistance - November 6, 2026
+
+CAC assistance services and approved in-kind item receipts carry no player-paid fee.
+Food, clothing credits, coats, school supplies, seasonal baskets, meals and gifts
+change available cash by USD 0.00; record actual approved items received, not a
+retail charge, cash award or unpaid remainder. Eligibility, quantities and
+availability still apply. CAC preparation/classes and VITA are free. Bill
+assistance reduces the eligible obligation; any uncovered bill portion is a
+provider balance, not a CAC fee. Only the separately approved tax-refund event
+creates a tax credit to available cash; classes and in-kind assistance do not.
+Earned wages remain separate income. See the draft library for sources and
+updated receipt copy. This documentation does not implement game effects.
+
+
+D044 now concerns general household-appointment travel, replacing the rarely
+used Workforce Development transportation pathway at the user’s request.
+It has no CAC choice; its CAC fact slot remains pending.
