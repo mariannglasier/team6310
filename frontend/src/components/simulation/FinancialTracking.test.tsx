@@ -5,6 +5,7 @@ import type { LoadedPlaythrough } from '../../types/playthrough'
 import type { ExpenseState } from '../../types/householdExpenses'
 import { usdCents } from '../../types/domain'
 import { createWalkthrough } from '../../state/employmentWalkthrough'
+import type { BillSnapshot } from '../../services/billGameplay'
 const run = {
   id: 'run',
   currentBalance: usdCents(35000),
@@ -169,4 +170,48 @@ it('handles an empty saved schedule distinctly from a request failure', () => {
   expect(
     screen.getByText('No household expense definitions are available.'),
   ).toBeInTheDocument()
+})
+
+it('counts settled bills once in cash flow and keeps unpaid obligations out of cash deductions', () => {
+  const employment = {
+    ...createWalkthrough(
+      {
+        id: 'p',
+        versionId: 'v',
+        name: 'Alex',
+        description: '',
+        startingBalance: usdCents(35000),
+        hasEnglishSkills: false,
+        hasComputerSkills: false,
+      },
+      [],
+      false,
+      usdCents(6000),
+    ),
+    balance: usdCents(44000),
+    history: [{ day: 9, text: 'Pay', change: usdCents(20000) }],
+  }
+  const bills = {
+    paidTotal: usdCents(10500),
+    outstandingTotal: usdCents(5000),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(500),
+  } as BillSnapshot
+  render(
+    <FinancialTracking
+      run={{ ...run, currentBalance: employment.balance }}
+      employment={employment}
+      bills={bills}
+      expenses={{ status: 'ready', data: { source: 'occurrences', items: [] } }}
+    >
+      Decision
+    </FinancialTracking>,
+  )
+  const sidebar = screen.getByRole('complementary', {
+    name: 'Household and balance',
+  })
+  expect(within(sidebar).getByText('$440.00')).toBeInTheDocument()
+  expect(within(sidebar).getByText('$350.00')).toBeInTheDocument()
+  expect(within(sidebar).getByText('$110.00')).toBeInTheDocument()
+  expect(within(sidebar).getByText('$50.00')).toBeInTheDocument()
 })

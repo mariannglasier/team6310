@@ -1,5 +1,7 @@
 # Gameplay documentation reconciliation — November 7, 2026
 
+> Historical reconciliation record. The November 8 bills approval in [Bills system](bills-system.md) supersedes this report’s optional-only bills decisions and scenario-based bill description. Its account of the November 7 merge remains historical evidence.
+
 ## Scope and baseline
 
 Documentation-only merge into `playing-scenarios`, starting at `6b07c19` with a clean working tree. Incoming branch: `origin/content/scenario-cac-facts` at `89f8656f2b2dfeae8db01f07f896017ae1936684` (the requested scenario-cac-facts branch). No fetch was performed; the merge uses the locally available remote-tracking ref. Git reports multiple merge bases, so review included both the incoming changes and direct tip comparisons. Tip differences that reflect later destination implementation are not incoming deletions to apply.

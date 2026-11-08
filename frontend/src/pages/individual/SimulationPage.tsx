@@ -17,6 +17,7 @@ import { FinancialTracking } from '../../components/simulation/FinancialTracking
 import { loadHouseholdExpenses } from '../../services/householdExpenses'
 import type { ExpenseState } from '../../types/householdExpenses'
 import type { LoadedPlaythrough } from '../../types/playthrough'
+import { BillSimulation } from './BillSimulation'
 
 type LoadState =
   | { status: 'loading' }
@@ -67,6 +68,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
           playthrough,
           expenses: { status: 'loading' },
         })
+        if (playthrough.expensesInitializedAt) return
         try {
           const data = await loadHouseholdExpenses(playthrough)
           if (current)
@@ -109,6 +111,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
       </>
     )
   const run = state.playthrough
+  if (run.expensesInitializedAt) return <BillSimulation initialRun={run} />
   return (
     <FinancialTracking
       run={run}

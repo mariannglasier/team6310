@@ -204,10 +204,7 @@ export function EmploymentGame({
           {result && <Facts support={state.support} />}
           {finished && (
             <>
-              <p>
-                {state.reason ??
-                  'The 30-day walkthrough is complete. Only employment choices and weekly income were simulated; placeholder days did not include household bills.'}
-              </p>
+              <p>{state.reason ?? 'You reached the end of the month.'}</p>
               <p>
                 Ending balance: <strong>{formatUsd(state.balance)}</strong>
               </p>

@@ -81,6 +81,7 @@ it('loads the owned run and its pinned persona while retaining all run fields', 
     sessionId: null,
     currentJobId: 'job',
     employmentState: { opaque: ['preserve'] },
+    expensesInitializedAt: null,
     persona: {
       id: 'persona',
       versionId: 'pinned-version',

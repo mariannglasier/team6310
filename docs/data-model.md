@@ -1,6 +1,6 @@
 > **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
 >
-> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+> **Bills approval — November 8, 2026:** Independent bills, fixed per-expense fees incurred once on Ignore, later full settlement, non-ending payment rejection, post-employment Day 2/3 bills, and Day 30 completion with unpaid obligations are approved. See [the bills specification and staged implementation record](bills-system.md). This supersedes the earlier optional-only notices and scenario-based bill flow. Actual content remains designer-supplied. The branch now includes prepared SQL and frontend integration; this is not evidence of hosted deployment. See the staged implementation and verification record.
 >
 > **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
 
@@ -121,16 +121,24 @@ One game attempt and its current financial and scenario state.
 
 ### `playthrough_expenses`
 
-Individual bill occurrences, including recurring charges and payment state.
+Individual bill occurrences, including recurring charges and payment state. The prepared
+[Stage 1 bills migration](bills-system.md) snapshots original principal, name and fixed
+fee, adds immutable Ignore/payment receipts, and enforces matching run/definition
+editions. This is repository implementation, not a hosted deployment claim.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
 | playthrough_expense_id | uuid | Unique bill occurrence identifier. | Specified PK. |
 | playthrough_id | uuid | Attempt owing the bill. | Specified FK → playthroughs.playthrough_id. |
-| expense_id | uuid | Source scheduled expense definition. | Specified FK → persona_expenses.expense_id. |
-| due_day | integer | Simulation day payment is due. | Day bounds unresolved (C3). |
-| amount_due | numeric(12,2) | Amount charged for this occurrence. | Range and snapshot behavior unresolved (C2, C1). |
-| paid_at | timestamptz | Actual payment timestamp. | Specified optional; NULL represents no recorded payment. |
+| expense_id | uuid | Source scheduled expense definition. | Prepared composite FK with version_id → persona_expenses. |
+| due_day | smallint | Simulation day payment is due. | Prepared constraint: Days 1–30. |
+| amount_due | numeric | Immutable original principal. | Prepared finite, nonnegative, cent-precision check within numeric(12,2) range; no input rounding. |
+| name_snapshot | text | Immutable display name. | Required by prepared Stage 1 migration. |
+| late_fee_amount | numeric | Immutable fixed fee; incurred only if ignored_at exists. | Separate from original principal. |
+| ignored_at | timestamptz | Ignore receipt and one-time fee-incurrence marker. | Preserved after settlement. |
+| paid_at | timestamptz | Actual payment timestamp. | NULL represents no recorded payment. |
+| paid_day | smallint | Simulation day of settlement. | Required together with paid_at and payment_balance_after. |
+| payment_balance_after | numeric | Committed remaining cash at settlement. | Immutable once paid. |
 | version_id | uuid | Content version associated with this bill. | Specified FK → content_versions.version_id; C1. |
 
 ### `player_responses`
@@ -164,7 +172,10 @@ Facilitated group games, current scenarios, and response deadlines.
 
 ### `persona_expenses`
 
-Scheduled household expenses, either one-time or recurring.
+Scheduled household expenses, either one-time or recurring. Stage 1 adds required
+`late_fee_amount` with no content default. Published definitions are immutable;
+new definitions must belong to a matching persona draft edition. NULL recurrence
+is one-time, a positive interval repeats, and occurrences beyond Day 30 are excluded.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |

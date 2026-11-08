@@ -31,7 +31,7 @@ export async function loadPlaythrough(
     const { data: row, error } = await client
       .from('playthroughs')
       .select(
-        'playthrough_id,persona_id,version_id,owner_user_id,current_scenario_id,current_balance,current_day,cac_support_enabledabled,status,started_at,session_id,current_job_id,employment_state',
+        'playthrough_id,persona_id,version_id,owner_user_id,current_scenario_id,current_balance,current_day,cac_support_enabledabled,status,started_at,session_id,current_job_id,employment_state,expenses_initialized_at',
       )
       .eq('playthrough_id', id)
       .maybeSingle()
@@ -86,6 +86,7 @@ export async function loadPlaythrough(
       sessionId: nullableText(row.session_id),
       currentJobId: nullableText(row.current_job_id),
       employmentState: row.employment_state,
+      expensesInitializedAt: row.expenses_initialized_at ?? null,
       persona,
     }
   } catch (error) {

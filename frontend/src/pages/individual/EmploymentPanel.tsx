@@ -17,13 +17,27 @@ import { paths } from '../../app/paths'
 import { EmploymentGame } from './EmploymentGame'
 import { ScenarioPanel } from '../../components/simulation/ScenarioPanel'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
+import type { BillSnapshot } from '../../services/billGameplay'
+import {
+  DueBillsPanel,
+  type BillAction,
+} from '../../components/simulation/BillControls'
+import { formatUsd } from '../../lib/money'
 
 export function EmploymentPanel({
   run,
   onCommit,
+  bills,
+  billBusy = false,
+  onBillAction,
+  onPendingChange,
 }: {
   run: LoadedPlaythrough
   onCommit: (snapshot: CommittedEmployment) => void
+  bills?: BillSnapshot | null
+  billBusy?: boolean
+  onBillAction?: BillAction
+  onPendingChange?: (pending: boolean) => void
 }) {
   const { replay, replayOf, setEmployment } = useSetup()
   const navigate = useNavigate()
@@ -33,6 +47,22 @@ export function EmploymentPanel({
   const [uncertain, setUncertain] = useState(false)
   const [pending, setPending] = useState(false)
   const busy = useRef(false)
+  useEffect(() => {
+    onPendingChange?.(pending)
+  }, [pending, onPendingChange])
+  const billsEnabled = Boolean(run.expensesInitializedAt)
+  const billsReady =
+    !billsEnabled ||
+    Boolean(
+      bills &&
+      snapshot &&
+      bills.run.currentDay === snapshot.run.currentDay &&
+      bills.run.currentBalance === snapshot.run.currentBalance &&
+      (bills.run.employmentState as { revision?: number })?.revision ===
+        snapshot.revision,
+    )
+  const dueToday =
+    bills?.items.some((b) => b.dueDay === snapshot?.run.currentDay) ?? false
   useEffect(() => {
     let current = true
     Promise.all([employmentSnapshot(run), hasPending(run.id)]).then(
@@ -58,7 +88,7 @@ export function EmploymentPanel({
     }
   }, [run, setEmployment])
   async function send(action: EmploymentAction, retry = false) {
-    if (!snapshot || busy.current) return
+    if (!snapshot || busy.current || billBusy) return
     busy.current = true
     setPending(true)
     setError('')
@@ -85,19 +115,23 @@ export function EmploymentPanel({
   })
   useEffect(() => {
     const state = snapshot?.state
-    if (!state || pending || uncertain || error) return
+    if (!state || pending || uncertain || error || billBusy) return
     if (
       state.stage === 'income' ||
       (state.stage === 'day' &&
+        billsReady &&
+        !dueToday &&
         (state.day === 2 || (state.day === 3 && state.hiredDay === 3)))
     ) {
       const timer = window.setTimeout(() => advanceAutomatically(), 0)
       return () => window.clearTimeout(timer)
     }
-  }, [snapshot, pending, uncertain, error])
+  }, [snapshot, pending, uncertain, error, billBusy, billsReady, dueToday])
   const state = snapshot?.state
   const skipInterviewDay =
     state?.stage === 'day' &&
+    billsReady &&
+    !dueToday &&
     (state.day === 2 || (state.day === 3 && state.hiredDay === 3))
   const automatic = skipInterviewDay || state?.stage === 'income'
   return (
@@ -115,14 +149,29 @@ export function EmploymentPanel({
         </Button>
       )}
       <fieldset
-        disabled={pending || uncertain || automatic}
+        disabled={
+          pending ||
+          uncertain ||
+          automatic ||
+          billBusy ||
+          (state?.stage === 'day' && !billsReady)
+        }
         aria-busy={pending || automatic}
         className="employment-controls"
       >
-        {skipInterviewDay ? (
+        {state?.stage === 'day' && billsEnabled && !billsReady ? (
+          <p role="status">Loading saved bills…</p>
+        ) : skipInterviewDay ? (
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
           </p>
+        ) : state?.stage === 'day' && bills && dueToday && onBillAction ? (
+          <DueBillsPanel
+            snapshot={bills}
+            onAction={onBillAction}
+            busy={pending || billBusy}
+            onContinue={() => void send({ type: 'continue' })}
+          />
         ) : snapshot?.state &&
           snapshot.state.stage === 'day' &&
           snapshot.run.currentScenarioId ? (
@@ -175,6 +224,18 @@ export function EmploymentPanel({
               </Button>
             </div>
           )
+        )}
+        {state?.stage === 'complete' && bills && (
+          <section aria-label="Unpaid obligations at completion">
+            <h2>Unpaid obligations</h2>
+            <p>{formatUsd(bills.outstandingTotal)}, including late fees.</p>
+            {bills.outstandingTotal > 0 && (
+              <p>
+                These bills remain unpaid. Further consequences could occur
+                beyond this month.
+              </p>
+            )}
+          </section>
         )}
       </fieldset>
     </>

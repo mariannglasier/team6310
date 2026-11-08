@@ -10,6 +10,8 @@ import { PersonaAvatar } from './PersonaAvatar'
 import { BalanceDisplay } from './BalanceDisplay'
 import { usdCents, type UsdCents } from '../../types/domain'
 import './financialTracking.css'
+import type { BillSnapshot } from '../../services/billGameplay'
+import { OverdueBills, type BillAction } from './BillControls'
 
 function CalendarIcon() {
   return (
@@ -79,11 +81,17 @@ export function FinancialTracking({
   employment,
   pregame = false,
   scenarioChanges = [],
+  bills,
+  onBillAction,
+  billBusy = false,
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
   children: ReactNode
   scenarioChanges?: readonly UsdCents[] | null
+  bills?: BillSnapshot | null
+  onBillAction?: BillAction
+  billBusy?: boolean
   pregame?: boolean
   preview?: Walkthrough
   employment?: Walkthrough
@@ -95,23 +103,28 @@ export function FinancialTracking({
     committed?.balance ?? preview?.balance ?? run.currentBalance
   const history = committed?.history
   const income =
-    history && scenarioChanges
+    history && (bills || scenarioChanges)
       ? usdCents(
           history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0) +
-            scenarioChanges.reduce(
-              (sum, change) => sum + Math.max(0, change),
-              0,
-            ),
+            (bills
+              ? bills.scenarioIncome
+              : scenarioChanges!.reduce(
+                  (sum, change) => sum + Math.max(0, change),
+                  0,
+                )),
         )
       : null
   const charged =
-    history && scenarioChanges
+    history && (bills || scenarioChanges)
       ? usdCents(
           history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0) +
-            scenarioChanges.reduce(
-              (sum, change) => sum + Math.max(0, -change),
-              0,
-            ),
+            (bills
+              ? bills.scenarioCharged
+              : scenarioChanges!.reduce(
+                  (sum, change) => sum + Math.max(0, -change),
+                  0,
+                )) +
+            (bills?.paidTotal ?? 0),
         )
       : null
   const starting =
@@ -242,6 +255,12 @@ export function FinancialTracking({
               </p>
             )}
             <dl className="finance-totals">
+              {bills && (
+                <div>
+                  <dt>Unpaid obligations</dt>
+                  <dd>{formatUsd(bills.outstandingTotal)}</dd>
+                </div>
+              )}
               <div>
                 <dt>Starting balance</dt>
                 <dd>
@@ -266,6 +285,13 @@ export function FinancialTracking({
           className="finance-right"
           aria-label="Upcoming household expenses"
         >
+          {bills && onBillAction && (
+            <OverdueBills
+              snapshot={bills}
+              onAction={onBillAction}
+              busy={billBusy}
+            />
+          )}
           <section>
             <h2>Coming up</h2>
             <p className="finance-subtitle">Upcoming scheduled expenses</p>

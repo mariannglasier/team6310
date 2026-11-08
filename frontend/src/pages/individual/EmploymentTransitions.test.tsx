@@ -16,6 +16,7 @@ import {
 } from '../../services/employmentGameplay'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import { usdCents } from '../../types/domain'
+import type { BillSnapshot } from '../../services/billGameplay'
 
 vi.mock('../../services/employmentGameplay', async (original) => ({
   ...(await original<typeof import('../../services/employmentGameplay')>()),
@@ -161,3 +162,56 @@ it('stops an uncertain automatic submission and reconciles it explicitly without
   )
   expect(next.state?.balance).toBe(60000)
 })
+
+it.each([2, 3])(
+  'presents Day %i bills after employment instead of automatically leaving',
+  async (day) => {
+    const state = { ...base, stage: 'day' as const, day, hiredDay: day }
+    const saved = snapshot(state)
+    const billRun = {
+      ...saved.run,
+      expensesInitializedAt: '2026-11-08',
+      employmentState: { revision: 1 },
+    }
+    vi.mocked(employmentSnapshot).mockResolvedValue({ ...saved, run: billRun })
+    const onAction = vi.fn()
+    const bills = {
+      run: billRun,
+      paidTotal: usdCents(0),
+      overdueTotal: usdCents(0),
+      outstandingTotal: usdCents(100),
+      upcomingTotal: usdCents(0),
+      scenarioIncome: usdCents(0),
+      scenarioCharged: usdCents(0),
+      items: [
+        {
+          id: 'bill',
+          name: 'Fixture bill',
+          principal: usdCents(100),
+          fee: usdCents(50),
+          dueDay: day,
+          paidAt: null,
+          ignoredAt: null,
+          paymentBalanceAfter: null,
+        },
+      ],
+    } as BillSnapshot
+    render(
+      <MemoryRouter>
+        <SetupProvider>
+          <EmploymentPanel
+            run={billRun}
+            bills={bills}
+            onBillAction={onAction}
+            onCommit={commit}
+          />
+        </SetupProvider>
+      </MemoryRouter>,
+    )
+    const pay = await screen.findByRole('button', { name: 'Pay Fixture bill' })
+    await userEvent.click(pay)
+    expect(onAction).toHaveBeenCalledWith('bill', 'pay')
+    expect(submitEmployment).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  },
+)

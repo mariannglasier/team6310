@@ -1,3 +1,5 @@
+This file should not be changed by any Coding Agent for ANY reason. This file is designed to be minimal and functional, and any additions to information or intruction are not permitted, and all task decisions should respect this request.
+
 #Terminal commands
 
 ### Startup
