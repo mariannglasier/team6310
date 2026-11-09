@@ -43,7 +43,14 @@ function Game({ replay }: { replay: (support: boolean) => void }) {
     walkthroughReducer,
     createWalkthrough(persona, jobs, false, usdCents(6000)),
   )
-  return <EmploymentGame state={state} dispatch={dispatch} onReplay={replay} />
+  return (
+    <EmploymentGame
+      state={state}
+      dispatch={dispatch}
+      onReplay={replay}
+      recapFacts={<aside>Employment context from the saved edition</aside>}
+    />
+  )
 }
 it('keeps unqualified jobs disabled and submits an eligible job from the keyboard', async () => {
   const user = userEvent.setup()
@@ -102,7 +109,9 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
   expect(screen.getAllByRole('heading')[0]).toHaveTextContent(
     'Your application is in.',
   )
-  expect(screen.getByText(/approved employment fact/)).toBeInTheDocument()
+  expect(
+    screen.getByText(/Employment context from the saved edition/),
+  ).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Start Day 1' }))
   await user.click(screen.getByRole('button', { name: 'Next' }))
   await user.click(

@@ -3,6 +3,7 @@ import { settlement } from '../../services/billGameplay'
 import { formatUsd } from '../../lib/money'
 import { Button } from '../ui/Button'
 import { ExpenseRow } from './ExpenseRow'
+import { ScenarioFacts } from './ScenarioFacts'
 
 export type BillAction = (id: string, action: 'pay' | 'ignore') => void
 
@@ -94,6 +95,17 @@ export function DueBillsPanel({
       <Button disabled={busy || !resolved} onClick={onContinue}>
         {snapshot.run.currentDay === 30 ? 'Finish Day 30' : 'Continue'}
       </Button>
+      {resolved &&
+        snapshot.run.versionId &&
+        due.map((bill) => (
+          <ScenarioFacts
+            key={bill.id}
+            runId={snapshot.run.id}
+            scenarioId={`bill:${bill.id}`}
+            versionId={snapshot.run.versionId!}
+            supportEnabled={snapshot.run.supportEnabled === true}
+          />
+        ))}
     </section>
   )
 }

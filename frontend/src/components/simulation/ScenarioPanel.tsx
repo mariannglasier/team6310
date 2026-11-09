@@ -10,6 +10,7 @@ import type { Scenario } from '../../types/domain'
 import { RadioGroup } from '../ui/RadioGroup'
 import { Button } from '../ui/Button'
 import { formatUsd } from '../../lib/money'
+import { ScenarioFacts } from './ScenarioFacts'
 
 export function ScenarioPanel({
   run,
@@ -98,11 +99,16 @@ export function ScenarioPanel({
                 name="scenario-choice"
                 value={saved?.decision?.choiceId ?? selected}
                 onChange={select}
-                options={scenario.choices.map((choice) => ({
-                  value: choice.id,
-                  label: choice.text,
-                  description: `${choice.balanceChange > 0 ? '+' : ''}${formatUsd(choice.balanceChange)}`,
-                }))}
+                options={scenario.choices
+                  .filter(
+                    (choice) =>
+                      !choice.requiresCac || run.supportEnabled === true,
+                  )
+                  .map((choice) => ({
+                    value: choice.id,
+                    label: choice.text,
+                    description: `${choice.upfrontCost ? `Pay ${formatUsd(choice.upfrontCost)} upfront; net balance change ` : ''}${choice.balanceChange > 0 ? '+' : ''}${formatUsd(choice.balanceChange)}`,
+                  }))}
               />
               <Button
                 disabled={!selected || pending || !!saved?.decision}
@@ -129,6 +135,14 @@ export function ScenarioPanel({
             <p role="status">
               Your household could not afford this choice. The simulation ended.
             </p>
+          )}
+          {saved?.decision && (
+            <ScenarioFacts
+              runId={saved.run.id}
+              scenarioId={scenario.id}
+              versionId={scenario.versionId}
+              supportEnabled={saved.run.supportEnabled === true}
+            />
           )}
         </>
       )}

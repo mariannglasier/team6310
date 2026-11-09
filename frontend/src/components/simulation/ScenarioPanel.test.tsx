@@ -15,6 +15,9 @@ vi.mock('../../services/scenarioGameplay', () => ({
   restoreScenario: restore,
   submitScenario: submit,
 }))
+vi.mock('./ScenarioFacts', () => ({
+  ScenarioFacts: () => <aside aria-label="Scenario facts">Saved facts</aside>,
+}))
 const run = {
   id: 'run',
   currentScenarioId: 'scenario',
@@ -46,11 +49,13 @@ it('selects without changing money and offers Continue only after commit', async
     await screen.findByRole('button', { name: /Receive assistance/ }),
   )
   expect(onCommit).not.toHaveBeenCalled()
+  expect(screen.queryByLabelText('Scenario facts')).toBeNull()
   expect(
     screen.queryByRole('button', { name: 'Continue simulation' }),
   ).toBeNull()
   await userEvent.click(screen.getByRole('button', { name: 'Submit decision' }))
   expect(await screen.findByText('Saved result')).toBeVisible()
+  expect(screen.getByLabelText('Scenario facts')).toBeVisible()
   expect(onContinue).not.toHaveBeenCalled()
   await userEvent.click(
     screen.getByRole('button', { name: 'Continue simulation' }),
@@ -79,4 +84,39 @@ it('blocks advancement when required content fails to load', async () => {
   expect(
     screen.queryByRole('button', { name: 'Continue simulation' }),
   ).toBeNull()
+})
+
+it('hides CAC-only choices in regular mode', async () => {
+  load.mockResolvedValue({
+    ...localScenario,
+    choices: localScenario.choices.map((choice) => ({
+      ...choice,
+      requiresCac: choice.id === 'receive',
+    })),
+  })
+  render(<ScenarioPanel run={run} onCommit={vi.fn()} onContinue={vi.fn()} />)
+  expect(
+    await screen.findByRole('button', { name: /Decline assistance/ }),
+  ).toBeVisible()
+  expect(
+    screen.queryByRole('button', { name: /Receive assistance/ }),
+  ).toBeNull()
+})
+
+it('shows an upfront fee separately from a positive net refund', async () => {
+  load.mockResolvedValue({
+    ...localScenario,
+    choices: [
+      {
+        ...localScenario.choices[0],
+        text: 'Pay for tax preparation',
+        balanceChange: usdCents(90100),
+        upfrontCost: usdCents(9900),
+      },
+    ],
+  })
+  render(<ScenarioPanel run={run} onCommit={vi.fn()} onContinue={vi.fn()} />)
+  expect(
+    await screen.findByText('Pay $99.00 upfront; net balance change +$901.00'),
+  ).toBeVisible()
 })

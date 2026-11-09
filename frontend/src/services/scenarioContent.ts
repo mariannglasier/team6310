@@ -30,7 +30,7 @@ export async function loadScenario(
   const { data, error: choicesError } = await client
     .from('choices')
     .select(
-      'choice_id,scenario_id,choice_text,balance_change,response_text,next_scenario_id,version_id',
+      'choice_id,scenario_id,choice_text,balance_change,response_text,next_scenario_id,version_id,requires_cac,upfront_cost',
     )
     .eq('scenario_id', row.scenario_id)
     .eq('version_id', row.version_id)
@@ -59,6 +59,8 @@ export async function loadScenario(
         text: text(choice.choice_text),
         balanceChange: parseUsdCents(choice.balance_change, 'balance_change'),
         responseText: text(choice.response_text),
+        requiresCac: choice.requires_cac === true,
+        upfrontCost: parseUsdCents(choice.upfront_cost, 'upfront_cost'),
       }
     }),
   }

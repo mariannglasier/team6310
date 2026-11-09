@@ -16,6 +16,7 @@ import type { LoadedPlaythrough } from '../../types/playthrough'
 import { paths } from '../../app/paths'
 import { EmploymentGame } from './EmploymentGame'
 import { ScenarioPanel } from '../../components/simulation/ScenarioPanel'
+import { ScenarioFacts } from '../../components/simulation/ScenarioFacts'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
 import type { BillSnapshot } from '../../services/billGameplay'
 import {
@@ -193,6 +194,24 @@ export function EmploymentPanel({
           />
         ) : snapshot?.state ? (
           <EmploymentGame
+            recapFacts={
+              snapshot.run.versionId ? (
+                <ScenarioFacts
+                  runId={snapshot.run.id}
+                  scenarioId={
+                    snapshot.state.stage === 'reapply-result'
+                      ? 'D003'
+                      : snapshot.state.stage === 'interview-result'
+                        ? snapshot.state.day === 3
+                          ? 'D004'
+                          : 'D002'
+                        : 'D001'
+                  }
+                  versionId={snapshot.run.versionId}
+                  supportEnabled={snapshot.run.supportEnabled === true}
+                />
+              ) : undefined
+            }
             state={
               snapshot.state.stage === 'income'
                 ? { ...snapshot.state, stage: 'day' }
