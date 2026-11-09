@@ -8,18 +8,19 @@ import './AppLayout.css'
 
 export function AppLayout() {
   const { pathname } = useLocation()
-  const isGameplay = pathname === paths.simulation
+  const isIndividualGameplay = pathname === paths.simulation
+  const isGameplay = isIndividualGameplay || pathname.startsWith('/group/')
   const isLanding = pathname === paths.home
   // Every simulation page sits on the scenic stage between header and footer.
   const isStage = isStagePath(pathname)
   const previousPath = useRef(pathname)
   useEffect(() => {
     const heading = document.querySelector<HTMLHeadingElement>('#page-heading')
-    document.title = `${isGameplay ? 'Individual simulation' : (heading?.textContent ?? 'Page')} | CAC Poverty Simulation`
+    document.title = `${isIndividualGameplay ? 'Individual simulation' : (heading?.textContent ?? 'Page')} | CAC Poverty Simulation`
     if (previousPath.current !== pathname)
       (heading ?? document.querySelector<HTMLElement>('#main-content'))?.focus()
     previousPath.current = pathname
-  }, [pathname, isGameplay])
+  }, [pathname, isIndividualGameplay])
 
   return (
     <div

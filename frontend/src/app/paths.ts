@@ -16,5 +16,9 @@ export const paths = {
 
 // Simulation pages share the scenic stage between the header and footer.
 export function isStagePath(pathname: string) {
-  return pathname === '/simulation' || pathname.startsWith('/simulation/')
+  return (
+    pathname === '/simulation' ||
+    pathname.startsWith('/simulation/') ||
+    pathname.startsWith('/group/')
+  )
 }

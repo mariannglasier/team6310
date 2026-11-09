@@ -16,16 +16,16 @@ This document describes the application's intended architecture. The repository 
 
 The application uses a client-server architecture. React provides the browser interface, Supabase provides backend services, and PostgreSQL stores application data. Cloudflare Pages is the selected frontend hosting platform.
 
-| Component | Technology | Responsibility |
-| --- | --- | --- |
-| Browser interface | React 19 and TypeScript | Screens, navigation, temporary selections, accessible controls, and presentation of simulation results |
-| Frontend development and build | Vite 8 | Local development server and production assets |
-| Backend services | Supabase | Data access and protected application operations |
-| Persistent storage | PostgreSQL through Supabase | Household content, scenarios, statistics, playthroughs, responses, sessions, and content versions |
-| Session identity and staff sign-in | Supabase Auth | Anonymous player/host sessions and employee authentication |
-| Group updates | Supabase Realtime | Distribute authorized session and participant updates |
-| Frontend hosting | Cloudflare Pages | Serve the built web application |
-| Verification | Vitest, React Testing Library, ESLint, Prettier, TypeScript | Behavior tests, linting, formatting, type checking, and build checks |
+| Component                          | Technology                                                  | Responsibility                                                                                         |
+| ---------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Browser interface                  | React 19 and TypeScript                                     | Screens, navigation, temporary selections, accessible controls, and presentation of simulation results |
+| Frontend development and build     | Vite 8                                                      | Local development server and production assets                                                         |
+| Backend services                   | Supabase                                                    | Data access and protected application operations                                                       |
+| Persistent storage                 | PostgreSQL through Supabase                                 | Household content, scenarios, statistics, playthroughs, responses, sessions, and content versions      |
+| Session identity and staff sign-in | Supabase Auth                                               | Anonymous player/host sessions and employee authentication                                             |
+| Group updates                      | Supabase Realtime                                           | Distribute authorized session and participant updates                                                  |
+| Frontend hosting                   | Cloudflare Pages                                            | Serve the built web application                                                                        |
+| Verification                       | Vitest, React Testing Library, ESLint, Prettier, TypeScript | Behavior tests, linting, formatting, type checking, and build checks                                   |
 
 React supports reusable interface components across setup, decisions, recaps, and results. TypeScript provides shared typed interfaces for application data. Supabase brings database access, authentication, and realtime services into the selected backend platform. PostgreSQL supports the relationships between content, choices, recorded decisions, and financial state. Separating interface state from protected operations prevents browser-controlled values from determining authoritative outcomes.
 
@@ -158,7 +158,7 @@ CAC support availability and actual assistance use are separate. Enabling suppor
 
 ### Group simulation
 
-Hosts create sessions with join codes. Participants join and complete their own household/support setup. Each participant maintains an independent balance, decision history, and circumstances. Hosts advance participants individually after decisions and recaps, inspect progress, and can end the session. Group comparisons distinguish completed and partial runs. Supabase Realtime distributes authorized updates while the backend enforces session ownership and membership.
+Hosts create sessions with join codes and choose whether CAC support is available. Participants join, vote for one shared household, and mark ready. The winning household supplies one session balance, expense schedule, employment outcome, and scenario state. Participants cast replaceable votes while a round is open; the host closes voting, reveals results, advances the protected shared state, and can end the session. Supabase distributes authorized updates while the backend enforces host ownership and participant membership.
 
 ### Educational comparisons and CAC information
 
@@ -180,13 +180,13 @@ Decision commitment calculates consequences from trusted content and updates res
 
 The documented application entities are:
 
-| Area | Entities | Purpose |
-| --- | --- | --- |
-| Simulation content | `categories`, `personas`, `persona_categories`, `scenarios`, `scenario_personas`, `service_coverage`, `choices`, `cac_support_effects` | Edition-scoped route coverage, household definitions, scenarios, decisions, and assistance effects |
-| Educational statistics | `statistics`, `scenario_statistics` | Source-backed figures and links to relevant scenarios |
-| Gameplay records | `playthroughs`, `playthrough_expenses`, `player_responses` | Run state, bill occurrences, and committed decisions |
-| Group coordination | `group_sessions` | Facilitated sessions and participant association |
-| Content history | `content_versions`, `scenario_generation_requests`, `source_bindings` | Immutable published editions, pending drafts, generation review, and resolved-cost provenance |
+| Area                   | Entities                                                                                                                               | Purpose                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Simulation content     | `categories`, `personas`, `persona_categories`, `scenarios`, `scenario_personas`, `service_coverage`, `choices`, `cac_support_effects` | Edition-scoped route coverage, household definitions, scenarios, decisions, and assistance effects |
+| Educational statistics | `statistics`, `scenario_statistics`                                                                                                    | Source-backed figures and links to relevant scenarios                                              |
+| Gameplay records       | `playthroughs`, `playthrough_expenses`, `player_responses`                                                                             | Run state, bill occurrences, and committed decisions                                               |
+| Group coordination     | `group_sessions`                                                                                                                       | Facilitated sessions and participant association                                                   |
+| Content history        | `content_versions`, `scenario_generation_requests`, `source_bindings`                                                                  | Immutable published editions, pending drafts, generation review, and resolved-cost provenance      |
 
 Individual playthroughs have no group association; group playthroughs reference their session. Scenarios belong to content versions. Supabase supplies `auth.users` separately from the application entities. Detailed fields and relationships are defined in [Data model](data-model.md); proposed SQL types and constraints there remain proposals rather than an implemented schema.
 

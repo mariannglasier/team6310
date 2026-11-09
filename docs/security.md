@@ -16,6 +16,12 @@ Anonymous Auth users have authenticated database sessions; being authenticated d
 
 Persist the session using the supported Auth client so refreshing in the same browser restores the player's owned run and group membership. Do not place tokens in URLs, public links, analytics, logs, or exports. Clearing browser storage can remove anonymous access; do not offer recovery through an unverified run identifier. Protect session creation against automated abuse using supported CAPTCHA and rate limiting.
 
+When a player joins a group, generate a random application-facing participant
+identifier in the database. Keep it separate from the Supabase Auth user ID,
+associate it with exactly one session membership, and return the existing value
+on a repeated join by the same anonymous identity. Group playthroughs reference
+that membership so responses remain attributable without names or contact data.
+
 ### CAC employees
 
 Staff sign in through Supabase Auth with their work email and password. Provision staff access through a trusted administrative process; public registration and a matching email domain must not confer staff privileges.
@@ -55,6 +61,11 @@ Generate nonsequential, difficult-to-guess join codes and validate them server-s
 Bind host authority to the verified creator identity. Check membership before accessing session state and check host ownership before advancement or termination. Rate-limit code guessing, joining, and session creation. Closed sessions reject new gameplay operations. Realtime channels must enforce the same ownership/membership boundaries as ordinary reads.
 
 Hosts see progress and authorized comparisons, not names, emails, access tokens, or other participants' unrestricted decision histories. Group comparisons remain within the session's authorized audience rather than becoming publicly queryable by join code.
+
+The host lobby may show database-generated participant aliases, selected
+fictional household names, and readiness. It must not expose the underlying Auth
+user IDs. Participants may change only their own setup while the session remains
+in the lobby; the protected start operation validates every membership again.
 
 ## Data handling and privacy
 
