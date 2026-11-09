@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { paths } from '../../app/paths'
 import { useSetup } from '../../state/setupContext'
@@ -7,21 +8,17 @@ import {
   PlaythroughLoadError,
 } from '../../services/loadPlaythrough'
 import { findOwnedRuns } from '../../services/employmentGameplay'
-import { EmploymentPanel } from './EmploymentPanel'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
-import { FinancialTracking } from '../../components/simulation/FinancialTracking'
-import { loadHouseholdExpenses } from '../../services/householdExpenses'
-import type { ExpenseState } from '../../types/householdExpenses'
 import type { LoadedPlaythrough } from '../../types/playthrough'
+import { BillSimulation } from './BillSimulation'
 
 type LoadState =
   | { status: 'loading' }
   | { status: 'unavailable' }
   | { status: 'error' }
-  | { status: 'ready'; playthrough: LoadedPlaythrough; expenses: ExpenseState }
+  | { status: 'ready'; playthrough: LoadedPlaythrough }
 
 function RecordedPlaythrough({ id }: { id: string }) {
-  const { setEmployment, employment } = useSetup()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   useEffect(() => {
     let current = true
@@ -32,29 +29,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
           setState({ status: 'unavailable' })
           return
         }
-        setState({
-          status: 'ready',
-          playthrough,
-          expenses: { status: 'loading' },
-        })
-        try {
-          const data = await loadHouseholdExpenses(playthrough)
-          if (current)
-            setState({
-              status: 'ready',
-              playthrough,
-              expenses: data
-                ? { status: 'ready', data }
-                : { status: 'unavailable' },
-            })
-        } catch {
-          if (current)
-            setState({
-              status: 'ready',
-              playthrough,
-              expenses: { status: 'unavailable' },
-            })
-        }
+        setState({ status: 'ready', playthrough })
       },
       () => {
         if (current) setState({ status: 'error' })
@@ -78,39 +53,26 @@ function RecordedPlaythrough({ id }: { id: string }) {
         <PlaythroughRecovery />
       </>
     )
-  const run = state.playthrough
-  return (
-    <FinancialTracking
-      run={run}
-      expenses={state.expenses}
-      employment={employment?.runId === run.id ? employment.state : undefined}
-      pregame={['board', 'preparation-result', 'application-result'].includes(
-        String((run.employmentState as { stage?: string } | null)?.stage),
-      )}
-    >
-      <EmploymentPanel
-        run={run}
-        onCommit={(snapshot) => {
-          setState((current) =>
-            current.status === 'ready'
-              ? { ...current, playthrough: snapshot.run }
-              : current,
-          )
-          setEmployment(
-            snapshot.state ? { runId: run.id, state: snapshot.state } : null,
-          )
-        }}
-      />
-      {!run.persona && (
-        <p role="alert">
-          Household information for this content version is unavailable.
-        </p>
-      )}
-    </FinancialTracking>
-  )
+  return <BillSimulation initialRun={state.playthrough} />
 }
 
+const LocalScenarioPreview = import.meta.env.DEV
+  ? lazy(() => import('../../development/LocalScenarioPreview'))
+  : null
+
 export function SimulationPage() {
+  const [params] = useSearchParams()
+  if (LocalScenarioPreview && params.get('localScenario') === 'day4') {
+    return (
+      <Suspense fallback={<p role="status">Loading local preview…</p>}>
+        <LocalScenarioPreview />
+      </Suspense>
+    )
+  }
+  return <SavedSimulationPage />
+}
+
+function SavedSimulationPage() {
   const { createdPlaythrough, recordPlaythrough } = useSetup()
   const [runs, setRuns] = useState<Awaited<ReturnType<typeof findOwnedRuns>>>(
     [],

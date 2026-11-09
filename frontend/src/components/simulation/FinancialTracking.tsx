@@ -8,23 +8,12 @@ import type {
 import { formatUsd } from '../../lib/money'
 import { PersonaAvatar } from './PersonaAvatar'
 import { BalanceDisplay } from './BalanceDisplay'
-import { usdCents } from '../../types/domain'
+import { usdCents, type UsdCents } from '../../types/domain'
 import './financialTracking.css'
+import type { BillSnapshot } from '../../services/billGameplay'
+import { OverdueBills, type BillAction } from './BillControls'
+import { ExpenseRow } from './ExpenseRow'
 
-function CalendarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <rect x="4" y="5" width="16" height="15" rx="2" />
-      <path d="M8 3v4m8-4v4M4 10h16m-12 4h3m2 0h3" />
-    </svg>
-  )
-}
 function ExpenseList({
   items,
   definitions,
@@ -40,17 +29,16 @@ function ExpenseList({
   return (
     <ul className="finance-upcoming">
       {ordered.map((expense) => (
-        <li key={expense.id}>
-          <span className="finance-bill-icon">
-            <CalendarIcon />
-          </span>
-          <div>
-            <small>
-              {expense.dueDay === null
-                ? 'Due date unavailable'
-                : `${definitions ? 'First due' : 'Due'} Day ${expense.dueDay}`}
-            </small>
-            <strong>{expense.name ?? 'Expense name unavailable'}</strong>
+        <ExpenseRow
+          key={expense.id}
+          name={expense.name ?? 'Expense name unavailable'}
+          amount={expense.amount}
+          dueLabel={
+            expense.dueDay === null
+              ? 'Due date unavailable'
+              : `${definitions ? 'First due' : 'Due'} Day ${expense.dueDay}`
+          }
+          detail={
             <small>
               {definitions
                 ? 'Payment status unavailable'
@@ -58,13 +46,8 @@ function ExpenseList({
                   ? 'Paid'
                   : 'No payment recorded'}
             </small>
-          </div>
-          <span className="finance-expense-amount">
-            {expense.amount === null
-              ? 'Amount unavailable'
-              : formatUsd(expense.amount)}
-          </span>
-        </li>
+          }
+        />
       ))}
     </ul>
   )
@@ -78,10 +61,18 @@ export function FinancialTracking({
   preview,
   employment,
   pregame = false,
+  scenarioChanges = [],
+  bills,
+  onBillAction,
+  billBusy = false,
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
   children: ReactNode
+  scenarioChanges?: readonly UsdCents[] | null
+  bills?: BillSnapshot | null
+  onBillAction?: BillAction
+  billBusy?: boolean
   pregame?: boolean
   preview?: Walkthrough
   employment?: Walkthrough
@@ -92,16 +83,31 @@ export function FinancialTracking({
   const displayBalance =
     committed?.balance ?? preview?.balance ?? run.currentBalance
   const history = committed?.history
-  const income = history
-    ? usdCents(
-        history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0),
-      )
-    : null
-  const charged = history
-    ? usdCents(
-        history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0),
-      )
-    : null
+  const income =
+    history && (bills || scenarioChanges)
+      ? usdCents(
+          history.reduce((sum, entry) => sum + Math.max(0, entry.change), 0) +
+            (bills
+              ? bills.scenarioIncome
+              : scenarioChanges!.reduce(
+                  (sum, change) => sum + Math.max(0, change),
+                  0,
+                )),
+        )
+      : null
+  const charged =
+    history && (bills || scenarioChanges)
+      ? usdCents(
+          history.reduce((sum, entry) => sum + Math.max(0, -entry.change), 0) +
+            (bills
+              ? bills.scenarioCharged
+              : scenarioChanges!.reduce(
+                  (sum, change) => sum + Math.max(0, -change),
+                  0,
+                )) +
+            (bills?.paidTotal ?? 0),
+        )
+      : null
   const starting =
     committed && income !== null && charged !== null
       ? usdCents(committed.balance - income + charged)
@@ -254,9 +260,15 @@ export function FinancialTracking({
           className="finance-right"
           aria-label="Upcoming household expenses"
         >
+          {bills && onBillAction && (
+            <OverdueBills
+              snapshot={bills}
+              onAction={onBillAction}
+              busy={billBusy}
+            />
+          )}
           <section>
             <h2>Coming up</h2>
-            <p className="finance-subtitle">Upcoming scheduled expenses</p>
             {expenses.status === 'loading' && (
               <p role="status">Loading household expenses…</p>
             )}
@@ -288,10 +300,6 @@ export function FinancialTracking({
                     <ExpenseList items={paid} definitions={false} />
                   </>
                 )}
-                <small>
-                  Shown for planning. Displaying an expense does not deduct
-                  money.
-                </small>
               </>
             )}
           </section>

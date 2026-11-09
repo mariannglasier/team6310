@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Bills approval — November 8, 2026:** Independent bills, fixed per-expense fees incurred once on Ignore, later full settlement, non-ending payment rejection, post-employment Day 2/3 bills, and Day 30 completion with unpaid obligations are approved. See [the bills specification and staged implementation record](bills-system.md). This supersedes the earlier optional-only notices and scenario-based bill flow. Actual content remains designer-supplied. The branch now includes prepared SQL and frontend integration; this is not evidence of hosted deployment. See the staged implementation and verification record.
+>
+> **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # Data Model
 
 ## 1. Overview and evidence
@@ -105,7 +111,7 @@ One game attempt and its current financial and scenario state.
 | persona_id | uuid | Selected household profile. | Specified FK → personas.persona_id. |
 | current_scenario_id | uuid | Current scenario. | Specified FK → scenarios.scenario_id; nullability at start/end unresolved. |
 | current_balance | numeric(12,2) | Current available balance in USD. | Exact decimal or integer-cent arithmetic; signed changes. A required payable event that cannot be paid ends the run without recording an unaffordable charge. |
-| current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; multiple decisions can occur on one day. |
+| current_day | integer | Current simulation day. | Pre-game stage followed by Days 1–30; ordinary/employment event days are separate, preserving the Day 2 interview/result/reapplication exception. |
 | cac_support_enabled | boolean | Whether CAC assistance applies. | Default and requiredness unresolved. |
 | status | text | Game progress state. | Allowed values and transitions unresolved (C4). |
 | started_at | timestamptz | Attempt start timestamp. | Default and requiredness unresolved. |
@@ -115,16 +121,24 @@ One game attempt and its current financial and scenario state.
 
 ### `playthrough_expenses`
 
-Individual bill occurrences, including recurring charges and payment state.
+Individual bill occurrences, including recurring charges and payment state. The prepared
+[Stage 1 bills migration](bills-system.md) snapshots original principal, name and fixed
+fee, adds immutable Ignore/payment receipts, and enforces matching run/definition
+editions. This is repository implementation, not a hosted deployment claim.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
 | playthrough_expense_id | uuid | Unique bill occurrence identifier. | Specified PK. |
 | playthrough_id | uuid | Attempt owing the bill. | Specified FK → playthroughs.playthrough_id. |
-| expense_id | uuid | Source scheduled expense definition. | Specified FK → persona_expenses.expense_id. |
-| due_day | integer | Simulation day payment is due. | Day bounds unresolved (C3). |
-| amount_due | numeric(12,2) | Amount charged for this occurrence. | Range and snapshot behavior unresolved (C2, C1). |
-| paid_at | timestamptz | Actual payment timestamp. | Specified optional; NULL represents no recorded payment. |
+| expense_id | uuid | Source scheduled expense definition. | Prepared composite FK with version_id → persona_expenses. |
+| due_day | smallint | Simulation day payment is due. | Prepared constraint: Days 1–30. |
+| amount_due | numeric | Immutable original principal. | Prepared finite, nonnegative, cent-precision check within numeric(12,2) range; no input rounding. |
+| name_snapshot | text | Immutable display name. | Required by prepared Stage 1 migration. |
+| late_fee_amount | numeric | Immutable fixed fee; incurred only if ignored_at exists. | Separate from original principal. |
+| ignored_at | timestamptz | Ignore receipt and one-time fee-incurrence marker. | Preserved after settlement. |
+| paid_at | timestamptz | Actual payment timestamp. | NULL represents no recorded payment. |
+| paid_day | smallint | Simulation day of settlement. | Required together with paid_at and payment_balance_after. |
+| payment_balance_after | numeric | Committed remaining cash at settlement. | Immutable once paid. |
 | version_id | uuid | Content version associated with this bill. | Specified FK → content_versions.version_id; C1. |
 
 ### `player_responses`
@@ -158,7 +172,10 @@ Facilitated group games, current scenarios, and response deadlines.
 
 ### `persona_expenses`
 
-Scheduled household expenses, either one-time or recurring.
+Scheduled household expenses, either one-time or recurring. Stage 1 adds required
+`late_fee_amount` with no content default. Published definitions are immutable;
+new definitions must belong to a matching persona draft edition. NULL recurrence
+is one-time, a positive interval repeats, and occurrences beyond Day 30 are excluded.
 
 | Field | Proposed PostgreSQL type | Description | Source constraints / open decisions |
 | --- | --- | --- | --- |
@@ -264,7 +281,7 @@ Parent-side cardinalities describe the plan's intended design. Except for explic
 | --- | --- | --- |
 | C1 | Content versions | Resolved design: stable logical IDs with edition-scoped rows; published editions are immutable; pending edits are separate; every playthrough retains its starting version_id. Final DDL and publication transaction remain pending. |
 | C2 | Money | Resolved design: USD, exact decimal/integer-cent arithmetic, final rounding once to cents with half-cent ties away from zero, signed balance changes, and capped assistance. |
-| C3 | Simulation time | Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
+| C3 | Simulation time | Approved event-day design: separate ordinary/employment days, preserving the Day 2 interview/result/immediate reapplication exception. Resolved design: pre-game plus Days 1–30; automatic income is credited with a notification before that day's scenarios; scheduled and non-scheduled payments/events use the same end-of-day scenario flow; scheduled income begins seven days after hiring; an unaffordable attempted optional choice or missed/unaffordable required payment ends the run. |
 | C4 | States and nullability | Define playthrough statuses and transitions; confirm group/content status vocabularies. Decide required text, FKs, timestamps, and version fields; decide whether current_scenario_id may be NULL while waiting or after completion. |
 | C5 | Decision/payment consistency | Validate scenario, choice, ownership, eligibility, support, and edition in protected operations. Commit response, state changes, and payment/income idempotency atomically. Prevent duplicate scheduled/scenario charges. |
 | C6 | Group participation | Define join-code uniqueness (global or active sessions only), expiration, membership identity, participant visibility, deadline enforcement, and how group answers advance each attempt. No round identifier or vote aggregation rule is supplied. |

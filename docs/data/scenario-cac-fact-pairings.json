@@ -1,0 +1,700 @@
+{
+  "source": "docs/scenario-draft-library.md",
+  "source_branch": "origin/content/scenario-draft-library",
+  "source_commit": "aef3d98",
+  "retrieved_on": "2026-11-06",
+  "reporting_year": 2025,
+  "note": "Documentation references only. D-keys are not database scenario IDs. No scenario links or publication state were written.",
+  "pairings": [
+    {
+      "scenario_reference": "D001",
+      "title": "Looking for work",
+      "status": "paired_for_review",
+      "fact_alias": "C24",
+      "fact": {
+        "fact_id": "7cb64039-5726-43da-8f15-fbf8b63e8f83",
+        "service_key": "adult_education",
+        "fact_key": "total_students_in_adult_education_programs",
+        "reporting_year": 2025,
+        "value": "610",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported 610 total students in Adult Education programs."
+      },
+      "rationale": "The choice explicitly includes adult English/computer preparation before selecting a job.",
+      "assistance_note": "Conditional free CAC preparation; USD 0.00, no cash credit. Course totals do not determine skills, eligibility or wages."
+    },
+    {
+      "scenario_reference": "D002",
+      "title": "An interview today",
+      "status": "paired_for_review",
+      "fact_alias": "C15",
+      "fact": {
+        "fact_id": "859b8cec-1e1c-4887-9f55-fd55f1bb349c",
+        "service_key": "canopy_thrift",
+        "fact_key": "dollar_amount_of_client_credits_used_at_cac_canopy_thrift",
+        "reporting_year": 2025,
+        "value": "206768.67",
+        "unit": "Dollars",
+        "display_text": "In 2025, clients used $206,768.67 in credits at CAC Canopy Thrift."
+      },
+      "rationale": "Professional-clothing costs connect directly to the client-credit program.",
+      "assistance_note": "Existing conditional clothing pathway; annual credit does not set its amount."
+    },
+    {
+      "scenario_reference": "D003",
+      "title": "Back to the job search",
+      "status": "paired_for_review",
+      "fact_alias": "C07",
+      "fact": {
+        "fact_id": "db12c137-fad7-4277-b4ca-6a203b344e38",
+        "service_key": "career_services",
+        "fact_key": "people_helped_by_career_services",
+        "reporting_year": 2025,
+        "value": "229",
+        "unit": "Number",
+        "display_text": "In 2025, Career Services helped 229 people."
+      },
+      "rationale": "Reapplying after an unsuccessful interview is directly relevant to career support.",
+      "assistance_note": "Context only; retain no CAC choice and no automatic job placement."
+    },
+    {
+      "scenario_reference": "D004",
+      "title": "Another interview",
+      "status": "paired_for_review",
+      "fact_alias": "C08",
+      "fact": {
+        "fact_id": "2675ebbd-e014-4506-a0fd-1130a9ffe692",
+        "service_key": "career_services",
+        "fact_key": "job_placements",
+        "reporting_year": 2025,
+        "value": "80",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported 80 job placements."
+      },
+      "rationale": "A follow-up interview is relevant to the reported job-placement outcome.",
+      "assistance_note": "Existing conditional clothing pathway is unchanged; placements do not determine scripted hiring."
+    },
+    {
+      "scenario_reference": "D005",
+      "title": "Time to file taxes",
+      "status": "paired_for_review",
+      "fact_alias": "C21",
+      "fact": {
+        "fact_id": "5b9132c2-90d6-4dea-9dc0-f2de13a89e2f",
+        "service_key": "vita",
+        "fact_key": "tax_returns_through_the_vita_program",
+        "reporting_year": 2025,
+        "value": "503",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported 503 tax returns through the VITA program."
+      },
+      "rationale": "The scenario is tax filing, and the fact measures returns through VITA.",
+      "assistance_note": "Existing conditional VITA pathway; no change to the approved fixed simulation refund."
+    },
+    {
+      "scenario_reference": "D006",
+      "title": "Rent is due",
+      "status": "paired_for_review",
+      "fact_alias": "C01",
+      "fact": {
+        "fact_id": "5fa2bac7-6016-4db8-b705-fc593f6b75ec",
+        "service_key": "eviction_prevention",
+        "fact_key": "evictions_prevented",
+        "reporting_year": 2025,
+        "value": "1108",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported preventing evictions for 1,108 households."
+      },
+      "rationale": "The obligation is rent and the fact is specifically about eviction prevention.",
+      "assistance_note": "Existing conditional rent pathway; no eligibility or coverage amount inferred."
+    },
+    {
+      "scenario_reference": "D007",
+      "title": "Keeping the lights on",
+      "status": "paired_for_review",
+      "fact_alias": "C01",
+      "fact": {
+        "fact_id": "5fa2bac7-6016-4db8-b705-fc593f6b75ec",
+        "service_key": "eviction_prevention",
+        "fact_key": "evictions_prevented",
+        "reporting_year": 2025,
+        "value": "1108",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported preventing evictions for 1,108 households."
+      },
+      "rationale": "Electricity costs compete with rent and other essentials, connecting this decision to housing stability and eviction prevention.",
+      "assistance_note": "The user confirmed rent and utility bill support through CAC eviction prevention. Offer conditional CAC bill support in CAC mode; validate household eligibility and availability, cap assistance at the eligible bill balance, and bind the approved coverage amount separately from annual facts."
+    },
+    {
+      "scenario_reference": "D008",
+      "title": "The water bill",
+      "status": "paired_for_review",
+      "fact_alias": "C02",
+      "fact": {
+        "fact_id": "b697ae84-1fd2-4bae-83da-7a10c983ac24",
+        "service_key": "financial_assistance",
+        "fact_key": "amount_paid_through_financial_assistance",
+        "reporting_year": 2025,
+        "value": "796416.64",
+        "unit": "Dollars",
+        "display_text": "In 2025, CAC reported $796,416.64 in total financial assistance to prevent homelessness."
+      },
+      "rationale": "Water and sewer costs are part of household housing pressure, providing context for financial assistance to prevent homelessness.",
+      "assistance_note": "The user confirmed rent and utility bill support through CAC eviction prevention. Offer conditional CAC bill support in CAC mode; validate household eligibility and availability, cap assistance at the eligible bill balance, and bind the approved coverage amount separately from annual facts."
+    },
+    {
+      "scenario_reference": "D009",
+      "title": "Staying connected",
+      "status": "no_suitable_fact",
+      "reason": "No phone-plan or telecommunications-service fact."
+    },
+    {
+      "scenario_reference": "D010",
+      "title": "The internet bill",
+      "status": "paired_for_review",
+      "fact_alias": "C02",
+      "fact": {
+        "fact_id": "b697ae84-1fd2-4bae-83da-7a10c983ac24",
+        "service_key": "financial_assistance",
+        "fact_key": "amount_paid_through_financial_assistance",
+        "reporting_year": 2025,
+        "value": "796416.64",
+        "unit": "Dollars",
+        "display_text": "In 2025, CAC reported $796,416.64 in total financial assistance to prevent homelessness."
+      },
+      "rationale": "The home-internet bill competes with rent and other household obligations, providing broader housing-budget context for financial assistance to prevent homelessness.",
+      "assistance_note": "The user confirmed rent and utility bill support through CAC eviction prevention. Offer conditional CAC bill support in CAC mode; validate household eligibility and availability, cap assistance at the eligible bill balance, and bind the approved coverage amount separately from annual facts."
+    },
+    {
+      "scenario_reference": "D011",
+      "title": "Car insurance is due",
+      "status": "paired_for_review",
+      "fact_alias": "C22",
+      "fact": {
+        "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+        "service_key": "financial_literacy_classes",
+        "fact_key": "students_enrolled_in_financial_literacy_classes",
+        "reporting_year": 2025,
+        "value": "218",
+        "unit": "Number",
+        "display_text": "In 2025, 218 students enrolled in Financial Literacy Classes."
+      },
+      "rationale": "Choosing how to handle an insurance installment is a financial-literacy/budget tradeoff.",
+      "assistance_note": "Context only; no CAC car-insurance payment or insurance service inferred."
+    },
+    {
+      "scenario_reference": "D012",
+      "title": "A clinic bill arrives",
+      "status": "no_suitable_fact",
+      "reason": "No clinic-cost or medical-assistance fact."
+    },
+    {
+      "scenario_reference": "D013",
+      "title": "The childcare bill",
+      "status": "no_suitable_fact",
+      "reason": "No daycare/childcare-payment fact; Meals for Kids measures food support."
+    },
+    {
+      "scenario_reference": "D014",
+      "title": "Maya's school meal balance",
+      "status": "paired_for_review",
+      "fact_alias": "C16",
+      "fact": {
+        "fact_id": "9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01",
+        "service_key": "meals_for_kids",
+        "fact_key": "children_served_by_meals_for_kids",
+        "reporting_year": 2025,
+        "value": "1097",
+        "unit": "Number",
+        "display_text": "In 2025, Meals for Kids served 1,097 children."
+      },
+      "rationale": "The child’s meal-account decision has relevant child-food-access context.",
+      "assistance_note": "Context only; Meals for Kids is not represented as paying the school account."
+    },
+    {
+      "scenario_reference": "D015",
+      "title": "The repair bill",
+      "status": "no_suitable_fact",
+      "reason": "No vehicle-repair invoice or automotive-assistance fact."
+    },
+    {
+      "scenario_reference": "D016",
+      "title": "A pharmacy bill arrives",
+      "status": "no_suitable_fact",
+      "reason": "No prescription-payment or medicine-assistance fact."
+    },
+    {
+      "scenario_reference": "D017",
+      "title": "A repayment is due",
+      "status": "paired_for_review",
+      "fact_alias": "C22",
+      "fact": {
+        "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+        "service_key": "financial_literacy_classes",
+        "fact_key": "students_enrolled_in_financial_literacy_classes",
+        "reporting_year": 2025,
+        "value": "218",
+        "unit": "Number",
+        "display_text": "In 2025, 218 students enrolled in Financial Literacy Classes."
+      },
+      "rationale": "Managing an existing repayment installment is a financial-literacy decision.",
+      "assistance_note": "Context only; CAC does not pay or restructure this debt in the draft."
+    },
+    {
+      "scenario_reference": "D018",
+      "title": "The gas bill",
+      "status": "paired_for_review",
+      "fact_alias": "C01",
+      "fact": {
+        "fact_id": "5fa2bac7-6016-4db8-b705-fc593f6b75ec",
+        "service_key": "eviction_prevention",
+        "fact_key": "evictions_prevented",
+        "reporting_year": 2025,
+        "value": "1108",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported preventing evictions for 1,108 households."
+      },
+      "rationale": "Household gas costs compete with rent and other essentials, connecting this decision to housing stability and eviction prevention.",
+      "assistance_note": "The user confirmed rent and utility bill support through CAC eviction prevention. Offer conditional CAC bill support in CAC mode; validate household eligibility and availability, cap assistance at the eligible bill balance, and bind the approved coverage amount separately from annual facts."
+    },
+    {
+      "scenario_reference": "D019",
+      "title": "Rent or a cash cushion?",
+      "status": "paired_for_review",
+      "fact_alias": "C02",
+      "fact": {
+        "fact_id": "b697ae84-1fd2-4bae-83da-7a10c983ac24",
+        "service_key": "financial_assistance",
+        "fact_key": "amount_paid_through_financial_assistance",
+        "reporting_year": 2025,
+        "value": "796416.64",
+        "unit": "Dollars",
+        "display_text": "In 2025, CAC reported $796,416.64 in total financial assistance to prevent homelessness."
+      },
+      "rationale": "The scenario concerns rent pressure and preserving housing stability.",
+      "assistance_note": "Existing conditional rent pathway; annual spending is not the household’s benefit amount."
+    },
+    {
+      "scenario_reference": "D020",
+      "title": "A medical bill remains",
+      "status": "no_suitable_fact",
+      "reason": "No medical-bill assistance fact."
+    },
+    {
+      "scenario_reference": "D021",
+      "title": "The car will not start",
+      "status": "no_suitable_fact",
+      "reason": "No vehicle repair or roadside-assistance fact."
+    },
+    {
+      "scenario_reference": "D022",
+      "title": "An unexpected dental expense",
+      "status": "no_suitable_fact",
+      "reason": "No dental-care cost or dental-assistance fact."
+    },
+    {
+      "scenario_reference": "D023",
+      "title": "A broken phone",
+      "status": "no_suitable_fact",
+      "reason": "No phone replacement or device-assistance fact."
+    },
+    {
+      "scenario_reference": "D024",
+      "title": "A family emergency",
+      "status": "no_suitable_fact",
+      "reason": "No emergency family-travel assistance fact; targeted workforce transportation is not a general travel benefit."
+    },
+    {
+      "scenario_reference": "D025",
+      "title": "Childcare falls through",
+      "status": "no_suitable_fact",
+      "reason": "No replacement-childcare or daycare-access fact."
+    },
+    {
+      "scenario_reference": "D026",
+      "title": "Time for new tires",
+      "status": "no_suitable_fact",
+      "reason": "No tire replacement or automotive-assistance fact."
+    },
+    {
+      "scenario_reference": "D027",
+      "title": "Broken glasses",
+      "status": "no_suitable_fact",
+      "reason": "No vision-care or glasses-replacement assistance fact."
+    },
+    {
+      "scenario_reference": "D028",
+      "title": "A plumbing problem",
+      "status": "no_suitable_fact",
+      "reason": "No plumbing/home-repair assistance fact."
+    },
+    {
+      "scenario_reference": "D029",
+      "title": "An unexpected appointment for Maya",
+      "status": "no_suitable_fact",
+      "reason": "No child healthcare/appointment assistance fact."
+    },
+    {
+      "scenario_reference": "D030",
+      "title": "A broken laptop",
+      "status": "no_suitable_fact",
+      "reason": "Computer Classes measures education, not laptop repair or replacement."
+    },
+    {
+      "scenario_reference": "D031",
+      "title": "The car needs a tow",
+      "status": "no_suitable_fact",
+      "reason": "No towing or vehicle-recovery assistance fact."
+    },
+    {
+      "scenario_reference": "D032",
+      "title": "A larger share to cover",
+      "status": "no_suitable_fact",
+      "reason": "The shared household purchase is unspecified. Define the actual goods before selecting a relevant program fact."
+    },
+    {
+      "scenario_reference": "D033",
+      "title": "A damaged work item",
+      "status": "no_suitable_fact",
+      "reason": "The damaged work item is unspecified; clothing and computer classes do not establish equipment coverage."
+    },
+    {
+      "scenario_reference": "D034",
+      "title": "A broken dresser",
+      "status": "no_suitable_fact",
+      "reason": "No suitable dresser/furniture CAC outcome fact is assigned. The user confirmed household furniture availability; retain the fact slot unresolved rather than substituting an unrelated clothing statistic."
+    },
+    {
+      "scenario_reference": "D035",
+      "title": "Groceries lost",
+      "status": "paired_for_review",
+      "fact_alias": "C25",
+      "fact": {
+        "fact_id": "efaf231b-3db3-4c4d-b276-758006af8aab",
+        "service_key": "mini_market",
+        "fact_key": "pounds_of_food_available_from_the_cac_mini_market",
+        "reporting_year": 2025,
+        "value": "1160328",
+        "unit": "Pounds",
+        "display_text": "In 2025, the CAC Mini-Market reported 1,160,328 pounds of food available."
+      },
+      "rationale": "The expense here is replacement groceries, not repairing the refrigerator.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D036",
+      "title": "A full grocery basket?",
+      "status": "paired_for_review",
+      "fact_alias": "C04",
+      "fact": {
+        "fact_id": "94210a01-4766-46ad-beba-d7400c9fd31e",
+        "service_key": "mini_market",
+        "fact_key": "visits_to_the_cac_mini_market",
+        "reporting_year": 2025,
+        "value": "36521",
+        "unit": "Number",
+        "display_text": "In 2025, there were 36,521 visits to the CAC Mini-Market."
+      },
+      "rationale": "The decision is grocery access and choosing a food basket.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D037",
+      "title": "Your ride to work falls through",
+      "status": "no_suitable_fact",
+      "reason": "The transportation measure is workforce-program-specific; this card applies to employed people generally."
+    },
+    {
+      "scenario_reference": "D038",
+      "title": "A load of laundry",
+      "status": "no_suitable_fact",
+      "reason": "No laundry-service or laundry-fee assistance fact; clothing distribution is a different activity."
+    },
+    {
+      "scenario_reference": "D039",
+      "title": "Maya's school trip",
+      "status": "no_suitable_fact",
+      "reason": "Tools for School concerns supplies, not school-trip participation or fees."
+    },
+    {
+      "scenario_reference": "D040",
+      "title": "Worn-out shoes",
+      "status": "paired_for_review",
+      "fact_alias": "C14",
+      "fact": {
+        "fact_id": "5d6bc795-8a41-49ca-862f-9aaf73405b49",
+        "service_key": "canopy_thrift",
+        "fact_key": "households_served_by_cac_canopy_thrift",
+        "reporting_year": 2025,
+        "value": "2152",
+        "unit": "Number",
+        "display_text": "In 2025, CAC Canopy Thrift served 2,152 households."
+      },
+      "rationale": "Replacing everyday shoes connects to the clothing program’s household reach.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D041",
+      "title": "Too tired to cook?",
+      "status": "paired_for_review",
+      "fact_alias": "C05",
+      "fact": {
+        "fact_id": "ec44118c-3be1-46b1-9585-8f34d638bbd9",
+        "service_key": "mini_market",
+        "fact_key": "households_served_by_the_cac_mini_market",
+        "reporting_year": 2025,
+        "value": "2995",
+        "unit": "Number",
+        "display_text": "In 2025, the CAC Mini-Market served 2,995 households."
+      },
+      "rationale": "Buying meal ingredients has relevant household food-access context.",
+      "assistance_note": "Context only; no restaurant, prepared-meal reimbursement or new CAC option."
+    },
+    {
+      "scenario_reference": "D042",
+      "title": "School supplies for Maya",
+      "status": "paired_for_review",
+      "fact_alias": "C17",
+      "fact": {
+        "fact_id": "c6a72bf1-47ac-4d53-9adc-8ad68dd120c4",
+        "service_key": "tools_for_school",
+        "fact_key": "children_served_by_tools_for_school",
+        "reporting_year": 2025,
+        "value": "1090",
+        "unit": "Number",
+        "display_text": "In 2025, Tools for School served 1,090 children."
+      },
+      "rationale": "The decision is specifically school supplies for a child.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D043",
+      "title": "A family birthday",
+      "status": "no_suitable_fact",
+      "reason": "Hope for the Holidays is seasonal holiday support, not general birthday gifts."
+    },
+    {
+      "scenario_reference": "D044",
+      "title": "Getting to an appointment",
+      "status": "no_suitable_fact",
+      "reason": "No general household-appointment transportation fact is assigned. The rarely used workforce transportation service is excluded from this replacement."
+    },
+    {
+      "scenario_reference": "D045",
+      "title": "A coat for Maya",
+      "status": "paired_for_review",
+      "fact_alias": "C18",
+      "fact": {
+        "fact_id": "e8473e58-6338-4855-93be-7608f27696ab",
+        "service_key": "coats_for_kids",
+        "fact_key": "children_served_by_coats_for_kids",
+        "reporting_year": 2025,
+        "value": "623",
+        "unit": "Number",
+        "display_text": "In 2025, Coats for Kids served 623 children."
+      },
+      "rationale": "The need is a child’s warm coat in the program’s season.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D046",
+      "title": "Packing lunch or buying it?",
+      "status": "paired_for_review",
+      "fact_alias": "C05",
+      "fact": {
+        "fact_id": "ec44118c-3be1-46b1-9585-8f34d638bbd9",
+        "service_key": "mini_market",
+        "fact_key": "households_served_by_the_cac_mini_market",
+        "reporting_year": 2025,
+        "value": "2995",
+        "unit": "Number",
+        "display_text": "In 2025, the CAC Mini-Market served 2,995 households."
+      },
+      "rationale": "Ingredients for work lunches connect to household food access.",
+      "assistance_note": "Context only; no workplace-lunch subsidy or new CAC choice."
+    },
+    {
+      "scenario_reference": "D047",
+      "title": "A broken bag",
+      "status": "no_suitable_fact",
+      "reason": "No fact establishes bag replacement/repair; the general clothing program is insufficient."
+    },
+    {
+      "scenario_reference": "D048",
+      "title": "Meals for Maya",
+      "status": "paired_for_review",
+      "fact_alias": "C16",
+      "fact": {
+        "fact_id": "9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01",
+        "service_key": "meals_for_kids",
+        "fact_key": "children_served_by_meals_for_kids",
+        "reporting_year": 2025,
+        "value": "1097",
+        "unit": "Number",
+        "display_text": "In 2025, Meals for Kids served 1,097 children."
+      },
+      "rationale": "The scenario explicitly covers meals for a child during the program period.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D049",
+      "title": "A fee to access your money",
+      "status": "paired_for_review",
+      "fact_alias": "C22",
+      "fact": {
+        "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+        "service_key": "financial_literacy_classes",
+        "fact_key": "students_enrolled_in_financial_literacy_classes",
+        "reporting_year": 2025,
+        "value": "218",
+        "unit": "Number",
+        "display_text": "In 2025, 218 students enrolled in Financial Literacy Classes."
+      },
+      "rationale": "Comparing a fee-charging money-access route with a free route is financial-literacy context.",
+      "assistance_note": "Context only; no claim that CAC pays fees or offers the payment instrument."
+    },
+    {
+      "scenario_reference": "D050",
+      "title": "Running low on essentials",
+      "status": "no_suitable_fact",
+      "reason": "No hygiene-supply assistance fact."
+    },
+    {
+      "scenario_reference": "D051",
+      "title": "A chance to learn",
+      "status": "paired_for_review",
+      "fact_alias": "C24",
+      "fact": {
+        "fact_id": "7cb64039-5726-43da-8f15-fbf8b63e8f83",
+        "service_key": "adult_education",
+        "fact_key": "total_students_in_adult_education_programs",
+        "reporting_year": 2025,
+        "value": "610",
+        "unit": "Number",
+        "display_text": "In 2025, CAC reported 610 total students in Adult Education programs."
+      },
+      "rationale": "The card asks whether to invest money and time in optional learning.",
+      "assistance_note": "Context only; CAC does not fund the private workshop or grant a qualification in this draft."
+    },
+    {
+      "scenario_reference": "D052",
+      "title": "Maya's birthday",
+      "status": "no_suitable_fact",
+      "reason": "Holiday-program facts do not establish birthday-party support."
+    },
+    {
+      "scenario_reference": "D053",
+      "title": "A holiday meal",
+      "status": "paired_for_review",
+      "fact_alias": "C06",
+      "fact": {
+        "fact_id": "1eec83c9-41ca-4aef-be22-1e36289d9d95",
+        "service_key": "holiday_food_baskets",
+        "fact_key": "households_who_received_holiday_food_baskets",
+        "reporting_year": 2025,
+        "value": "984",
+        "unit": "Number",
+        "display_text": "In 2025, 984 households received Holiday Food Baskets."
+      },
+      "rationale": "The need is a distinct seasonal holiday food basket.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D054",
+      "title": "Clothes need replacing",
+      "status": "paired_for_review",
+      "fact_alias": "C15",
+      "fact": {
+        "fact_id": "859b8cec-1e1c-4887-9f55-fd55f1bb349c",
+        "service_key": "canopy_thrift",
+        "fact_key": "dollar_amount_of_client_credits_used_at_cac_canopy_thrift",
+        "reporting_year": 2025,
+        "value": "206768.67",
+        "unit": "Dollars",
+        "display_text": "In 2025, clients used $206,768.67 in credits at CAC Canopy Thrift."
+      },
+      "rationale": "The decision concerns replacement clothing and a lower-cost alternative.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D055",
+      "title": "Someone asks for help",
+      "status": "paired_for_review",
+      "fact_alias": "C22",
+      "fact": {
+        "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+        "service_key": "financial_literacy_classes",
+        "fact_key": "students_enrolled_in_financial_literacy_classes",
+        "reporting_year": 2025,
+        "value": "218",
+        "unit": "Number",
+        "display_text": "In 2025, 218 students enrolled in Financial Literacy Classes."
+      },
+      "rationale": "Balancing help for another person against one’s own budget is financial-literacy context.",
+      "assistance_note": "Context only; no CAC reimbursement, loan, or moral score."
+    },
+    {
+      "scenario_reference": "D056",
+      "title": "A holiday gift for Maya",
+      "status": "paired_for_review",
+      "fact_alias": "C19",
+      "fact": {
+        "fact_id": "18b975be-96cb-49ec-901b-ccd04c6c6a5c",
+        "service_key": "hope_for_the_holidays",
+        "fact_key": "households_served_by_hope_for_the_holidays",
+        "reporting_year": 2025,
+        "value": "614",
+        "unit": "Number",
+        "display_text": "In 2025, Hope for the Holidays served 614 households."
+      },
+      "rationale": "The card explicitly concerns the named holiday program and a child’s holiday gift.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    },
+    {
+      "scenario_reference": "D057",
+      "title": "A pass or a few fares?",
+      "status": "no_suitable_fact",
+      "reason": "No general bus-pass/fare fact; workforce-specific transportation cannot be generalized to all personas."
+    },
+    {
+      "scenario_reference": "D058",
+      "title": "Laundry supplies are running low",
+      "status": "no_suitable_fact",
+      "reason": "No laundry-detergent/supply assistance fact."
+    },
+    {
+      "scenario_reference": "D059",
+      "title": "Time with a friend",
+      "status": "paired_for_review",
+      "fact_alias": "C22",
+      "fact": {
+        "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+        "service_key": "financial_literacy_classes",
+        "fact_key": "students_enrolled_in_financial_literacy_classes",
+        "reporting_year": 2025,
+        "value": "218",
+        "unit": "Number",
+        "display_text": "In 2025, 218 students enrolled in Financial Literacy Classes."
+      },
+      "rationale": "Choosing between a paid outing and a free alternative is a discretionary-budget tradeoff.",
+      "assistance_note": "Context only; no claim of CAC leisure funding or a judgment about spending."
+    },
+    {
+      "scenario_reference": "D060",
+      "title": "The groceries are running low",
+      "status": "paired_for_review",
+      "fact_alias": "C26",
+      "fact": {
+        "fact_id": "0a3f963a-b2c5-47d6-8b9d-e0d396da6a66",
+        "service_key": "mini_market",
+        "fact_key": "individuals_served_by_the_cac_mini_market",
+        "reporting_year": 2025,
+        "value": "7034",
+        "unit": "Number",
+        "display_text": "In 2025, the CAC Mini-Market served 7,034 individuals."
+      },
+      "rationale": "The scenario is a distinct late-month household food need.",
+      "assistance_note": "Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values."
+    }
+  ]
+}

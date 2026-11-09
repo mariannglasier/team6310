@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Bills approval — November 8, 2026:** Independent bills, fixed per-expense fees incurred once on Ignore, later full settlement, non-ending payment rejection, post-employment Day 2/3 bills, and Day 30 completion with unpaid obligations are approved. See [the bills specification and staged implementation record](bills-system.md). This supersedes the earlier optional-only notices and scenario-based bill flow. Actual content remains designer-supplied. The branch now includes prepared SQL and frontend integration; this is not evidence of hosted deployment. See the staged implementation and verification record.
+>
+> **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # External Data and API Integration
 
 Scenario maintenance and gameplay use the approved relational content model in [scenarios.md](scenarios.md). External sources provide provenance-backed inputs and facts; they do not generate authoritative financial rules or player outcomes.
@@ -325,6 +331,8 @@ This represents a proposed placeholder format, not a finalized implementation re
 The reference mechanism must be defined during architecture and implementation. Regular expressions could help identify placeholders in text, but they would not replace the logic needed to retrieve, validate, and apply the referenced values. 
 
 ### Calculating Simulation Values 
+
+**Recovered content guidance:** Ordinary scenarios may represent hardship without a CAC service. Offline draft amounts are unapproved assumptions, not retrieved prices or benefits; annual CAC totals do not establish household amounts. Optional bill concepts in the draft library do not require new bindings or payment processing. Future-consequence text requires independent content review if ever selected for use.
 
 Some simulation expenses will require calculations using sourced values and scenario-specific inputs. 
 

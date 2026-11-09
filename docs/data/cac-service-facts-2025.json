@@ -1,0 +1,669 @@
+{
+  "source": "public.cac_service_facts joined to public.cac_services",
+  "project_ref": "uucneyuspeqpygiucfvr",
+  "retrieved_on": "2026-11-06",
+  "reporting_year": 2025,
+  "note": "Read-only documentation snapshot. Decimal values are strings. This file does not publish data or create scenario links in the database.",
+  "facts": [
+    {
+      "fact_id": "7cb64039-5726-43da-8f15-fbf8b63e8f83",
+      "service_key": "adult_education",
+      "service_name": "Adult Education",
+      "fact_key": "total_students_in_adult_education_programs",
+      "fact_title": "total students in Adult Education programs",
+      "value": "610",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "19910209-07b9-4d24-88df-96a17a816c72",
+      "service_key": "cac_general",
+      "service_name": "CAC General",
+      "fact_key": "new_households_served_by_cac_for_the_first_time",
+      "fact_title": "new households served by CAC for the first time",
+      "value": "2153",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5cdd07bf-92ca-4bb4-a7ec-0d1c73e61144",
+      "service_key": "cac_general",
+      "service_name": "CAC General",
+      "fact_key": "unduplicated_households_served_by_cac",
+      "fact_title": "unduplicated households served by CAC",
+      "value": "4440",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "d40b0a9a-5ab9-45fa-af7f-280827b9c3fb",
+      "service_key": "cac_general",
+      "service_name": "CAC General",
+      "fact_key": "unduplicated_individuals_served_by_cac",
+      "fact_title": "total individuals served by CAC",
+      "value": "9632",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "859b8cec-1e1c-4887-9f55-fd55f1bb349c",
+      "service_key": "canopy_thrift",
+      "service_name": "CAC Canopy Thrift",
+      "fact_key": "dollar_amount_of_client_credits_used_at_cac_canopy_thrift",
+      "fact_title": "dollar amount of client credits used at CAC Canopy Thrift",
+      "value": "206768.67",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5d6bc795-8a41-49ca-862f-9aaf73405b49",
+      "service_key": "canopy_thrift",
+      "service_name": "CAC Canopy Thrift",
+      "fact_key": "households_served_by_cac_canopy_thrift",
+      "fact_title": "households served by CAC Canopy Thrift",
+      "value": "2152",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "81090dcc-e663-4e19-8689-311f4d888266",
+      "service_key": "canopy_thrift",
+      "service_name": "CAC Canopy Thrift",
+      "fact_key": "individuals_served_by_cac_canopy_thrift",
+      "fact_title": "individuals served by CAC Canopy Thrift",
+      "value": "5501",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "d67b5595-2f67-4818-94f4-70bd387e9812",
+      "service_key": "canopy_thrift",
+      "service_name": "CAC Canopy Thrift",
+      "fact_key": "money_from_cac_canopy_thrift_sales_including_taxes",
+      "fact_title": "money from CAC Canopy Thrift sales (including taxes)",
+      "value": "386946.74999999994",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "2675ebbd-e014-4506-a0fd-1130a9ffe692",
+      "service_key": "career_services",
+      "service_name": "Career Services",
+      "fact_key": "job_placements",
+      "fact_title": "job placements",
+      "value": "80",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "db12c137-fad7-4277-b4ca-6a203b344e38",
+      "service_key": "career_services",
+      "service_name": "Career Services",
+      "fact_key": "people_helped_by_career_services",
+      "fact_title": "people helped by Career Services",
+      "value": "229",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "e8473e58-6338-4855-93be-7608f27696ab",
+      "service_key": "coats_for_kids",
+      "service_name": "Coats for Kids",
+      "fact_key": "children_served_by_coats_for_kids",
+      "fact_title": "children served by Coats for Kids",
+      "value": "623",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "28b01c5e-aefd-40e7-a999-68928b30ac42",
+      "service_key": "coats_for_kids",
+      "service_name": "Coats for Kids",
+      "fact_key": "households_served_by_coats_for_kids",
+      "fact_title": "households served by Coats for Kids",
+      "value": "243",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "50cc0849-2aec-43df-b006-397f36c54cb9",
+      "service_key": "coats_for_kids",
+      "service_name": "Coats for Kids",
+      "fact_key": "in_kind_value_for_coats_for_kids",
+      "fact_title": "in-kind value for Coats for Kids",
+      "value": "13508",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "1431705b-90b7-4a17-87d6-3c6fbdad30e5",
+      "service_key": "computer_classes",
+      "service_name": "Computer Classes",
+      "fact_key": "students_in_computer_classes",
+      "fact_title": "students in Computer Classes",
+      "value": "42",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "78e816ed-2364-4ef7-af46-4d0ebac64ffa",
+      "service_key": "empowerment_center",
+      "service_name": "Empowerment Center",
+      "fact_key": "event_participants_at_the_empowerment_center",
+      "fact_title": "event participants through the Empowerment Center",
+      "value": "432",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "2baa9c38-09b0-476d-9d02-5015a37443e5",
+      "service_key": "esol",
+      "service_name": "English as a Second or Other Language Classes (ESOL)",
+      "fact_key": "students_enrolled_in_esol_classes",
+      "fact_title": "students enrolled in ESOL classes",
+      "value": "521",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5fa2bac7-6016-4db8-b705-fc593f6b75ec",
+      "service_key": "eviction_prevention",
+      "service_name": "Eviction Prevention",
+      "fact_key": "evictions_prevented",
+      "fact_title": "evictions prevented",
+      "value": "1108",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "b697ae84-1fd2-4bae-83da-7a10c983ac24",
+      "service_key": "financial_assistance",
+      "service_name": "Financial Assistance",
+      "fact_key": "amount_paid_through_financial_assistance",
+      "fact_title": "total financial assistance amount to prevent homelessness",
+      "value": "796416.64",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "d32689c8-067a-4f59-aa48-2424384b7116",
+      "service_key": "financial_literacy_classes",
+      "service_name": "Financial Literacy Classes",
+      "fact_key": "students_enrolled_in_financial_literacy_classes",
+      "fact_title": "students enrolled in Financial Literacy Classes",
+      "value": "218",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "1eec83c9-41ca-4aef-be22-1e36289d9d95",
+      "service_key": "holiday_food_baskets",
+      "service_name": "Holiday Food Baskets",
+      "fact_key": "households_who_received_holiday_food_baskets",
+      "fact_title": "households who received Holiday Food Baskets",
+      "value": "984",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "89cb7c17-e6ca-4e83-8f73-764c22bd24dc",
+      "service_key": "holiday_food_baskets",
+      "service_name": "Holiday Food Baskets",
+      "fact_key": "individuals_who_received_holiday_food_baskets",
+      "fact_title": "individuals who received Holiday Food Baskets",
+      "value": "2647",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "29bee5b8-ccfd-4cee-88ed-602b11193367",
+      "service_key": "holiday_food_baskets",
+      "service_name": "Holiday Food Baskets",
+      "fact_key": "pounds_of_food_delivered_in_holiday_food_baskets",
+      "fact_title": "pounds of food delivered in Holiday Food Baskets",
+      "value": "15967.14",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "c77e529a-3f97-4433-900d-6e0ece43dc34",
+      "service_key": "homelessness_prevention",
+      "service_name": "Homelessness Prevention",
+      "fact_key": "individuals_who_remained_housed",
+      "fact_title": "individuals who remained housed",
+      "value": "2345",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "3e9b2af8-403a-4f9f-926f-44a511e4c54c",
+      "service_key": "hope_for_the_holidays",
+      "service_name": "Hope for the Holidays",
+      "fact_key": "hope_for_the_holidays_sponsors",
+      "fact_title": "Hope for the Holidays sponsors",
+      "value": "328",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "18b975be-96cb-49ec-901b-ccd04c6c6a5c",
+      "service_key": "hope_for_the_holidays",
+      "service_name": "Hope for the Holidays",
+      "fact_key": "households_served_by_hope_for_the_holidays",
+      "fact_title": "households served by Hope for the Holidays",
+      "value": "614",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "23ea1dde-dfa9-474e-8cb6-e369ac441f66",
+      "service_key": "hope_for_the_holidays",
+      "service_name": "Hope for the Holidays",
+      "fact_key": "in_kind_value_for_hope_for_the_holidays",
+      "fact_title": "in-kind value for Hope for the Holidays",
+      "value": "145000",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "6d57945d-df2c-4e3d-801f-d47eb3316050",
+      "service_key": "hope_for_the_holidays",
+      "service_name": "Hope for the Holidays",
+      "fact_key": "individuals_served_by_hope_for_the_holidays",
+      "fact_title": "individuals served by Hope for the Holidays",
+      "value": "1450",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01",
+      "service_key": "meals_for_kids",
+      "service_name": "Meals for Kids\n",
+      "fact_key": "children_served_by_meals_for_kids",
+      "fact_title": "children served by Meals for Kids",
+      "value": "1097",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "97cd3e43-1302-4a31-9a49-681f02fd00ca",
+      "service_key": "meals_for_kids",
+      "service_name": "Meals for Kids\n",
+      "fact_key": "in_kind_value_for_meals_for_kids",
+      "fact_title": "in-kind value for Meals for Kids",
+      "value": "6678.22",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "016e3baf-42a5-4792-b96a-70157fbaa9c0",
+      "service_key": "meals_for_kids",
+      "service_name": "Meals for Kids\n",
+      "fact_key": "meals_provided_by_meals_for_kids",
+      "fact_title": "meals provided by Meals for Kids",
+      "value": "15435.158333333333",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "a194ffd4-028a-4795-8e37-7e6872839924",
+      "service_key": "meals_for_kids",
+      "service_name": "Meals for Kids\n",
+      "fact_key": "pounds_of_food_provided_to_clients_by_meals_for_kids",
+      "fact_title": "pounds of food provided to clients by Meals for Kids",
+      "value": "18522.189999999999",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "97fa5684-7b99-409d-b869-748e1996652f",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "food_purchase_cost_for_the_cac_mini_market",
+      "fact_title": "food purchase cost for the CAC Mini-Market",
+      "value": "98077.790000000008",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "ec44118c-3be1-46b1-9585-8f34d638bbd9",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "households_served_by_the_cac_mini_market",
+      "fact_title": "households served by the CAC Mini-Market",
+      "value": "2995",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "0a3f963a-b2c5-47d6-8b9d-e0d396da6a66",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "individuals_served_by_the_cac_mini_market",
+      "fact_title": "individuals served by the CAC Mini-Market",
+      "value": "7034",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "b455e7c2-c18b-46f9-85f2-9fccf5969771",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "meals_provided_by_the_cac_mini_market",
+      "fact_title": "meals provided by the CAC Mini-Market",
+      "value": "913738.66666666674",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "efaf231b-3db3-4c4d-b276-758006af8aab",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "pounds_of_food_available_from_the_cac_mini_market",
+      "fact_title": "pounds of food available from the CAC Mini-Market",
+      "value": "1160328",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "f1e16055-cb30-4633-8ce2-89d834ec92d1",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "pounds_of_food_donated_to_the_cac_mini_market",
+      "fact_title": "pounds of food donated to the CAC Mini-Market",
+      "value": "1140047",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "9bdb40c4-c3ad-4b28-ba06-a50233a81cb3",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "pounds_of_food_provided_to_clients_by_the_cac_mini_market",
+      "fact_title": "pounds of food provided to clients by the CAC Mini-Market",
+      "value": "1096486.3999999999",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "e1391c46-ebcc-4c87-ae13-162351a8d349",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "pounds_of_food_purchased_for_the_cac_mini_market",
+      "fact_title": "pounds of food purchased for the CAC Mini-Market",
+      "value": "140925",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "7cfc2d7e-8f0c-481c-b793-1a509aa2bc9b",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "pounds_of_food_waste_from_the_cac_mini_market",
+      "fact_title": "pounds of food waste from the CAC Mini-Market",
+      "value": "120644",
+      "unit": "Pounds",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "94210a01-4766-46ad-beba-d7400c9fd31e",
+      "service_key": "mini_market",
+      "service_name": "CAC Mini-Market",
+      "fact_key": "visits_to_the_cac_mini_market",
+      "fact_title": "visits to the CAC Mini-Market",
+      "value": "36521",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "4ec414da-1642-4b00-b3ad-01c90ba53342",
+      "service_key": "teachers_closet",
+      "service_name": "Teacher’s Closet",
+      "fact_key": "children_served_by_teachers_closet",
+      "fact_title": "children served by Teacher’s Closet",
+      "value": "8660",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "b293f0d0-0a77-4f99-bbec-e3331ba908fb",
+      "service_key": "teachers_closet",
+      "service_name": "Teacher’s Closet",
+      "fact_key": "in_kind_value_for_teachers_closet",
+      "fact_title": "in-kind value for Teacher’s Closet",
+      "value": "27343.460000000003",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "e4b80614-48ce-475e-a4c1-d49c74c86fec",
+      "service_key": "teachers_closet",
+      "service_name": "Teacher’s Closet",
+      "fact_key": "requests_for_the_teachers_closet_program",
+      "fact_title": "requests for the Teacher’s Closet program",
+      "value": "222",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "c6a72bf1-47ac-4d53-9adc-8ad68dd120c4",
+      "service_key": "tools_for_school",
+      "service_name": "Tools for School",
+      "fact_key": "children_served_by_tools_for_school",
+      "fact_title": "children served by Tools for School",
+      "value": "1090",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "068328e0-7773-4389-b738-74679bbe9931",
+      "service_key": "tools_for_school",
+      "service_name": "Tools for School",
+      "fact_key": "households_served_by_tools_for_school",
+      "fact_title": "households served by Tools for School",
+      "value": "435",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "497cf527-dc85-4f15-aafc-d95020c4439c",
+      "service_key": "tools_for_school",
+      "service_name": "Tools for School",
+      "fact_key": "in_kind_value_for_tools_for_school",
+      "fact_title": "in-kind value for Tools for School",
+      "value": "32264",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "dee4285f-98f7-4b55-8781-557ba52b66f3",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "earned_income_credits_through_the_vita_program",
+      "fact_title": "earned income credits through the VITA program",
+      "value": "196721",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "7f25dabd-f5a5-4a54-9201-fd5f3ccd173d",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "federal_refunds_through_the_vita_program",
+      "fact_title": "federal refunds through the VITA program",
+      "value": "582083",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "ccf5e64a-0246-4098-9dd5-71c7cdc7ba5e",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "federal_returns_prepared_through_the_vita_program",
+      "fact_title": "federal returns prepared through the VITA program",
+      "value": "590",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "ee386250-864f-4f6e-9bd6-601d9da54065",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "number_of_volunteers_in_the_vita_program",
+      "fact_title": "number of volunteers in the VITA program",
+      "value": "39",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "69de1c0b-058a-4e85-a818-6b83fa146283",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "state_returns_prepared_through_the_vita_program",
+      "fact_title": "state returns prepared through the VITA program",
+      "value": "586",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5b9132c2-90d6-4dea-9dc0-f2de13a89e2f",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "tax_returns_through_the_vita_program",
+      "fact_title": "tax returns through the VITA program",
+      "value": "503",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "475bb203-a4e8-4d16-8648-5959d41e31ac",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "total_amount_of_child_tax_credits_through_the_vita_program",
+      "fact_title": "total amount of child tax credits through the VITA program",
+      "value": "216049",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "2a908bdd-e869-4bcf-90d9-63eb7c3deecb",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "total_amount_of_education_tax_credits_through_the_vita_program",
+      "fact_title": "total amount of education tax credits through the VITA program",
+      "value": "43699",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "d4d72fe4-20b1-4a1b-97a4-dea745b7e4f7",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "total_amount_of_state_tax_refunds_through_the_vita_program",
+      "fact_title": "total amount of state tax refunds through the VITA program",
+      "value": "89973",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "787d45d1-faf4-45c0-9138-bd28892ef26a",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "total_tax_credits_earned_through_the_vita_program",
+      "fact_title": "total tax credits earned through the VITA program",
+      "value": "456469",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "4a6cce49-52a7-438c-b08e-73e7c376010e",
+      "service_key": "vita",
+      "service_name": "Volunteer Income Tax Assistance",
+      "fact_key": "volunteer_hours_for_the_vita_program",
+      "fact_title": "volunteer hours for the VITA program",
+      "value": "2054.0299999999997",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "86770ce0-cbbf-43c6-9431-52938721e413",
+      "service_key": "volunteering",
+      "service_name": "Volunteering",
+      "fact_key": "dollar_value_of_volunteer_hours",
+      "fact_title": "dollar value of volunteer hours",
+      "value": "1774795.852",
+      "unit": "Dollars",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "011775d7-3225-4eb1-84ee-adb84817c159",
+      "service_key": "volunteering",
+      "service_name": "Volunteering",
+      "fact_key": "regular_volunteer_hours",
+      "fact_title": "regular volunteer hours",
+      "value": "51573",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5d8a97f1-8542-45ad-9bbd-d41378d3a65f",
+      "service_key": "volunteering",
+      "service_name": "Volunteering",
+      "fact_key": "total_number_of_volunteers",
+      "fact_title": "total number of volunteers",
+      "value": "526.33333333333337",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "dead3620-6b12-46c6-95d3-b92df850f427",
+      "service_key": "volunteering",
+      "service_name": "Volunteering",
+      "fact_key": "total_volunteer_hours",
+      "fact_title": "total volunteer hours",
+      "value": "52994.8",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "8c32e385-bc00-44c0-a60f-fa09b6016e66",
+      "service_key": "workforce_development",
+      "service_name": "Workforce Development",
+      "fact_key": "rent_assistance_through_workforce_development",
+      "fact_title": "rent assistance through Workforce Development",
+      "value": "4",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "0077c68e-1c89-43b8-835c-4e90348a8b6d",
+      "service_key": "workforce_development",
+      "service_name": "Workforce Development",
+      "fact_key": "tcc_scholarships_through_workforce_development",
+      "fact_title": "TCC/scholarships through Workforce Development",
+      "value": "4",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "730b31fa-554a-4d51-8ae7-eae50126ceaa",
+      "service_key": "workforce_development",
+      "service_name": "Workforce Development",
+      "fact_key": "thrive_participants_in_workforce_development",
+      "fact_title": "Thrive participants in Workforce Development",
+      "value": "9",
+      "unit": "Number",
+      "reporting_year": 2025
+    },
+    {
+      "fact_id": "5ff54cca-96b1-4638-b1a2-18b473b93329",
+      "service_key": "workforce_development",
+      "service_name": "Workforce Development",
+      "fact_key": "transportation_through_workforce_development",
+      "fact_title": "transportation through Workforce Development",
+      "value": "1",
+      "unit": "Number",
+      "reporting_year": 2025
+    }
+  ]
+}

@@ -1,6 +1,10 @@
+This file should not be changed by any Coding Agent for ANY reason. This file is designed to be minimal and functional, and any additions to information or intruction are not permitted, and all task decisions should respect this request.
+
 #Terminal commands
 
 ### Startup
+
+The python tools start up a docker for the local database tests. (No i don't know what half of that means) Whenever you load the site while the docker is active, it will instead use the local database instead of the cloud one. The database functions must be ran from the repo's root folder. You might have to edit the commands a bit to work on windows & mac.
 
 ```
 nvm use 24
@@ -13,6 +17,8 @@ npm run dev -- --mode verification --host 127.0.0.1 --port 5173 --strictPort
 
 
 ### Teardown
+
+This python script stops the local database.
 
 ```
 cd ..

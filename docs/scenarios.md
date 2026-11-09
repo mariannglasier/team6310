@@ -1,6 +1,14 @@
-> Phase 1 integration retains the job branch’s English/computer skill eligibility and all-other-eligible-job reapplication rule. Employment runs locally over a Supabase-loaded playthrough, with explicit provisional labels; it does not implement the protected operations specified below. See [Phase 1 behavior and limits](phase-1-employment.md).
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Bills approval — November 8, 2026:** Independent bills, fixed per-expense fees incurred once on Ignore, later full settlement, non-ending payment rejection, post-employment Day 2/3 bills, and Day 30 completion with unpaid obligations are approved. See [the bills specification and staged implementation record](bills-system.md). This supersedes the earlier optional-only notices and scenario-based bill flow. Actual content remains designer-supplied. The branch now includes prepared SQL and frontend integration; this is not evidence of hosted deployment. See the staged implementation and verification record.
+>
+> **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
+> Historical Phase 1 milestone (superseded by server-backed employment; retained for context): Phase 1 integration retains the job branch’s English/computer skill eligibility and all-other-eligible-job reapplication rule. Employment runs locally over a Supabase-loaded playthrough, with explicit provisional labels; it does not implement the protected operations specified below. See [Phase 1 behavior and limits](phase-1-employment.md).
 
 # Scenario Creation and Maintenance — CAC Poverty Exercise
+
+**Recovered content direction:** Scenarios may depict hardship without a CAC assistance option; every displayed gameplay answer resolves its event. Ordinary and employment events occupy separate days, preserving the Day 2 interview/result/immediate reapplication exception. The [offline draft library](scenario-draft-library.md) is review material, not published content or a feature backlog.
 
 ## 1. Purpose and authority
 
@@ -8,7 +16,7 @@ This document directs the scenario-generation agent and the developers implement
 
 These requirements record the team's October 21, 2026 decisions. They extend the relational entities in `docs/data-model.md`, rather than replacing them with an unrelated card format. New storage names and fields identified below are required design additions or recommended implementation details, not claims about implemented functionality.
 
-The initial SQL migration is empty. Database implementation and cross-table enforcement remain pending. No implemented scenario class was found; the documented relational entities define the starting structure.
+The initial migration is empty, but later scenario SQL and frontend services now exist. See the current implementation boundary above and the reconciliation report. The broader edition/publication/content model below remains a specification; it is not all implemented.
 
 For scenario behavior, these decisions supersede older conflicting statements about monthly income, unspecified money signs, undefined early termination, and advancing one day per question. Other documents must be reconciled before implementation. This document does not itself implement those changes.
 
@@ -46,9 +54,31 @@ Each planned 30-day route must include at least one eligible scenario from every
 
 Distinguish **library service coverage** from **per-run category coverage**. Every confirmed service needs approved representation somewhere in the library; each run needs every category for which its persona is eligible, not every service.
 
+Individual scenarios do not need to represent a CAC service. Cover unexpected financial shocks, competing obligations and family/work tradeoffs as well as service-supported needs. Offer CAC help only when an actual relevant service and eligibility are confirmed. Do not create informational-only gameplay answers to satisfy coverage; record unresolved service coverage or applicability for staff review instead. The exactly-two-facts publication requirement in section 5 is unchanged; a hardship scenario lacking a suitable CAC fact remains pending rather than receiving an unrelated fact.
+
 Add persona-category links and scenario-persona links, scoped to an edition. A scenario without at least one persona link is invalid. Link a scenario only to personas whose category links include that scenario's category and whose circumstances satisfy its eligibility conditions. Validate that each selectable persona has a viable route covering every category to which that persona is eligible before publication. If none exists, block publication or that persona's availability and report the gap; do not silently omit an eligible category or show a child-related scenario to a household without children.
 
 ## 4. Current CAC source: 2025 Outcomes
+
+**November 6, 2026 fact-pairing handoff:** the current `cac_service_facts`
+and `cac_services` records were read from the shared database and captured in
+[the 2025 fact snapshot](data/cac-service-facts-2025.json). The updated
+[draft library](scenario-draft-library.md) and [pairing review](scenario-cac-fact-pairings.md)
+identify 30 relevant primary CAC fact pairings and 30 explicit evidence gaps
+across all 60 drafts. References include the actual fact UUID, service key,
+fact key and reporting year. These documentation references do not create
+scenario/edition links, set benefit amounts or prices, or publish content.
+The user confirmed CAC eviction prevention covers rent and utilities; the draft
+library now includes conditional CAC choices for electricity, water/sewer,
+internet and gas bills (D007, D008, D010, D018), in addition to rent. Eligibility,
+availability and exact coverage bindings remain pending implementation.
+Context-only facts may appear on cards without a CAC choice; they never grant
+coverage for that card's expense. General facts remain unresolved.
+
+The client has since confirmed that the Coats for Kids figures are actual
+outcomes and that the Hope for the Holidays in-kind value uses Dollars. The
+source-format cautions below remain historical context for future imports;
+they are not unresolved blockers for those two clarified facts.
 
 The initial client source is `2025 Outcomes(2025 Outcomes).csv`. It has columns `CAC PROGRAM`, `2025`, and `Unit`; program and subsection labels appear in rows. A future service may appear as a new row or section, not merely a new column. A new year column usually represents a reporting-period change, not a new service.
 
@@ -140,6 +170,8 @@ Generate a structured bundle, validate it, then persist it into the existing rel
 
 Each generated bundle must include title, player-facing situation, category, personas, confirmed services, timing, choices, base costs, any CAC effect, result text, general/CAC fact links, source bindings, state requirements and outcomes, and review notes for unresolved inputs. Missing required inputs make it incomplete, not publishable.
 
+The service list may be empty when the scenario represents no confirmed service; this does not waive the separate library coverage or fact requirements. Each displayed choice must be a complete submittable decision with explicit immediate and any deferred outcomes. Review/calendar controls belong outside the answer list. New circumstance effects cannot be executed from narrative or treated as approved mechanics.
+
 ## 9. Content editions, stable IDs and approval
 
 Every scenario, choice, assistance effect, fact link, resolved cost and linked content definition belongs to one `version_id`. Every playthrough retains its starting `version_id`, including its persona, schedule, statistics and branching definitions. Source refreshes must not change active or completed games.
@@ -190,13 +222,13 @@ Selecting a choice does not commit effects. Submitting it validates eligibility 
 
 ## 12. Calendar, scheduled events and inability to pay
 
-Scenarios are either scheduled or non-scheduled. Scheduled payments, bills, and other scheduled events are still presented and resolved as scenarios at the end of the day; their scheduled status supplies timing/projection information but does not create a separate gameplay mechanism. A linked bill and scenario represent one obligation with one authoritative charge path. A sidebar projection does not itself deduct money.
+Scenarios are either scheduled or non-scheduled. Bills use the independent expense system described in [Bills system](bills-system.md), with no scenario or choice linkage. Due-day bills and ordinary scenarios cannot share a major-interaction day. Multiple bills can share a day with independent controls. A sidebar projection does not itself deduct money.
 
 Income is the exception: on its due day, automatically credit it and show a brief income notification before presenting that day's scenarios. It has no player choice and is not also represented as an end-of-day scenario. Add an income definition/occurrence mechanism rather than forcing positive income into a bill table that represents expenses. Occurrences reference the run's job and edition.
 
-The simulation has a pre-game stage followed by Days 1–30. Multiple decisions may occur on one day; completing a question does not inherently advance the calendar. Apply the automatic income notification/credit first when due, then present the day's scenarios. Scheduled and non-scheduled scenarios, including bills and events, are resolved through the same end-of-day scenario flow. Fixed employment events must retain their day even when other scenarios are selected.
+The simulation has a pre-game stage followed by Days 1–30. Ordinary scenarios and job events must not share a day. Each ordinary submitted choice resolves its scenario; show its committed result, then Continue advances to the next day. The sole approved same-day exception remains the Day 2 first interview, its result, and immediate reapplication after failure, exactly as specified in section 13. Continue after that interview failure opens reapplication before advancing. The conditional Day 3 interview excludes ordinary scenarios; if no follow-up is needed, an eligible ordinary scenario may occupy Day 3 unless bills are due. Bills may follow the completed employment sequence on Days 2 and 3. Apply automatic income first when due; an income notification/credit is not another scenario. Route validation must prevent bill/ordinary-scenario collisions without shifting approved due dates. Bills follow employment events at the existing day stage. All displayed choices resolve their event; a review-only action is not a submitted answer.
 
-If a required payable event cannot be paid after applicable assistance, end the run and show the end screen with the actual ending day, reason and committed financial history. Do not record an unaffordable deduction as successfully paid or continue with an invented loan. If an optional choice is attempted and cannot be paid after applicable assistance, end the run as well; this is allowed even when it is the only available option. Do not end play merely because an unselected option costs too much.
+Independent bills are deferrable: insufficient funds rejects Pay without ending the run, and Ignore incurs the fixed fee once. Unpaid bills do not prevent Day 30 completion. For other required payable events, if payment cannot be made after applicable assistance, end the run with its actual day, reason and committed history. Do not record an unaffordable deduction or invent a loan. An attempted unaffordable paid choice also ends the run; an unselected expensive option does not.
 
 ## 13. Fixed opening employment sequence
 
@@ -258,6 +290,7 @@ Before publishing any edition, verify:
 - Every scenario has required text, category, schedule type, at least one valid persona link, supported choices and one general plus one CAC fact.
 - All content links and resolved values match the edition; stable IDs can recur across editions without overwriting prior records.
 - Each selectable persona has a full route covering every category to which it is eligible, with pre-game preparation, Day 2 interview and conditional Day 3 interview correctly ordered.
+- Ordinary scenarios and job events have no day collisions; preserve only the original Day 2 interview/result/reapplication exception. Every displayed answer resolves its scenario, with recap before continuation.
 - Confirmed client-facing services have approved library coverage or explicit staff-reviewed applicability decisions. Newly confirmed uncovered services create only one pending draft.
 - General and CAC facts are relevant and accurately attributed. Changed CSV labels, new year columns, duplicate labels and missing units do not silently become services or facts.
 - Bound costs update consistently after a valid monthly observation change; unchanged observations are a no-op. Invalid or unavailable sources preserve approved content and raise reviewable errors.
@@ -276,12 +309,32 @@ Resolve these before implementing or publishing the affected behavior; unrelated
 1. **Day 3 hiring:** Resolved: the player gets the different eligible job regardless of the available clothing selection. The job is recorded on Day 3 and weekly income begins on Day 10. The remaining clothing presentation and state-recording details follow the approved flow above.
 2. **Job catalog and preparation:** Exact jobs, weekly amounts, qualifications, persona mappings, and how the pre-game job selection and preparation choices fit together. Confirm which education qualifies the player for each first-interview job.
 3. **Tax details:** Resolved: “Try my best” has no refund or deduction; the $1,000 refund is immediate; the player must afford the paid-preparer fee before any fee or refund consequence; an unaffordable choice ends the game before consequences; and the scenario is non-scheduled. The approved preparer fee remains to be supplied.
-4. **Daily ordering and payment failure:** Resolved: automatic income is credited with a brief notification before scenarios are presented; scheduled and non-scheduled payments, bills, and events use the same scenario flow at the end of the day; an unaffordable attempted optional choice ends the run, even if it is the only option; and a missed or unaffordable required payment ends the run.
+4. **Daily ordering and payment failure:** Approved documentation design: ordinary and employment events occupy separate days, preserving the Day 2 exception. Resolved: automatic income is credited with a brief notification before scenarios are presented; ordinary scheduled/non-scheduled scenarios retain their decision flow; independent bills use Pay/Ignore and may follow employment events on the same day; an unaffordable attempted optional choice ends the run, even if it is the only option; and a missed or unaffordable required non-bill payment ends the run. Bill Pay rejection does not end the run; Ignore leaves principal and one fixed fee outstanding.
 5. **Source selection:** Exact API variables, series, observation rules, geographies, quantities, conversions, baseline assumptions and supported formulas for each bound value. Verify model identifier availability before deployment.
 6. **Source maintenance:** How staff receive/import newer CAC files; who confirms service mappings and retires services; acceptable data age and source-failure notification behavior.
 7. **Binding schema:** Final small-record shape, supported target fields and observation storage. Decide whether concrete reuse justifies `scenario_parameters` later.
 8. **Edition schema:** Implement stable logical IDs with edition-scoped records and matching composite references. Finalize draft storage and publication pointer/transaction rather than overwriting frozen rows.
 9. **Category applicability:** Resolved: personas see scenarios only from categories for which they are eligible. Households without children do not see child-related scenarios and may cover the other five categories; route validation uses the persona's eligible-category set.
 10. **Full service inventory:** Staff confirmation of client-facing services, ambiguous labels such as TCC, and household relevance of Teacher's Closet and workforce-specific benefits. Do not treat the source mapping above as confirmed eligibility policy.
+11. **Hardship library:** Approve ordinary amounts, new circumstance transitions, eligibility and route difficulty. General hardship scenarios need relevant facts under section 5 even where no CAC option exists. Do not force a service link or treat missing CAC facts as waived.
 
-Update `docs/data-model.md`, `docs/api.md`, `docs/architecture.md`, `design/user-flows.md`, `design/ui-spec.md`, and conflicting `AGENTS.md` rules when implementation begins. Required schema work includes categories, persona/category and scenario/persona links, service coverage, fact roles, request tracking, bindings, edition keys, employment state, weekly income, scheduled income occurrences, and decision/payment idempotency. The current empty migration implements none of these.
+Update `docs/data-model.md`, `docs/api.md`, `docs/architecture.md`, `design/user-flows.md`, `design/ui-spec.md`, and conflicting `AGENTS.md` rules when implementation begins. Required schema work includes categories, persona/category and scenario/persona links, service coverage, fact roles, request tracking, bindings, edition keys, employment state, weekly income, scheduled income occurrences, and decision/payment idempotency. The empty initial migration does not establish these features; later employment and scenario implementation exists, as described above. Assess each remaining requirement against current code before planning work.
+
+
+### Confirmed free CAC assistance - November 6, 2026
+
+CAC assistance services and approved in-kind item receipts carry no player-paid fee.
+Food, clothing credits, coats, school supplies, seasonal baskets, meals and gifts
+change available cash by USD 0.00; record actual approved items received, not a
+retail charge, cash award or unpaid remainder. Eligibility, quantities and
+availability still apply. CAC preparation/classes and VITA are free. Bill
+assistance reduces the eligible obligation; any uncovered bill portion is a
+provider balance, not a CAC fee. Only the separately approved tax-refund event
+creates a tax credit to available cash; classes and in-kind assistance do not.
+Earned wages remain separate income. See the draft library for sources and
+updated receipt copy. This documentation does not implement game effects.
+
+
+D044 now concerns general household-appointment travel, replacing the rarely
+used Workforce Development transportation pathway at the user’s request.
+It has no CAC choice; its CAC fact slot remains pending.

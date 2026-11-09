@@ -1,0 +1,64 @@
+# Gameplay documentation reconciliation — November 7, 2026
+
+> Historical reconciliation record. The November 8 bills approval in [Bills system](bills-system.md) supersedes this report’s optional-only bills decisions and scenario-based bill description. Its account of the November 7 merge remains historical evidence.
+
+## Scope and baseline
+
+Documentation-only merge into `playing-scenarios`, starting at `6b07c19` with a clean working tree. Incoming branch: `origin/content/scenario-cac-facts` at `89f8656f2b2dfeae8db01f07f896017ae1936684` (the requested scenario-cac-facts branch). No fetch was performed; the merge uses the locally available remote-tracking ref. Git reports multiple merge bases, so review included both the incoming changes and direct tip comparisons. Tip differences that reflect later destination implementation are not incoming deletions to apply.
+
+Acceptance: merge the incoming documentation, preserve existing implementation and approved decisions, retain conflicting proposals visibly without granting approval, and explain bills without implementing them. Supabase MCP tools were discovered. No database connection, reset, migration application, environment change or hosted deployment was performed.
+
+## Contradictions and reconciliation
+
+| Incoming information or conflict | Resolution |
+| --- | --- |
+| 66-record 2025 CAC fact snapshot; 60 draft pairings, 30 matched and 30 evidence gaps | Retained both JSON artifacts and the pairing review. UUIDs are source references, not published scenario links. This reconciliation checks internal consistency, not fresh database/source accuracy. All 60 general fact slots remain unresolved. |
+| Free CAC services/in-kind receipts; conditional rent/utility assistance; D034 dresser and D044 appointment-travel replacements | Retained the incoming recorded client clarifications and revised copy. Free items create no cash award or player fee. Exact allocations, eligibility, availability and edition bindings remain pending; annual statistics do not set household benefits. No gameplay effects were changed. |
+| Incoming unpaid-bill language calls Ignore, late fees, sidebar Pay and completion with debt approved requirements | Existing November 6 optional-only decision takes precedence. These remain historical proposals, not requirements, tasks, publication prerequisites or acceptance criteria. The destination specifications retain current payment-failure rules. Detailed draft examples remain visible under an explicit optional-only notice. |
+| Incoming UI/flow verification says “same-day decisions” and adds mandatory debt checks | Retained separated ordinary/employment days and only the Day 2 interview/result/immediate reapplication exception. Did not adopt debt checks as acceptance criteria. |
+| Incoming/baseline text says ordinary scenarios are placeholders or in-memory mocks | Updated the shared implementation notices and library status. Current code includes protected direct-balance submission, saved response/recap restoration and scheduled progression. This is narrower than the full draft library. |
+| Older incoming employment wording says “lower-requirement” job | Destination different-eligible-job reapplication and current English/computer eligibility remain authoritative. No job catalog, wages or employment behavior changed. |
+| Empty-initial-migration statements imply no scenario implementation | Clarified in scenarios.md: the initial migration is not evidence about later SQL/services. Broader content/version/publication requirements remain specifications rather than implementation claims. Historical phase documents retain their dated scope. |
+
+The incoming branch's already-shared bill-requirement paragraphs in AGENTS, architecture, data model, API and security do not constitute new approval. Direct comparison exposed their conflict with the destination's later reconciliation. They were not reinstated; their proposed behavior is recorded below. Conflict resolutions retain incoming library copy and fact bindings while preserving destination authority notices. The two JSON artifacts and pairing review are retained without data edits.
+
+## Preserved decisions and implementation evidence
+
+- **Scheduling:** pre-game plus Days 1–30; ordinary scenarios and employment events occupy separate days, with the Day 2 exception. Income notices are not scenarios. Recap precedes Continue. Current scenario SQL chooses a single published, persona-matching scheduled scenario for the current day, rejects collisions and blocks departure before a saved response. Day 2 is excluded; Day 3 ordinary content requires a Day 2 hire. This is not a complete random route/category/branching engine.
+- **Persistence:** `frontend/src/services/scenarioGameplay.ts`, `ScenarioPanel.tsx` and `supabase/migrations/20261107010000_scenario_decisions_and_scheduling.sql` provide identifier-only submission and restoration. The SQL validates ownership, edition, scenario/choice relationships and ordinary day; commits exact balance and response together; returns saved same-choice retries and rejects different-choice retries. Submission does not itself advance the day. Progression integrates with employment advancement. Migration presence alone does not prove deployment.
+- **Employment/payday:** `submit_employment_action` and server-controlled `employment_state` remain unchanged. Weekly income starts at zero and first pays seven days after hiring: Day 2 hire → 9/16/23/30; Day 3 hire → 10/17/24. Automatic due-day income precedes the day's scenario, is credited once and is not a bill or another choice. Phase 2 documents describe server-backed receipts and restoration; no live database verification was performed here.
+- **Money/endings:** USD and exact calculations, signed changes, selection without financial effect, and protected committed submission remain authoritative. Current direct-balance SQL ends an unaffordable attempt without a deduction or successful response; zero-dollar and exactly affordable choices are not automatic endings. CAC effects are rejected by that narrow ordinary submission slice. No liability/fee engine is implied by a negative choice amount.
+- **Day 30:** normal completion follows the Day 30 recap/Continue; early required-payment or attempted-choice failure retains actual progress. Completion with outstanding debt remains undecided. No automatic ending based solely on current balance is introduced.
+
+## Bills in plain language
+
+| Question | Documented position and limits |
+| --- | --- |
+| What is a bill? | A household amount owed for an expense, such as rent, utilities, phone, insurance, childcare, medical/pharmacy invoices or a repayment. The draft library groups D006–D020 as 15 bill alternatives. Not every paid scenario, shock, purchase or free CAC receipt is a bill. The exact authoritative bill classification/provider terms remain unresolved. |
+| Immediate expense or persistent obligation? | Existing specifications describe scheduled household expense definitions and run-specific occurrences with amount due, due day and optional payment timestamp. A committed payment is a cash deduction; upcoming projections are not deductions. Persistent unpaid principal/fees is a separate, unapproved extension, not established by a NULL paid_at. |
+| Can a player choose not to pay? | Incoming drafts propose Pay/Ignore and conditional CAC help. Ignore would resolve the event without deducting cash. That continuation exception is not approved. Current specifications retain early ending for missed/unaffordable required payments and attempted unaffordable paid choices; an expensive unselected option does not itself end play. |
+| Do unpaid amounts accumulate? | The historical proposal records each ignored bill's principal plus a fee, accumulating outstanding debt separately from cash. No approved accumulation, debt accounting or interest policy exists. Do not infer one from the examples. |
+| Recurring bills? | Existing persona_expenses specifications support one-time or recurring schedules via first_due_day and optional repeat_interval_days; run occurrences represent due dates. NULL repeat interval means one-time. Exact amounts/intervals require approved content. This does not approve recurring late fees or show that recurring expense generation is implemented. |
+| Late fees? | Draft rows contain illustrative initial fees. The entire unpaid-bill mechanic, including whether any fee exists, is undecided. Values, grace periods, timing, repetition, compounding and partial payment are not approved. |
+| Scenarios and financial tracking? | Scheduled and non-scheduled expenses use the scenario interaction flow; selection does nothing, submission commits approved effects once, and recap precedes advancement. Avoid double charging a scenario and expense occurrence. Income is separate. The debt proposal would add a second protected settlement operation retaining the original Ignore answer/history, but no such operation is authorized by this merge. |
+| What would the player see/do? | Current approved UI direction includes day, cash, upcoming amounts/dates, scenario choices, Submit, committed recap and Continue. The unapproved proposal adds unpaid sidebar items showing principal/fees/total and a Pay button, plus Day 30 debt explanations. It would allow debt to remain through completion and no implicit shutoff/eviction; none of these controls or outcomes is a current requirement. |
+| Specified versus implied? | Expense definitions/occurrences, possible recurrence, cash/projection separation and protected payment effects are documented design. Ignore, liability accrual, sidebar settlement and completion with debt are explicit draft proposals, not approved requirements. Collection, credit damage, shutoff, eviction, loans and automatic future deductions cannot be inferred from narrative consequence text. |
+
+### Comparison with repository database and simulation code
+
+`docs/data-model.md` describes `persona_expenses` (name, amount, first due day, recurrence) and `playthrough_expenses` (run, expense, due day, amount due, paid_at, edition). `frontend/src/services/householdExpenses.ts` reads existing occurrences, falling back to definitions for upcoming displays; it does not generate obligations, apply fees or settle bills. The fallback selects first_due_day, not a full recurrence engine. `FinancialTracking.tsx` presents expense information, not an unpaid-debt ledger.
+
+The ordinary scenario RPC supports a trusted choice's direct `balance_change` and saved response. It explicitly excludes expense settlement and CAC effects. It neither marks an occurrence paid nor creates unpaid principal, fees or a settlement history. A zero-dollar Ignore-labelled choice would therefore not establish a debt system. Separate automatic wages use employment state. These are code/schema-document comparisons; no claim is made about the current live database inventory or installed function definitions.
+
+## Unresolved decisions
+
+1. Whether to adopt unpaid bills at all, and which obligations would be deferrable versus required. Existing payment-failure rules stand until a separately approved change.
+2. If adopted: principal/fee accounting, fee existence/amount/timing/repetition, grace periods, partial payment, settlement affordability/ending behavior, persistence/idempotency and Day 30 debt policy. Storage and protected settlement design are not authorized work.
+3. Exact bill classification, provider terms, approved expense amounts, recurrence dates and collision-free schedules; no invented shifts of due dates.
+4. Draft prices, tax preparer fee, hardship/state consequences, persona eligibility, CAC coverage/quantities and bindings. Configured job wages exist; unresolved draft binding references do not invalidate the current catalog.
+5. All general facts, 30 missing relevant CAC facts, final publication/edition links and route validation. D034 furniture coverage does not waive the exactly-two-facts publication requirement.
+6. Incoming copy says not to reveal refunds before outcomes while an older UI tax instruction asks for a CAC refund label. Future content integration must reconcile that presentation conflict before changing UI; this merge changes neither.
+
+## Verification
+
+Documentation-only validation checks merge ancestry/parents, conflict-marker removal, whitespace, JSON parsing, 66 snapshot facts, 60 unique draft/pairing references, 30 paired/30 unpaired records and paired fact ID/value/unit/year consistency. Compare the final tree against baseline `6b07c19` for all paths outside documentation and AGENTS.md. Application tests/builds and database tests are not run: no application or database behavior is changed and no test-generated database writes are needed. Existing gameplay verification results are historical evidence in phase documents, not newly rerun checks or CI results.

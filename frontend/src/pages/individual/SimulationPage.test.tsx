@@ -1,4 +1,4 @@
-import { loadHouseholdExpenses } from '../../services/householdExpenses'
+import { loadBillSnapshot } from '../../services/billGameplay'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
@@ -8,8 +8,17 @@ import { loadPlaythrough } from '../../services/loadPlaythrough'
 import { usdCents } from '../../types/domain'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 
-vi.mock('../../services/householdExpenses', () => ({
-  loadHouseholdExpenses: vi.fn(),
+vi.mock('../../services/supabase', () => ({
+  getSupabaseClient: async () => ({
+    from: () => ({
+      select: () => ({ eq: async () => ({ data: [], error: null }) }),
+    }),
+  }),
+}))
+
+vi.mock('../../services/billGameplay', async (original) => ({
+  ...(await original<typeof import('../../services/billGameplay')>()),
+  loadBillSnapshot: vi.fn(),
 }))
 
 vi.mock('../../services/loadPlaythrough', async (original) => ({
@@ -65,10 +74,16 @@ function renderPage(
 }
 beforeEach(() => {
   vi.resetAllMocks()
-  vi.mocked(loadHouseholdExpenses).mockResolvedValue({
-    source: 'definitions',
+  vi.mocked(loadBillSnapshot).mockImplementation(async (run) => ({
+    run,
     items: [],
-  })
+    paidTotal: usdCents(0),
+    overdueTotal: usdCents(0),
+    outstandingTotal: usdCents(0),
+    upcomingTotal: usdCents(0),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(0),
+  }))
   vi.mocked(loadPlaythrough).mockResolvedValue(loaded)
 })
 it('shows loading then the saved household, exact balance, day, and status', async () => {
@@ -121,11 +136,7 @@ it('renders null display fields as unavailable, not zero or a default stage', as
   expect(await screen.findByText('Current day unavailable')).toBeInTheDocument()
   expect(screen.getByText('Household unavailable')).toBeInTheDocument()
   expect(screen.queryByText('$0.00')).not.toBeInTheDocument()
-  expect(
-    screen.getByText(
-      'Household information for this content version is unavailable.',
-    ),
-  ).toBeInTheDocument()
+  expect(await screen.findByRole('alert')).toBeInTheDocument()
 })
 it('makes no request without the retained UUID', () => {
   renderPage(null)
