@@ -12,21 +12,8 @@ import { usdCents, type UsdCents } from '../../types/domain'
 import './financialTracking.css'
 import type { BillSnapshot } from '../../services/billGameplay'
 import { OverdueBills, type BillAction } from './BillControls'
+import { ExpenseRow } from './ExpenseRow'
 
-function CalendarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <rect x="4" y="5" width="16" height="15" rx="2" />
-      <path d="M8 3v4m8-4v4M4 10h16m-12 4h3m2 0h3" />
-    </svg>
-  )
-}
 function ExpenseList({
   items,
   definitions,
@@ -42,17 +29,16 @@ function ExpenseList({
   return (
     <ul className="finance-upcoming">
       {ordered.map((expense) => (
-        <li key={expense.id}>
-          <span className="finance-bill-icon">
-            <CalendarIcon />
-          </span>
-          <div>
-            <small>
-              {expense.dueDay === null
-                ? 'Due date unavailable'
-                : `${definitions ? 'First due' : 'Due'} Day ${expense.dueDay}`}
-            </small>
-            <strong>{expense.name ?? 'Expense name unavailable'}</strong>
+        <ExpenseRow
+          key={expense.id}
+          name={expense.name ?? 'Expense name unavailable'}
+          amount={expense.amount}
+          dueLabel={
+            expense.dueDay === null
+              ? 'Due date unavailable'
+              : `${definitions ? 'First due' : 'Due'} Day ${expense.dueDay}`
+          }
+          detail={
             <small>
               {definitions
                 ? 'Payment status unavailable'
@@ -60,13 +46,8 @@ function ExpenseList({
                   ? 'Paid'
                   : 'No payment recorded'}
             </small>
-          </div>
-          <span className="finance-expense-amount">
-            {expense.amount === null
-              ? 'Amount unavailable'
-              : formatUsd(expense.amount)}
-          </span>
-        </li>
+          }
+        />
       ))}
     </ul>
   )
@@ -255,12 +236,6 @@ export function FinancialTracking({
               </p>
             )}
             <dl className="finance-totals">
-              {bills && (
-                <div>
-                  <dt>Unpaid obligations</dt>
-                  <dd>{formatUsd(bills.outstandingTotal)}</dd>
-                </div>
-              )}
               <div>
                 <dt>Starting balance</dt>
                 <dd>
@@ -294,7 +269,6 @@ export function FinancialTracking({
           )}
           <section>
             <h2>Coming up</h2>
-            <p className="finance-subtitle">Upcoming scheduled expenses</p>
             {expenses.status === 'loading' && (
               <p role="status">Loading household expenses…</p>
             )}
@@ -326,10 +300,6 @@ export function FinancialTracking({
                     <ExpenseList items={paid} definitions={false} />
                   </>
                 )}
-                <small>
-                  Shown for planning. Displaying an expense does not deduct
-                  money.
-                </small>
               </>
             )}
           </section>

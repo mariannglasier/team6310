@@ -107,12 +107,52 @@ it('shows full overdue settlements and disables payment outside the playable day
     />,
   )
   expect(
-    within(screen.getByRole('region', { name: 'Overdue bills' })).getByRole(
-      'button',
-    ),
+    within(screen.getByRole('region', { name: 'Overdue' })).getByRole('button'),
   ).toBeDisabled()
   expect(
     screen.queryByRole('button', { name: /Ignore/ }),
+  ).not.toBeInTheDocument()
+})
+
+it('hides the entire Overdue section when no unpaid ignored bills remain', () => {
+  const { rerender } = render(
+    <OverdueBills snapshot={snapshot} onAction={vi.fn()} busy={false} />,
+  )
+  expect(
+    screen.queryByRole('region', { name: 'Overdue' }),
+  ).not.toBeInTheDocument()
+  rerender(
+    <OverdueBills
+      snapshot={{ ...snapshot, items: [{ ...bill, ignoredAt: '2026-11-08' }] }}
+      onAction={vi.fn()}
+      busy={false}
+    />,
+  )
+  const section = screen.getByRole('region', { name: 'Overdue' })
+  expect(
+    within(section).getByRole('heading', { name: 'Overdue' }),
+  ).toBeInTheDocument()
+  expect(section.querySelector('.finance-bill-icon svg')).toBeInTheDocument()
+  expect(section.querySelector('.finance-expense-amount')).toHaveTextContent(
+    '$105.00',
+  )
+  expect(
+    within(section).queryByText(
+      /No payment recorded|Payment status|Recorded payments/,
+    ),
+  ).not.toBeInTheDocument()
+  rerender(
+    <OverdueBills
+      snapshot={{
+        ...snapshot,
+        items: [{ ...bill, ignoredAt: '2026-11-08', paidAt: '2026-11-09' }],
+      }}
+      onAction={vi.fn()}
+      busy={false}
+    />,
+  )
+  expect(
+    screen.queryByRole('region', { name: 'Overdue' }),
   ).not.toBeInTheDocument()
 })
 

@@ -213,5 +213,11 @@ it('counts settled bills once in cash flow and keeps unpaid obligations out of c
   expect(within(sidebar).getByText('$440.00')).toBeInTheDocument()
   expect(within(sidebar).getByText('$350.00')).toBeInTheDocument()
   expect(within(sidebar).getByText('$110.00')).toBeInTheDocument()
-  expect(within(sidebar).getByText('$50.00')).toBeInTheDocument()
+  expect(within(sidebar).queryByText('$50.00')).not.toBeInTheDocument()
+  expect(screen.queryByText('Unpaid obligations')).not.toBeInTheDocument()
+  expect(
+    screen.queryByText('Upcoming scheduled expenses'),
+  ).not.toBeInTheDocument()
+  expect(screen.queryByText(/Shown for planning/)).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Coming up' })).toBeInTheDocument()
 })

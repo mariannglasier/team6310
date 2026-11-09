@@ -2,6 +2,7 @@ import type { Bill, BillSnapshot } from '../../services/billGameplay'
 import { settlement } from '../../services/billGameplay'
 import { formatUsd } from '../../lib/money'
 import { Button } from '../ui/Button'
+import { ExpenseRow } from './ExpenseRow'
 
 export type BillAction = (id: string, action: 'pay' | 'ignore') => void
 
@@ -16,45 +17,56 @@ function BillRow({
   busy: boolean
   overdue?: boolean
 }) {
-  return (
-    <li className="bill-row">
-      <h3>{bill.name}</h3>
-      <p>
-        Due Day {bill.dueDay} · {formatUsd(bill.principal)}
-      </p>
-      {bill.ignoredAt && <p>Late fee: {formatUsd(bill.fee)}</p>}
-      {bill.paidAt ? (
-        <p role="status">Paid {formatUsd(settlement(bill))}</p>
-      ) : bill.ignoredAt && !overdue ? (
-        <p role="status">Ignored · {formatUsd(settlement(bill))} outstanding</p>
-      ) : (
-        <>
-          <p>Total to pay: {formatUsd(settlement(bill))}</p>
-          {!overdue && (
-            <p>Ignoring adds a late fee of {formatUsd(bill.fee)}.</p>
-          )}
-          <div className="bill-actions">
-            <Button
-              disabled={busy}
-              aria-label={`Pay ${bill.name}`}
-              onClick={() => onAction(bill.id, 'pay')}
-            >
-              Pay
-            </Button>
-            {!overdue && (
-              <Button
-                disabled={busy}
-                variant="secondary"
-                aria-label={`Ignore ${bill.name}`}
-                onClick={() => onAction(bill.id, 'ignore')}
-              >
-                Ignore
-              </Button>
-            )}
-          </div>
-        </>
+  const pay = (
+    <Button
+      disabled={busy}
+      aria-label={`Pay ${bill.name}`}
+      onClick={() => onAction(bill.id, 'pay')}
+    >
+      Pay
+    </Button>
+  )
+  const controls = (
+    <>
+      {pay}
+      {!overdue && (
+        <Button
+          disabled={busy}
+          variant="secondary"
+          aria-label={`Ignore ${bill.name}`}
+          onClick={() => onAction(bill.id, 'ignore')}
+        >
+          Ignore
+        </Button>
       )}
-    </li>
+    </>
+  )
+  const resolved = bill.paidAt || (bill.ignoredAt && !overdue)
+  const detail = (
+    <>
+      {bill.ignoredAt && <small>Late fee: {formatUsd(bill.fee)}</small>}
+      {!overdue &&
+        (bill.paidAt ? (
+          <p role="status">Paid {formatUsd(settlement(bill))}</p>
+        ) : bill.ignoredAt ? (
+          <p role="status">
+            Ignored · {formatUsd(settlement(bill))} outstanding
+          </p>
+        ) : (
+          <small>Ignoring adds a late fee of {formatUsd(bill.fee)}.</small>
+        ))}
+    </>
+  )
+  return (
+    <ExpenseRow
+      name={bill.name}
+      dueLabel={`Due Day ${bill.dueDay}`}
+      amount={settlement(bill)}
+      variant={overdue ? 'overdue' : 'due'}
+      detail={detail}
+      iconActions={overdue && !resolved ? pay : undefined}
+      actions={!overdue && !resolved ? controls : undefined}
+    />
   )
 }
 
@@ -74,7 +86,7 @@ export function DueBillsPanel({
   return (
     <section aria-label="Bills due today">
       <h2>Your household bills</h2>
-      <ul className="bill-list">
+      <ul className="finance-upcoming">
         {due.map((bill) => (
           <BillRow key={bill.id} bill={bill} onAction={onAction} busy={busy} />
         ))}
@@ -96,30 +108,27 @@ export function OverdueBills({
   busy: boolean
 }) {
   const overdue = snapshot.items.filter((b) => b.ignoredAt && !b.paidAt)
+  if (!overdue.length) return null
   const active =
     snapshot.run.status === 'active' &&
     (snapshot.run.employmentState as { stage?: string })?.stage === 'day'
   return (
-    <section aria-label="Overdue bills">
-      <h2>Overdue bills</h2>
+    <section className="finance-overdue" aria-label="Overdue">
+      <h2>Overdue</h2>
       <p>
         Total outstanding: <strong>{formatUsd(snapshot.overdueTotal)}</strong>
       </p>
-      {overdue.length ? (
-        <ul className="bill-list">
-          {overdue.map((bill) => (
-            <BillRow
-              key={bill.id}
-              bill={bill}
-              onAction={onAction}
-              busy={busy || !active}
-              overdue
-            />
-          ))}
-        </ul>
-      ) : (
-        <p>No overdue bills.</p>
-      )}
+      <ul className="finance-upcoming">
+        {overdue.map((bill) => (
+          <BillRow
+            key={bill.id}
+            bill={bill}
+            onAction={onAction}
+            busy={busy || !active}
+            overdue
+          />
+        ))}
+      </ul>
     </section>
   )
 }
