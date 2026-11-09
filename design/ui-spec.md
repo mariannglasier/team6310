@@ -124,11 +124,11 @@ Use financial outcomes and expense schedules supplied by the simulation model. D
 
 Keep the chosen card highlighted and show a recap directly beneath the options. This is a state of the decision screen, not a separate page.
 
-The recap contains Decision Recorded, the selected option, immediate consequence, Balance Before, Cost Today, Balance After, After Upcoming Expenses, and Circumstance Change. Distinguish actual current balance from a projection after future expenses. Submitted choices are read-only.
+For individual ordinary scenarios, submission opens an interim screen with the scenario heading and fact boxes. Hide the option form and omit Decision Recorded, the consequence sentence and the balance-change/balance-after summary. Continue to next day appears below the facts. Preserve the committed outcome for financial tracking and restoration. Leave at least 20px between choice cards and Submit decision before submission.
 
-Display the scenario's approved general fact; in CAC mode also display its approved CAC fact. Include value, unit, geography, data period, and source, and distinguish support availability from support actually used. Label community statistics separately from the player's choice and anonymous simulation responses. Missing comparisons do not block continuation.
+Display the scenario's general fact or labeled development context in a bottom card; in CAC mode add a second card only when a supported CAC passage exists. Preserve dates, units and geography in sourced copy where relevant. Do not show a source-link button; retain source metadata in the backend. Distinguish support availability from actual use. Missing CAC facts do not block this development edition.
 
-Individual players use Continue Simulation to advance. Group participants see that advancement is controlled by their host. Both retain access to their own recap.
+Individual players use Continue to next day below the fact boxes to advance. Group participants see that advancement is controlled by their host. Both retain access to their own recap.
 
 ## 8. Results summary
 
@@ -189,8 +189,12 @@ Validate edits and show draft-save or approval success/failure. Published change
 
 Players are anonymous; do not require names, email addresses, or player accounts. Identify each run using an anonymous session identifier. Refreshing in the same browser restores the run's household, support setting, day, balance, decisions, and current decision/recap state. Group participants also retain their session association. Restore committed choices without applying their effects again.
 
-Show loading feedback during content retrieval and submission. If required content fails to load, show Retry and prevent invalid advancement. Submission failures preserve the selected option and show an error; do not show Decision Recorded before successful commitment. Announce recap and asynchronous errors to assistive technology. An ended run restores its results state rather than reopening decision submission.
+Show loading feedback during content retrieval and submission. If required content fails to load, show Retry and prevent invalid advancement. Submission failures preserve the selected option and show an error; do not open the interim fact screen before successful commitment. Announce recap and asynchronous errors to assistive technology. An ended run restores its results state rather than reopening decision submission.
 
 ## Verification criteria
 
 Verify explicit household/support choices, direct confirmation and legacy Review redirects, locked active setup, pre-game employment and clothing flow, both support modes, separated ordinary/employment event days with the Day 2 interview/result/immediate reapplication exception, scheduled weekly income and animated notifications, Day 30 completion, inability-to-pay early endings, refresh recovery, duplicate-safe submission, missing comparison data, replay through fresh setup, separate interactive data navigation, host-controlled participant advancement, independent group finances, early group termination, authorized pending-edition editing/approval, and content-version isolation. Check keyboard, desktop fit and narrow-screen use throughout.
+
+### Individual gameplay feedback ? November 9, 2026
+
+Tax choices show the initial expense only, including zero for free preparation; do not disclose the expected refund or net gain before submission. The backend still applies the saved fee/refund rules atomically. Sidebar money values remain on one line with a responsive font size. Overdue rows omit the due-day label and calendar graphic while retaining the bill name, fee, outstanding amount and Pay action.

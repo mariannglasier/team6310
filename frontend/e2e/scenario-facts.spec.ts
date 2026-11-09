@@ -26,7 +26,7 @@ for (const support of [false, true])
       persona_id: 'persona',
       version_id: 'version',
       owner_user_id: 'owner',
-      current_balance: 250,
+      current_balance: 1772,
       current_day: 3,
       cac_support_enabledabled: support,
       status: 'active',
@@ -184,6 +184,21 @@ for (const support of [false, true])
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true)
+    await expect(
+      page.getByRole('link', { name: 'Source', exact: true }),
+    ).toHaveCount(0)
+    const balance = page.locator('.finance-balance')
+    await expect(balance).toHaveText('$1,772.00')
+    expect(
+      await balance.evaluate((el) => el.scrollWidth <= el.clientWidth),
+    ).toBe(true)
+    const factsBox = await page
+      .getByLabel('Scenario facts', { exact: true })
+      .boundingBox()
+    const nextButton = await page
+      .getByRole('button', { name: 'Continue to next day' })
+      .boundingBox()
+    expect(nextButton!.y).toBeGreaterThanOrEqual(factsBox!.y + factsBox!.height)
     await page.screenshot({
       path: testInfo.outputPath('recap-facts.png'),
       fullPage: true,

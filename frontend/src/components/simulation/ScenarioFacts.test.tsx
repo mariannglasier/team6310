@@ -18,12 +18,12 @@ const cac = {
   sourceUrl: 'https://www.ourcac.org/',
 }
 beforeEach(() => vi.clearAllMocks())
-it('shows general and CAC cards with source links in CAC mode', async () => {
+it('shows general and CAC cards without source buttons in CAC mode', async () => {
   load.mockResolvedValue([cac, general])
   render(<ScenarioFacts {...props} supportEnabled />)
   expect(await screen.findByText(general.text)).toBeVisible()
   expect(screen.getByText(cac.text)).toBeVisible()
-  expect(screen.getAllByRole('link', { name: 'Source' })).toHaveLength(2)
+  expect(screen.queryByRole('link', { name: 'Source' })).toBeNull()
 })
 it('never displays a CAC observation in regular mode', async () => {
   load.mockResolvedValue([general, cac])

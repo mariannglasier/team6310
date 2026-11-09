@@ -26,3 +26,11 @@
   margin: 0 0 12px;
   line-height: 1.6;
 }
+
+.scenario-choice-controls > .ui-button {
+  margin-top: 20px;
+}
+
+.scenario-continue {
+  margin-top: 24px;
+}

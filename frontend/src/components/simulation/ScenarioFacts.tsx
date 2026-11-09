@@ -68,9 +68,6 @@ export function ScenarioFacts({
                   : 'Community fact'}
             </h3>
             <p>{fact.text}</p>
-            <a href={fact.sourceUrl} target="_blank" rel="noreferrer">
-              Source
-            </a>
           </section>
         ))}
     </aside>

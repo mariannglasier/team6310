@@ -168,7 +168,6 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
     return {
       width: innerWidth,
       overflow: document.documentElement.scrollWidth > innerWidth,
-      icon: box(row, 'svg'),
       pay: box(row, 'button'),
       amount: box(due, '.finance-expense-amount'),
       actions: box(due, '.bill-actions'),
@@ -177,11 +176,11 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
     }
   })
   expect(geometry.overflow).toBe(false)
+  await expect(overdue.locator('svg')).toHaveCount(0)
+  await expect(overdue.getByText(/Due Day/)).toHaveCount(0)
   if (geometry.width > 760) {
-    expect(geometry.pay.y).toBeGreaterThanOrEqual(geometry.icon.bottom)
     expect(geometry.actions.x).toBeGreaterThanOrEqual(geometry.amount.right)
   } else {
-    expect(geometry.pay.x).toBeGreaterThanOrEqual(geometry.icon.right)
     expect(geometry.actions.y).toBeGreaterThanOrEqual(geometry.amount.bottom)
     expect(geometry.duePay.y).toBe(geometry.ignore.y)
   }

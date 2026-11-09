@@ -211,6 +211,8 @@ it.each([2, 3])(
     await userEvent.click(pay)
     expect(onAction).toHaveBeenCalledWith('bill', 'pay')
     expect(submitEmployment).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Continue to next day' }),
+    ).toBeDisabled()
   },
 )
