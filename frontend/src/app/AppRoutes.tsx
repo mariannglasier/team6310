@@ -17,6 +17,7 @@ import {
   NotFoundPage,
 } from '../pages/public/InformationPages'
 import { LandingPage } from '../pages/public/LandingPage'
+import { DataExplorerPage } from '../pages/public/data/DataExplorerPage'
 import { IntegrationTestPage } from '../pages/development/IntegrationTestPage'
 import { AdminRouteBoundary } from './AdminRouteBoundary'
 import { paths } from './paths'
@@ -35,6 +36,7 @@ export function AppRoutes() {
           <Route path={paths.home} element={<LandingPage />} />
           <Route path={paths.learn} element={<LearnPage />} />
           <Route path={paths.donate} element={<DonatePage />} />
+          <Route path={paths.data} element={<DataExplorerPage />} />
           <Route
             path={paths.introduction}
             element={<Navigate to={paths.individual} replace />}

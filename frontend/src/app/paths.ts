@@ -14,7 +14,12 @@ export const paths = {
   adminDashboard: '/admin/dashboard',
 } as const
 
-// Simulation pages share the scenic stage between the header and footer.
+// Simulation pages and Explore Data share the scenic stage between the header
+// and footer.
 export function isStagePath(pathname: string) {
-  return pathname === '/simulation' || pathname.startsWith('/simulation/')
+  return (
+    pathname === '/simulation' ||
+    pathname.startsWith('/simulation/') ||
+    pathname === paths.data
+  )
 }

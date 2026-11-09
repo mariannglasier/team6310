@@ -10,12 +10,13 @@
 
 ### Frontend foundation status
 
-React Router connects the responsive landing page and clearly labeled feature placeholders. The landing page links Start simulation, Join a group, and Host a group to existing routes; Learn/Donate use team-approved CAC websites. Explore Data reserves `/data`, which currently reaches the fallback page. Simulation, internal CAC information, and staff features remain scaffolding. Run `npm ci` in `frontend/` after pulling dependency changes.
+React Router connects the responsive landing page and clearly labeled feature placeholders. The landing page links Start simulation, Join a group, and Host a group to existing routes; Learn/Donate use team-approved CAC websites. Explore Data opens `/data`, a static, illustrative data explorer (see [docs/data-explorer.md](docs/data-explorer.md)); it makes no API calls yet. Simulation, internal CAC information, and staff features remain scaffolding. Run `npm ci` in `frontend/` after pulling dependency changes.
 
 | Route | Placeholder |
 | --- | --- |
 | `/` | Responsive landing page with team-supplied copy |
 | `/learn` | CAC information; approved content/destination pending |
+| `/data` | Explore Data: static, illustrative explorer for six topics (no API calls) |
 | `/donate` | Donation; approved external destination pending |
 | `/simulation/introduction` | Legacy URL redirects to `/simulation/individual` |
 | `/simulation/individual` | Select an approved published household; Start simulation confirms it through the existing protected start RPC and opens pre-game job search |
