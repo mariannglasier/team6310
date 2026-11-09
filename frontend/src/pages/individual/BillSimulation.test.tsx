@@ -125,7 +125,9 @@ it('reconciles a lost payment response and restores a saved receipt on remount w
   await userEvent.click(pay)
   expect(await screen.findByText('Paid $10.00')).toBeInTheDocument()
   expect(screen.getByText('$90.00')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  expect(
+    screen.getByRole('button', { name: 'Continue to next day' }),
+  ).toBeEnabled()
   view.unmount()
   show()
   expect(await screen.findByText('Paid $10.00')).toBeInTheDocument()

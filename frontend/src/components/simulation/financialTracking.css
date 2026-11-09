@@ -619,3 +619,19 @@
     flex-direction: row;
   }
 }
+
+/* Keep monetary values together within the narrow household and bills rails. */
+.finance-sidebar .finance-balance {
+  font-size: clamp(20px, 2.1vw, 32px);
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.finance-totals dd,
+.finance-expense-amount,
+.finance-overdue strong {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.finance-right .finance-expense-amount {
+  font-size: 20px;
+}

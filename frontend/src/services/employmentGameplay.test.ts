@@ -5,7 +5,9 @@ import {
   rememberRun,
   forgetRun,
   submitEmployment,
+  employmentSnapshot,
 } from './employmentGameplay'
+import { contentService } from './contentService'
 import { getSupabaseClient } from './supabase'
 import type { LoadedPlaythrough } from '../types/playthrough'
 vi.mock('./supabase', () => ({ getSupabaseClient: vi.fn() }))
@@ -126,3 +128,42 @@ it('clears a known rejected request but never commits client changes', async () 
   expect(run.employmentState).toEqual(initial)
   expect(localStorage.getItem('cac-employment-v1:owner:pending:run')).toBeNull()
 })
+
+it.each(['day', 'ended'])(
+  'restores an ended run from stored %s state as an end screen',
+  async (stage) => {
+    vi.spyOn(contentService, 'loadJobs').mockResolvedValue([])
+    const endedRun = {
+      ...run,
+      status: 'ended',
+      currentDay: 7,
+      supportEnabled: false,
+      currentScenarioId: 'unaffordable-scenario',
+      employmentState: {
+        ...initial,
+        stage,
+        prepared: false,
+        hasEnglishSkills: false,
+        hasComputerSkills: false,
+        assistanceUsed: false,
+        clothing: 'none',
+        targetId: null,
+        initialTargetId: null,
+        hiredDay: null,
+        weeklyIncome: '0.00',
+        history: [],
+        creditedDays: [],
+        reason: null,
+      },
+    }
+    const restored = await employmentSnapshot(endedRun)
+    expect(restored.state).toMatchObject({
+      stage: 'ended',
+      day: 7,
+      balance: 12345,
+      reason: 'Your household could not afford this choice.',
+    })
+    expect(endedRun.employmentState.stage).toBe(stage)
+    expect(rpc).not.toHaveBeenCalled()
+  },
+)

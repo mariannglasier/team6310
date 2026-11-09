@@ -1,0 +1,36 @@
+.scenario-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.scenario-facts__card {
+  padding: 20px;
+  border: 1px solid var(--finance-rule, #cbd5e1);
+  border-radius: 12px;
+  background: var(--finance-blue, #dcebf9);
+  overflow-wrap: anywhere;
+}
+
+.scenario-facts__card:nth-child(2) {
+  background: var(--finance-green, #e6eadc);
+}
+
+.scenario-facts__card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.scenario-facts__card p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.scenario-choice-controls > .ui-button {
+  margin-top: 20px;
+}
+
+.scenario-continue {
+  margin-top: 24px;
+}

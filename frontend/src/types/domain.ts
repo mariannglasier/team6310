@@ -54,6 +54,8 @@ export interface Choice extends EditionRecord {
   readonly text: string
   readonly balanceChange: UsdCents
   readonly responseText: string
+  readonly requiresCac?: boolean
+  readonly upfrontCost?: UsdCents
 }
 export type SimulationProgress =
   | { readonly stage: 'pre-game' }

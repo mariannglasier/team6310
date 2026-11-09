@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { JobBoard } from '../../components/simulation/JobBoard'
 import { paths } from '../../app/paths'
@@ -12,24 +12,6 @@ import {
 } from '../../state/employmentWalkthrough'
 import '../../components/simulation/employment.css'
 
-function Facts({ support }: { support: boolean }) {
-  return (
-    <details className="employment-facts">
-      <summary>Scenario facts</summary>
-      <h3>General fact</h3>
-      <p>Placeholder — approved employment fact and source pending.</p>
-      {support && (
-        <>
-          <h3>CAC impact fact</h3>
-          <p>
-            Placeholder — approved scenario-linked CAC fact and source pending.
-          </p>
-        </>
-      )}
-    </details>
-  )
-}
-
 const headings = {
   board: 'Find your next opportunity.',
   'preparation-result': 'Your preparation is complete.',
@@ -41,17 +23,19 @@ const headings = {
   'reapply-result': 'Your application is in.',
   income: 'Your weekly pay has arrived.',
   complete: 'You reached Day 30.',
-  ended: 'Your walkthrough ended early.',
+  ended: 'Simulation ended early.',
 } as const
 
 export function EmploymentGame({
   state,
   dispatch,
   onReplay,
+  recapFacts,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
   onReplay: (support: boolean) => void
+  recapFacts?: ReactNode
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -201,7 +185,7 @@ export function EmploymentGame({
               </Button>
             </div>
           )}
-          {result && <Facts support={state.support} />}
+          {result && state.stage !== 'preparation-result' && recapFacts}
           {finished && (
             <>
               <p>{state.reason ?? 'You reached the end of the month.'}</p>

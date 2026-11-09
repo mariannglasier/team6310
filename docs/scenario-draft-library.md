@@ -6,6 +6,20 @@
 
 # CAC Poverty Exercise — 60 scenario drafts, revised
 
+**November 7 baseline correction:** Historical scenario dollar examples are not verified market prices. The [online baseline audit](scenario-data-sourcing.md#online-baseline-evidence---november-7-2026) records checked evidence and replacement proposals for rent and other costs, renewed API candidates, and unresolved components across all 60 cards. In particular, $650 is unsupported as full-apartment Sandy Springs monthly rent. Complete the specified housing/product/service quantities and all-in charges before publication; CPI cannot validate an unsupported baseline. This is documentation, not a gameplay price change.
+
+## Automatic publication of data refreshes - November 7, 2026
+
+User decision: routine source-driven price, wage, refund, fee, assistance-cap and numerical-fact updates automatically produce and publish a new immutable edition after automated validation, with no human review or CAC approval step. This supersedes earlier monthly review/approval gates. Configure sources, baseline evidence, formulas, fact templates and validation rules during initial setup; routine updates reuse those definitions. New scenarios, new service/eligibility mappings and changes to gameplay rules remain a separate content workflow, not a prerequisite for publishing routine data updates. Do not regenerate free-form claims or infer new services from changed data.
+
+Monthly maintenance fetches/imports observations, validates units/geography/period/schema and required bindings, calculates dependent amounts/fact text, and atomically publishes the validated edition for new games. Keep an audit diff and machine validation results for traceability, not approval. Unchanged inputs are a no-op. Failed or missing inputs retain their last usable values and flag source status; if a complete valid edition cannot be built, retain the current published edition. No monthly review queue or approval request is created. Active/completed games and recorded obligations retain their original version. This documents required behavior; automation is not yet implemented.
+
+
+## Monetary update requirement - November 7, 2026
+
+The user superseded all earlier fixed-monetary-value exceptions: no price or other monetary value may be hard coded without an automatic update plan. This includes the former $60 interview-clothing amount and $1,000 simulation refund. Earlier fixed-value language and historical dollar examples below do not authorize permanent constants. Each binding requires an automatic source retrieval/import or recalculation method, schedule, formula/baseline as applicable, failure handling and automatic validated edition publication. See [scenario-data-sourcing.md](scenario-data-sourcing.md#automatic-update-coverage-for-every-monetary-value). Missing plans remain publication blockers. Active runs and already-recorded transactions retain their originating edition. This decision is documentation only; automatic updates are not implemented.
+
+
 **November 2, 2026 · Content and specification handoff · Pending staff review.** This revision replaces the earlier service-centered draft library. No application, database or financial engine has been changed.
 
 ## Historical branch handoff: employment prerequisites
@@ -264,7 +278,7 @@ Any available valid submitted choice hires the different job on Day 3, regardles
 
 **Situation:** “It is time to file your taxes. Will you handle the return yourself or get help preparing it?”
 
-**Timing:** `non_scheduled`; proposed Day 18. Only one tax filing per run.
+**Timing:** Required once per playthrough; scheduled ordinary-day slot, exact day pending. See the required-occurrence decision below.
 
 | Key | Submitted choice | Money / state | Result |
 | --- | --- | --- | --- |
@@ -277,7 +291,11 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Facts:** general `G-D005` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D005` = paired C21 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
 
-**CAC fact text:** “In 2025, CAC reported 503 tax returns through the VITA program.”
+**CAC fact text:** “Tax preparation can connect households with money back at filing time. In 2025, CAC reported 503 tax returns through VITA and $672,056 in combined federal and state refunds.”
+
+**Composite CAC fact sources:** S18/S19; service `vita`; 2025 return-count record `5b9132c2-90d6-4dea-9dc0-f2de13a89e2f` = 503 Number; federal-refund record `7f25dabd-f5a5-4a54-9201-fd5f3ccd173d` = USD 582083; state-refund record `d4d72fe4-20b1-4a1b-97a4-dea745b7e4f7` = USD 89973. Derived total: 582083 + 89973 = USD 672056. This is one player-facing CAC passage backed by three observations, not three fact slots. Require matching reporting years, compatible scopes and complete inputs before automatically updating the passage; never add tax-credit totals to refunds, divide this total by 503, or infer 503 unique recipients. Count and refund observations are reported program measures, not a verified matched cohort. Exact original source verification remains pending; the snapshot verifies the stored figures. The passage does not set the simulated household refund. Historical pairing files remain the earlier single-record proposal; this composite supersedes it for D005 final binding.
+
+**Required occurrence - user decision, November 7, 2026:** D005 is mandatory once in every playthrough, in both support modes and for every persona. Reserve a scheduled ordinary-day slot; it must not be omitted by random selection, selected again, or collide with employment events. This supersedes earlier non-scheduled/optional sampling instructions for D005. The exact due day remains to be configured; the earlier Day 18 is a proposal, not a newly approved day. Early-ended runs cannot show later days: they may end before reaching the reserved tax event, but every complete route must include it. Existing early-ending rules are unchanged. If literal display before every possible early ending is required, its placement needs a separate explicit change; no new pre-game event is inferred. Verify exactly-once inclusion, all personas/modes, routing and refresh restoration. This is a documentation requirement; scheduling is not implemented here.
 
 **CAC fact reference:** `cac_service_facts` · service `vita` · fact `tax_returns_through_the_vita_program` · year 2025 · `fact_id=5b9132c2-90d6-4dea-9dc0-f2de13a89e2f`. [Pairing rationale](scenario-cac-fact-pairings.md#d005).
 

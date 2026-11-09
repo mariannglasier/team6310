@@ -69,7 +69,7 @@ for (const [label, amount] of [
     ).toBeVisible()
     await page.getByRole('button', { name: 'Submit decision' }).click()
     await expect(
-      page.getByText('Decision recorded', { exact: true }),
+      page.getByRole('button', { name: 'Continue to next day', exact: true }),
     ).toBeVisible()
     await expect(
       page.getByLabel(`Current balance $${(140 + amount).toFixed(2)}`, {
@@ -78,11 +78,11 @@ for (const [label, amount] of [
     ).toBeVisible()
     await page.reload()
     await expect(
-      page.getByText('Decision recorded', { exact: true }),
+      page.getByRole('button', { name: 'Continue to next day', exact: true }),
     ).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Submit decision' }),
-    ).toBeDisabled()
+    ).toHaveCount(0)
     await expect(
       page
         .getByText('Starting balance', { exact: true })
@@ -102,7 +102,7 @@ for (const [label, amount] of [
         .locator('dd'),
     ).toHaveText(`$${(60 + Math.max(0, -amount)).toFixed(2)}`)
     await page
-      .getByRole('button', { name: 'Continue simulation', exact: true })
+      .getByRole('button', { name: 'Continue to next day', exact: true })
       .click()
     await expect(
       page.getByRole('heading', { name: 'Day 5 of 30', includeHidden: true }),
@@ -134,7 +134,7 @@ for (const [label, amount] of [
         }),
       ).toBeVisible()
       await page
-        .getByRole('button', { name: 'Continue simulation', exact: true })
+        .getByRole('button', { name: 'Continue to next day', exact: true })
         .click()
     }
     await expect(

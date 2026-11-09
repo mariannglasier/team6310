@@ -22,6 +22,8 @@ const choice = {
   choice_text: 'Database choice',
   response_text: 'Database response',
   balance_change: '25.00',
+  upfront_cost: '0.00',
+  requires_cac: false,
   next_scenario_id: null,
 }
 function mock(

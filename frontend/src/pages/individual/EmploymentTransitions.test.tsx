@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Routes, Route } from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { EmploymentPanel } from './EmploymentPanel'
 import { SetupProvider } from '../../state/SetupProvider'
@@ -74,6 +74,59 @@ function show(state: Walkthrough) {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(hasPending).mockResolvedValue(false)
+})
+
+it('opens the end screen for an unaffordable scenario and lets the player replay', async () => {
+  vi.mocked(employmentSnapshot).mockResolvedValue({
+    ...snapshot({
+      ...base,
+      stage: 'ended',
+      day: 7,
+      reason: 'Your household could not afford this choice.',
+    }),
+    run: {
+      ...run,
+      status: 'ended',
+      currentDay: 7,
+      currentScenarioId: 'unaffordable',
+    },
+  })
+  render(
+    <MemoryRouter initialEntries={['/simulation']}>
+      <SetupProvider>
+        <Routes>
+          <Route
+            path="/simulation"
+            element={
+              <EmploymentPanel
+                run={{ ...run, status: 'ended' }}
+                onCommit={commit}
+              />
+            }
+          />
+          <Route
+            path="/simulation/individual"
+            element={<h1>Choose your household</h1>}
+          />
+        </Routes>
+      </SetupProvider>
+    </MemoryRouter>,
+  )
+  expect(
+    await screen.findByRole('heading', { name: 'Simulation ended early.' }),
+  ).toBeVisible()
+  expect(screen.getByRole('link', { name: 'Return home' })).toHaveAttribute(
+    'href',
+    '/',
+  )
+  expect(screen.queryByText('Opening your results…')).toBeNull()
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Replay from household selection' }),
+  )
+  expect(
+    await screen.findByRole('heading', { name: 'Choose your household' }),
+  ).toBeVisible()
+  expect(submitEmployment).not.toHaveBeenCalled()
 })
 
 it('keeps pending decisions quiet and prevents duplicate submission before showing the committed next screen', async () => {
@@ -211,6 +264,8 @@ it.each([2, 3])(
     await userEvent.click(pay)
     expect(onAction).toHaveBeenCalledWith('bill', 'pay')
     expect(submitEmployment).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Continue to next day' }),
+    ).toBeDisabled()
   },
 )

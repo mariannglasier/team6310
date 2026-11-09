@@ -54,7 +54,9 @@ it('keeps simultaneous bills independent and prevents departure before each is r
     screen.getByRole('button', { name: 'Ignore Fixture rent' }),
   )
   expect(action).toHaveBeenCalledWith('rent', 'ignore')
-  expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  expect(
+    screen.getByRole('button', { name: 'Continue to next day' }),
+  ).toBeDisabled()
   rerender(
     <DueBillsPanel
       snapshot={{
@@ -85,7 +87,9 @@ it('keeps simultaneous bills independent and prevents departure before each is r
       onContinue={next}
     />,
   )
-  await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Continue to next day' }),
+  )
   expect(next).toHaveBeenCalledOnce()
 })
 it('shows full overdue settlements and disables payment outside the playable day stage', () => {
@@ -132,7 +136,8 @@ it('hides the entire Overdue section when no unpaid ignored bills remain', () =>
   expect(
     within(section).getByRole('heading', { name: 'Overdue' }),
   ).toBeInTheDocument()
-  expect(section.querySelector('.finance-bill-icon svg')).toBeInTheDocument()
+  expect(section.querySelector('.finance-bill-icon svg')).toBeNull()
+  expect(within(section).queryByText(/Due Day/)).toBeNull()
   expect(section.querySelector('.finance-expense-amount')).toHaveTextContent(
     '$105.00',
   )

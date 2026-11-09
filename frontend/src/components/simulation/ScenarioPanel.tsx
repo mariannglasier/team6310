@@ -6,10 +6,11 @@ import {
   type ScenarioRunSnapshot,
 } from '../../services/scenarioGameplay'
 import type { LoadedPlaythrough } from '../../types/playthrough'
-import type { Scenario } from '../../types/domain'
+import { usdCents, type Scenario } from '../../types/domain'
 import { RadioGroup } from '../ui/RadioGroup'
 import { Button } from '../ui/Button'
 import { formatUsd } from '../../lib/money'
+import { ScenarioFacts } from './ScenarioFacts'
 
 export function ScenarioPanel({
   run,
@@ -85,24 +86,33 @@ export function ScenarioPanel({
           <p>{scenario.description}</p>
           {!scenario.choices.length ? (
             <p role="alert">Choices are unavailable.</p>
-          ) : (
+          ) : !saved?.decision ? (
             <fieldset
               disabled={
                 pending || !!saved?.decision || saved?.run.status === 'ended'
               }
               aria-busy={pending}
-              className="employment-controls"
+              className="employment-controls scenario-choice-controls"
             >
               <RadioGroup
                 label="Your decision"
                 name="scenario-choice"
                 value={saved?.decision?.choiceId ?? selected}
                 onChange={select}
-                options={scenario.choices.map((choice) => ({
-                  value: choice.id,
-                  label: choice.text,
-                  description: `${choice.balanceChange > 0 ? '+' : ''}${formatUsd(choice.balanceChange)}`,
-                }))}
+                options={scenario.choices
+                  .filter(
+                    (choice) =>
+                      !choice.requiresCac || run.supportEnabled === true,
+                  )
+                  .map((choice) => ({
+                    value: choice.id,
+                    label: choice.text,
+                    description:
+                      choice.upfrontCost ||
+                      (choice.requiresCac && choice.balanceChange > 0)
+                        ? `Initial expense: ${formatUsd(choice.upfrontCost ?? usdCents(0))}`
+                        : `${choice.balanceChange > 0 ? '+' : ''}${formatUsd(choice.balanceChange)}`,
+                  }))}
               />
               <Button
                 disabled={!selected || pending || !!saved?.decision}
@@ -111,24 +121,22 @@ export function ScenarioPanel({
                 Submit decision
               </Button>
             </fieldset>
+          ) : null}
+          {saved?.run.status === 'ended' && (
+            <p role="status">Opening your results…</p>
           )}
           {saved?.decision && (
-            <section role="status">
-              <h3>Decision recorded</h3>
-              <p>{saved.responseText}</p>
-              <p>
-                Balance change:{' '}
-                {saved.decision.balanceChangeApplied > 0 ? '+' : ''}
-                {formatUsd(saved.decision.balanceChangeApplied)}
-              </p>
-              <p>Balance after: {formatUsd(saved.decision.balanceAfter)}</p>
-              <Button onClick={onContinue}>Continue simulation</Button>
-            </section>
-          )}
-          {saved?.run.status === 'ended' && (
-            <p role="status">
-              Your household could not afford this choice. The simulation ended.
-            </p>
+            <>
+              <ScenarioFacts
+                runId={saved.run.id}
+                scenarioId={scenario.id}
+                versionId={scenario.versionId}
+                supportEnabled={saved.run.supportEnabled === true}
+              />
+              <div className="scenario-continue">
+                <Button onClick={onContinue}>Continue to next day</Button>
+              </div>
+            </>
           )}
         </>
       )}
