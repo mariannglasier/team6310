@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { AppLayout } from '../layouts/AppLayout'
-import { AdminDashboardPage, AdminLoginPage } from '../pages/admin/AdminPages'
+import { AdminLoginPage } from '../pages/admin/AdminPages'
+import { AdminDashboardPage } from '../pages/admin/dashboard/AdminDashboardPage'
 import { HostPage, JoinPage } from '../pages/group/GroupPages'
 import { SimulationPage } from '../pages/individual/SimulationPage'
 import { ReviewPage } from '../pages/individual/ReviewPage'
@@ -9,6 +10,7 @@ import {
   ResultsPage,
 } from '../pages/individual/SimulationPages'
 import { SetupProvider } from '../state/SetupProvider'
+import { StaffAuthProvider } from '../state/StaffAuthProvider'
 import {
   DonatePage,
   LearnPage,
@@ -43,12 +45,14 @@ export function AppRoutes() {
           <Route path={paths.results} element={<ResultsPage />} />
           <Route path={paths.host} element={<HostPage />} />
           <Route path={paths.join} element={<JoinPage />} />
-          <Route path={paths.adminLogin} element={<AdminLoginPage />} />
-          <Route element={<AdminRouteBoundary />}>
-            <Route
-              path={paths.adminDashboard}
-              element={<AdminDashboardPage />}
-            />
+          <Route element={<StaffAuthProvider />}>
+            <Route path={paths.adminLogin} element={<AdminLoginPage />} />
+            <Route element={<AdminRouteBoundary />}>
+              <Route
+                path={paths.adminDashboard}
+                element={<AdminDashboardPage />}
+              />
+            </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>

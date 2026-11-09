@@ -24,6 +24,17 @@ Use a protected staff authorization record or server-controlled claim. Users mus
 
 Supabase Auth manages password storage and verification. Never store passwords in application tables or logs. Sign-out clears local staff credentials and returns the interface to public access. Every protected request must validate the current session and authorization. Revoking staff access must prevent subsequent protected operations even if an existing token remains valid.
 
+### Staff sign-in implementation status
+
+- The browser signs in with `supabase.auth.signInWithPassword` and then calls `public.is_cac_staff()`. Only a literal `true` opens the dashboard. Valid credentials without staff authorization are signed out immediately; if the check cannot complete, access fails closed.
+- `public.cac_staff` (`user_id` → `auth.users`, `active`, `provisioned_at`) has RLS enabled, no policies, and no grants to `anon` or `authenticated`. `is_cac_staff()` is `SECURITY DEFINER`, uses an empty `search_path`, requires a non-anonymous Auth user, and is executable by `authenticated` (not `anon`). `assert_cac_staff(uuid)` is for protected server-side operations only. The migration `20261109000000_cac_staff_authorization.sql` reproduces the objects already present on the hosted project.
+- Provision staff only through a trusted process: create the Auth user (Supabase Dashboard → Authentication → Users, with a password and a confirmed email), then in the SQL editor run `insert into public.cac_staff (user_id) select id from auth.users where email = '<work email>';`. Revoke with `update public.cac_staff set active = false where user_id = ...;`, which takes effect on the next `is_cac_staff()` check even if the token is unexpired.
+- The UI gate is a convenience. Every future staff record or mutation must itself call `is_cac_staff()`/`assert_cac_staff()` or an equivalent RLS policy.
+- A staff sign-in replaces any anonymous player session in the same browser; use a separate browser profile for staff and play.
+- The read-only dashboard queries stored content with the signed-in session, so Row Level Security decides what returns. Scenarios, choices, personas, expenses, jobs, statistics, and scenario links come through the existing published-edition policies (jobs: approved and active only). `cac_services` and `cac_service_facts` have staff-only read policies. `staff_read_categories` (migration `20261109120000_staff_read_categories.sql`, applied to the hosted project) lets staff read `categories`. Unpublished drafts are not yet visible to staff; that needs staff read policies when draft editing is built.
+- `public.categories` retains broad table grants to `anon` and `authenticated` and relies on RLS having no write policies; revoke the write grants when the table is next reviewed.
+- Not yet verified: hosted Auth settings (email provider enabled, signup restrictions, CAPTCHA/rate limits), and end-to-end sign-in against the hosted project with a real staff account.
+
 ## Authorization matrix
 
 | Actor | Allowed | Denied |
