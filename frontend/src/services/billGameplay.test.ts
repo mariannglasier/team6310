@@ -25,7 +25,6 @@ const raw = () => ({
     current_job_id: null,
     cac_support_enabledabled: false,
     employment_state: { stage: 'day', revision: 1 },
-    expenses_initialized_at: '2026-11-08T12:00:00Z',
   },
   bills: [
     {
@@ -110,7 +109,6 @@ it('restores an initialized empty schedule without falling back to definitions',
   rpc.mockResolvedValue({ data: value, error: null })
   const result = await loadBillSnapshot(expected)
   expect(result.items).toEqual([])
-  expect(result.run.expensesInitializedAt).toBeTruthy()
   expect(rpc).toHaveBeenCalledOnce()
 })
 it.each(['owner', 'edition', 'duplicate', 'money'])(

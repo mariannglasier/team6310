@@ -1,5 +1,6 @@
 -- Bills Stage 1 only. Prepared for review; not authorization to deploy hosted SQL.
--- No content, legacy schedule reconstruction, payments or advancement changes.
+-- Development revision: initialization is atomic; no compatibility marker is stored.
+-- Earlier local installations require the explicit development refresh described in docs/bills-system.md.
 BEGIN;
 
 -- Fail rather than silently reinterpret records created since the read-only review.
@@ -11,7 +12,6 @@ DO $$ BEGIN
 END $$;
 
 ALTER TABLE public.playthroughs
- ADD COLUMN expenses_initialized_at timestamptz,
  ADD CONSTRAINT playthroughs_bill_edition_key UNIQUE (playthrough_id,version_id);
 
 -- Keep numeric unconstrained by typmod so CHECK rejects, rather than rounds,
@@ -115,27 +115,6 @@ CREATE TRIGGER playthrough_expenses_guard_bill_snapshot
  BEFORE UPDATE ON public.playthrough_expenses
  FOR EACH ROW EXECUTE FUNCTION public.guard_bill_occurrence_snapshot();
 
-CREATE FUNCTION public.guard_bill_run_marker() RETURNS trigger
-LANGUAGE plpgsql SET search_path='' AS $$
-BEGIN
- IF TG_OP='INSERT' THEN
-   IF NEW.expenses_initialized_at IS NOT NULL THEN RAISE EXCEPTION 'Bill marker is server controlled'; END IF;
- ELSE
-   IF OLD.expenses_initialized_at IS NOT NULL AND ROW(NEW.expenses_initialized_at,NEW.persona_id,NEW.version_id)
-   IS DISTINCT FROM ROW(OLD.expenses_initialized_at,OLD.persona_id,OLD.version_id) THEN
-     RAISE EXCEPTION 'Initialized bill schedule identity is immutable';
-   END IF;
-   -- Only the nested AFTER INSERT initialization may stamp a new run.
-   -- This is an integrity check; authorization also relies on no client UPDATE
-   -- grants and no public EXECUTE on the initialization trigger function.
-   IF OLD.expenses_initialized_at IS NULL AND NEW.expenses_initialized_at IS NOT NULL
-      AND pg_trigger_depth()<>2 THEN RAISE EXCEPTION 'Bills initialize only during run creation'; END IF;
- END IF;
- RETURN NEW;
-END $$;
-CREATE TRIGGER playthroughs_guard_bill_marker BEFORE INSERT OR UPDATE ON public.playthroughs
- FOR EACH ROW EXECUTE FUNCTION public.guard_bill_run_marker();
-
 CREATE FUNCTION public.initialize_fresh_bill_schedule() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
@@ -147,13 +126,14 @@ BEGIN
  OR NEW.current_day IS DISTINCT FROM 1 OR NEW.session_id IS NOT NULL
  OR NEW.employment_state IS NOT NULL OR NEW.current_job_id IS NOT NULL
  OR NEW.current_scenario_id IS NOT NULL OR NEW.cac_support_enabledabled IS NOT NULL THEN
-   RETURN NEW;
+   RAISE EXCEPTION 'Fresh anonymous individual playthrough required';
  END IF;
  PERFORM 1 FROM public.content_versions WHERE version_id=NEW.version_id FOR SHARE;
  IF NOT EXISTS(SELECT 1 FROM public.personas p JOIN public.content_versions v USING(version_id)
    WHERE p.persona_id=NEW.persona_id AND p.version_id=NEW.version_id
    AND v.status='published' AND v.published_at IS NOT NULL
-   AND NEW.current_balance=coalesce(p.general_starting_balance,0)) THEN RETURN NEW; END IF;
+   AND NEW.current_balance=coalesce(p.general_starting_balance,0)) THEN
+   RAISE EXCEPTION 'Published persona and valid starting balance required'; END IF;
  PERFORM 1 FROM public.playthroughs WHERE playthrough_id=NEW.playthrough_id FOR UPDATE;
  IF EXISTS (
    SELECT 1 FROM public.persona_expenses e
@@ -170,8 +150,6 @@ BEGIN
  CROSS JOIN LATERAL generate_series(e.first_due_day::integer,30,
    coalesce(e.repeat_interval_days::integer,31)) d(day)
  WHERE e.persona_id=NEW.persona_id AND e.version_id=NEW.version_id;
- UPDATE public.playthroughs SET expenses_initialized_at=clock_timestamp()
- WHERE playthrough_id=NEW.playthrough_id;
  RETURN NEW;
 END $$;
 CREATE TRIGGER initialize_fresh_bill_schedule AFTER INSERT ON public.playthroughs
@@ -207,7 +185,7 @@ BEGIN
    RAISE EXCEPTION 'Review required: bill owner needs unfiltered source and occurrence access';
  END IF;
  FOREACH f IN ARRAY ARRAY['public.guard_bill_definition()'::regprocedure,
-   'public.guard_bill_occurrence_snapshot()'::regprocedure,'public.guard_bill_run_marker()'::regprocedure,
+   'public.guard_bill_occurrence_snapshot()'::regprocedure,
    'public.initialize_fresh_bill_schedule()'::regprocedure] LOOP
    EXECUTE format('ALTER FUNCTION %s OWNER TO %I',f,owner_name);
    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC',f);

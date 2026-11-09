@@ -8,11 +8,14 @@ import {
 } from '../../services/billGameplay'
 import {
   employmentSnapshot,
+  MissingEmploymentMarkerError,
+  UnsupportedEmploymentDocumentError,
   type CommittedEmployment,
 } from '../../services/employmentGameplay'
 import { FinancialTracking } from '../../components/simulation/FinancialTracking'
 import { EmploymentPanel } from './EmploymentPanel'
 import { Button } from '../../components/ui/Button'
+import { PlaythroughRecovery } from './PlaythroughRecovery'
 
 export function BillSimulation({
   initialRun,
@@ -26,6 +29,7 @@ export function BillSimulation({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [uncertain, setUncertain] = useState(false)
+  const [recoverable, setRecoverable] = useState(false)
   const [employmentBusy, setEmploymentBusy] = useState(false)
   const busy = useRef(false)
   const generation = useRef(0)
@@ -37,6 +41,7 @@ export function BillSimulation({
     const sequence = ++generation.current
     setLoading(true)
     setError('')
+    setRecoverable(false)
     try {
       await accept(await loadBillSnapshot(run), sequence)
       if (sequence === generation.current) setUncertain(false)
@@ -48,6 +53,10 @@ export function BillSimulation({
             : 'Unable to load saved bills.',
         )
         setUncertain(true)
+        setRecoverable(
+          cause instanceof MissingEmploymentMarkerError ||
+            cause instanceof UnsupportedEmploymentDocumentError,
+        )
       }
     } finally {
       if (sequence === generation.current) setLoading(false)
@@ -119,9 +128,14 @@ export function BillSimulation({
       employment={saved?.employment.state ?? undefined}
       onBillAction={(id, type) => void action(id, type)}
       billBusy={loading || uncertain || employmentBusy}
-      pregame={!saved?.employment.state || saved.employment.state.day === 0}
+      pregame={
+        saved
+          ? !saved.employment.state || saved.employment.state.day === 0
+          : false
+      }
     >
       {error && <p role="alert">{error}</p>}
+      {recoverable && <PlaythroughRecovery />}
       {uncertain && (
         <Button
           disabled={loading}

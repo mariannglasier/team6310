@@ -170,7 +170,6 @@ it.each([2, 3])(
     const saved = snapshot(state)
     const billRun = {
       ...saved.run,
-      expensesInitializedAt: '2026-11-08',
       employmentState: { revision: 1 },
     }
     vi.mocked(employmentSnapshot).mockResolvedValue({ ...saved, run: billRun })

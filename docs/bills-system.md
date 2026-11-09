@@ -31,7 +31,6 @@ Added fields:
 | Table | Fields | Meaning |
 | --- | --- | --- |
 | `persona_expenses` | `late_fee_amount` | Required designer-supplied fixed fee; no invented default |
-| `playthroughs` | `expenses_initialized_at` | Server marker; historical runs remain NULL |
 | `playthrough_expenses` | `name_snapshot`, `late_fee_amount` | Immutable name and fee alongside existing original `amount_due` |
 | `playthrough_expenses` | `ignored_at` | Ignore receipt and one-time fee-incurrence marker |
 | `playthrough_expenses` | `paid_day`, `payment_balance_after` | Payment audit fields alongside existing `paid_at` |
@@ -54,17 +53,19 @@ shared edition-row lock, coordinating with publication changes. Occurrence snaps
 updates and changes to existing Ignore/payment receipts are rejected. No bill table
 mutation privileges or internal function EXECUTE grants are added for clients.
 
-An AFTER INSERT trigger independently checks fresh anonymous-owned individual-run
-invariants, generates occurrences, rejects ordinary-scenario collisions and stamps
-the marker in the creation transaction. It works in either order relative to the
-employment AFTER INSERT trigger. All work rolls back if creation fails. It does not
-call or replace scenario functions. It does not expose an initialization RPC.
+An AFTER INSERT trigger validates fresh anonymous-owned individual-run invariants,
+generates occurrences and rejects ordinary-scenario collisions in the creation
+transaction. Invalid individual creation raises an error rather than silently
+skipping initialization. It works in either order relative to the employment
+AFTER INSERT trigger. All work rolls back if creation fails. It neither calls nor
+replaces scenario functions and exposes no initialization RPC.
 
-A non-NULL marker with no occurrences means an initialized empty schedule. NULL
-means a historical/unsupported run; no lazy reconstruction or backfill is allowed.
-The marker cannot be supplied on insertion, cleared or changed after initialization.
-Its initial update is restricted to the nested creation-trigger context, in addition
-to existing denial of client UPDATE access. Persona/edition are locked once marked.
+An empty occurrence set is a valid complete schedule. Every individual simulation
+uses the bills snapshot and advancement path; there is no persisted initialization
+or compatibility marker, timestamp cutover, or special historical-run routing.
+Development runs are disposable. No historical compatibility guarantee is provided.
+Client ownership/RLS restrictions and the existing protected operations continue to
+prevent independent changes to authoritative run settings and finances.
 
 ## Stages 2–4: gameplay, finances and presentation
 
@@ -106,7 +107,7 @@ The final summary reports remaining cash and total unpaid obligations including
 fees. Sidebar payments are disabled after completion.
 
 All migrations remain unapplied to hosted Supabase. Deploy reviewed SQL before the
-new frontend, which queries the new marker column. No production expense content,
+new frontend, which uses the same bills snapshot for every individual run. No production expense content,
 legacy schedule migration, CAC bill assistance or hosted deployment is included.
 
 For financial integration, `playthroughs.current_balance` remains authoritative.
@@ -125,7 +126,7 @@ PGLITE_MODULE=/absolute/path/to/@electric-sql/pglite/dist/index.js node supabase
 
 The suite uses an explicit disposable test schema and synthetic values only. It is
 not a reconstruction of historical migrations. It exercises creation with actual
-employment/scenario functions, schedules, empty/legacy runs, immutable snapshots,
+employment/scenario functions, schedules, empty/populated runs, immutable snapshots,
 edition FKs, RLS/ACL denial, trigger ordering and rollback. PGlite does not establish
 multi-session locking behavior, Supabase API behavior or hosted deployment success.
 
@@ -199,3 +200,55 @@ refusal/idempotency unit suite also passed (six tests). Browser viewport testing
 is not implied by these API checks.
 
 The manual-testing guide is user-maintained and must not be edited by agents.
+
+## Development revision: initialization marker removed
+
+The team explicitly rejected compatibility with historical development runs.
+`expenses_initialized_at`, `guard_bill_run_marker()` and its trigger have been
+removed from the three development bills migration files. Pay, Ignore, snapshot
+retrieval and advancement no longer test a compatibility flag. Atomic creation,
+valid empty schedules, occurrence uniqueness and financial transaction behavior
+remain in force. The employment initialization document is a separate existing
+system and was not changed.
+
+These migration versions had already been installed in the local verification
+stack before revision, using direct SQL with no migration ledger. **Editing their
+files does not update an installed database.** Do not replay the foundation over
+populated expense tables or silently mark a revised file as applied.
+
+For the existing disposable local stack, the agent applied the explicit one-time
+refresh through `tools/install_bills_local.py --refresh-development-sql`. It replaces
+only bills function definitions, drops the obsolete guard/trigger/column, refreshes
+the REST schema cache, and verifies data plus employment/scenario function checksums
+in one transaction. It leaves existing test data in place without adding legacy
+runtime handling. It refuses a database with a recorded migration ledger, where an
+explicit forward migration or deliberate disposable-environment rebuild must be
+reviewed separately. No migration-history rows are edited.
+
+For a clean development installation, apply the revised versions in their original
+order: `20261108010000`, `20261108020000`, `20261108030000`. The foundation still
+requires empty expense tables. The one-time refresh is an agent maintenance action,
+not part of the user's routine startup commands. The human-maintained manual guide
+is unchanged. Hosted Supabase was neither modified nor deployed to.
+
+Verification after marker removal:
+
+- Revised migrations passed the isolated SQL suite for empty, one-time and recurring
+  schedules, both initialization-trigger orderings, rejected creation and rollback,
+  occurrence uniqueness, Pay/Ignore, advancement, both employment branches, payday,
+  scenario progression and Day 30 unpaid obligations. The standalone PostgreSQL
+  suite also passed overlapping duplicate payments and both payment/payday orders.
+- Actual local Supabase Auth/REST passed empty-schedule retrieval, initializer
+  rejection with no surviving run, both synthetic households through Day 30,
+  cross-owner denial, unauthorized writes, concurrent duplicate payments, and both
+  lock orders for payment racing payday and scenario spending. API race checks used
+  disposable users/runs and temporary local row locks, not simulated API roles.
+- Frontend format, lint, typecheck and build passed; Vitest passed 275 tests with two
+  opt-in tests skipped. Nine Chromium checks passed for bills, financial panels and
+  full-month employment/replay at desktop, tablet and mobile widths.
+- The unchanged standalone employment SQL suite passed. Local installer tests passed
+  nine cases, including source mismatch detection, refusal of recorded migration
+  history and explicit refresh transaction boundaries. Local readiness checks confirm
+  the installed bills function bodies match the revised sources.
+
+These checks establish development verification, not hosted deployment approval.

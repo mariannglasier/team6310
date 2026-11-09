@@ -7,15 +7,8 @@ import {
   loadPlaythrough,
   PlaythroughLoadError,
 } from '../../services/loadPlaythrough'
-import { getSupabaseClient } from '../../services/supabase'
-import { parseUsdCents } from '../../services/contentService'
-import type { UsdCents } from '../../types/domain'
 import { findOwnedRuns } from '../../services/employmentGameplay'
-import { EmploymentPanel } from './EmploymentPanel'
 import { PlaythroughRecovery } from './PlaythroughRecovery'
-import { FinancialTracking } from '../../components/simulation/FinancialTracking'
-import { loadHouseholdExpenses } from '../../services/householdExpenses'
-import type { ExpenseState } from '../../types/householdExpenses'
 import type { LoadedPlaythrough } from '../../types/playthrough'
 import { BillSimulation } from './BillSimulation'
 
@@ -23,37 +16,10 @@ type LoadState =
   | { status: 'loading' }
   | { status: 'unavailable' }
   | { status: 'error' }
-  | { status: 'ready'; playthrough: LoadedPlaythrough; expenses: ExpenseState }
+  | { status: 'ready'; playthrough: LoadedPlaythrough }
 
 function RecordedPlaythrough({ id }: { id: string }) {
-  const { setEmployment, employment } = useSetup()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
-  const [scenarioChanges, setScenarioChanges] = useState<{
-    balance: UsdCents | null
-    changes: readonly UsdCents[]
-  } | null>(null)
-  const balance =
-    state.status === 'ready' ? state.playthrough.currentBalance : null
-  useEffect(() => {
-    let active = true
-    void getSupabaseClient()
-      .then(async (client) => {
-        const { data, error } = await client
-          .from('player_responses')
-          .select('balance_change_applied')
-          .eq('playthrough_id', id)
-        if (error) throw error
-        const changes = (data ?? []).map((row) =>
-          parseUsdCents(row.balance_change_applied, 'balance_change_applied'),
-        )
-        if (active) setScenarioChanges({ balance, changes })
-      })
-      .catch(() => {})
-    return () => {
-      active = false
-    }
-  }, [id, balance])
-
   useEffect(() => {
     let current = true
     loadPlaythrough(id).then(
@@ -63,30 +29,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
           setState({ status: 'unavailable' })
           return
         }
-        setState({
-          status: 'ready',
-          playthrough,
-          expenses: { status: 'loading' },
-        })
-        if (playthrough.expensesInitializedAt) return
-        try {
-          const data = await loadHouseholdExpenses(playthrough)
-          if (current)
-            setState({
-              status: 'ready',
-              playthrough,
-              expenses: data
-                ? { status: 'ready', data }
-                : { status: 'unavailable' },
-            })
-        } catch {
-          if (current)
-            setState({
-              status: 'ready',
-              playthrough,
-              expenses: { status: 'unavailable' },
-            })
-        }
+        setState({ status: 'ready', playthrough })
       },
       () => {
         if (current) setState({ status: 'error' })
@@ -110,40 +53,7 @@ function RecordedPlaythrough({ id }: { id: string }) {
         <PlaythroughRecovery />
       </>
     )
-  const run = state.playthrough
-  if (run.expensesInitializedAt) return <BillSimulation initialRun={run} />
-  return (
-    <FinancialTracking
-      run={run}
-      expenses={state.expenses}
-      scenarioChanges={
-        scenarioChanges?.balance === balance ? scenarioChanges.changes : null
-      }
-      employment={employment?.runId === run.id ? employment.state : undefined}
-      pregame={['board', 'preparation-result', 'application-result'].includes(
-        String((run.employmentState as { stage?: string } | null)?.stage),
-      )}
-    >
-      <EmploymentPanel
-        run={run}
-        onCommit={(snapshot) => {
-          setState((current) =>
-            current.status === 'ready'
-              ? { ...current, playthrough: snapshot.run }
-              : current,
-          )
-          setEmployment(
-            snapshot.state ? { runId: run.id, state: snapshot.state } : null,
-          )
-        }}
-      />
-      {!run.persona && (
-        <p role="alert">
-          Household information for this content version is unavailable.
-        </p>
-      )}
-    </FinancialTracking>
-  )
+  return <BillSimulation initialRun={state.playthrough} />
 }
 
 const LocalScenarioPreview = import.meta.env.DEV

@@ -23,7 +23,6 @@ LANGUAGE sql STABLE SECURITY INVOKER SET search_path='' AS $$
    FROM public.player_responses pr WHERE pr.playthrough_id=p.playthrough_id AND pr.version_id=p.version_id
  ) s
  WHERE p.playthrough_id=p_run_id AND p.owner_user_id=auth.uid() AND p.session_id IS NULL
-   AND p.expenses_initialized_at IS NOT NULL
    AND coalesce((auth.jwt()->>'is_anonymous')::boolean,false);
 $$;
 -- Invoker/RLS read only; strip default grants before exposing the one operation.

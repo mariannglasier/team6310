@@ -16,7 +16,6 @@ export interface LoadedPlaythrough {
   readonly currentJobId: string | null
   // Opaque database value: no employment structure or semantics are defined here.
   readonly employmentState: unknown
-  readonly expensesInitializedAt?: string | null
   readonly persona: {
     readonly id: string
     readonly versionId: string

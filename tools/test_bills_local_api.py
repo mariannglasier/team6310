@@ -7,7 +7,7 @@ from verify_employment_local import auth, request
 VERSION = '63100000-0000-4000-8000-000000000800'
 SELECT = ('playthrough_id,persona_id,version_id,owner_user_id,current_scenario_id,'
           'current_balance,current_day,cac_support_enabledabled,status,started_at,'
-          'session_id,current_job_id,employment_state,expenses_initialized_at')
+          'session_id,current_job_id,employment_state')
 
 
 def main():
@@ -16,12 +16,26 @@ def main():
     jobs = request('/rest/v1/jobs?select=job_id&version_id=eq.' + VERSION
                    + '&is_active=eq.true&is_approved=eq.true&needs_english_skills=eq.false&needs_computer_skills=eq.false')
     assert len(jobs) >= 2
+    # Empty schedules are initialized atomically without any stored marker.
+    empty_personas = request('/rest/v1/personas?select=persona_id&name=eq.%5BLOCAL%20TEST%5D%20Alex')
+    assert len(empty_personas) == 1
+    empty_token, _ = auth()
+    empty_id = request('/rest/v1/rpc/start_individual_playthrough', {'p_persona_id': empty_personas[0]['persona_id']}, empty_token)
+    empty = request('/rest/v1/rpc/get_bill_snapshot', {'p_run_id': empty_id}, empty_token)
+    assert empty['bills'] == [] and Decimal(str(empty['outstanding_total'])) == 0
+    # The AFTER INSERT initializer rejects non-anonymous creation; no run survives.
+    registered, _ = auth(True)
+    before = request('/rest/v1/playthroughs?select=playthrough_id', token=registered)
+    failure = request('/rest/v1/rpc/start_individual_playthrough', {'p_persona_id': personas[0]['persona_id']}, registered, allowed=(400,))
+    assert 'Fresh anonymous individual playthrough required' in failure['message']
+    assert request('/rest/v1/playthroughs?select=playthrough_id', token=registered) == before == []
+    print('PASS: actual Auth/REST empty schedule and initializer rejection rolls back creation')
     for persona in personas:
         token, owner = auth()
         run_id = request('/rest/v1/rpc/start_individual_playthrough', {'p_persona_id': persona['persona_id']}, token)
         # Reproduce the exact frontend GET that previously failed with HTTP 400.
         loaded = request('/rest/v1/playthroughs?select=' + SELECT + '&playthrough_id=eq.' + run_id, token=token)
-        assert len(loaded) == 1 and loaded[0]['expenses_initialized_at'] and loaded[0]['owner_user_id'] == owner
+        assert len(loaded) == 1 and loaded[0]['owner_user_id'] == owner
 
         def snapshot():
             return request('/rest/v1/rpc/get_bill_snapshot', {'p_run_id': run_id}, token)

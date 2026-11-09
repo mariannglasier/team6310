@@ -33,7 +33,6 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
     current_scenario_id: null,
     started_at: null,
     session_id: null,
-    expenses_initialized_at: '2026-11-08T12:00:00Z',
     employment_state: {
       engine: 'employment-v1',
       schemaVersion: 1,

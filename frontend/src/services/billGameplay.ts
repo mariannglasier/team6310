@@ -78,8 +78,6 @@ export async function loadBillSnapshot(
     !Array.isArray(value.bills)
   )
     throw new Error('Unexpected saved bill snapshot')
-  const marker = timestamp(r.expenses_initialized_at)
-  if (!marker) throw new Error('Bill schedule is not initialized')
   const ids = new Set<string>()
   const items = value.bills.map((item: unknown): Bill => {
     const b = object(item)
@@ -128,7 +126,6 @@ export async function loadBillSnapshot(
       currentJobId: r.current_job_id === null ? null : text(r.current_job_id),
       supportEnabled: r.cac_support_enabledabled as boolean | null,
       employmentState: r.employment_state,
-      expensesInitializedAt: marker,
     },
     items,
     paidTotal: money(value.paid_total),

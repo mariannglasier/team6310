@@ -50,9 +50,8 @@ export function EmploymentPanel({
   useEffect(() => {
     onPendingChange?.(pending)
   }, [pending, onPendingChange])
-  const billsEnabled = Boolean(run.expensesInitializedAt)
   const billsReady =
-    !billsEnabled ||
+    !bills ||
     Boolean(
       bills &&
       snapshot &&
@@ -159,7 +158,7 @@ export function EmploymentPanel({
         aria-busy={pending || automatic}
         className="employment-controls"
       >
-        {state?.stage === 'day' && billsEnabled && !billsReady ? (
+        {state?.stage === 'day' && !billsReady ? (
           <p role="status">Loading saved bills…</p>
         ) : skipInterviewDay ? (
           <p className="sr-only" role="status">

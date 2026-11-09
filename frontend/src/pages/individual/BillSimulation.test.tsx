@@ -53,7 +53,6 @@ const run = {
   sessionId: null,
   supportEnabled: false,
   startedAt: null,
-  expensesInitializedAt: '2026-11-08',
   employmentState: { revision: 1, stage: 'day' },
   persona: { id: 'p', versionId: 'v', name: 'Alex', description: '' },
 } as LoadedPlaythrough

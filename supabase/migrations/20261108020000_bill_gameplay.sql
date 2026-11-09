@@ -7,7 +7,7 @@ BEGIN
  IF auth.uid() IS NULL OR coalesce((auth.jwt()->>'is_anonymous')::boolean,false) IS NOT TRUE THEN
    RAISE EXCEPTION 'Anonymous participant required'; END IF;
  SELECT * INTO r FROM public.playthroughs WHERE playthrough_id=p_run_id AND owner_user_id=auth.uid() FOR UPDATE;
- IF NOT FOUND OR r.session_id IS NOT NULL OR r.expenses_initialized_at IS NULL THEN RAISE EXCEPTION 'Bills unavailable'; END IF;
+ IF NOT FOUND OR r.session_id IS NOT NULL THEN RAISE EXCEPTION 'Bills unavailable'; END IF;
  SELECT * INTO b FROM public.playthrough_expenses WHERE playthrough_expense_id=p_occurrence_id
    AND playthrough_id=r.playthrough_id AND version_id=r.version_id FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'Bill unavailable'; END IF;
@@ -32,7 +32,7 @@ BEGIN
  IF auth.uid() IS NULL OR coalesce((auth.jwt()->>'is_anonymous')::boolean,false) IS NOT TRUE THEN
    RAISE EXCEPTION 'Anonymous participant required'; END IF;
  SELECT * INTO r FROM public.playthroughs WHERE playthrough_id=p_run_id AND owner_user_id=auth.uid() FOR UPDATE;
- IF NOT FOUND OR r.session_id IS NOT NULL OR r.expenses_initialized_at IS NULL THEN RAISE EXCEPTION 'Bills unavailable'; END IF;
+ IF NOT FOUND OR r.session_id IS NOT NULL THEN RAISE EXCEPTION 'Bills unavailable'; END IF;
  SELECT * INTO b FROM public.playthrough_expenses WHERE playthrough_expense_id=p_occurrence_id
    AND playthrough_id=r.playthrough_id AND version_id=r.version_id FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'Bill unavailable'; END IF;
@@ -48,7 +48,6 @@ END $$;
 CREATE FUNCTION public.guard_bill_advancement() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
- IF OLD.expenses_initialized_at IS NULL THEN RETURN NEW; END IF;
  IF (NEW.current_day IS DISTINCT FROM OLD.current_day OR NEW.status='completed'
      OR NEW.employment_state->>'stage'='complete')
  AND EXISTS(SELECT 1 FROM public.playthrough_expenses WHERE playthrough_id=OLD.playthrough_id

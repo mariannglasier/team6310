@@ -63,8 +63,6 @@ await db.exec(migration('20261107010000_scenario_decisions_and_scheduling'));
 const start = async (p = persona) => (await db.query('select start_individual_playthrough($1) id', [p])).rows[0].id;
 const state = async id => (await db.query('select * from playthroughs where playthrough_id=$1', [id])).rows[0];
 const bills = async id => (await db.query('select * from playthrough_expenses where playthrough_id=$1 order by due_day,expense_id', [id])).rows;
-const legacy = await start();
-const legacyBefore = await state(legacy);
 const gameplayDefinitions = async () => (await db.query(`select proname,pg_get_functiondef(oid) definition from pg_proc
  where pronamespace='public'::regnamespace and proname in ('submit_employment_action','submit_scenario_decision',
  'restore_scenario_decision','manage_scheduled_scenario_progression','mark_fresh_employment_run','start_individual_playthrough') order by proname`)).rows;
@@ -76,10 +74,8 @@ await assert.rejects(() => db.exec(sql), /requires empty expense tables/);
 await db.exec('rollback; delete from persona_expenses');
 await db.exec(sql);
 assert.deepEqual(await gameplayDefinitions(),gameplayBefore);
-assert.deepEqual(await state(legacy), {...legacyBefore, expenses_initialized_at:null});
-assert.deepEqual(await bills(legacy), []);
 const empty = await start();
-assert.ok((await state(empty)).expenses_initialized_at);
+assert.equal(Number((await db.query("select count(*) n from information_schema.columns where table_schema='public' and table_name='playthroughs' and column_name='expenses_initialized_at'")).rows[0].n),0);
 assert.equal((await state(empty)).employment_state.stage, 'uninitialized');
 assert.deepEqual(await bills(empty), []);
 
@@ -129,8 +125,6 @@ await assert.rejects(() => definition(uuid(27),'Late content',1,1,null,1), /draf
 for (const assignment of ['amount_due=11',"name_snapshot='Changed'",'late_fee_amount=99','due_day=4',`expense_id='${simultaneous}'`]) {
  await assert.rejects(() => db.query(`update playthrough_expenses set ${assignment} where playthrough_expense_id=$1`,[rows[0].playthrough_expense_id]), /snapshots are immutable/);
 }
-await assert.rejects(() => db.query('update playthroughs set expenses_initialized_at=null where playthrough_id=$1',[run]), /identity is immutable/);
-await assert.rejects(() => db.query('update playthroughs set expenses_initialized_at=now() where playthrough_id=$1',[legacy]), /only during run creation/);
 await assert.rejects(() => db.query('update playthrough_expenses set paid_at=now() where playthrough_expense_id=$1',[rows[0].playthrough_expense_id]), /bill_payment/);
 // Trusted test-only transitions exercise the immutable history guards; Stage 1
 // deliberately exposes no participant operation that performs these updates.
@@ -145,7 +139,7 @@ await assert.rejects(() => db.query(copySql,[run,copy.expense_id,v,copy.due_day,
 await assert.rejects(() => db.query(copySql,[empty,copy.expense_id,v,2,20,copy.name_snapshot,3]), /run_edition_fk/);
 await assert.rejects(() => db.query(copySql,[empty,copy.expense_id,version,2,20,copy.name_snapshot,3]), /definition_edition_fk/);
 // No API roles or leaked default grants can call internal trigger functions.
-for (const name of ['guard_bill_definition','guard_bill_occurrence_snapshot','guard_bill_run_marker','initialize_fresh_bill_schedule']) {
+for (const name of ['guard_bill_definition','guard_bill_occurrence_snapshot','initialize_fresh_bill_schedule']) {
  const security = (await db.query(`select p.proowner=c.relowner correct_owner,
    has_function_privilege('authenticated',p.oid,'EXECUTE') auth,
    has_function_privilege('anon',p.oid,'EXECUTE') anon,
@@ -157,28 +151,29 @@ for (const name of ['guard_bill_definition','guard_bill_occurrence_snapshot','gu
 await db.exec('alter trigger initialize_fresh_bill_schedule on playthroughs rename to z_initialize_fresh_bill_schedule');
 const reordered = await start(p);
 assert.equal((await state(reordered)).employment_state.stage,'uninitialized');
-assert.ok((await state(reordered)).expenses_initialized_at);
 assert.equal((await bills(reordered)).length,8);
-// A collision rolls back the run AND all generated rows/markers.
+// A collision rolls back the run AND all generated rows.
 await db.query(`insert into scenarios values($1,$2,$3,'scheduled',9)`,[uuid(40),v,p]);
 const beforeRuns = (await db.query('select count(*) n from playthroughs')).rows[0].n;
 const beforeBills = (await db.query('select count(*) n from playthrough_expenses')).rows[0].n;
 await assert.rejects(() => start(p), /schedule collision/);
 assert.equal((await db.query('select count(*) n from playthroughs')).rows[0].n,beforeRuns);
 assert.equal((await db.query('select count(*) n from playthrough_expenses')).rows[0].n,beforeBills);
-// Invalid privileged/nonparticipant insert paths never gain a bills marker.
+// Individual creation fails closed rather than producing a run with a skipped schedule.
 await db.exec('set test.anonymous=false');
-const registered = await start();
-assert.equal((await state(registered)).expenses_initialized_at,null);
+await assert.rejects(()=>start(),/Fresh anonymous individual/);
 await db.exec('set test.anonymous=true');
-await assert.rejects(() => db.query(`insert into playthroughs(persona_id,version_id,owner_user_id,current_balance,current_day,status,started_at,expenses_initialized_at)
- values($1,$2,$3,100,1,'active',now(),now())`,[persona,version,owner]), /server controlled/);
+await assert.rejects(()=>db.query(`insert into playthroughs(persona_id,version_id,owner_user_id,current_balance,current_day,status,started_at)
+ values($1,$2,$3,99,1,'active',now())`,[persona,version,owner]),/starting balance/);
+await assert.rejects(()=>db.query(`insert into playthroughs(playthrough_id,persona_id,version_id,owner_user_id,current_balance,current_day,status,started_at)
+ values($1,$2,$3,$4,100,1,'active',now())`,[run,p,v,owner]),/playthroughs_pkey/);
+assert.equal((await bills(run)).length,8);
 // A later trigger failure must roll back successful occurrence initialization too.
 await db.exec(`create function test_fail_insert() returns trigger language plpgsql as $$begin raise exception 'Injected failure';end$$;
  create trigger zz_test_fail after insert on playthroughs for each row execute function test_fail_insert();`);
 await assert.rejects(() => start(), /Injected failure/);
-assert.equal(Number((await db.query('select count(*) n from playthroughs')).rows[0].n),Number(beforeRuns)+1);
-console.log('PASS: Stage 1 schedules, empty/legacy runs, Days 2/3, Day 30, snapshots, edition constraints, RLS/ACLs, trigger ordering and creation rollback');
+assert.equal(Number((await db.query('select count(*) n from playthroughs')).rows[0].n),Number(beforeRuns));
+console.log('PASS: Stage 1 schedules, empty/populated runs, Days 2/3, Day 30, snapshots, edition constraints, RLS/ACLs, trigger ordering and creation rollback');
 await db.exec('drop trigger zz_test_fail on playthroughs');
 await db.query('delete from scenarios where scenario_id=$1',[uuid(40)]);
 await db.exec(migration('20261108020000_bill_gameplay'));
@@ -280,6 +275,8 @@ assert.equal(Number(snapshot.outstanding_total),71);
 assert.equal(Number(snapshot.upcoming_total),0);
 assert.equal(Number(snapshot.run.current_balance),97); // three wages, less the Day 9 settlement, after injected zero cash
 assert.equal(snapshot.bills.length,8);
+const emptySnapshot=(await db.query('select get_bill_snapshot($1) result',[empty])).rows[0].result;
+assert.deepEqual(emptySnapshot.bills,[]);assert.equal(Number(emptySnapshot.paid_total),0);assert.equal(Number(emptySnapshot.outstanding_total),0);
 await db.exec(`set test.uid='${uuid(99)}'`);
 assert.equal((await db.query('select get_bill_snapshot($1) result',[game])).rows[0].result,null);
 await db.exec(`reset role;set test.uid='${owner}'`);
