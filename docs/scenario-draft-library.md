@@ -1,3 +1,9 @@
+> **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
+>
+> **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
+>
+> **Current implementation boundary — updated November 7, 2026:** Employment uses server-controlled `employment_state` JSONB and `submit_employment_action`. The current branch includes protected ordinary direct-balance submissions, saved responses/recaps, atomic restoration and scheduled scenario progression through `submit_scenario_decision`, `restore_scenario_decision` and a progression trigger. The normal simulation uses these services; the development preview is not the only scenario path. This does not implement the 60-card library, expense settlement, unpaid debt, late fees or general branching. Repository code is evidence of implementation, not proof of deployment; see [the reconciliation report](gameplay-documentation-reconciliation.md). Hosted Supabase remains the maintained production database. Do not reconstruct historical migrations, reset or recreate hosted Supabase, automatically apply hosted migrations, replace anonymous authentication, or let clients independently write authoritative balances.
+
 # CAC Poverty Exercise — 60 scenario drafts, revised
 
 **November 7 baseline correction:** Historical scenario dollar examples are not verified market prices. The [online baseline audit](scenario-data-sourcing.md#online-baseline-evidence---november-7-2026) records checked evidence and replacement proposals for rent and other costs, renewed API candidates, and unresolved components across all 60 cards. In particular, $650 is unsupported as full-apartment Sandy Springs monthly rent. Complete the specified housing/product/service quantities and all-in charges before publication; CPI cannot validate an unsupported baseline. This is documentation, not a gameplay price change.
@@ -16,27 +22,37 @@ The user superseded all earlier fixed-monetary-value exceptions: no price or oth
 
 **November 2, 2026 · Content and specification handoff · Pending staff review.** This revision replaces the earlier service-centered draft library. No application, database or financial engine has been changed.
 
+## Historical branch handoff: employment prerequisites
+
+At source commit `aef3d98`, this content branch excluded later employment implementation. The destination now has server-backed employment using `employment_state` JSONB and `submit_employment_action`; its English/computer eligibility and different-eligible-job reapplication behavior take precedence over older draft wording. These drafts do not authorize employment changes.
+
+## Approved direction and unresolved details
+
+**Bill-example status:** Every Ignore, unpaid-principal, fee, sidebar Pay, debt-summary and related review-blocker statement below is conditional historical reference only. None establishes a required feature, implementation task, publication prerequisite or acceptance criterion. The existing payment-failure rules remain authoritative.
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 ## CAC fact pairing update — November 6, 2026
 
 30 scenarios now have one proposed CAC fact paired to an existing database record; 30 retain a specific evidence gap. See the [60-scenario pairing review](scenario-cac-fact-pairings.md) and [read-only fact snapshot](data/cac-service-facts-2025.json). References use real fact IDs plus service key, fact key and reporting year. These are documentation pairings for review; no scenario rows, game effects, general facts, or publication state were changed. The attached revised library was checked against this branch and matched before editing.
 
-## Combined branch status - November 6, 2026
+## Historical incoming branch status - November 6, 2026
 
 This branch now includes GitHub main's application code through `a0d9383`, alongside the scenario drafts and CAC fact pairings. Main's Phase 1 and Phase 2 employment implementation is present; see [Phase 2 employment](phase-2-employment.md). The earlier handoff stating that employment implementation was excluded is superseded by this merge.
 
-The draft library remains proposed content. Combining branches does not implement ordinary scenarios, ignored bills, sidebar settlements, fact display, or publication. Reconcile draft-specific employment bindings and eligibility with the implemented employment catalog before mapping or publishing these cards. The approved draft choices and fact pairings below are preserved.
+The draft library remains proposed content. This content merge adds no gameplay implementation. Destination ordinary-scenario persistence is described above; ignored bills, sidebar settlements, draft fact display and publication are not supplied by this library. Reconcile draft-specific employment bindings and eligibility with the implemented employment catalog before mapping or publishing these cards. The draft choices and proposed fact pairings below are preserved for review; unpaid-bill approval claims are superseded by the optional-only decision above.
 
 ### Current code versus these drafts
 
 The merged application starts a run directly from household selection; the legacy Review route redirects. Employment already uses English/computer eligibility, CAC preparation, $60 professional clothing with ownership reuse, same-day Day 2 reapplication to another eligible job, Day 3 hiring, and weekly pay beginning seven days after hiring. These are existing employment behaviors, not features newly implemented by this draft library. See [Phase 1 employment](phase-1-employment.md) and [Phase 2 employment](phase-2-employment.md) for implementation scope.
 
-Ordinary days still use walkthrough placeholders. The 60 cards, tax decision, annual CAC fact sentences, unpaid-bill model and sidebar Pay are content/design handoffs awaiting implementation and review. Draft references to unresolved wages or IDs concern binding these cards to approved edition records; they do not mean the current job board has no configured wages or IDs. The illustrative route below is not the current application schedule.
+Scheduled ordinary scenarios now support protected saved submissions and progression on the destination branch; unconfigured ordinary days may still show placeholders. The 60 cards, tax decision and annual CAC fact sentences remain content handoffs for review. The unpaid-bill model and sidebar Pay are optional, unapproved historical concepts, not pending implementation tasks. Draft references to unresolved wages or IDs concern binding these cards to approved edition records; they do not mean the current job board has no configured wages or IDs. The illustrative route below is not the current application schedule.
 
 ## Player-facing copy handoff - November 6, 2026
 
 Each scenario title is the player-facing heading above its situation text. D001-D060 identifiers are internal references and are never displayed. Titles describe the current event without revealing later events, calendar routing, or hidden outcomes.
 
-Only scenario titles, **Situation**, choice labels, committed result text, approved fact display sentences, and approved end-screen debt explanations are player-facing fields. All timing, money/state columns, eligibility, mapping, review blockers and explanatory prose are staff/developer notes and must not be displayed as narrative. The Markdown is a content handoff, not a file the application currently renders.
+Only scenario titles, **Situation**, choice labels, committed result text, approved fact display sentences, and hypothetical end-screen debt explanations (only if separately approved) are player-facing fields. All timing, money/state columns, eligibility, mapping, review blockers and explanatory prose are staff/developer notes and must not be displayed as narrative. The Markdown is a content handoff, not a file the application currently renders.
 
 Player copy stays in the household's present circumstances. Do not mention the exercise, script, mode, numbered days, hidden rules, future interview opportunities, guaranteed hiring, refunds, or later events before they occur. Scheduled bills may be shown ahead of time. Reveal the actual committed outcome after submission; do not preview alternative outcomes. Keep implementation cautions outside visible text.
 
@@ -44,7 +60,7 @@ Braced tokens are rendering bindings, never literal display text: `{job_title}` 
 
 For D002, append exactly one outcome after the clothing receipt: **hired:** "You got the job as {job_title}." **not hired:** "The interview did not lead to a job." Select it from the committed result, never from the clothing label alone. These branches are staff instructions; never show both or label them to the player. D004 result sentences appear only after the hiring action commits.
 
-## Approved direction and unresolved details
+## Incoming content clarifications and unresolved details
 
 **D034 replacement - November 6, 2026:** The user requested a broken dresser instead of a bed and confirmed CAC carries dressers, cabinets, chairs and home decor. D034 now includes a conditional free dresser-receipt choice. The existing $390/$165 retail alternatives remain draft assumptions. No CAC furniture outcome statistic has been assigned; the user does not require forcing a fact connection for this edit. This does not resolve the existing publication fact requirement.
 
@@ -59,15 +75,17 @@ Website review: CAC describes [free clothing assistance](https://ourcac.org/serv
 
 The user approved a library built around hard household decisions, major financial shocks, and selective CAC support. Every displayed gameplay choice below is a complete submitted decision. There are no “review your money” answers. A zero-cost answer still records a real choice and its stated outcome. The inspiration is the resource-pressure approach discussed with [SPENT](https://playspent.org/); these are original drafts, not copied cards or verified reproductions of its mechanics.
 
-**Approved bills behavior:** ignoring a bill completes that scenario and creates an unpaid sidebar item with principal plus a late fee. It deducts no cash. Each item has a Pay button. Successful payment deducts its outstanding total once and removes it from the unpaid list, preserving history. Bills may remain unpaid through Day 30. The end screen lists the remaining debt and explains possible future consequences. Ignoring a bill does not end the run.
+**Optional future bill concept, not planned:** The historical idea was to record unpaid principal on Ignore without deducting cash. Whether to adopt that idea, any late fees, sidebar payment, or month completion with debt remains undecided. No implementation or approval work is scheduled by this document.
 
-**Approved days:** ordinary scenarios and job events occupy separate days. Preserve the existing Day 2 first interview, its result, and immediate reapplication after failure as the sole exception. The conditional follow-up stays on Day 3. Submit → committed result → Continue → next day, except Continue after a failed Day 2 interview first opens same-day reapplication. Automatic weekly pay remains a notification/credit before the day’s scenario, not a second scenario. Sidebar Pay is an account action, not another scenario or day advance.
+**Approved days:** ordinary scenarios and job events occupy separate days. Preserve the existing Day 2 first interview, its result, and immediate reapplication after failure as the sole exception. The conditional follow-up stays on Day 3. Submit → committed result → Continue → next day, except Continue after a failed Day 2 interview first opens same-day reapplication. Automatic weekly pay remains a notification/credit before the day’s scenario, not a second scenario.
 
 **Not approved by this document:** the numerical amounts, late-fee values/repetition rules, new ordinary choice consequences, scenario-specific eligibility and actual costs. All ordinary dollar figures below are **illustrative simulation assumptions proposed for review**, not market quotes, entitlements, legal fees or approved financial rules. The approved exceptions are interview clothing at USD 60.00 and the fixed USD 1,000.00 tax refund. Tax preparer fee and job wages remain unresolved. No invented draft amount is ready for production.
 
 The fee examples provisionally show **one fee on the initial Ignore submission** so the arithmetic is reviewable. Whether fees ever repeat, a grace period exists, or an ignored balance can be paid in part is UNRESOLVED. Do not implement recurrence, interest, partial payments or compounded fees from these drafts. The currently proposed sidebar Pay settles the full outstanding total. Bills cannot be re-ignored to generate duplicate fees.
 
-## Shared content contract
+## Draft reference conventions (not a feature backlog)
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 - Authority: [scenarios.md](scenarios.md), [data-model.md](data-model.md), [security.md](security.md), and the approved decisions above. The offline batch exception affects this writing task only; the application’s one-draft-per-generation-request rule is unchanged.
 - Exactly 60 drafts: **5 fixed-flow/tax, 15 bill alternatives, 15 major shocks, 25 everyday/family/work tradeoffs**. Categories are the six approved names. Ten per category is no longer a constraint. A run selects a compatible subset, not all 60.
@@ -75,7 +93,7 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 - Keys D001–D060, choice suffixes, state labels and C-fact aliases are document references, not actual database IDs. No published logical IDs are replaced by these reference keys. State labels describe **proposed structured outcomes**, never working engine code.
 - Every scenario has exactly one general fact slot and one CAC fact slot, as the unchanged publication rule requires. All general facts remain UNRESOLVED; a topic sourcing brief appears per card. Where a relevant CAC observation is available, its slot now references the current database-backed registry and a proposed display sentence. A context-only pairing does not add a CAC choice or assistance effect. A scenario with no relevant CAC observation keeps that slot UNRESOLVED; do not force an unrelated CAC service onto it or imply CAC can cover the expense. Fact-policy exceptions have not been approved. This is an explicit publication blocker for unsupported topics.
 - No CAC option is offered unless listed on that card and mode, actual service/item eligibility, availability and edition mapping validate. Cards without CAC support stay without it in both modes. A financial effect is capped at eligible expense remaining; no cash from in-kind coverage, no stacking. CAC impact facts do not mean support was available or used.
-- Selection alone changes nothing. Protected submission atomically records the selected answer, authorized effects and actual assistance use; retries/refresh never repeat charges, fees, wages, refunds or choices. Show success only after commitment. Expensive unselected alternatives do not end play. The existing rule that an attempted unaffordable paid option ends the run remains unchanged; bill Ignore offers the separate approved no-cash continuation path. An unsuccessful sidebar Pay must never erase debt or record payment; existing unaffordable-attempt ending behavior still applies unless separately changed by the team.
+- Selection alone changes nothing. Protected submission atomically records the selected answer, authorized effects and actual assistance use; retries/refresh never repeat charges, fees, wages, refunds or choices. Show success only after commitment. Expensive unselected alternatives do not end play. The existing rule that an attempted unaffordable paid option ends the run remains unchanged; bill Ignore is only an optional, undecided future concept. An unsuccessful sidebar Pay must never erase debt or record payment; existing unaffordable-attempt ending behavior still applies unless separately changed by the team.
 - Deferral creates debt only on bill cards. “Wait,” “decline” or “buy less” on ordinary cards leaves the stated need unmet; it does not fabricate a bill or late fee. No loan, negative-balance permission, score, automatic illness, eviction, job loss or additional charge is implied. Any proposed future mechanic must be approved and explicitly implemented.
 - Each ordinary choice resolves the card and shows its result. Subsequent route selection follows eligibility and circumstance state; unmet needs in result text do not automatically trigger another event. All new state dependencies, wage changes and delayed costs below are review blockers until the team defines them. Results are respectful, without a correct-parent or responsible-person score.
 - Money uses USD and signed exact decimal/integer-cent calculations; round final values once with half-cent ties away from zero. Each amount needs its own edition-scoped binding: target, approved assumption or source observation, units/period/geography, quantity/formula and resolved cents. Annual CAC totals never determine individual purchase or assistance values.
@@ -254,6 +272,8 @@ Any available valid submitted choice hires the different job on Day 3, regardles
 
 ## D005 — Time to file taxes
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** fixed / Financial Literacy & Taxes. **Persona intent:** ALL. **Eligibility:** Non-scheduled; proposed Day 18; not previously filed.
 
 **Situation:** “It is time to file your taxes. Will you handle the return yourself or get help preparing it?”
@@ -284,6 +304,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approved job/fee/service bindings and fixed-flow validation.
 
 ## D006 — Rent is due
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -319,6 +341,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D007 — Keeping the lights on
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “The electricity bill is due. Your household still needs groceries and transportation this month. Which obligation will you carry?”
@@ -352,6 +376,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Bind confirmed utility support to approved eligibility, availability and coverage amounts.
 
 ## D008 — The water bill
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -387,6 +413,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D009 — Staying connected
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “Your phone plan renews today. Keeping it paid competes with the money you were trying to save for an emergency.”
@@ -415,6 +443,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires a modeled plan that allows an unpaid billed balance; not a prepaid top-up..
 
 ## D010 — The internet bill
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -450,6 +480,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D011 — Car insurance is due
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Financial Literacy & Taxes. **Persona intent:** CAR. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “A car insurance installment is due. Ignoring it preserves cash today while leaving a larger amount unpaid.”
@@ -483,6 +515,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D012 — A clinic bill arrives
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “A bill from an earlier clinic visit comes due. The care already happened; ignoring the invoice will not undo the visit.”
@@ -512,6 +546,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D013 — The childcare bill
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “Maya’s agreed childcare arrangement has an invoice due. Paying it uses money you had hoped to keep available for the rest of the month.”
@@ -540,6 +576,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Requires approved care arrangement and terms. CAC daycare payments are not established..
 
 ## D014 — Maya's school meal balance
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -574,6 +612,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D015 — The repair bill
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** CAR. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “A repair completed before the month has a bill due today. The car is already repaired; this choice is about the unpaid invoice.”
@@ -603,6 +643,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D016 — A pharmacy bill arrives
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “A pharmacy account invoice for an earlier purchase is due. The medicine was already supplied.”
@@ -631,6 +673,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only if a billed pharmacy arrangement is explicitly configured; do not assume pharmacies extend credit..
 
 ## D017 — A repayment is due
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Financial Literacy & Taxes. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -664,6 +708,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Staff must approve existence, terms and persona linkage; do not create an automatic loan..
 
 ## D018 — The gas bill
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -699,6 +745,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## D019 — Rent or a cash cushion?
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
 **Situation:** “Rent is due just as you start to rebuild a cash buffer. Paying means giving up that buffer; ignoring creates a larger obligation.”
@@ -732,6 +780,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Alternative to D006 for the same monthly rent occurrence, never a second rent charge..
 
 ## D020 — A medical bill remains
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
@@ -1844,6 +1894,8 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 ## Illustrative route and difficulty review
 
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
 The 60 cards are alternatives. Draft amounts and one sample route are insufficient evidence that difficulty is balanced. Use approved starting balances, jobs/wages and household expenses to evaluate routes in both modes before publication. The aim is sustained pressure from competing needs and a few large shocks, without forcing every household through all 15 shocks or making survival mathematically impossible on every path. No completion-rate target is approved.
 
 The following is an **unapproved editorial route for Jordan**, assuming the necessary car, household-service, school, care and seasonal predicates have been explicitly approved. It demonstrates day separation and category coverage only; it is not a validated or ready-to-publish schedule. Replace ineligible events rather than assume the predicates. No rule makes these scenarios appear in live play today.
@@ -1933,7 +1985,9 @@ Teacher’s Closet audience, TCC meaning and workforce counting units still need
 
 The requirement for exactly one relevant CAC fact plus one general fact remains unchanged. All 60 general fact slots remain unsourced. The 30 unmatched CAC slots remain publication blockers until suitable facts or a separately approved policy revision exist. Pairing existing CAC records does not publish this draft library or approve its illustrative prices.
 
-## Database handoff
+## Historical mapping ideas (not implementation tasks)
+
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
 
 | Draft field | Intended mapping | Resolution required |
 | --- | --- | --- |
@@ -1943,15 +1997,17 @@ The requirement for exactly one relevant CAC fact plus one general fact remains 
 | Proposed costs and outcomes | Choice/expense bindings and structured transition definitions | Approved exact money, supported state, affordability checks, no executable narrative |
 | CAC option when present | `cac_support_effects`, service coverage | One capped effect at most; confirmed service/item/household eligibility; real service ID |
 | Fact slots | Proposed CAC source: `cac_service_facts`; edition linkage: `statistics`, `scenario_statistics` | Use the referenced real fact record as source; resolve actual scenario/edition IDs and exactly one approved general/CAC role. No database link was created by this documentation edit. |
-| Ignored bill | Run-specific bill occurrence plus liability/fee tracking | Original principal, outstanding principal, fee components, paid status, version, source response and idempotency; exact schema still to be designed |
-| Sidebar Pay | Separate protected settlement operation/history | Caller ownership, active run, owned outstanding bill, current total, affordability, atomic payment and debt settlement; never replace the original scenario answer |
+| Optional, unapproved ignored-bill concept | Run-specific bill occurrence plus liability/fee tracking | Original principal, outstanding principal, fee components, paid status, version, source response and idempotency; exact schema still to be designed |
+| Optional, unapproved sidebar Pay concept | Separate protected settlement operation/history | Caller ownership, active run, owned outstanding bill, current total, affordability, atomic payment and debt settlement; never replace the original scenario answer |
 | Deferred effects / needs | Run-specific circumstance definitions | Approve mechanics and route predicates before implementation; no extra charge inferred from prose |
 | Draft review | Pending content/review records | Staff approvals and provenance; do not invent model API calls, generation request records or attempt counts for this offline authoring task |
 
 For each unresolved field, retain a pending marker instead of a fake ID or numeric zero. Freeze approved contents by edition, pin runs to their starting version, and keep pending edits out of gameplay. Restore ignored balances, fee components and paid history without replaying transactions. Replays start new runs and retain the old summary/history.
 
-## Remaining decisions and verification
+## Historical review considerations (not scheduled work)
 
-Approved mechanics are recorded in the corresponding specifications; they are not implemented by this document. Before publication, approve all new amount assumptions, late-fee timing/repetition, whether partial settlement is supported, applicable billed obligations/provider terms, future-consequence text, new state transitions, general/CAC facts, and compatible routes with no day collisions. Keep the two approved fixed money rules and original Day 2 sequence intact.
+**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+
+Approved mechanics are recorded in the corresponding specifications; they are not implemented by this document. Any draft independently selected for future publication would need content and fact review. Bill mechanics, fees, settlement and completion with debt are optional ideas only; retaining their examples creates no obligation to review or implement them. Keep the two approved fixed money rules and original Day 2 sequence intact.
 
 Editorial checks cover 60 sequential unique entries, the 5/15/15/25 type mix, choice rows and required fields, no review-only answers, arithmetic in unpaid examples, selective CAC options, preserved source references, and fixed-flow markers. They do not demonstrate actual simulation, security enforcement, market/legal accuracy, route solvability or balanced difficulty. Frontend tests/builds are outside this content-only update.

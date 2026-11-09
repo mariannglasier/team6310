@@ -5,7 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { SetupProvider } from '../../state/SetupProvider'
 import { getSupabaseClient } from '../../services/supabase'
 import { loadPlaythrough } from '../../services/loadPlaythrough'
-import { loadHouseholdExpenses } from '../../services/householdExpenses'
+import { loadBillSnapshot } from '../../services/billGameplay'
 import { contentService } from '../../services/contentService'
 import { createIndividualPlaythrough } from '../../services/playthroughService'
 import { usdCents } from '../../types/domain'
@@ -19,8 +19,9 @@ vi.mock('../../services/loadPlaythrough', async (original) => ({
   ...(await original<typeof import('../../services/loadPlaythrough')>()),
   loadPlaythrough: vi.fn(),
 }))
-vi.mock('../../services/householdExpenses', () => ({
-  loadHouseholdExpenses: vi.fn(),
+vi.mock('../../services/billGameplay', async (original) => ({
+  ...(await original<typeof import('../../services/billGameplay')>()),
+  loadBillSnapshot: vi.fn(),
 }))
 vi.mock('../../services/playthroughService', () => ({
   createIndividualPlaythrough: vi.fn(),
@@ -88,10 +89,16 @@ beforeEach(() => {
     },
   } as unknown as Awaited<ReturnType<typeof getSupabaseClient>>)
   vi.mocked(loadPlaythrough).mockResolvedValue(run)
-  vi.mocked(loadHouseholdExpenses).mockResolvedValue({
-    source: 'definitions',
+  vi.mocked(loadBillSnapshot).mockImplementation(async (run) => ({
+    run,
     items: [],
-  })
+    paidTotal: usdCents(0),
+    overdueTotal: usdCents(0),
+    outstandingTotal: usdCents(0),
+    upcomingTotal: usdCents(0),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(0),
+  }))
   vi.mocked(contentService.loadHouseholds).mockResolvedValue({
     versionId: 'edition',
     versionNumber: 1,

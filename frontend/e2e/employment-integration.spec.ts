@@ -126,6 +126,17 @@ test('integrated employment keeps saved finances and supports a full local month
         stage: 'uninitialized',
         receipts: {},
       }
+    } else if (url.includes('/rpc/get_bill_snapshot')) {
+      body = {
+        run: savedRow(),
+        bills: [],
+        paid_total: 0,
+        overdue_total: 0,
+        outstanding_total: 0,
+        upcoming_total: 0,
+        scenario_income: 0,
+        scenario_charged: 0,
+      }
     } else if (url.includes('/rpc/submit_employment_action')) {
       const payload = route.request().postDataJSON()
       if (payload.p_action.type === 'initialize')
@@ -354,7 +365,7 @@ test('integrated employment keeps saved finances and supports a full local month
   await expect(page.locator('.finance-balance')).toHaveText('$1,340.00')
   await expect(
     page.getByRole('complementary', { name: 'Upcoming household expenses' }),
-  ).toContainText('Rent')
+  ).not.toContainText('Rent')
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

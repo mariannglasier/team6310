@@ -323,6 +323,7 @@ export async function submitEmployment(
   const committed = {
     ...run,
     employmentState: row.employment_state,
+    currentScenarioId: row.current_scenario_id,
     currentBalance: parseUsdCents(row.current_balance, 'balance'),
     currentDay: row.current_day,
     currentJobId: row.current_job_id,

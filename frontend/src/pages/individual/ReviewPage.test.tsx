@@ -1,4 +1,4 @@
-import { loadHouseholdExpenses } from '../../services/householdExpenses'
+import { loadBillSnapshot } from '../../services/billGameplay'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
@@ -16,8 +16,9 @@ import { createIndividualPlaythrough } from '../../services/playthroughService'
 import { SimulationPage } from './SimulationPage'
 import { loadPlaythrough } from '../../services/loadPlaythrough'
 
-vi.mock('../../services/householdExpenses', () => ({
-  loadHouseholdExpenses: vi.fn(),
+vi.mock('../../services/billGameplay', async (original) => ({
+  ...(await original<typeof import('../../services/billGameplay')>()),
+  loadBillSnapshot: vi.fn(),
 }))
 
 vi.mock('../../services/loadPlaythrough', () => ({ loadPlaythrough: vi.fn() }))
@@ -86,10 +87,16 @@ const chooseCenter = async (user: ReturnType<typeof userEvent.setup>) => {
 
 beforeEach(() => {
   vi.resetAllMocks()
-  vi.mocked(loadHouseholdExpenses).mockResolvedValue({
-    source: 'definitions',
+  vi.mocked(loadBillSnapshot).mockImplementation(async (run) => ({
+    run,
     items: [],
-  })
+    paidTotal: usdCents(0),
+    overdueTotal: usdCents(0),
+    outstandingTotal: usdCents(0),
+    upcomingTotal: usdCents(0),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(0),
+  }))
   vi.mocked(loadPlaythrough).mockImplementation(async (id) => ({
     id,
     personaId: 'p1',

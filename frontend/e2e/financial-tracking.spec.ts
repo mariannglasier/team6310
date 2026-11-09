@@ -64,6 +64,59 @@ test('financial panels follow the approved layout and stay readable at every vie
         },
         { expense_id: 'rent', name: 'Rent', amount: 500, first_due_day: 4 },
       ]
+    } else if (url.includes('/rpc/get_bill_snapshot')) {
+      body = {
+        run: {
+          playthrough_id: 'run',
+          persona_id: 'persona',
+          version_id: 'version',
+          owner_user_id: 'owner',
+          current_scenario_id: null,
+          current_balance: 350,
+          current_day: 1,
+          cac_support_enabledabled: null,
+          status: 'active',
+          started_at: null,
+          session_id: null,
+          current_job_id: null,
+          employment_state: {
+            engine: 'employment-v1',
+            schemaVersion: 1,
+            revision: 0,
+            stage: 'uninitialized',
+            receipts: {},
+          },
+        },
+        bills: [
+          {
+            playthrough_expense_id: 'rent',
+            name_snapshot: 'Rent',
+            amount_due: 500,
+            due_day: 4,
+          },
+          {
+            playthrough_expense_id: 'utilities',
+            name_snapshot: 'Utilities',
+            amount_due: 75,
+            due_day: 14,
+          },
+        ].map((bill) => ({
+          ...bill,
+          playthrough_id: 'run',
+          version_id: 'version',
+          late_fee_amount: 0,
+          ignored_at: null,
+          paid_at: null,
+          paid_day: null,
+          payment_balance_after: null,
+        })),
+        paid_total: 0,
+        overdue_total: 0,
+        outstanding_total: 575,
+        upcoming_total: 575,
+        scenario_income: 0,
+        scenario_charged: 0,
+      }
     } else if (url.includes('/playthroughs'))
       body = [
         {
@@ -73,13 +126,19 @@ test('financial panels follow the approved layout and stay readable at every vie
           owner_user_id: 'owner',
           current_scenario_id: null,
           current_balance: 350,
-          current_day: 2,
+          current_day: 1,
           cac_support_enabledabled: null,
           status: 'active',
           started_at: null,
           session_id: null,
           current_job_id: null,
-          employment_state: null,
+          employment_state: {
+            engine: 'employment-v1',
+            schemaVersion: 1,
+            revision: 0,
+            stage: 'uninitialized',
+            receipts: {},
+          },
         },
       ]
     else if (url.includes('/personas')) body = [persona]

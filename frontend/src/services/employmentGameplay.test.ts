@@ -102,6 +102,7 @@ it('retries the identical persisted request after a lost response', async () => 
           current_balance: '123.45',
           current_day: 1,
           current_job_id: null,
+          current_scenario_id: null,
           cac_support_enabledabled: null,
           status: 'active',
         },
