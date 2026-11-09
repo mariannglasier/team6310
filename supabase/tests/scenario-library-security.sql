@@ -21,6 +21,8 @@ BEGIN
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',actor,'role','authenticated','is_anonymous',true)::text,true);
  result:=public.submit_scenario_decision(rid,sid,cid);
  IF result->'run'->>'status'<>'ended' OR (result->'run'->>'current_balance')::numeric<>0
+ OR result->'run'->'employment_state'->>'stage'<>'ended'
+ OR NOT public.valid_employment_document(result->'run'->'employment_state')
  OR result->'response'<>'null'::jsonb OR EXISTS(SELECT 1 FROM public.player_responses WHERE playthrough_id=rid)
  THEN RAISE EXCEPTION 'Unaffordable preparation must not apply a fee or refund'; END IF;
  IF EXISTS(SELECT 1 FROM public.get_event_recap_facts(rid,sid::text)) THEN RAISE EXCEPTION 'Uncommitted fact read'; END IF;

@@ -23,7 +23,7 @@ const headings = {
   'reapply-result': 'Your application is in.',
   income: 'Your weekly pay has arrived.',
   complete: 'You reached Day 30.',
-  ended: 'Your walkthrough ended early.',
+  ended: 'Simulation ended early.',
 } as const
 
 export function EmploymentGame({

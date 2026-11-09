@@ -222,9 +222,11 @@ export async function employmentSnapshot(
   if (jobs.some((j) => j.versionId !== run.versionId))
     throw new UnsupportedEmploymentDocumentError('Wrong job edition')
   const pregame =
+    run.status === 'active' &&
     ['board', 'preparation-result', 'application-result'].includes(
       String(s.stage),
-    ) && run.currentDay === 1
+    ) &&
+    run.currentDay === 1
   const state: Walkthrough = {
     persona: {
       ...run.persona,
@@ -234,7 +236,7 @@ export async function employmentSnapshot(
     jobs: jobs.map((job) => ({ job })),
     support: run.supportEnabled,
     clothingCost: parseUsdCents('60.00', 'clothing'),
-    stage: s.stage as Walkthrough['stage'],
+    stage: run.status === 'ended' ? 'ended' : (s.stage as Walkthrough['stage']),
     day: pregame ? 0 : run.currentDay,
     balance: run.currentBalance,
     prepared: s.prepared as boolean,
@@ -246,7 +248,11 @@ export async function employmentSnapshot(
     hiredDay: s.hiredDay as number | null,
     weeklyIncome: parseUsdCents(s.weeklyIncome, 'weeklyIncome'),
     assistanceUsed: s.assistanceUsed as boolean,
-    reason: s.reason as string | null,
+    reason:
+      run.status === 'ended'
+        ? ((s.reason as string | null) ??
+          'Your household could not afford this choice.')
+        : (s.reason as string | null),
     history: (s.history as Record<string, unknown>[]).map((e) => {
       if (!e || !Number.isInteger(e.day) || typeof e.text !== 'string')
         throw new UnsupportedEmploymentDocumentError('Invalid saved history')

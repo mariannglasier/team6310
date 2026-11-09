@@ -132,7 +132,7 @@ Individual players use Continue to next day below the fact boxes to advance. Gro
 
 ## 8. Results summary
 
-Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run.
+Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run. An unaffordable ordinary choice must open this end screen with Replay from household selection and Return home, rather than leave the player on a disabled scenario. Restore already-ended runs to this screen using the saved terminal status, day and balance; replay creates a new attempt.
 
 Include days completed, ending/current balance, completed decisions and consequences, CAC support availability and actual use, and applicable comparisons. Do not fabricate results for unanswered questions.
 

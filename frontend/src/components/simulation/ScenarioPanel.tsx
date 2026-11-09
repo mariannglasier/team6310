@@ -123,9 +123,7 @@ export function ScenarioPanel({
             </fieldset>
           ) : null}
           {saved?.run.status === 'ended' && (
-            <p role="status">
-              Your household could not afford this choice. The simulation ended.
-            </p>
+            <p role="status">Opening your results…</p>
           )}
           {saved?.decision && (
             <>
