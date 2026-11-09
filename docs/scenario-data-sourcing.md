@@ -37,6 +37,8 @@ Current status: the 60 general slots below now have 60 distinct semantic measure
 
 ## Player-facing fact copy
 
+General facts may be numerical or qualitative. Prefer a sourced observation about people, their circumstances or the decision over a loosely related statistic. Do not turn every price binding into an inflation fact: financial maintenance and player-facing facts serve separate purposes. Qualitative facts must be descriptive, not recommendations, unsupported moral lessons or claims about what the player should do. Preserve their source, population, date where relevant and semantic identity.
+
 Facts describe people, their circumstances or sourced real-world conditions; they are not recommendations or instructions about what the player should do. Qualitative facts are welcome and do not need a numerical API binding.
 
 November 7 copy update: all 60 general fact templates and 30 sourced CAC passages now connect the observation to the household decision. Context does not assert a measured cause, guaranteed outcome or new assistance benefit. These passages are proposed display copy; source/update paragraphs and evidence gaps are staff/developer notes. Substitute validated numbers, dates and geography from the versioned source binding before display; never show unresolved tokens. Missing CAC facts remain publication gaps. Initial template/source verification is separate from routine automatic refresh and publication, which requires no monthly human review.
@@ -288,7 +290,7 @@ Source: S18/S19; fact ID `db12c137-fad7-4277-b4ca-6a203b344e38`; service `career
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Another interview means can mean more time spent traveling and preparing, while keeping other needs in view. In {period}, {pct}% of Sandy Springs workers who traveled to work had a commute of at least 60 minutes.”
+**Player-facing general fact template:** “Another interview can mean more time spent traveling and preparing, while keeping other needs in view. In {period}, {pct}% of Sandy Springs workers who traveled to work had a commute of at least 60 minutes.”
 
 **General fact semantic key:** `acs:B08303:long_commute`
 
@@ -356,7 +358,7 @@ Source/update: S28, [IRS Topic 601: Earned Income Credit](https://www.irs.gov/ta
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households with a computed rent-to-income ratio spent at least 30% of their income on gross rent.”
+**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households spent at least 30% of their income on gross rent.”
 
 **General fact semantic key:** `acs:B25070:rent_burden`
 
@@ -491,11 +493,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Keeping internet service means balancing the connection you need with other bills. In {period}, {pct}% of Sandy Springs households had a broadband internet subscription.”
+**Player-facing general fact:** “Internet access is part of everyday life for most adults. In a 2025 U.S. survey, 90% of adults said they used the internet every day.”
 
-**General fact semantic key:** `acs:B28002:broadband`
+**General fact semantic key:** `digital:adult_daily_internet_use`
 
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B28002. Broadband subscription households / all households. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S29, [Pew Research Center: Internet use and digital divides](https://www.pewresearch.org/short-reads/2026/01/08/internet-use-smartphone-ownership-digital-divides-in-u-s/), published January 8, 2026; survey February 5-June 18, 2025. Daily use includes almost constantly, several times daily and about once daily; denominator all U.S. adults, not only internet users. Exact observed value 90 percent. Source checked November 7, 2026. This demonstrates everyday use, not that every activity requires internet or a paid home broadband subscription. Proposed copy; initial binding verification pending. Retain the survey year and source observation; monitor later releases through a configured backend report import with schema/population checks and automatic validated edition publication. No free-form claim regeneration.
 
 **CAC fact (separate from price and general fact)**
 
@@ -557,11 +559,11 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A clinic bill can add pressure after the appointment is over. Between {base observation period} and {latest observation period}, the U.S. price index for physicians' services changed by {pct}%.”
+**Player-facing general fact:** “In the Federal Reserve's 2025 U.S. survey, adults with lower family incomes were more likely to have gone without medical care because they could not afford it.”
 
-**General fact semantic key:** `cpi:SEMC01`
+**General fact semantic key:** `health:income_related_forgone_care`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEMC01. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S30, [Federal Reserve: economic hardships](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm). Income-group comparison of forgone care; association, not proof of causation. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -590,11 +592,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Childcare is part of making the workday possible, and its cost has to fit alongside other essentials. In {year}, the published center-based childcare price for school-age children in Fulton County was {amount} per {period}.”
+**Player-facing general fact:** “Childcare can be one of a family's largest expenses. In the Federal Reserve's 2025 U.S. survey, most families paying for both childcare and housing spent at least half as much on childcare as on rent or mortgage payments.”
 
-**General fact semantic key:** `ndcp:Fulton:school_age:center_price`
+**General fact semantic key:** `care:childcare_cost_relative_to_housing`
 
-Source/update: S11; configure automatic download/import using the documented age/provider/unit columns. Select school-age center care price and documented unit; no extrapolation from infant/full-day care. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S31, [Federal Reserve: Living Arrangements and Care Work](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-living-arrangements-care-work.htm), childcare section and figure 13, published May 2026. Population: families paying for both childcare and housing; national 2025 survey, not a Sandy Springs estimate. Source explicitly reports the majority comparison; this is not a ratio of the two published medians. Monthly childcare costs use weekly payments multiplied by 52/12; housing is rent or mortgage payments. Source checked November 8, 2026. Initial binding verification pending. Check monthly for annual SHED releases; replace the dated comparison only when the same population and calculation are validated from a configured report/data import. Otherwise retain the 2025 statement and flag unavailable or changed source structure; do not automatically rewrite the claim. This fact does not set the scenario's bill amount.
 
 **CAC fact (separate from price and general fact)**
 
@@ -689,11 +691,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Paying for medicine means fitting a health need into the money available for the month. Between {base observation period} and {latest observation period}, the U.S. price index for prescription drugs changed by {pct}%.”
+**Player-facing general fact:** “Some U.S. adults reported going without prescription medicine because of its cost in the Federal Reserve's 2025 survey.”
 
-**General fact semantic key:** `cpi:SEMF01`
+**General fact semantic key:** `health:prescription_cost_barrier`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEMF01. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S30, [Federal Reserve: economic hardships](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm). Prescription-medicine item, distinct from overall care and dental items; no treatment recommendation. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -756,11 +758,11 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Keeping your home supplied with gas means making room for another utility bill. Between {base observation period} and {latest observation period}, the U.S. price index for utility piped gas service changed by {pct}%.”
+**Player-facing general fact:** “Some U.S. households reported keeping their homes at unhealthy temperatures because of energy costs in the 2024 Residential Energy Consumption Survey.”
 
-**General fact semantic key:** `cpi:SEHF02`
+**General fact semantic key:** `energy:unhealthy_home_temperature`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEHF02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S37, [EIA: 2024 household energy insecurity](https://www.eia.gov/consumption/residential/data/2024/hc/pdf/HC11.1_2024.pdf). Reported household energy insecurity, not specific to natural gas or proof of a local effect. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -885,11 +887,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A dental expense can mean choosing how much care you can pay for now. Between {base observation period} and {latest observation period}, the U.S. price index for dental services changed by {pct}%.”
+**Player-facing general fact:** “Dental care was the type of care U.S. adults most often reported skipping because of cost in the Federal Reserve's 2025 survey.”
 
-**General fact semantic key:** `cpi:SEMC02`
+**General fact semantic key:** `health:dental_most_skipped_care`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEMC02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S30, [Federal Reserve: economic hardships](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm). Comparison across care types, distinct from prescription and income-group facts. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -948,11 +950,11 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A family emergency can leave you weighing the cost of being there against the money needed at home. Between {base observation period} and {latest observation period}, the U.S. price index for intercity transportation other than air travel changed by {pct}%.”
+**Player-facing general fact:** “In the Federal Reserve's 2025 U.S. survey, people provided unpaid care to relatives or friends who needed help because of illness, disability or aging.”
 
-**General fact semantic key:** `cpi:SETG02`
+**General fact semantic key:** `care:unpaid_adult_relative_support`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SETG02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S31, [Federal Reserve: care work](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-living-arrangements-care-work.htm). Adult caregiving observation; no claim about travel, family obligations or the specific emergency. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -983,11 +985,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “When childcare falls through, even a short gap in care can require a new plan for the workday. Between {base observation period} and {latest observation period}, the U.S. price index for childcare and nursery school changed by {pct}%.”
+**Player-facing general fact:** “A Census Bureau study of U.S. households found that problems finding adequate childcare were accompanied by time away from work.”
 
-**General fact semantic key:** `cpi:SEEB03`
+**General fact semantic key:** `care:disruption_work_absence`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEEB03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S32, [Census: childcare challenges](https://www.census.gov/library/working-papers/2026/demo/sehsd-wp2026-08.html). 2026 working paper, 2025 CPS ASEC about 2024; descriptive finding, not a predicted penalty for this choice. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1330,11 +1332,11 @@ Source: S18/S19; fact ID `efaf231b-3db3-4c4d-b276-758006af8aab`; service `mini_m
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Choosing a smaller grocery basket can preserve cash while leaving some items behind. Between {base observation period} and {latest observation period}, the U.S. price index for fruits and vegetables changed by {pct}%.”
+**Player-facing general fact:** “Food insecurity can mean eating a less varied diet even when a household is still getting enough food to avoid cutting meal sizes.”
 
-**General fact semantic key:** `cpi:SAF113`
+**General fact semantic key:** `food:reduced_diet_variety`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SAF113. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S33, [USDA: food-security measurement](https://ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-us/measurement). Paraphrases low food security definition; distinct from episodic shortages and child-specific measures. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1486,11 +1488,11 @@ Source: S18/S19; fact ID `5d6bc795-8a41-49ca-862f-9aaf73405b49`; service `canopy
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “After a tiring day, a prepared meal can trade a higher price for less work in the kitchen. Between {base observation period} and {latest observation period}, the U.S. price index for limited-service meals and snacks changed by {pct}%.”
+**Player-facing general fact:** “In the 2025 U.S. time-use survey, women were more likely than men to spend part of their day preparing food and cleaning up afterward.”
 
-**General fact semantic key:** `cpi:SEFV02`
+**General fact semantic key:** `time:cooking_gender_participation`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEFV02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S34, [BLS: 2025 American Time Use Survey](https://www.bls.gov/news.release/archives/atus_06252026.htm). Table 1, population age 15 and older; descriptive national pattern, not an expectation about the player. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1738,11 +1740,11 @@ Source: S18/S19; fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`; service `meals_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Paying a fee to access your own money leaves less of it for the things you need. Between {base observation period} and {latest observation period}, the U.S. price index for financial services changed by {pct}%.”
+**Player-facing general fact:** “People without bank accounts have cited high or unpredictable fees and minimum balance requirements among their reasons for staying outside the banking system.”
 
-**General fact semantic key:** `cpi:SEGD05`
+**General fact semantic key:** `banking:reported_access_barriers`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEGD05. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S36, [Federal Reserve: financial inclusion](https://www.federalreserve.gov/newsevents/speech/barr20250715a.htm). Reported reasons, not evidence that every account has these charges or that the player is unbanked. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -2053,11 +2055,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Meeting a friend for a sit-down meal is one way an outing can add to the budget. Between {base observation period} and {latest observation period}, the U.S. price index for full-service meals and snacks changed by {pct}%.”
+**Player-facing general fact:** “Americans were less likely to spend time socializing or communicating on an average day in 2025 than in 2015, according to the U.S. time-use survey.”
 
-**General fact semantic key:** `cpi:SEFV01`
+**General fact semantic key:** `social:less_daily_socializing`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEFV01. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S34, [BLS: 2025 American Time Use Survey](https://www.bls.gov/news.release/archives/atus_06252026.htm). Release comparison across years; does not establish that paid outings improve well-being or that socializing requires money. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -2085,11 +2087,11 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Restocking groceries can mean finding room for everyday foods such as milk and cheese. Between {base observation period} and {latest observation period}, the U.S. price index for dairy products changed by {pct}%.”
+**Player-facing general fact:** “For U.S. households experiencing very low food security, disrupted meals and reduced food intake were usually occasional episodes rather than a constant condition, according to USDA's 2024 report.”
 
-**General fact semantic key:** `cpi:SEFJ`
+**General fact semantic key:** `food:episodic_shortages`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEFJ. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S35, [USDA: Household Food Security in 2024](https://ers.usda.gov/sites/default/files/_laserfiche/publications/113623/ERR-358.pdf). Retain reporting year and very-low-food-security population; do not generalize to every household. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
 
 **CAC fact (separate from price and general fact)**
 
@@ -2099,7 +2101,7 @@ Source: S18/S19; fact ID `0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`; service `mini_m
 
 ### Fact uniqueness audit
 
-All 60 general slots have distinct semantic fact keys, not merely different introductory wording. D003 uses a sourced qualitative fact about jobseekers rather than a numerical measure. CPI candidates use U.S. city-average observations for distinct categories, explicitly labeled U.S.; ACS candidates use distinct measures and population universes. Initial API validation must also reject aliased series and accidental duplicate underlying measures. No new current numerical observations were invented.
+All 60 general slots have distinct semantic fact keys, not merely different introductory wording. The library mixes sourced qualitative observations with numerical templates; neither wording changes nor removing digits makes a repeated underlying claim unique. Remaining CPI candidates use U.S. city-average observations for distinct categories, explicitly labeled U.S.; ACS candidates use distinct measures and population universes. Initial API validation must also reject aliased series and accidental duplicate underlying measures. No new current numerical observations were invented.
 
 D046 now uses the distinct donated-food CAC observation directly in its scenario section. The historical CAC pairing files retain their earlier proposals; this document records the replacement for final edition binding. Other CAC repeats remain permitted where no suitable distinct observation has been established.
 
@@ -2114,22 +2116,22 @@ D046 now uses the distinct donated-food CAC observation directly in its scenario
 | D007 | eia:GA:RES:monthly_electricity_price |
 | D008 | cpi:SEHG01 |
 | D009 | cpi:SEED03 |
-| D010 | acs:B28002:broadband |
+| D010 | digital:adult_daily_internet_use |
 | D011 | cpi:SETE |
-| D012 | cpi:SEMC01 |
-| D013 | ndcp:Fulton:school_age:center_price |
+| D012 | health:income_related_forgone_care |
+| D013 | care:childcare_cost_relative_to_housing |
 | D014 | school:FCS:student_lunch_rate |
 | D015 | cpi:SETD03 |
-| D016 | cpi:SEMF01 |
+| D016 | health:prescription_cost_barrier |
 | D017 | acs:B17001:poverty |
-| D018 | cpi:SEHF02 |
+| D018 | energy:unhealthy_home_temperature |
 | D019 | acs:B25064:median_gross_rent |
 | D020 | acs:B27001:uninsured |
 | D021 | cpi:SETD |
-| D022 | cpi:SEMC02 |
+| D022 | health:dental_most_skipped_care |
 | D023 | acs:B28001:smartphone_only |
-| D024 | cpi:SETG02 |
-| D025 | cpi:SEEB03 |
+| D024 | care:unpaid_adult_relative_support |
+| D025 | care:disruption_work_absence |
 | D026 | cpi:SETC01 |
 | D027 | cpi:SEMC03 |
 | D028 | acs:B25047:lacking_plumbing |
@@ -2140,12 +2142,12 @@ D046 now uses the distinct donated-food CAC observation directly in its scenario
 | D033 | cpi:SEHM01 |
 | D034 | cpi:SEHJ01 |
 | D035 | cpi:SAF11 |
-| D036 | cpi:SAF113 |
+| D036 | food:reduced_diet_variety |
 | D037 | acs:B08301:public_transport_commute |
 | D038 | cpi:SEGD03 |
 | D039 | cpi:SERF02 |
 | D040 | cpi:SEAE |
-| D041 | cpi:SEFV02 |
+| D041 | time:cooking_gender_participation |
 | D042 | cpi:SEEA |
 | D043 | cpi:SS33032 |
 | D044 | acs:B08201:no_vehicle_households |
@@ -2153,7 +2155,7 @@ D046 now uses the distinct donated-food CAC observation directly in its scenario
 | D046 | cpi:SS0501A |
 | D047 | cpi:SEGE |
 | D048 | cpi:SEFV03 |
-| D049 | cpi:SEGD05 |
+| D049 | banking:reported_access_barriers |
 | D050 | cpi:SEGB |
 | D051 | cpi:SERF03 |
 | D052 | cpi:SS02041 |
@@ -2163,8 +2165,8 @@ D046 now uses the distinct donated-food CAC observation directly in its scenario
 | D056 | cpi:SERE01 |
 | D057 | marta:MARTA:regular_base_fare |
 | D058 | cpi:SEHN01 |
-| D059 | cpi:SEFV01 |
-| D060 | cpi:SEFJ |
+| D059 | social:less_daily_socializing |
+| D060 | food:episodic_shortages |
 
 ## Implementation sequence and acceptance checks
 
@@ -2228,6 +2230,15 @@ External documentation checks: November 7, 2026. “Verified” means the cited 
 | S27 | [BLS CPS definitions](https://www.bls.gov/cps/definitions.htm) | Describes jobseekers with different work histories; supports the qualitative D003 fact. Source checked November 7, 2026. |
 | S26 | [ACS detailed table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html) | Table catalogue inspected November 7; exact cells and observations require initial validation. |
 | S24 | [Existing wage importer](../integrations/bls_oews/bls_oews_sync.py), [scheduler](../.github/workflows/bls_oews_sync.yml), [README](../README.md#bls-wage-synchronization) | Implementation inspected locally: BLS API, eight SOC jobs, Atlanta area 12060, monthly checks, draft-only writes. Live execution and deployment not verified. |
+| S29 | [Pew: everyday internet use](https://www.pewresearch.org/short-reads/2026/01/08/internet-use-smartphone-ownership-digital-divides-in-u-s/) | January 2026 report, 2025 U.S. adult survey: 90 percent use the internet daily. Does not measure need for paid home broadband. Checked November 7, 2026; initial binding verification pending. |
+| S30 | [Federal Reserve: economic hardships](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm) | 2025 SHED U.S. adult findings; distinct healthcare measures, not local estimates. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S31 | [Federal Reserve: care work](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-living-arrangements-care-work.htm) | 2025 SHED: childcare spending relative to housing and adult caregiving are distinct observations; D013 rechecked November 8, 2026. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S32 | [Census: childcare challenges](https://www.census.gov/library/working-papers/2026/demo/sehsd-wp2026-08.html) | May 2026 working paper using 2025 CPS ASEC about 2024; descriptive findings, not causal estimates. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S33 | [USDA: food-security measurement](https://ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-us/measurement) | Definitions distinguish dietary variety from disrupted intake; not a local prevalence estimate. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S34 | [BLS: 2025 American Time Use Survey](https://www.bls.gov/news.release/archives/atus_06252026.htm) | June 2026 archived release; national time-use observations, not individual behavior predictions. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S35 | [USDA: Household Food Security in 2024](https://ers.usda.gov/sites/default/files/_laserfiche/publications/113623/ERR-358.pdf) | Historical U.S. food insecurity can be episodic; not an individual household assessment. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S36 | [Federal Reserve: financial inclusion](https://www.federalreserve.gov/newsevents/speech/barr20250715a.htm) | July 2025 speech citing household banking research; reasons people report being unbanked. Checked November 7, 2026; proposed copy, initial content verification pending. |
+| S37 | [EIA: 2024 household energy insecurity](https://www.eia.gov/consumption/residential/data/2024/hc/pdf/HC11.1_2024.pdf) | RECS table HC11.1 includes reported unhealthy indoor temperatures; national, not local. Checked November 7, 2026; proposed copy, initial content verification pending. |
 
 ### Consolidated local evidence still needed
 
