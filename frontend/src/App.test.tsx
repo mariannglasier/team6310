@@ -50,6 +50,7 @@ test.each([
   ['/', 'Financial hardship can happen to anyone. How would you respond?'],
   ['/learn', 'Learn About CAC'],
   ['/donate', 'Donate'],
+  ['/data', 'Explore our community'],
   ['/simulation/introduction', 'Every household has a story.'],
   ['/simulation/individual', 'Every household has a story.'],
   ['/dev/integration-test', 'Temporary Supabase integration test'],
@@ -286,8 +287,8 @@ test('review without a selected household returns to household selection', () =>
     '/simulation/individual',
   )
 })
-test.each(['/simulation/individual', '/simulation/results'])(
-  'simulation page %s sits on the scenic stage between the header and footer',
+test.each(['/simulation/individual', '/simulation/results', '/data'])(
+  'page %s sits on the scenic stage between the header and footer',
   (path) => {
     const { container } = renderRoute(path)
     const stage = container.querySelector('main.stage')

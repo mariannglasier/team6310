@@ -164,6 +164,8 @@ Hosts create sessions with join codes. Participants join and complete their own 
 
 The interface shows approved question-linked community statistics and a separate interactive data page. Its measures include decision distributions, ending-balance distributions, CAC support use, and community context. Population statistics and simulation response aggregates have separate labels and sources. Charts use the populations, filters, and denominators defined in the UI specification. Missing comparisons do not prevent gameplay.
 
+The public Explore Data page (`/data`) is a separate, static data explorer for the six scenario categories. Its content lives in `frontend/src/pages/public/data/dataExplorerContent.ts`, makes no network calls, and uses no database or Auth session. API connections are a later phase; see `docs/data-explorer.md`.
+
 Public navigation and results provide client-approved CAC information and donation links. The application does not process donation payments.
 
 ### Employee administration
