@@ -42,7 +42,7 @@ Read actual configuration and code before making implementation claims. If relev
 - `.github/workflows/ci.yml` defines automated frontend checks.
 - `agentic-test-responces/` contains a prior agent-task record.
 
-The current application provides React Router navigation and labeled placeholder pages, with route tests. The administrative route boundary redirects all dashboard entry to sign-in pending real authentication and staff authorization. Do not claim the simulation, deployed database, or access policies are implemented based on installed dependencies, route scaffolding, or documentation.
+The current application provides React Router navigation and labeled placeholder pages, with route tests. The administrative route boundary admits only users who sign in through Supabase Auth and pass the database staff-authorization check (`public.is_cac_staff()`); all other dashboard entry redirects to sign-in. The dashboard is a read-only content viewer with no editing or publishing tools yet. Do not claim the simulation, deployed database, or access policies are implemented based on installed dependencies, route scaffolding, or documentation.
 
 Sprint 1 prioritizes the individual simulation. Group gameplay and employee administration belong to later scope. Implement the assigned task and its acceptance criteria without expanding into other features or unrelated refactoring.
 

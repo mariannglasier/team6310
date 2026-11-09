@@ -1,8 +1,15 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation, useNavigate } from 'react-router'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import App from './App'
+
+// No staff session: protected admin routes must fail closed without network.
+vi.mock('./services/staffAuth', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./services/staffAuth')>()),
+  restoreStaffSession: vi.fn().mockResolvedValue(null),
+  onStaffSignedOut: vi.fn(() => () => {}),
+}))
 
 function HistoryControls() {
   const navigate = useNavigate()
@@ -107,12 +114,12 @@ test.each([
   await user.click(screen.getByRole('link', { name: label }))
   expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
 })
-test('admin dashboard fails closed, including with untrusted browser role flags', () => {
+test('admin dashboard fails closed, including with untrusted browser role flags', async () => {
   localStorage.setItem('role', 'staff')
   try {
     renderRoute('/admin/dashboard')
     expect(
-      screen.getByRole('heading', { name: 'Employee sign-in' }),
+      await screen.findByRole('heading', { name: 'Employee sign-in' }),
     ).toBeInTheDocument()
     expect(screen.getByLabelText('Current path')).toHaveTextContent(
       '/admin/login',
@@ -120,7 +127,6 @@ test('admin dashboard fails closed, including with untrusted browser role flags'
     expect(
       screen.queryByRole('heading', { name: 'Employee dashboard' }),
     ).not.toBeInTheDocument()
-    expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument()
   } finally {
     localStorage.removeItem('role')
   }
