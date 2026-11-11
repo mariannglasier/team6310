@@ -12,12 +12,12 @@ This standing specification defines user journeys and state transitions for indi
 
 ## Roles
 
-| Role              | Responsibilities                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------------------- |
-| Individual player | Set up an anonymous household run, make decisions, review results, replay                           |
-| Group participant | Manage an independent household in a host-controlled session                                        |
-| Group host        | Create a session, advance participants individually, end the session, facilitate comparison/debrief |
-| CAC administrator | Authenticate and edit statistics and scenario questions                                             |
+| Role              | Responsibilities                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| Individual player | Set up an anonymous household run, make decisions, review results, replay                |
+| Group participant | Vote on decisions for one shared household in a host-controlled session                  |
+| Group host        | Create a session, close voting, advance the shared simulation, and facilitate discussion |
+| CAC administrator | Authenticate and edit statistics and scenario questions                                  |
 
 ## Individual journey
 
@@ -134,14 +134,14 @@ View Data Visualization opens a separate interactive page with four measures: de
 
 1. The host selects Host a Group, creates a session, and receives a shareable join code.
 2. Participants select Join a Group and enter the code. Validate the session and show a readable error for invalid codes.
-3. Each participant completes household/support setup and confirmation. Each has independent money, choices, and circumstances; there is no shared household balance.
-4. The host controls advancement for each participant individually. A participant submits the current decision and reviews the recap; host advancement moves that participant to the next day's question. Do not substitute a vote or another participant's choice for their decision.
-5. The host can inspect participant progress and continue facilitating while participants complete their own runs.
-6. A participant finishing Day 30 sees their own summary and can recap while others continue.
-7. The host may end the game early. Stop further submissions for the ended session and show each participant a full or partial summary based on their actual progress.
-8. At the end, compare participant results and support a group debrief. Preserve separate household states and label partial runs accurately.
+3. The host chooses whether CAC support is available. Each participant votes for a household and marks ready. The highest household tally, with deterministic tie-breaking, becomes the shared household.
+4. Before Day 1, the group votes through the employment sequence: optional CAC preparation, job application, professional clothing, interview result, and—after a first-interview failure—a different job and follow-up interview.
+5. The winning choices update one protected shared employment state and balance. Buying professional clothing costs the approved $60 once; CAC clothing is available only in support-enabled sessions. Support availability alone grants no benefit.
+6. The host closes each voting round, reveals its tally, and advances the shared session. Participants may replace their own vote while voting remains open.
+7. Days 1–30 use the selected household's scenarios, balance, expense schedule, and shared decision outcomes. The host may end the game early and the session retains actual shared progress.
+8. At the end, show the shared group result and support a facilitated debrief.
 
-Host advancement must not count an unanswered question as a completed decision or invent a participant's answer. Keep participant/session state through refresh. Individual completion and a session-wide end are distinct events.
+Host advancement must not fabricate a participant vote or change a submitted choice. Keep the shared session and each participant's current vote through refresh.
 
 ## Employee administration
 
@@ -173,4 +173,4 @@ Staff authentication does not require player authentication. Public players rema
 
 ## Verification criteria
 
-Verify setup validation, direct household confirmation, legacy Review redirects, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, separated ordinary/employment event days with the Day 2 interview/result/immediate reapplication exception, automatic payday feedback, scheduled income, refresh recovery, duplicate-safe submission, required-event early endings, Day 30 summaries, replay through new setup, separate interactive data exploration, individual host advancement, independent group finances, participant recaps, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.
+Verify setup validation, direct household confirmation, legacy Review redirects, immutable active setup, pre-game employment flow, support opportunities and capped use tracking, separated ordinary/employment event days with the Day 2 interview/result/immediate reapplication exception, automatic payday feedback, scheduled income, refresh recovery, duplicate-safe submission, required-event early endings, Day 30 summaries, replay through new setup, separate interactive data exploration, shared group household/finances/employment, protected host advancement, replaceable participant votes, early host termination, staff authorization, pending-edition approval, and version isolation for existing runs. Verify keyboard navigation and responsive layouts as specified in the UI file.

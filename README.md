@@ -216,3 +216,10 @@ For local runs, export them in your shell or keep them in an untracked file (for
 - `release ... is older than stored wage_year`: a stale release was ignored.
 - `published content is immutable`: the target version is published; omit `--version-id` or target a draft.
 - `no job row in version`: the importer never inserts jobs into an existing version; ask staff to add the missing CAC job row.
+
+## Group session join codes (November 9, 2026)
+
+Host a Group now creates/restores a database-backed waiting session and displays
+its shareable join code. Join a Group enrolls an anonymous player using that code.
+See [implementation, connection and verification](docs/group-join-codes.md).
+Group gameplay and host advancement are not implemented by this change.

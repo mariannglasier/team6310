@@ -56,7 +56,7 @@ test.each([
   ['/dev/integration-test', 'Temporary Supabase integration test'],
   ['/simulation/results', 'Simulation results'],
   ['/group/host', 'Host a Group'],
-  ['/group/join', 'Join a Group'],
+  ['/group/join', 'Play with a group!'],
   ['/admin/login', 'Employee sign-in'],
   ['/unknown/path', 'Page not found'],
 ])('loads %s directly', (path, heading) => {
@@ -107,13 +107,15 @@ test.each([
   },
 )
 test.each([
-  ['Host a group', 'Host a Group'],
-  ['Join a group', 'Join a Group'],
+  ['Host a group', 'Make room for conversation.'],
+  ['Join a group', 'Play with a group!'],
 ])('mode navigation opens %s', async (label, heading) => {
   const user = userEvent.setup()
   renderRoute()
   await user.click(screen.getByRole('link', { name: label }))
-  expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { name: heading }),
+  ).toBeInTheDocument()
 })
 test('admin dashboard fails closed, including with untrusted browser role flags', async () => {
   localStorage.setItem('role', 'staff')
@@ -302,7 +304,15 @@ test.each(['/simulation/individual', '/simulation/results', '/data'])(
     )
   },
 )
-test.each(['/', '/learn', '/group/host', '/unknown/path'])(
+test('group pages use the scenic gameplay stage without an outer content panel', () => {
+  const { container } = renderRoute('/group/host')
+  const stage = container.querySelector('main.stage')
+  expect(stage).not.toBeNull()
+  expect(stage?.querySelector(':scope > .stage__panel')).toBeNull()
+  expect(container.querySelector('.app-shell--gameplay')).not.toBeNull()
+})
+
+test.each(['/', '/learn', '/unknown/path'])(
   'non-simulation page %s does not use the scenic stage',
   (path) => {
     const { container } = renderRoute(path)

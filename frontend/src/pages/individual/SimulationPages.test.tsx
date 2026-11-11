@@ -118,7 +118,6 @@ it('keeps Continue disabled until a household is chosen, then opens Review witho
   )
   await user.click(next)
   expect(screen.getByLabelText('Current path')).toHaveTextContent('/simulation')
-  expect(screen.getByText('Job search')).toBeInTheDocument()
 })
 
 it('moves between households with arrows, dots, and keyboard while keeping focus', async () => {

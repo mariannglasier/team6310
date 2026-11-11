@@ -20,6 +20,7 @@ export function isStagePath(pathname: string) {
   return (
     pathname === '/simulation' ||
     pathname.startsWith('/simulation/') ||
-    pathname === paths.data
+    pathname === paths.data ||
+    pathname.startsWith('/group/')
   )
 }
