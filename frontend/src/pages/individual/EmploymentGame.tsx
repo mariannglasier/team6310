@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Button, ButtonLink } from '../../components/ui/Button'
+import { Button } from '../../components/ui/Button'
 import { JobBoard } from '../../components/simulation/JobBoard'
-import { paths } from '../../app/paths'
 import { formatUsd } from '../../lib/money'
 import {
   availableJobs,
@@ -201,16 +200,8 @@ export function EmploymentGame({
                     Try again with CAC support
                   </Button>
                 )}
-                <ButtonLink to={paths.home}>Return home</ButtonLink>
               </div>
             </>
-          )}
-          {!finished && (
-            <div className="employment-actions">
-              <Button variant="text" onClick={() => dispatch({ type: 'end' })}>
-                End walkthrough
-              </Button>
-            </div>
           )}
         </section>
       </div>

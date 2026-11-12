@@ -284,6 +284,16 @@ export async function forgetRun(id: string) {
   const locator = key(await participantId(), 'run')
   if (localStorage.getItem(locator) === id) localStorage.removeItem(locator)
 }
+// Replay intent is a locator only. The initialize RPC validates its owner and
+// eligibility; storing it grants no support or financial benefit.
+export async function rememberedReplay() {
+  return localStorage.getItem(key(await participantId(), 'replay')) ?? undefined
+}
+export async function rememberReplay(id?: string) {
+  const locator = key(await participantId(), 'replay')
+  if (id) localStorage.setItem(locator, id)
+  else localStorage.removeItem(locator)
+}
 export async function submitEmployment(
   run: LoadedPlaythrough,
   revision: number,

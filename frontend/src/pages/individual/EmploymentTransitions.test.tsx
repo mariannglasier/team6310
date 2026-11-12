@@ -24,6 +24,9 @@ vi.mock('../../services/employmentGameplay', async (original) => ({
   submitEmployment: vi.fn(),
   hasPending: vi.fn(),
   rememberedRun: vi.fn().mockResolvedValue(null),
+  rememberedReplay: vi.fn().mockResolvedValue(undefined),
+  rememberReplay: vi.fn().mockResolvedValue(undefined),
+  forgetRun: vi.fn().mockResolvedValue(undefined),
 }))
 const base = createWalkthrough(
   {
@@ -115,10 +118,7 @@ it('opens the end screen for an unaffordable scenario and lets the player replay
   expect(
     await screen.findByRole('heading', { name: 'Simulation ended early.' }),
   ).toBeVisible()
-  expect(screen.getByRole('link', { name: 'Return home' })).toHaveAttribute(
-    'href',
-    '/',
-  )
+  expect(screen.queryByRole('link', { name: 'Return home' })).toBeNull()
   expect(screen.queryByText('Opening your results…')).toBeNull()
   await userEvent.click(
     screen.getByRole('button', { name: 'Replay from household selection' }),

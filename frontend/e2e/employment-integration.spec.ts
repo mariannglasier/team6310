@@ -417,13 +417,15 @@ test('integrated employment keeps saved finances and supports a full local month
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true)
-  await page.getByRole('button', { name: 'End walkthrough' }).click()
   await expect(
-    page.getByRole('heading', { name: 'Your walkthrough ended early.' }),
-  ).toBeVisible()
+    page.getByRole('button', { name: 'End walkthrough' }),
+  ).toHaveCount(0)
+  await page
+    .getByRole('link', { name: 'CAC Poverty Simulation', exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/$/)
+  await page.goto('/simulation')
   await page.reload()
-  await expect(
-    page.getByRole('heading', { name: 'Your walkthrough ended early.' }),
-  ).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Placeholder' })).toBeVisible()
   expect(inserts).toBe(2)
 })

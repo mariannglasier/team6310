@@ -47,7 +47,25 @@ export function EmploymentPanel({
   const [recoverable, setRecoverable] = useState(false)
   const [uncertain, setUncertain] = useState(false)
   const [pending, setPending] = useState(false)
+  const [replaying, setReplaying] = useState(false)
   const busy = useRef(false)
+  async function startReplay(support: boolean) {
+    if (busy.current || billBusy) return
+    busy.current = true
+    setReplaying(true)
+    setError('')
+    try {
+      await replay(support)
+      navigate(paths.individual)
+    } catch {
+      setError(
+        'Unable to prepare replay. Check browser storage and try Replay again.',
+      )
+    } finally {
+      busy.current = false
+      setReplaying(false)
+    }
+  }
   useEffect(() => {
     onPendingChange?.(pending)
   }, [pending, onPendingChange])
@@ -164,6 +182,7 @@ export function EmploymentPanel({
       <fieldset
         disabled={
           pending ||
+          replaying ||
           uncertain ||
           automatic ||
           billBusy ||
@@ -232,8 +251,7 @@ export function EmploymentPanel({
               void send(a)
             }}
             onReplay={(support) => {
-              replay(support)
-              navigate(paths.individual)
+              void startReplay(support)
             }}
           />
         ) : (

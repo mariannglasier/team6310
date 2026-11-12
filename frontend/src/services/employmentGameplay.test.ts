@@ -4,6 +4,8 @@ import {
   rememberedRun,
   rememberRun,
   forgetRun,
+  rememberReplay,
+  rememberedReplay,
   submitEmployment,
   employmentSnapshot,
 } from './employmentGameplay'
@@ -88,6 +90,19 @@ it('does not forget a different run or another participant locator', async () =>
   await forgetRun('newer-run')
   owner = 'owner'
   expect(await rememberedRun()).toBe('newer-run')
+  expect(rpc).not.toHaveBeenCalled()
+})
+it('persists and clears replay intent only for the verified participant', async () => {
+  await rememberReplay('completed-run')
+  expect(await rememberedReplay()).toBe('completed-run')
+  owner = 'another'
+  expect(await rememberedReplay()).toBeUndefined()
+  await rememberReplay('another-completed-run')
+  owner = 'owner'
+  await rememberReplay()
+  expect(await rememberedReplay()).toBeUndefined()
+  owner = 'another'
+  expect(await rememberedReplay()).toBe('another-completed-run')
   expect(rpc).not.toHaveBeenCalled()
 })
 it('retries the identical persisted request after a lost response', async () => {
