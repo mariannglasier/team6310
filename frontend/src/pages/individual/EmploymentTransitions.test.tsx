@@ -202,7 +202,8 @@ it('stops an uncertain automatic submission and reconciles it explicitly without
   const retry = await screen.findByRole('button', {
     name: 'Reconcile pending submission',
   })
-  expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  expect(screen.getByText("Opening today's content…")).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   expect(commit).not.toHaveBeenCalled()
   await userEvent.click(retry)
   await waitFor(() => expect(commit).toHaveBeenCalledExactlyOnceWith(next))

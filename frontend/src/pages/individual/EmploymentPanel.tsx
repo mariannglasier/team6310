@@ -51,16 +51,29 @@ export function EmploymentPanel({
   useEffect(() => {
     onPendingChange?.(pending)
   }, [pending, onPendingChange])
-  const billsReady =
-    !bills ||
+  // Content identity is independent of financial synchronization. A payment or
+  // decision can change cash/revision without changing the mounted day's panel.
+  // An explicit null snapshot is unresolved; undefined preserves standalone use.
+  const dayContentReady =
+    bills === undefined ||
     Boolean(
       bills &&
       snapshot &&
+      bills.run.id === snapshot.run.id &&
+      bills.run.versionId === snapshot.run.versionId &&
       bills.run.currentDay === snapshot.run.currentDay &&
-      bills.run.currentBalance === snapshot.run.currentBalance &&
-      (bills.run.employmentState as { revision?: number })?.revision ===
-        snapshot.revision,
+      bills.run.currentScenarioId === snapshot.run.currentScenarioId,
     )
+  const billsReady =
+    dayContentReady &&
+    (bills === undefined ||
+      Boolean(
+        bills &&
+        snapshot &&
+        bills.run.currentBalance === snapshot.run.currentBalance &&
+        (bills.run.employmentState as { revision?: number })?.revision ===
+          snapshot.revision,
+      ))
   const dueToday =
     bills?.items.some((b) => b.dueDay === snapshot?.run.currentDay) ?? false
   useEffect(() => {
@@ -159,8 +172,10 @@ export function EmploymentPanel({
         aria-busy={pending || automatic}
         className="employment-controls"
       >
-        {state?.stage === 'day' && !billsReady ? (
-          <p role="status">Loading saved bills…</p>
+        {state?.stage === 'income' ? (
+          <p role="status">Opening today's content…</p>
+        ) : state?.stage === 'day' && !dayContentReady ? (
+          <p role="status">Loading today's content…</p>
         ) : skipInterviewDay ? (
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
@@ -212,11 +227,7 @@ export function EmploymentPanel({
                 />
               ) : undefined
             }
-            state={
-              snapshot.state.stage === 'income'
-                ? { ...snapshot.state, stage: 'day' }
-                : snapshot.state
-            }
+            state={snapshot.state}
             dispatch={(a) => {
               void send(a)
             }}
