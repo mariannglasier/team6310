@@ -65,6 +65,7 @@ export function FinancialTracking({
   bills,
   onBillAction,
   billBusy = false,
+  layoutAction,
 }: {
   run: LoadedPlaythrough
   expenses: ExpenseState
@@ -73,13 +74,16 @@ export function FinancialTracking({
   bills?: BillSnapshot | null
   onBillAction?: BillAction
   billBusy?: boolean
+  layoutAction?: ReactNode
   pregame?: boolean
   preview?: Walkthrough
   employment?: Walkthrough
 }) {
   const committed =
     employment?.balance === run.currentBalance ? employment : undefined
-  const displayDay = committed?.day ?? preview?.day ?? run.currentDay
+  const displayDay = pregame
+    ? 0
+    : (committed?.day ?? preview?.day ?? run.currentDay)
   const displayBalance =
     committed?.balance ?? preview?.balance ?? run.currentBalance
   const history = committed?.history
@@ -179,80 +183,89 @@ export function FinancialTracking({
         })}
       </ol>
       <div className="finance-layout">
-        <aside className="finance-sidebar" aria-label="Household and balance">
-          <section className="finance-household">
-            <span className="finance-label">Your household</span>
-            <div className="finance-household-profile">
-              {run.persona && (
-                <div className="finance-avatar">
-                  <PersonaAvatar name={run.persona.name} />
-                </div>
-              )}
-              <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
-            </div>
-            <small>
-              Employment:{' '}
-              {committed
-                ? employed
-                  ? (job?.title ?? 'Job unavailable')
-                  : 'Not employed'
-                : 'Unavailable'}
-            </small>
-            <small className="finance-profile-detail">
-              Weekly income:{' '}
-              {committed ? formatUsd(committed.weeklyIncome) : 'Unavailable'}
-            </small>
-            <small className="finance-profile-detail">
-              CAC enrollment status:{' '}
-              {support === null
-                ? 'Unavailable'
-                : support
-                  ? 'client of the CAC'
-                  : 'not a client'}
-            </small>
-          </section>
-          <section className="finance-money" aria-label="Current balance">
-            <span className="finance-label">
-              {preview ? 'Provisional balance · not saved' : 'Current balance'}
-            </span>
-            <BalanceDisplay
-              key={run.id}
-              balance={displayBalance}
-              incomeKey={
-                lastPay && lastPay.day === committed?.day
-                  ? `${run.id}:${lastPay.day}`
-                  : undefined
-              }
-              income={committed?.weeklyIncome ?? usdCents(0)}
-            />
-            {preview && (
-              <p className="finance-confirmed">
-                Server-confirmed balance:{' '}
-                {run.currentBalance === null
+        <div className="finance-left">
+          <aside className="finance-sidebar" aria-label="Household and balance">
+            <section className="finance-household">
+              <span className="finance-label">Your household</span>
+              <div className="finance-household-profile">
+                {run.persona && (
+                  <div className="finance-avatar">
+                    <PersonaAvatar name={run.persona.name} />
+                  </div>
+                )}
+                <h2>{run.persona?.name ?? 'Household unavailable'}</h2>
+              </div>
+              <small>
+                Employment:{' '}
+                {committed
+                  ? employed
+                    ? (job?.title ?? 'Job unavailable')
+                    : 'Not employed'
+                  : 'Unavailable'}
+              </small>
+              <small className="finance-profile-detail">
+                Weekly income:{' '}
+                {committed ? formatUsd(committed.weeklyIncome) : 'Unavailable'}
+              </small>
+              <small className="finance-profile-detail">
+                CAC enrollment status:{' '}
+                {support === null
                   ? 'Unavailable'
-                  : formatUsd(run.currentBalance)}
-                . Day {run.currentDay ?? 'unavailable'}. Gameplay progress is
-                local only.
-              </p>
-            )}
-            <dl className="finance-totals">
-              <div>
-                <dt>Starting balance</dt>
-                <dd>
-                  {starting === null ? 'Unavailable' : formatUsd(starting)}
-                </dd>
-              </div>
-              <div>
-                <dt>Total income received</dt>
-                <dd>{income === null ? 'Unavailable' : formatUsd(income)}</dd>
-              </div>
-              <div>
-                <dt>Total expenses charged</dt>
-                <dd>{charged === null ? 'Unavailable' : formatUsd(charged)}</dd>
-              </div>
-            </dl>
-          </section>
-        </aside>
+                  : support
+                    ? 'client of the CAC'
+                    : 'not a client'}
+              </small>
+            </section>
+            <section className="finance-money" aria-label="Current balance">
+              <span className="finance-label">
+                {preview
+                  ? 'Provisional balance · not saved'
+                  : 'Current balance'}
+              </span>
+              <BalanceDisplay
+                key={run.id}
+                balance={displayBalance}
+                incomeKey={
+                  lastPay && lastPay.day === committed?.day
+                    ? `${run.id}:${lastPay.day}`
+                    : undefined
+                }
+                income={committed?.weeklyIncome ?? usdCents(0)}
+              />
+              {preview && (
+                <p className="finance-confirmed">
+                  Server-confirmed balance:{' '}
+                  {run.currentBalance === null
+                    ? 'Unavailable'
+                    : formatUsd(run.currentBalance)}
+                  . Day {run.currentDay ?? 'unavailable'}. Gameplay progress is
+                  local only.
+                </p>
+              )}
+              <dl className="finance-totals">
+                <div>
+                  <dt>Starting balance</dt>
+                  <dd>
+                    {starting === null ? 'Unavailable' : formatUsd(starting)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Total income received</dt>
+                  <dd>{income === null ? 'Unavailable' : formatUsd(income)}</dd>
+                </div>
+                <div>
+                  <dt>Total expenses charged</dt>
+                  <dd>
+                    {charged === null ? 'Unavailable' : formatUsd(charged)}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          </aside>
+          {layoutAction && (
+            <div className="finance-layout-action">{layoutAction}</div>
+          )}
+        </div>
         <div className="finance-main stage__panel">
           <div className="finance-content">{children}</div>
         </div>

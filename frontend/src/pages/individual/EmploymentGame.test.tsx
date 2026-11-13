@@ -98,6 +98,7 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
     </MemoryRouter>,
   )
   expect(screen.getAllByRole('button', { name: /^Choose / })).toHaveLength(2)
+  expect(screen.queryByRole('button', { name: 'End walkthrough' })).toBeNull()
   expect(
     screen.getByRole('button', { name: 'Submit application' }),
   ).toBeDisabled()
@@ -158,6 +159,7 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
     'You reached Day 30.',
   )
   expect(screen.getByText('$220.00')).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: 'Return home' })).toBeNull()
   expect(
     screen.queryByRole('heading', { name: 'Employment and financial history' }),
   ).toBeNull()

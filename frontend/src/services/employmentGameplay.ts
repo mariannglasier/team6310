@@ -9,6 +9,48 @@ export interface CommittedEmployment {
   run: LoadedPlaythrough
   state: Walkthrough | null
   revision: number
+  beforeEmploymentEnded?: boolean
+}
+export function isBeforeEmploymentEnd(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const s = value as Record<string, unknown>
+  if (
+    Object.keys(s).length !== 6 ||
+    s.engine !== 'employment-v1' ||
+    s.schemaVersion !== 1 ||
+    s.stage !== 'ended' ||
+    s.revision !== 1 ||
+    s.reason !== 'You ended the walkthrough.' ||
+    !s.receipts ||
+    typeof s.receipts !== 'object' ||
+    Array.isArray(s.receipts)
+  )
+    return false
+  const entries = Object.entries(s.receipts)
+  if (
+    entries.length !== 1 ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      entries[0][0],
+    )
+  )
+    return false
+  const receipt = entries[0][1] as Record<string, unknown>
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt))
+    return false
+  const action = receipt.action
+  return (
+    Object.keys(receipt).length === 6 &&
+    !!action &&
+    typeof action === 'object' &&
+    !Array.isArray(action) &&
+    Object.keys(action).length === 1 &&
+    (action as Record<string, unknown>).type === 'end' &&
+    receipt.expectedRevision === 0 &&
+    receipt.revision === 1 &&
+    receipt.day === 1 &&
+    receipt.change === '0' &&
+    receipt.stage === 'ended'
+  )
 }
 const stages = [
   'uninitialized',
@@ -180,6 +222,23 @@ export function documentState(value: unknown): Record<string, unknown> {
 export async function employmentSnapshot(
   run: LoadedPlaythrough,
 ): Promise<CommittedEmployment> {
+  if (isBeforeEmploymentEnd(run.employmentState)) {
+    if (
+      run.status !== 'ended' ||
+      run.currentDay !== 1 ||
+      run.currentJobId !== null ||
+      run.currentScenarioId !== null ||
+      run.sessionId !== null ||
+      run.supportEnabled !== null ||
+      run.currentBalance === null ||
+      !run.versionId ||
+      !run.persona
+    )
+      throw new UnsupportedEmploymentDocumentError(
+        'Inconsistent pre-employment ending',
+      )
+    return { run, state: null, revision: 1, beforeEmploymentEnded: true }
+  }
   const s = documentState(run.employmentState)
   if (s.stage === 'uninitialized') {
     if (
@@ -283,6 +342,16 @@ export async function rememberedRun() {
 export async function forgetRun(id: string) {
   const locator = key(await participantId(), 'run')
   if (localStorage.getItem(locator) === id) localStorage.removeItem(locator)
+}
+// Replay intent is a locator only. The initialize RPC validates its owner and
+// eligibility; storing it grants no support or financial benefit.
+export async function rememberedReplay() {
+  return localStorage.getItem(key(await participantId(), 'replay')) ?? undefined
+}
+export async function rememberReplay(id?: string) {
+  const locator = key(await participantId(), 'replay')
+  if (id) localStorage.setItem(locator, id)
+  else localStorage.removeItem(locator)
 }
 export async function submitEmployment(
   run: LoadedPlaythrough,

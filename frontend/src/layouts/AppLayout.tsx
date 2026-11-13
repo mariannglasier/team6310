@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
-import { Link, Outlet, useLocation } from 'react-router'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router'
+import { useSetup } from '../state/setupContext'
 import { Navigation } from '../components/ui/Navigation'
 import { isStagePath, paths } from '../app/paths'
 import { externalLinks } from '../app/externalLinks'
@@ -8,6 +9,38 @@ import './AppLayout.css'
 
 export function AppLayout() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { prepareHomeNavigation } = useSetup()
+  const [homeError, setHomeError] = useState('')
+  const [homePending, setHomePending] = useState(false)
+  const homeBusy = useRef(false)
+  async function goHome(event: MouseEvent<HTMLAnchorElement>) {
+    // Retain native new-tab behavior; the current tab keeps its selected run.
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return
+    event.preventDefault()
+    if (homeBusy.current) return
+    homeBusy.current = true
+    setHomePending(true)
+    setHomeError('')
+    try {
+      await prepareHomeNavigation()
+      navigate(paths.home)
+    } catch {
+      setHomeError(
+        'Unable to return home. Your saved playthrough has not been deleted. Try the CAC logo again to retry.',
+      )
+    } finally {
+      homeBusy.current = false
+      setHomePending(false)
+    }
+  }
   const isIndividualGameplay = pathname === paths.simulation
   const isGameplay = isIndividualGameplay || pathname.startsWith('/group/')
   const isLanding = pathname === paths.home
@@ -42,6 +75,8 @@ export function AppLayout() {
             className="site-title landing-brand"
             to={paths.home}
             aria-label="CAC Poverty Simulation"
+            onClick={(event) => void goHome(event)}
+            aria-busy={homePending}
           >
             <img
               src={cacLogo}
@@ -68,6 +103,7 @@ export function AppLayout() {
           tabIndex={-1}
           className={isStage ? 'stage' : undefined}
         >
+          {homeError && <p role="alert">{homeError}</p>}
           {isStage && !isGameplay ? (
             <div className="stage__panel">
               <Outlet />
@@ -79,7 +115,12 @@ export function AppLayout() {
       </div>
       <footer className="site-footer landing-footer">
         <div className="landing-footer__brand">
-          <Link to={paths.home} aria-label="Return to landing page">
+          <Link
+            to={paths.home}
+            aria-label="Return to landing page"
+            onClick={(event) => void goHome(event)}
+            aria-busy={homePending}
+          >
             <img
               src={cacLogo}
               width="150"

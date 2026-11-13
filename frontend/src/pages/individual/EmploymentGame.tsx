@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Button, ButtonLink } from '../../components/ui/Button'
+import { Button } from '../../components/ui/Button'
 import { JobBoard } from '../../components/simulation/JobBoard'
-import { paths } from '../../app/paths'
 import { formatUsd } from '../../lib/money'
 import {
   availableJobs,
@@ -11,6 +10,7 @@ import {
   type Walkthrough,
 } from '../../state/employmentWalkthrough'
 import '../../components/simulation/employment.css'
+import { SimulationResult } from '../../components/simulation/SimulationResult'
 
 const headings = {
   board: 'Find your next opportunity.',
@@ -187,30 +187,12 @@ export function EmploymentGame({
           )}
           {result && state.stage !== 'preparation-result' && recapFacts}
           {finished && (
-            <>
-              <p>{state.reason ?? 'You reached the end of the month.'}</p>
-              <p>
-                Ending balance: <strong>{formatUsd(state.balance)}</strong>
-              </p>
-              <div className="employment-actions">
-                <Button onClick={() => onReplay(false)}>
-                  Replay from household selection
-                </Button>
-                {state.stage === 'complete' && !state.support && (
-                  <Button variant="secondary" onClick={() => onReplay(true)}>
-                    Try again with CAC support
-                  </Button>
-                )}
-                <ButtonLink to={paths.home}>Return home</ButtonLink>
-              </div>
-            </>
-          )}
-          {!finished && (
-            <div className="employment-actions">
-              <Button variant="text" onClick={() => dispatch({ type: 'end' })}>
-                End walkthrough
-              </Button>
-            </div>
+            <SimulationResult
+              reason={state.reason}
+              balance={state.balance}
+              cacReplay={state.stage === 'complete' && !state.support}
+              onReplay={onReplay}
+            />
           )}
         </section>
       </div>

@@ -24,6 +24,7 @@ import {
   type BillAction,
 } from '../../components/simulation/BillControls'
 import { formatUsd } from '../../lib/money'
+import { useSimulationMutation } from '../../state/simulationMutation'
 
 export function EmploymentPanel({
   run,
@@ -34,7 +35,7 @@ export function EmploymentPanel({
   onPendingChange,
 }: {
   run: LoadedPlaythrough
-  onCommit: (snapshot: CommittedEmployment) => void
+  onCommit: (snapshot: CommittedEmployment) => void | Promise<void>
   bills?: BillSnapshot | null
   billBusy?: boolean
   onBillAction?: BillAction
@@ -47,7 +48,27 @@ export function EmploymentPanel({
   const [recoverable, setRecoverable] = useState(false)
   const [uncertain, setUncertain] = useState(false)
   const [pending, setPending] = useState(false)
+  const [replaying, setReplaying] = useState(false)
   const busy = useRef(false)
+  const mutation = useSimulationMutation()
+  const markUncertain = mutation.uncertain
+  async function startReplay(support: boolean) {
+    if (busy.current || billBusy) return
+    busy.current = true
+    setReplaying(true)
+    setError('')
+    try {
+      await replay(support)
+      navigate(paths.individual)
+    } catch {
+      setError(
+        'Unable to prepare replay. Check browser storage and try Replay again.',
+      )
+    } finally {
+      busy.current = false
+      setReplaying(false)
+    }
+  }
   useEffect(() => {
     onPendingChange?.(pending)
   }, [pending, onPendingChange])
@@ -84,6 +105,7 @@ export function EmploymentPanel({
           setSnapshot(s)
           setEmployment(s.state ? { runId: run.id, state: s.state } : null)
           setUncertain(p)
+          markUncertain('employment', p)
         }
       },
       (cause) => {
@@ -99,9 +121,9 @@ export function EmploymentPanel({
     return () => {
       current = false
     }
-  }, [run, setEmployment])
+  }, [run, setEmployment, markUncertain])
   async function send(action: EmploymentAction, retry = false) {
-    if (!snapshot || busy.current || billBusy) return
+    if (!snapshot || busy.current || billBusy || !mutation.begin(retry)) return
     busy.current = true
     setPending(true)
     setError('')
@@ -113,14 +135,18 @@ export function EmploymentPanel({
         retry,
       )
       setSnapshot(s)
-      onCommit(s)
+      await onCommit(s)
       setUncertain(false)
+      mutation.uncertain('employment', false)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Submission failed')
-      setUncertain(await hasPending(run.id).catch(() => true))
+      const unresolved = await hasPending(run.id).catch(() => true)
+      setUncertain(unresolved)
+      mutation.uncertain('employment', unresolved)
     } finally {
       busy.current = false
       setPending(false)
+      mutation.finish()
     }
   }
   const advanceAutomatically = useEffectEvent(() => {
@@ -128,7 +154,8 @@ export function EmploymentPanel({
   })
   useEffect(() => {
     const state = snapshot?.state
-    if (!state || pending || uncertain || error || billBusy) return
+    if (!state || pending || uncertain || error || billBusy || mutation.busy)
+      return
     if (
       state.stage === 'income' ||
       (state.stage === 'day' &&
@@ -139,7 +166,16 @@ export function EmploymentPanel({
       const timer = window.setTimeout(() => advanceAutomatically(), 0)
       return () => window.clearTimeout(timer)
     }
-  }, [snapshot, pending, uncertain, error, billBusy, billsReady, dueToday])
+  }, [
+    snapshot,
+    pending,
+    uncertain,
+    error,
+    billBusy,
+    billsReady,
+    dueToday,
+    mutation.busy,
+  ])
   const state = snapshot?.state
   const skipInterviewDay =
     state?.stage === 'day' &&
@@ -164,9 +200,11 @@ export function EmploymentPanel({
       <fieldset
         disabled={
           pending ||
+          replaying ||
           uncertain ||
           automatic ||
           billBusy ||
+          mutation.busy ||
           (state?.stage === 'day' && !billsReady)
         }
         aria-busy={pending || automatic}
@@ -194,15 +232,15 @@ export function EmploymentPanel({
             key={`${snapshot.run.id}:${snapshot.run.currentScenarioId}`}
             run={snapshot.run}
             onCommit={(run) => {
-              void employmentSnapshot(run).then(
-                (value) => {
+              return employmentSnapshot(run).then(
+                async (value) => {
                   setSnapshot(value)
-                  onCommit(value)
+                  await onCommit(value)
                 },
-                () =>
-                  setError(
-                    'Unable to restore saved progress. Reload to retry.',
-                  ),
+                (cause) => {
+                  setError('Unable to restore saved progress. Reload to retry.')
+                  throw cause
+                },
               )
             }}
             onContinue={() => void send({ type: 'continue' })}
@@ -232,8 +270,7 @@ export function EmploymentPanel({
               void send(a)
             }}
             onReplay={(support) => {
-              replay(support)
-              navigate(paths.individual)
+              void startReplay(support)
             }}
           />
         ) : (

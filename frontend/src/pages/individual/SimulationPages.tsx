@@ -47,8 +47,13 @@ function HouseholdChoices({
 }
 
 export function IndividualPage() {
-  const { selectedId, select, createdPlaythrough, recordPlaythrough } =
-    useSetup()
+  const {
+    selectedId,
+    select,
+    createdPlaythrough,
+    recordPlaythrough,
+    setupRestoring,
+  } = useSetup()
   const { state, retry } = useHouseholds()
   const busy = useRef(false)
   const [pending, setPending] = useState(false)
@@ -86,7 +91,11 @@ export function IndividualPage() {
           Choose the household whose finances you will manage for 30 days. Start
           simulation confirms your selection and begins your job search.
         </p>
-        <fieldset disabled={pending} className="employment-controls">
+        <fieldset
+          disabled={pending || setupRestoring}
+          aria-busy={pending || setupRestoring}
+          className="employment-controls"
+        >
           <HouseholdChoices
             state={state}
             retry={retry}

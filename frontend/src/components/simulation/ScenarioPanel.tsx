@@ -11,6 +11,7 @@ import { RadioGroup } from '../ui/RadioGroup'
 import { Button } from '../ui/Button'
 import { formatUsd } from '../../lib/money'
 import { ScenarioFacts } from './ScenarioFacts'
+import { useSimulationMutation } from '../../state/simulationMutation'
 
 export function ScenarioPanel({
   run,
@@ -18,7 +19,7 @@ export function ScenarioPanel({
   onContinue,
 }: {
   run: LoadedPlaythrough
-  onCommit: (run: LoadedPlaythrough) => void
+  onCommit: (run: LoadedPlaythrough) => void | Promise<void>
   onContinue: () => void
 }) {
   const [scenario, setScenario] = useState<Scenario | null>(null)
@@ -27,6 +28,8 @@ export function ScenarioPanel({
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
   const busy = useRef(false)
+  const mutation = useSimulationMutation()
+  const [uncertain, setUncertain] = useState(false)
   useEffect(() => {
     let active = true
     void (async () => {
@@ -41,7 +44,7 @@ export function ScenarioPanel({
           setScenario(content)
           setSaved(snapshot)
           if (snapshot.run.currentBalance !== run.currentBalance)
-            onCommit(snapshot.run)
+            await onCommit(snapshot.run)
         }
       } catch {
         if (active) setError('Unable to load this scenario. Reload to retry.')
@@ -54,31 +57,64 @@ export function ScenarioPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.id, run.currentScenarioId, run.versionId])
   async function submit() {
-    if (!scenario || !selected || busy.current || saved?.decision) return
+    if (
+      !scenario ||
+      !selected ||
+      busy.current ||
+      saved?.decision ||
+      !mutation.begin()
+    )
+      return
     busy.current = true
     setPending(true)
     setError('')
     try {
       const value = await submitScenario(run, scenario, selected)
       setSaved(value)
-      onCommit(value.run)
+      await onCommit(value.run)
     } catch {
       setError('Unable to confirm your decision. Reload or retry.')
       try {
         const value = await restoreScenario(run, scenario)
         setSaved(value)
-        onCommit(value.run)
+        await onCommit(value.run)
       } catch {
-        /* retain last confirmed snapshot */
+        setUncertain(true)
+        mutation.uncertain('scenario', true)
       }
     } finally {
       busy.current = false
       setPending(false)
+      mutation.finish()
+    }
+  }
+  async function reconcile() {
+    if (!scenario || busy.current || !mutation.begin(true)) return
+    busy.current = true
+    setPending(true)
+    try {
+      const value = await restoreScenario(run, scenario)
+      setSaved(value)
+      await onCommit(value.run)
+      setUncertain(false)
+      mutation.uncertain('scenario', false)
+      setError('')
+    } catch {
+      setError('Unable to confirm your decision. Reload or retry.')
+    } finally {
+      busy.current = false
+      setPending(false)
+      mutation.finish()
     }
   }
   return (
     <section className="employment-game" aria-label="Ordinary scenario">
       {error && <p role="alert">{error}</p>}
+      {uncertain && (
+        <Button disabled={pending} onClick={() => void reconcile()}>
+          Reload saved decision
+        </Button>
+      )}
       {!scenario && !error && <p role="status">Loading scenario…</p>}
       {scenario && (
         <>
@@ -89,7 +125,11 @@ export function ScenarioPanel({
           ) : !saved?.decision ? (
             <fieldset
               disabled={
-                pending || !!saved?.decision || saved?.run.status === 'ended'
+                pending ||
+                uncertain ||
+                mutation.busy ||
+                !!saved?.decision ||
+                saved?.run.status === 'ended'
               }
               aria-busy={pending}
               className="employment-controls scenario-choice-controls"
