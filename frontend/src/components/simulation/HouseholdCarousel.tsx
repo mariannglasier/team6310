@@ -109,7 +109,8 @@ export function HouseholdCarousel({
                   }}
                 >
                   <span
-                    className={`household-photo household-photo--${avatarTone(persona.name)}`}
+                    className="household-photo"
+                    style={{ backgroundColor: avatarTone(persona.name) }}
                   >
                     <PersonaAvatar name={persona.name} />
                   </span>

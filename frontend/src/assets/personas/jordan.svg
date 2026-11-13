@@ -1,0 +1,46 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 320 168"
+  preserveAspectRatio="xMidYMax meet"
+>
+  <view
+    id="profile"
+    viewBox="48 -57 224 224"
+    preserveAspectRatio="xMidYMax meet"
+  />
+  <path d="M30 146c48-24 212-28 260 0v22H30Z" fill="#fff" fill-opacity="0.55" />
+  <circle cx="124" cy="70" r="53" fill="#fff" fill-opacity="0.7" />
+  <circle cx="211" cy="91" r="35" fill="#fff" fill-opacity="0.55" />
+  <path d="M72 167c3-43 23-61 52-61s50 18 53 61Z" fill="#c84b5f" />
+  <circle cx="124" cy="75" r="31" fill="#875137" />
+  <path
+    d="M93 73c-4-28 15-43 34-43 22 0 37 15 33 43-9-13-19-17-32-17-15 0-25 6-35 17Z"
+    fill="#24252b"
+  />
+  <circle cx="113" cy="78" r="2.4" fill="#24252b" />
+  <circle cx="136" cy="78" r="2.4" fill="#24252b" />
+  <path
+    d="M116 91c5 5 12 5 17 0"
+    fill="none"
+    stroke="#24252b"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path d="M178 167c2-28 15-42 34-42s32 14 34 42Z" fill="#f3a330" />
+  <circle cx="212" cy="99" r="22" fill="#d39367" />
+  <path
+    d="M190 99c-3-20 9-32 22-32 16 0 27 12 23 32-5-9-13-13-23-13-9 0-16 4-22 13Zm42-16c14-6 18 4 15 15-6-4-10-8-15-15Z"
+    fill="#814b32"
+  />
+  <circle cx="204" cy="101" r="2" fill="#24252b" />
+  <circle cx="220" cy="101" r="2" fill="#24252b" />
+  <path
+    d="M205 111c3 3 8 3 11 0"
+    fill="none"
+    stroke="#24252b"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

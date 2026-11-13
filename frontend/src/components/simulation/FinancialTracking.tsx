@@ -190,7 +190,7 @@ export function FinancialTracking({
               <div className="finance-household-profile">
                 {run.persona && (
                   <div className="finance-avatar">
-                    <PersonaAvatar name={run.persona.name} />
+                    <PersonaAvatar name={run.persona.name} variant="profile" />
                   </div>
                 )}
                 <h2>{run.persona?.name ?? 'Household unavailable'}</h2>

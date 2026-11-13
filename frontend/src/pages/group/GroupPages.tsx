@@ -276,7 +276,10 @@ function GroupScenarioShell({
               <div className="finance-household-profile">
                 {role === 'participant' && session.householdName && (
                   <div className="finance-avatar">
-                    <PersonaAvatar name={session.householdName} />
+                    <PersonaAvatar
+                      name={session.householdName}
+                      variant="profile"
+                    />
                   </div>
                 )}
                 <h2>

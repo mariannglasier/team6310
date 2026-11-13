@@ -156,6 +156,7 @@
   margin: 16px 0 12px;
 }
 .finance-avatar {
+  position: relative;
   display: grid;
   width: 100%;
   max-width: 160px;
@@ -165,10 +166,14 @@
   border-radius: 50%;
   background: var(--accent-surface);
 }
-.finance-avatar svg {
+.finance-avatar .persona-avatar {
+  position: absolute;
+  inset: 0;
+  display: block;
   width: 100%;
-  height: auto;
-  align-self: end;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
 }
 .finance-household h2 {
   font-size: 24px;
