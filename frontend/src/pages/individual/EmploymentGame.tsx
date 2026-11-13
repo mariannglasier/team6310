@@ -10,6 +10,7 @@ import {
   type Walkthrough,
 } from '../../state/employmentWalkthrough'
 import '../../components/simulation/employment.css'
+import { SimulationResult } from '../../components/simulation/SimulationResult'
 
 const headings = {
   board: 'Find your next opportunity.',
@@ -186,22 +187,12 @@ export function EmploymentGame({
           )}
           {result && state.stage !== 'preparation-result' && recapFacts}
           {finished && (
-            <>
-              <p>{state.reason ?? 'You reached the end of the month.'}</p>
-              <p>
-                Ending balance: <strong>{formatUsd(state.balance)}</strong>
-              </p>
-              <div className="employment-actions">
-                <Button onClick={() => onReplay(false)}>
-                  Replay from household selection
-                </Button>
-                {state.stage === 'complete' && !state.support && (
-                  <Button variant="secondary" onClick={() => onReplay(true)}>
-                    Try again with CAC support
-                  </Button>
-                )}
-              </div>
-            </>
+            <SimulationResult
+              reason={state.reason}
+              balance={state.balance}
+              cacReplay={state.stage === 'complete' && !state.support}
+              onReplay={onReplay}
+            />
           )}
         </section>
       </div>

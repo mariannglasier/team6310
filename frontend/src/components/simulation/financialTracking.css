@@ -141,6 +141,15 @@
   border-radius: 12px;
   background: var(--surface);
 }
+.finance-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.finance-layout-action > .ui-button {
+  width: 100%;
+}
 .finance-household-profile {
   display: grid;
   gap: 12px;
@@ -380,6 +389,12 @@
   }
 }
 @media (max-width: 760px) {
+  .finance-left {
+    display: contents;
+  }
+  .finance-layout-action {
+    order: 1;
+  }
   .finance-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;

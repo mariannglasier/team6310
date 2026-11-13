@@ -5,7 +5,9 @@ import {
   rememberedRun,
   rememberedReplay,
   rememberReplay,
+  isBeforeEmploymentEnd,
 } from '../services/employmentGameplay'
+import type { LoadedPlaythrough } from '../types/playthrough'
 import { loadPlaythrough } from '../services/loadPlaythrough'
 import {
   SetupContext,
@@ -97,7 +99,16 @@ export function SetupProvider({ children }: { children: ReactNode }) {
       throw new Error('Unable to verify saved progress. Please retry.')
     }
   }
-  async function replay(support: boolean) {
+  async function replay(support: boolean, terminalRun?: LoadedPlaythrough) {
+    if (
+      !support &&
+      terminalRun?.id === selectedRun.current?.id &&
+      terminalRun?.status === 'ended' &&
+      isBeforeEmploymentEnd(terminalRun.employmentState)
+    ) {
+      await leavePlaythrough()
+      return
+    }
     if (
       employment?.state.stage !== 'complete' &&
       employment?.state.stage !== 'ended'

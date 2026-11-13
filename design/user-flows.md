@@ -97,17 +97,31 @@ On refresh, restore the latest committed state. A committed decision returns to 
 
 ## Ending and replay
 
-| Trigger                       | Result                                                       |
-| ----------------------------- | ------------------------------------------------------------ |
-| Day 30 question completed     | Full results with 30 days completed                          |
-| Player selects End Simulation | Partial results with actual progress and completed decisions |
-| Host ends the group early     | Each participant receives results for their completed work   |
+| Trigger                   | Result                                                       |
+| ------------------------- | ------------------------------------------------------------ |
+| Day 30 question completed | Full results with 30 days completed                          |
+| Player confirms Give Up   | Partial results with actual progress and completed decisions |
+| Host ends the group early | Each participant receives results for their completed work   |
 
 An ended run no longer accepts decisions. Partial summaries must be labeled as early endings and must not imply the player completed the month. Include balance, decisions/consequences, support availability/use, and applicable comparisons. Unanswered questions have no invented choices or outcomes.
 
+Approved November 12, 2026: active individual gameplay provides a red Give Up
+button below the finance sidebar at 761px and above, and below all simulation
+components at 760px and below. The existing modal asks **Give Up?** and **Are you
+sure you want to give up on this simulation?**, with Cancel and red Give Up
+actions. Confirmation pauses automatic advancement; Cancel submits nothing.
+Pending or uncertain gameplay and financial reconciliation block termination.
+The action is available immediately after Start simulation, before See who's
+hiring. It preserves actual progress, bills, financial state and employment data;
+it does not initialize employment. A run ended from the fresh marker displays
+the existing early-ending results with **Before Day 1**, its actual balance, and
+ordinary replay. CAC replay still requires an eligible completed unsupported run.
+See [the implementation and verification record](../docs/give-up.md) for the
+local/hosted deployment boundary.
+
 Replay clears the previous selected run and its matching browser locator before returning to household selection with no household selected. Invalidate pending restoration so refresh cannot reselect the old run. The player chooses a household and confirms with Start simulation. Preserve the chosen CAC replay source in owner-scoped browser storage across refresh; the protected initialization operation still validates eligibility. A new run uses the published content available when it starts and resets finances, day, expense state, circumstances and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
 
-The shared header and footer CAC/home logos open the landing page; there is no dedicated terminal Return Home control. For completed or ended individual runs, verify saved status and await `SetupProvider.leavePlaythrough()` cleanup before navigation. For active runs, preserve the selected run and locator for resumption; navigation does not terminate gameplay. Cleanup retains historical records and anonymous authentication, touches no unrelated storage, and reports recoverable failures without navigating away. Donate to CAC and Visit CAC Site use configured CAC-approved links. View Data Visualization opens a separate interactive data page. General End Simulation is specified above but remains separate from this navigation-and-cleanup implementation; the obsolete employment-specific End Walkthrough button is removed.
+The shared header and footer CAC/home logos open the landing page; there is no dedicated terminal Return Home control. For completed or ended individual runs, verify saved status and await `SetupProvider.leavePlaythrough()` cleanup before navigation. For active runs, preserve the selected run and locator for resumption; navigation does not terminate gameplay. Cleanup retains historical records and anonymous authentication, touches no unrelated storage, and reports recoverable failures without navigating away. Donate to CAC and Visit CAC Site use configured CAC-approved links. View Data Visualization opens a separate interactive data page. The obsolete employment-specific End Walkthrough button remains removed; Give Up belongs to the overall simulation layout.
 
 ## Comparison and data exploration
 

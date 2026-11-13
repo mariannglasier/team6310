@@ -5,6 +5,7 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Walkthrough } from './employmentWalkthrough'
+import type { LoadedPlaythrough } from '../types/playthrough'
 
 export interface EmploymentOverlay {
   readonly runId: string
@@ -23,7 +24,10 @@ export interface SetupSelection {
   readonly employment: EmploymentOverlay | null
   readonly setEmployment: Dispatch<SetStateAction<EmploymentOverlay | null>>
   readonly supportForNext: boolean
-  readonly replay: (support: boolean) => Promise<void>
+  readonly replay: (
+    support: boolean,
+    terminalRun?: LoadedPlaythrough,
+  ) => Promise<void>
   readonly prepareHomeNavigation: () => Promise<void>
   readonly leavePlaythrough: () => Promise<void>
   readonly createdPlaythrough: CreatedPlaythrough | null
