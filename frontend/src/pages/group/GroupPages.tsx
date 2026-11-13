@@ -5,6 +5,7 @@ import { SelectField, TextField } from '../../components/ui/FormFields'
 import { paths } from '../../app/paths'
 import { HouseholdCarousel } from '../../components/simulation/HouseholdCarousel'
 import { PersonaAvatar } from '../../components/simulation/PersonaAvatar'
+import { avatarTone } from '../../components/simulation/avatars'
 import { useHouseholds } from '../../hooks/useHouseholds'
 import '../../components/simulation/financialTracking.css'
 import '../../components/simulation/employment.css'
@@ -275,7 +276,12 @@ function GroupScenarioShell({
               </span>
               <div className="finance-household-profile">
                 {role === 'participant' && session.householdName && (
-                  <div className="finance-avatar">
+                  <div
+                    className="finance-avatar"
+                    style={{
+                      backgroundColor: avatarTone(session.householdName),
+                    }}
+                  >
                     <PersonaAvatar
                       name={session.householdName}
                       variant="profile"

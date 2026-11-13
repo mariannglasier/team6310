@@ -164,6 +164,10 @@ for (const [name, background] of [
     await loaded(profile)
     await expect(profile).toHaveAttribute('src', /#profile$/)
     const checkProfileSize = async () => {
+      await expect(page.locator('.finance-avatar')).toHaveCSS(
+        'background-color',
+        background,
+      )
       const size = (await page.locator('.finance-avatar').boundingBox())!
       const image = (await profile.boundingBox())!
       expect(image.width).toBeCloseTo(size.width, 1)

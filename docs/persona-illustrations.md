@@ -101,11 +101,13 @@ Open `frontend/src/components/simulation/avatars.ts`. There are only two additio
 2. Add one entry to `personaIllustrations`, containing the image and its tone.
 
 Set `tone` to the actual six-digit hex color you want, starting with `#`, such as
-`#e4ead9`. It sets the household-card background, not the colors of the people.
+`#e4ead9`. It sets the background behind the illustration in household selection,
+individual play, and group participant profiles, not the colors of the people.
 It is not a CSS class name or alias: the color is stored beside the image in this
-registration and applied directly by `HouseholdCarousel.tsx`. You do not need to
-edit a stylesheet or a separate list of color names. Profile containers keep
-their shared background; their color does not come from `tone`.
+registration. `HouseholdCarousel.tsx`, `FinancialTracking.tsx` and `GroupPages.tsx`
+call `avatarTone()` with the same name used to select their illustration. You do
+not need to edit a stylesheet or a separate list of color names. Facilitator
+profiles have no persona illustration.
 
 For reference, the current colors are Alex `#dcebf9` (light blue), Jordan
 `#fbe5e3` (light rose), Patricia `#e4ead9` (light green), Sofia `#ebe4f5`
@@ -159,9 +161,11 @@ Check these views at **1440, 768, 390 and 320px** browser widths:
 - Household selection: the wide composition, original card dimensions, background
   tone, name, and selection controls should still fit.
 - Individual play: the figure should rest at the profile's bottom, with no empty
-  strip below it and no clipped head or face.
+  strip below it and no clipped head or face. Its background should match the
+  registered tone seen in household selection.
 - Group participant view: check the same framing; its semi-wide sidebar has a
-  different available width from the individual sidebar.
+  different available width from the individual sidebar. The background should
+  match the registered tone for the displayed illustration.
 - Multiple-person artwork: make sure every person is recognisable at mobile size.
 - An unregistered name: it should still show the generic illustration.
 

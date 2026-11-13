@@ -7,6 +7,7 @@ import type {
 } from '../../types/householdExpenses'
 import { formatUsd } from '../../lib/money'
 import { PersonaAvatar } from './PersonaAvatar'
+import { avatarTone } from './avatars'
 import { BalanceDisplay } from './BalanceDisplay'
 import { usdCents, type UsdCents } from '../../types/domain'
 import './financialTracking.css'
@@ -189,7 +190,10 @@ export function FinancialTracking({
               <span className="finance-label">Your household</span>
               <div className="finance-household-profile">
                 {run.persona && (
-                  <div className="finance-avatar">
+                  <div
+                    className="finance-avatar"
+                    style={{ backgroundColor: avatarTone(run.persona.name) }}
+                  >
                     <PersonaAvatar name={run.persona.name} variant="profile" />
                   </div>
                 )}
