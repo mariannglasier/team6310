@@ -15,6 +15,7 @@ import type { LoadedPlaythrough } from '../types/playthrough'
 vi.mock('./supabase', () => ({ getSupabaseClient: vi.fn() }))
 const rpc = vi.fn()
 let owner = 'owner'
+let anonymous = true
 const initial = {
   engine: 'employment-v1',
   schemaVersion: 1,
@@ -46,11 +47,12 @@ beforeEach(() => {
   localStorage.clear()
   vi.resetAllMocks()
   owner = 'owner'
+  anonymous = true
   vi.mocked(getSupabaseClient).mockResolvedValue({
     rpc,
     auth: {
       getUser: async () => ({
-        data: { user: { id: owner, is_anonymous: true } },
+        data: { user: { id: owner, is_anonymous: anonymous } },
         error: null,
       }),
     },
@@ -182,3 +184,61 @@ it.each(['day', 'ended'])(
     expect(rpc).not.toHaveBeenCalled()
   },
 )
+
+it('uses staff identity for run/replay locators and employment requests', async () => {
+  anonymous = false
+  rpc.mockImplementation(async (name: string) => ({
+    data:
+      name === 'is_cac_staff'
+        ? true
+        : {
+            run: {
+              playthrough_id: 'run',
+              owner_user_id: 'owner',
+              persona_id: 'persona',
+              version_id: 'version',
+              employment_state: initial,
+              current_balance: '123.45',
+              current_day: 1,
+              current_job_id: null,
+              current_scenario_id: null,
+              cac_support_enabledabled: null,
+              status: 'active',
+            },
+          },
+    error: null,
+  }))
+  await rememberRun('run')
+  await rememberReplay('prior-run')
+  expect(await rememberedRun()).toBe('run')
+  expect(await rememberedReplay()).toBe('prior-run')
+  expect(
+    (await submitEmployment(run, 0, { type: 'initialize' })).run.ownerUserId,
+  ).toBe('owner')
+  expect(rpc).toHaveBeenCalledWith(
+    'submit_employment_action',
+    expect.objectContaining({
+      p_run_id: 'run',
+      p_revision: 0,
+      p_action: { type: 'initialize' },
+    }),
+  )
+  expect(localStorage.getItem('cac-employment-v1:owner:pending:run')).toBeNull()
+})
+it('does not submit or change locators/pending state for revoked staff', async () => {
+  anonymous = false
+  localStorage.setItem('cac-employment-v1:owner:run', 'run')
+  localStorage.setItem(
+    'cac-employment-v1:owner:pending:run',
+    'existing-request',
+  )
+  rpc.mockResolvedValue({ data: false, error: null })
+  await expect(submitEmployment(run, 0, { type: 'end' })).rejects.toThrow(
+    'does not currently have access',
+  )
+  expect(rpc).toHaveBeenCalledExactlyOnceWith('is_cac_staff')
+  expect(localStorage.getItem('cac-employment-v1:owner:run')).toBe('run')
+  expect(localStorage.getItem('cac-employment-v1:owner:pending:run')).toBe(
+    'existing-request',
+  )
+})

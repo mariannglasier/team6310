@@ -1,3 +1,4 @@
+import { individualPlayerId } from './individualSession'
 import { getSupabaseClient } from './supabase'
 import { contentService, parseUsdCents } from './contentService'
 import type { LoadedPlaythrough } from '../types/playthrough'
@@ -325,11 +326,7 @@ export async function employmentSnapshot(
   return { run, state, revision: Number(s.revision) }
 }
 export async function participantId() {
-  const client = await getSupabaseClient()
-  const { data, error } = await client.auth.getUser()
-  if (error || !data.user || data.user.is_anonymous !== true)
-    throw new Error('Existing participant session required')
-  return data.user.id
+  return individualPlayerId()
 }
 const key = (owner: string, suffix: string) =>
   `cac-employment-v1:${owner}:${suffix}`
