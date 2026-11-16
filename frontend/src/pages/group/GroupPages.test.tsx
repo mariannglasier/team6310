@@ -16,6 +16,7 @@ vi.mock('../../services/groupSessionService', () => ({
     voteJob: vi.fn(),
     voteEmployment: vi.fn(),
     updateSetup: vi.fn(),
+    review: vi.fn(),
   },
 }))
 const session: GroupSession = {
@@ -65,7 +66,130 @@ const session: GroupSession = {
 }
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.mocked(groupSessionService.review).mockResolvedValue([])
   vi.mocked(groupSessionService.restore).mockResolvedValue(null)
+})
+
+const endedSession: GroupSession = {
+  ...session,
+  status: 'closed',
+  roundState: 'completed',
+  currentDay: 8,
+  sharedBalance: 123.45,
+}
+
+test.each([true, false])(
+  'host replays with assistance %s in a fresh session',
+  async (assistance) => {
+    const user = userEvent.setup()
+    vi.mocked(groupSessionService.restore).mockResolvedValue(endedSession)
+    vi.mocked(groupSessionService.create).mockResolvedValue({
+      ...session,
+      sessionId: 'new-session',
+      joinCode: 'NEWCODE123456',
+    })
+    render(
+      <MemoryRouter>
+        <HostPage />
+      </MemoryRouter>,
+    )
+    expect(
+      await screen.findByRole('heading', { name: 'Every choice has a story.' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('8 of 30')).toBeInTheDocument()
+    expect(screen.getByText('$123.45')).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', {
+        name: assistance
+          ? 'Replay with CAC assistance'
+          : 'Replay without CAC assistance',
+      }),
+    )
+    expect(groupSessionService.create).toHaveBeenCalledWith(90, assistance)
+    expect(await screen.findByText('NEWCODE123456')).toBeInTheDocument()
+  },
+)
+
+test('failed replay preserves the ending and permits retry', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.restore).mockResolvedValue(endedSession)
+  vi.mocked(groupSessionService.create).mockRejectedValue(new Error('offline'))
+  render(
+    <MemoryRouter>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  await user.click(
+    await screen.findByRole('button', { name: 'Replay with CAC assistance' }),
+  )
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Your results are still saved',
+  )
+  expect(screen.getByText('$123.45')).toBeInTheDocument()
+  expect(
+    screen.getByRole('button', { name: 'Replay with CAC assistance' }),
+  ).toBeEnabled()
+})
+
+test('participant reviews saved tallies and their own vote, then joins again', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.join).mockResolvedValue({
+    ...endedSession,
+    isHost: false,
+    participantId: 'member',
+  })
+  vi.mocked(groupSessionService.review).mockResolvedValue([
+    {
+      day: 3,
+      scenarioId: 'q',
+      title: 'Groceries',
+      selectedChoiceId: 'a',
+      choices: [
+        { choiceId: 'a', text: 'Buy groceries', voteCount: 2 },
+        { choiceId: 'b', text: 'Wait', voteCount: 1 },
+      ],
+    },
+  ])
+  render(
+    <MemoryRouter>
+      <JoinPage />
+    </MemoryRouter>,
+  )
+  await user.type(screen.getByLabelText(/Session code/), session.joinCode)
+  await user.click(screen.getByRole('button', { name: /Join session/ }))
+  await user.click(await screen.findByText('Day 3 · Groceries'))
+  expect(screen.getByText('2 votes')).toBeVisible()
+  expect(screen.getByText('1 vote')).toBeVisible()
+  expect(screen.getByText(/Your vote/)).toBeVisible()
+  expect(
+    screen.queryByRole('button', { name: 'Replay with CAC assistance' }),
+  ).toBeNull()
+  await user.click(
+    screen.getByRole('button', { name: 'Join another group session' }),
+  )
+  expect(screen.getByLabelText(/Session code/)).toHaveValue('')
+})
+
+test('review failure offers retry and keeps replay available', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.restore).mockResolvedValue(endedSession)
+  vi.mocked(groupSessionService.review)
+    .mockRejectedValueOnce(new Error('offline'))
+    .mockResolvedValueOnce([])
+  render(
+    <MemoryRouter>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Unable to load saved choices',
+  )
+  await user.click(
+    screen.getByRole('button', { name: 'Retry loading choices' }),
+  )
+  expect(
+    await screen.findByText('No scenario votes were recorded.'),
+  ).toBeInTheDocument()
 })
 test('creates a committed session and copies its code', async () => {
   const user = userEvent.setup()

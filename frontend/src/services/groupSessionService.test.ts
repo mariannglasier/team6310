@@ -5,6 +5,51 @@ import { getSupabaseClient } from './supabase'
 vi.mock('./participantSession', () => ({ ensureParticipantSession: vi.fn() }))
 vi.mock('./supabase', () => ({ getSupabaseClient: vi.fn() }))
 const rpc = vi.fn()
+
+test('loads a session review through the protected RPC', async () => {
+  const review = [
+    {
+      day: 1,
+      scenarioId: 'q',
+      title: 'Groceries',
+      selectedChoiceId: null,
+      choices: [{ choiceId: 'a', text: 'Buy', voteCount: 2 }],
+    },
+  ]
+  rpc.mockResolvedValue({ data: review, error: null })
+  expect(await groupSessionService.review('session')).toEqual(review)
+  expect(ensureParticipantSession).toHaveBeenCalledOnce()
+  expect(rpc).toHaveBeenCalledWith('get_group_session_review', {
+    p_session_id: 'session',
+  })
+})
+
+test.each([
+  null,
+  {},
+  [{ day: 1 }],
+  [
+    {
+      day: 1,
+      scenarioId: 'q',
+      title: 'Q',
+      selectedChoiceId: null,
+      choices: [{ choiceId: 'a', text: 'A', voteCount: -1 }],
+    },
+  ],
+])('rejects malformed review data: %j', async (data) => {
+  rpc.mockResolvedValue({ data, error: null })
+  await expect(groupSessionService.review('session')).rejects.toThrow(
+    'Unable to load saved choices',
+  )
+})
+
+test('does not expose internal review errors', async () => {
+  rpc.mockResolvedValue({ data: [], error: { message: 'internal SQL' } })
+  await expect(groupSessionService.review('other-session')).rejects.toThrow(
+    'Unable to load saved choices. Please retry.',
+  )
+})
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(getSupabaseClient).mockResolvedValue({ rpc } as unknown as Awaited<

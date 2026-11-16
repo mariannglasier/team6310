@@ -60,6 +60,46 @@ voteable published scenarios; Day 30 completion closes the month.
 
 ## Connection and deployment
 
+### Group ending review — November 16, 2026
+
+The group Host and Join screens now use a dedicated ending card based on the
+checked-in Figma prototype's `GroupResults` and replay layout. It shows the saved
+shared balance, actual day reached, assistance availability, expandable scenario
+vote tallies, and the caller's own vote where present. Other participants' votes
+are shown as counts, without names or Auth identifiers. Unanswered scenarios are
+omitted. These are saved preference votes; the review does not imply that every
+vote caused a financial transaction. Employment voting history is not included:
+the existing employment tables replace/delete votes across interview attempts.
+
+Hosts can replay with or without CAC assistance through the existing protected
+session-creation operation, retaining the decision duration. Replay creates a new
+code and fresh household/readiness setup; participants explicitly join that code.
+Failed creation leaves the previous summary available. Individual play is unchanged.
+
+`20261116152935_group_ending_review.sql` prepares the read-only
+`get_group_session_review` RPC. It delegates to a private function that first
+checks the existing anonymous host/member authorization and rejects active
+sessions. It adds no direct table grants and changes no financial operations.
+This migration has **not** been applied to hosted Supabase. The review requires
+it; otherwise the screen offers a retry while balance and replay remain available.
+No historical migrations or local manual startup instructions were changed.
+
+Verification: format, lint, typecheck, production build, and `git diff --check`
+passed. The full Vitest rerun with two workers passed 398 tests, with two skipped;
+an earlier staff-login timeout passed both its isolated rerun and the full rerun.
+The new browser test passed its keyboard, overflow, tally, and replay assertions
+at desktop, tablet, mobile, and 320-pixel widths. Desktop and narrow-mobile
+screenshots were visually inspected. The Playwright runner stalled during server
+teardown after all four cases passed and was interrupted; its overall exit was
+therefore not successful.
+
+`supabase/tests/group-ending-review.sql` provides rollback-only checks for
+own-vote restoration, tallies, repeatable reads, unanswered-day omission, and
+active-session/nonmember/unauthenticated denial. These database tests could not
+run because the local Docker daemon was unavailable. Existing host restoration
+still restores open sessions only; returning to a finished session after a full
+page reload is outside this change.
+
 Migration applied to `cac-poverty-exercise` (`uucneyuspeqpygiucfvr`).
 Local `.env.local` matches that project's URL and contains a publishable key.
 Do not commit real environment values. Anonymous sign-in must be enabled.

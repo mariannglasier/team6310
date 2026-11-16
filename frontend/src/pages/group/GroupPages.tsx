@@ -14,6 +14,7 @@ import {
   type GroupSession,
 } from '../../services/groupSessionService'
 import './group.css'
+import { GroupEnding } from './GroupEnding'
 
 const weeklyPay = (value: number | string) =>
   new Intl.NumberFormat('en-US', {
@@ -376,6 +377,27 @@ export function HostPage() {
   const [notice, setNotice] = useState('')
   const [duration, setDuration] = useState<DecisionDuration>(60)
   const [cacSupport, setCacSupport] = useState(false)
+  const [replaying, setReplaying] = useState(false)
+  async function replay(withAssistance: boolean) {
+    if (!session || replaying) return
+    setReplaying(true)
+    setError('')
+    try {
+      const fresh = await groupSessionService.create(
+        session.decisionDurationSeconds,
+        withAssistance,
+      )
+      if (!fresh)
+        throw new Error('Unable to create a new session. Please retry.')
+      setSession(fresh)
+    } catch {
+      setError(
+        'Unable to start replay. Your results are still saved. Please retry.',
+      )
+    } finally {
+      setReplaying(false)
+    }
+  }
   useEffect(() => {
     let active = true
     groupSessionService
@@ -423,7 +445,7 @@ export function HostPage() {
       setNotice('Copy unavailable. Select the code above and copy it manually.')
     }
   }
-  const sessionId = session?.sessionId
+  const sessionId = session?.status === 'open' ? session.sessionId : undefined
   useEffect(() => {
     if (!sessionId) return
     const timer = window.setInterval(() => {
@@ -548,6 +570,20 @@ export function HostPage() {
     )
   }
 
+  if (session.roundState === 'completed' || session.status === 'closed') {
+    return (
+      <>
+        <GroupEnding
+          key={session.sessionId}
+          session={session}
+          onReplay={replay}
+          busy={replaying}
+        />
+        {error && <p role="alert">{error}</p>}
+      </>
+    )
+  }
+
   if (session.roundState !== 'lobby') {
     const question = session.question
     return (
@@ -560,12 +596,7 @@ export function HostPage() {
             Host · {session.joinCode} · {session.voteCount}/
             {session.participantCount} voted
           </span>
-          {session.roundState === 'completed' ? (
-            <>
-              <h1 id="page-heading">Group session complete</h1>
-              <p>Voting has ended for this session.</p>
-            </>
-          ) : (
+          {
             <>
               <p className="placeholder-label">
                 {session.roundType !== 'scenario'
@@ -599,7 +630,7 @@ export function HostPage() {
                 </p>
               )}
             </>
-          )}
+          }
           {error && <p role="alert">{error}</p>}
           <div className="employment-actions group-scenario-actions">
             {session.roundState === 'voting' && (
@@ -624,7 +655,7 @@ export function HostPage() {
                         : `Continue to Day ${session.currentDay + 1}`}
               </Button>
             )}
-            {session.roundState !== 'completed' && (
+            {
               <Button
                 variant="secondary"
                 disabled={busy}
@@ -632,7 +663,7 @@ export function HostPage() {
               >
                 End group session
               </Button>
-            )}
+            }
           </div>
         </section>
       </GroupScenarioShell>
@@ -808,7 +839,7 @@ export function JoinPage() {
       setBusy(false)
     }
   }
-  const sessionId = session?.sessionId
+  const sessionId = session?.status === 'open' ? session.sessionId : undefined
   useEffect(() => {
     if (!sessionId) return
     const timer = window.setInterval(() => {
@@ -888,6 +919,19 @@ export function JoinPage() {
   }
 
   if (session) {
+    if (session.roundState === 'completed' || session.status === 'closed') {
+      return (
+        <GroupEnding
+          key={session.sessionId}
+          session={session}
+          onJoinAgain={() => {
+            setSession(null)
+            setCode('')
+            setError('')
+          }}
+        />
+      )
+    }
     if (session.roundState !== 'lobby') {
       return (
         <GroupScenarioShell session={session} role="participant">
@@ -896,12 +940,7 @@ export function JoinPage() {
             aria-labelledby="page-heading"
           >
             <span className="group-badge">Session {session.joinCode}</span>
-            {session.roundState === 'completed' ? (
-              <>
-                <h1 id="page-heading">Session complete</h1>
-                <p>Thanks for taking part in the group discussion.</p>
-              </>
-            ) : (
+            {
               <>
                 <p className="placeholder-label">
                   {session.roundType !== 'scenario'
@@ -972,7 +1011,7 @@ export function JoinPage() {
                   </p>
                 )}
               </>
-            )}
+            }
             {error && <p role="alert">{error}</p>}
           </section>
         </GroupScenarioShell>

@@ -52,6 +52,13 @@ export interface GroupSession {
   householdVotes: GroupHouseholdVote[] | null
   sharedExpenses: GroupSharedExpense[] | null
 }
+export interface GroupDecisionReview {
+  day: number
+  scenarioId: string
+  title: string
+  selectedChoiceId: string | null
+  choices: Array<{ choiceId: string; text: string; voteCount: number }>
+}
 export interface GroupEmploymentOption {
   optionId: string
   text: string
@@ -193,6 +200,40 @@ async function configure(
     : null
 }
 export const groupSessionService = {
+  review: async (sessionId: string): Promise<GroupDecisionReview[]> => {
+    await ensureParticipantSession()
+    const client = await getSupabaseClient()
+    const { data, error } = await client.rpc('get_group_session_review', {
+      p_session_id: sessionId,
+    })
+    if (
+      error ||
+      !Array.isArray(data) ||
+      !data.every(
+        (row) =>
+          row &&
+          typeof row === 'object' &&
+          Number.isSafeInteger(row.day) &&
+          row.day > 0 &&
+          row.day <= 30 &&
+          typeof row.scenarioId === 'string' &&
+          typeof row.title === 'string' &&
+          (row.selectedChoiceId === null ||
+            typeof row.selectedChoiceId === 'string') &&
+          Array.isArray(row.choices) &&
+          row.choices.every(
+            (choice: Record<string, unknown>) =>
+              choice &&
+              typeof choice.choiceId === 'string' &&
+              typeof choice.text === 'string' &&
+              Number.isSafeInteger(choice.voteCount) &&
+              (choice.voteCount as number) >= 0,
+          ),
+      )
+    )
+      throw new Error('Unable to load saved choices. Please retry.')
+    return data as GroupDecisionReview[]
+  },
   restore: () => configure(false, 60, false),
   create: (
     decisionDurationSeconds: DecisionDuration,
