@@ -1,0 +1,45 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 320 168"
+  preserveAspectRatio="xMidYMax meet"
+>
+  <view
+    id="profile"
+    viewBox="60 -32 200 200"
+    preserveAspectRatio="xMidYMax meet"
+  />
+  <path d="M30 146c48-24 212-28 260 0v22H30Z" fill="#fff" fill-opacity="0.55" />
+  <circle cx="160" cy="76" r="63" fill="#fff" fill-opacity="0.7" />
+  <path
+    d="M119 74c-7-36 14-56 41-56s48 20 41 56l5 50c-13 7-24 6-31 0h-30c-7 6-18 7-31 0Z"
+    fill="#24252b"
+  />
+  <path d="M88 168c5-46 28-64 72-64s67 18 72 64Z" fill="#6a4c93" />
+  <path d="m143 106 17 34 17-34Z" fill="#fff" />
+  <path
+    d="m143 106-8 24m42-24 8 24"
+    fill="none"
+    stroke="#fff"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path d="M145 100h30v14h-30Z" fill="#c68a5e" />
+  <circle cx="160" cy="72" r="35" fill="#c68a5e" />
+  <path
+    d="M125 67c6-21 21-30 37-28 17 2 29 13 32 29-14-4-25-11-33-19-8 11-21 17-36 18Z"
+    fill="#24252b"
+  />
+  <circle cx="148" cy="77" r="2.5" fill="#24252b" />
+  <circle cx="172" cy="77" r="2.5" fill="#24252b" />
+  <path
+    d="M152 90c5 5 11 5 16 0"
+    fill="none"
+    stroke="#24252b"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="125" cy="84" r="2.6" fill="#e0b04a" />
+  <circle cx="195" cy="84" r="2.6" fill="#e0b04a" />
+</svg>

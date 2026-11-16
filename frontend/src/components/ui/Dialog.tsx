@@ -8,6 +8,8 @@ interface DialogProps {
   description: string
   onDismiss: () => void
   children?: ReactNode
+  dismissLabel?: string
+  dismissDisabled?: boolean
 }
 // Native modal dialogs provide focus containment and inert background content.
 export function Dialog({
@@ -16,6 +18,8 @@ export function Dialog({
   description,
   onDismiss,
   children,
+  dismissLabel = 'Close',
+  dismissDisabled = false,
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
   const dismissRef = useRef<HTMLButtonElement>(null)
@@ -42,16 +46,21 @@ export function Dialog({
       aria-describedby={`${id}-description`}
       onCancel={(event) => {
         event.preventDefault()
-        onDismiss()
+        if (!dismissDisabled) onDismiss()
       }}
     >
       <h2 id={`${id}-title`}>{title}</h2>
       <p id={`${id}-description`}>{description}</p>
-      {children}
       <div className="ui-dialog__actions">
-        <Button ref={dismissRef} variant="secondary" onClick={onDismiss}>
-          Close
+        <Button
+          ref={dismissRef}
+          variant="secondary"
+          disabled={dismissDisabled}
+          onClick={onDismiss}
+        >
+          {dismissLabel}
         </Button>
+        {children}
       </div>
     </dialog>
   )

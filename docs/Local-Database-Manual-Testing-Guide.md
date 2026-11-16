@@ -30,10 +30,13 @@ python3 tools/local_supabase.py stop
 ### Vite Website:
 
 > http://127.0.0.1:5173
+> ... /admin/login
 
 ### Local Supabase Interface
 
 > http://127.0.0.1:55323
+
+
 
 ### Extra Local Supabase info
 

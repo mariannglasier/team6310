@@ -1,3 +1,4 @@
+import { individualPlayerId } from './individualSession'
 import { parseUsdCents } from './contentService'
 import { getSupabaseClient } from './supabase'
 import type { LoadedPlaythrough } from '../types/playthrough'
@@ -25,9 +26,7 @@ export async function loadPlaythrough(
 ): Promise<LoadedPlaythrough | null> {
   try {
     const client = await getSupabaseClient()
-    const { data: identity, error: authError } = await client.auth.getUser()
-    if (authError || !identity.user?.id || identity.user.is_anonymous !== true)
-      throw new Error('An existing participant session is required')
+    const owner = await individualPlayerId()
     const { data: row, error } = await client
       .from('playthroughs')
       .select(
@@ -38,7 +37,7 @@ export async function loadPlaythrough(
     if (error) throw error
     // RLS intentionally makes missing and inaccessible rows indistinguishable.
     if (!row) return null
-    if (row.owner_user_id !== identity.user.id || row.playthrough_id !== id)
+    if (row.owner_user_id !== owner || row.playthrough_id !== id)
       throw new Error('Unexpected playthrough')
     if (row.current_day !== null && !Number.isInteger(row.current_day))
       throw new Error('Invalid day')

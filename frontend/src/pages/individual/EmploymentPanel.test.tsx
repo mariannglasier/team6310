@@ -35,6 +35,7 @@ beforeEach(() => {
   const client = {
     rpc,
     auth: {
+      getSession: async () => ({ data: { session: {} }, error: null }),
       getUser: async () => ({
         data: { user: { id: 'owner', is_anonymous: true } },
         error: null,

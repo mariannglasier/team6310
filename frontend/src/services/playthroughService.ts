@@ -1,7 +1,8 @@
 import {
-  ensureParticipantSession,
-  ParticipantSessionError,
-} from './participantSession'
+  ensureIndividualSession,
+  individualPlayerId,
+  IndividualSessionError,
+} from './individualSession'
 import { getSupabaseClient } from './supabase'
 
 // The RPC derives ownership, edition, and balance; only the persona ID is sent.
@@ -9,24 +10,22 @@ export async function createIndividualPlaythrough(
   personaId: string,
 ): Promise<string> {
   try {
-    await ensureParticipantSession()
+    await ensureIndividualSession()
     const client = await getSupabaseClient()
-    const { data: identity, error: identityError } = await client.auth.getUser()
-    if (identityError || !identity.user?.is_anonymous)
-      throw new ParticipantSessionError('Verified participant session required')
+    const owner = await individualPlayerId()
     const { data, error } = await client.rpc('start_individual_playthrough', {
       p_persona_id: personaId,
     })
     if (error || typeof data !== 'string' || !data.trim())
       throw new Error('Creation failed', { cause: error })
     try {
-      localStorage.setItem(`cac-employment-v1:${identity.user.id}:run`, data)
+      localStorage.setItem(`cac-employment-v1:${owner}:run`, data)
     } catch {
       /* Recovery chooser can recover this run without creating another. */
     }
     return data
   } catch (error) {
-    if (error instanceof ParticipantSessionError) throw error
+    if (error instanceof IndividualSessionError) throw error
     throw new Error(
       'Unable to confirm playthrough creation. Please contact the facilitator before retrying; a record may already have been created.',
       { cause: error },
