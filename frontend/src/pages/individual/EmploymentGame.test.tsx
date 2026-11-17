@@ -10,6 +10,9 @@ import {
   type WalkthroughJob,
 } from '../../state/employmentWalkthrough'
 import { usdCents, type Persona } from '../../types/domain'
+import { employmentSnapshot } from '../../services/employmentGameplay'
+import { contentService } from '../../services/contentService'
+import hostedDocument from '../../services/fixtures/hostedEmploymentDocument.json'
 
 const persona: Persona = {
   id: 'p1',
@@ -180,4 +183,72 @@ it('shows missing jobs as an actionable blocking state', () => {
   expect(
     screen.getByRole('button', { name: 'Submit application' }),
   ).toBeDisabled()
+})
+
+it('displays the restored clothing price and uses exact cents for a purchase', async () => {
+  const loadJobs = vi
+    .spyOn(contentService, 'loadJobs')
+    .mockResolvedValue(jobs.map(({ job }) => job))
+  try {
+    const snapshot = await employmentSnapshot({
+      id: 'run',
+      ownerUserId: 'owner',
+      personaId: persona.id,
+      versionId: persona.versionId,
+      persona,
+      currentDay: 2,
+      currentBalance: usdCents(10000),
+      currentScenarioId: null,
+      currentJobId: null,
+      sessionId: null,
+      supportEnabled: false,
+      status: 'active',
+      startedAt: null,
+      employmentState: {
+        ...hostedDocument,
+        stage: 'interview',
+        targetId: jobs[0].job.id,
+        initialTargetId: jobs[0].job.id,
+        clothingCost: '83.27',
+      },
+    })
+    if (!snapshot.state) throw new Error('Expected restored employment')
+    const dispatch = vi.fn()
+    render(
+      <MemoryRouter>
+        <EmploymentGame
+          state={snapshot.state}
+          dispatch={dispatch}
+          onReplay={vi.fn()}
+        />
+      </MemoryRouter>,
+    )
+    const user = userEvent.setup()
+    await user.click(
+      screen.getByRole('button', {
+        name: /Buy professional clothes.*\$83\.27/,
+      }),
+    )
+    expect(dispatch).not.toHaveBeenCalled()
+    await user.click(
+      screen.getByRole('button', { name: 'Submit clothing decision' }),
+    )
+    expect(dispatch).toHaveBeenCalledExactlyOnceWith({
+      type: 'interview',
+      choice: 'purchase',
+    })
+    const result = walkthroughReducer(snapshot.state, dispatch.mock.calls[0][0])
+    expect(result.balance).toBe(1673)
+    expect(result.history).toEqual(
+      expect.arrayContaining([expect.objectContaining({ change: -8327 })]),
+    )
+    const insufficient = walkthroughReducer(
+      { ...snapshot.state, balance: usdCents(8326) },
+      { type: 'interview', choice: 'purchase' },
+    )
+    expect(insufficient.stage).toBe('ended')
+    expect(insufficient.balance).toBe(8326)
+  } finally {
+    loadJobs.mockRestore()
+  }
 })

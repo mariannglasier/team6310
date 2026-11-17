@@ -1,0 +1,29 @@
+{
+  "engine": "employment-v1",
+  "schemaVersion": 1,
+  "revision": 1,
+  "stage": "board",
+  "receipts": {
+    "00000000-0000-4000-8000-000000000001": {
+      "action": { "type": "initialize" },
+      "expectedRevision": 0,
+      "revision": 1,
+      "day": 1,
+      "change": "0",
+      "stage": "board"
+    }
+  },
+  "prepared": false,
+  "hasEnglishSkills": false,
+  "hasComputerSkills": false,
+  "clothing": "none",
+  "targetId": null,
+  "initialTargetId": null,
+  "hiredDay": null,
+  "weeklyIncome": "0.00",
+  "assistanceUsed": false,
+  "history": [],
+  "creditedDays": [],
+  "reason": null,
+  "clothingCost": "60"
+}
