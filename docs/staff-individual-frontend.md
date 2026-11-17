@@ -30,6 +30,23 @@ adds an automatic creation retry. Group gameplay continues using the unchanged
 `ensureParticipantSession()` and remains anonymous-only. Development preview and
 integration-test restrictions remain unchanged.
 
+## Employment document price compatibility — November 17
+
+The frontend accepts the optional `clothingCost` string added by hosted migration
+`20261117003427_scenario_source_refresh`, retaining `employment-v1` schema version
+
+1. Prices must be positive decimal USD with at most two fractional digits and
+   below $1,000,000, matching the hosted edition-price constraint. The saved price
+   is converted to integer cents for the existing clothing display and walkthrough
+   calculations. Documents without the field retain the backend's $60.00 legacy
+   fallback; malformed prices and unrelated unknown fields remain rejected.
+
+The regression fixture reproduces the captured hosted board-document shape with
+a synthetic request UUID and no participant identity data. Tests cover restoration,
+legacy fallback, invalid fields, and display/purchase calculations using $83.27.
+These are frontend tests, not hosted Auth/API or browser verification. This
+compatibility change makes no database or authorization changes.
+
 ## Verification and integration boundary
 
 Frontend tests mock Supabase responses. Focused tests exercise the real identity

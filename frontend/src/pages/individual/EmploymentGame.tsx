@@ -31,11 +31,14 @@ export function EmploymentGame({
   dispatch,
   onReplay,
   recapFacts,
+  allowPlaceholder = false,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
   onReplay: (support: boolean) => void
   recapFacts?: ReactNode
+  // The caller must resolve bills and real scenarios before allowing fallback.
+  allowPlaceholder?: boolean
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -169,7 +172,11 @@ export function EmploymentGame({
               <Button onClick={advance}>Continue to Day 3</Button>
             </div>
           )}
-          {(state.stage === 'day' || state.stage === 'income') && (
+          {(state.stage === 'income' ||
+            (state.stage === 'day' && !allowPlaceholder)) && (
+            <p role="status">Loading today's content…</p>
+          )}
+          {state.stage === 'day' && allowPlaceholder && (
             <div className="employment-placeholder">
               <span className="placeholder-label">
                 Day {state.day} · End-of-day scenario
