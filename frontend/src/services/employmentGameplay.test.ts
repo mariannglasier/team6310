@@ -84,6 +84,32 @@ it('scopes the run locator to the verified participant', async () => {
   owner = 'another'
   expect(await rememberedRun()).toBeNull()
 })
+it('accepts edition-bound clothing prices and legacy state while rejecting invalid prices', () => {
+  const state = {
+    ...initial,
+    stage: 'board',
+    revision: 1,
+    prepared: false,
+    hasEnglishSkills: false,
+    hasComputerSkills: false,
+    assistanceUsed: false,
+    clothing: 'none',
+    targetId: null,
+    initialTargetId: null,
+    hiredDay: null,
+    weeklyIncome: '0.00',
+    history: [],
+    creditedDays: [],
+    reason: null,
+  }
+  expect(documentState(state).clothingCost).toBeUndefined()
+  expect(documentState({ ...state, clothingCost: '63.25' }).clothingCost).toBe(
+    '63.25',
+  )
+  for (const clothingCost of ['-1.00', '0.00', 'bad', 60]) {
+    expect(() => documentState({ ...state, clothingCost })).toThrow()
+  }
+})
 it('does not forget a different run or another participant locator', async () => {
   await rememberRun('newer-run')
   await forgetRun('old-run')

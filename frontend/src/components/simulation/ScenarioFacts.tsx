@@ -68,6 +68,10 @@ export function ScenarioFacts({
                   : 'Community fact'}
             </h3>
             <p>{fact.text}</p>
+            <a href={fact.sourceUrl} target="_blank" rel="noopener noreferrer">
+              Source
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
           </section>
         ))}
     </aside>

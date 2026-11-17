@@ -1,3 +1,11 @@
+> **Monthly refresh policy updated November 17, 2026.** Tax-credit baselines USD 989 and Jordan/Maya USD 1989 follow BLS all-items CPI. Validated OEWS wages publish automatically in the monthly edition. Failed components copy their last published amounts and retain their earlier verification dates. The game’s Last updated panel marks carried-forward values.
+
+> **API-only refresh approved November 16, 2026.** Scheduled updates request JSON APIs only. Dedicated APIs supply rent, electricity and modeled EITC. BLS CPI supplies remaining prices, including all-items CPI CUUR0000SA0 for school meals and transit alternatives. Historical website links document facts and starting amounts. Annual statistics retain their reporting year until a supported data source replaces them.
+
+> **Approved part 2 revision — November 16, 2026.** The active catalog now contains 51 cards. D031/D037/D038/D041/D057/D060 are additionally retired without replacement. D033 is a kitchen appliance, D039 school soccer, and D040 an adult coat. Added free CAC options retain a zero cash effect. All retained nonzero prices and fees remain source-bound. This revision supersedes earlier descriptions below.
+
+> **Approved facts and pricing revision November 15, 2026.** The attached facts fixes.docx changes the active catalog to 57 cards, retires D016/D017/D023 without replacements, makes all four households car owners, changes D027 to work shoes, and approves the revised starting prices. Every nonzero scenario price and fee has a monthly source binding. See [the implementation and Supabase setup](supabase-game-data-setup.md). Earlier draft amounts and missing-car restrictions below are historical.
+
 > **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
 >
 > **Unpaid bills — optional future consideration only:** No approval of this mechanic is confirmed. It is not an approved requirement, planned feature, implementation task, or acceptance criterion. Creating unpaid principal on Ignore, late fees, sidebar settlement, and Day 30 completion with outstanding debt all remain undecided. Historical draft examples are retained only for reference; they do not change current payment-failure rules or authorize development.
@@ -118,14 +126,11 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 | D013 | bill | Childcare & Youth | The childcare bill | JORDAN | None |
 | D014 | bill | Childcare & Youth | Maya's school meal balance | JORDAN | None |
 | D015 | bill | Essential Goods & Clothing | The repair bill | CAR | None |
-| D016 | bill | Essential Goods & Clothing | A pharmacy bill arrives | ALL | None |
-| D017 | bill | Financial Literacy & Taxes | A repayment is due | ALL | None |
 | D018 | bill | Housing & Utilities | The gas bill | ALL | Conditional |
 | D019 | bill | Housing & Utilities | Rent or a cash cushion? | ALL | Conditional |
 | D020 | bill | Essential Goods & Clothing | A medical bill remains | ALL | None |
 | D021 | shock | Essential Goods & Clothing | The car will not start | CAR | None |
 | D022 | shock | Essential Goods & Clothing | An unexpected dental expense | ALL | None |
-| D023 | shock | Essential Goods & Clothing | A broken phone | ALL | None |
 | D024 | shock | Essential Goods & Clothing | A family emergency | ALL | None |
 | D025 | shock | Childcare & Youth | Childcare falls through | JORDAN | None |
 | D026 | shock | Essential Goods & Clothing | Time for new tires | CAR | None |
@@ -133,36 +138,30 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 | D028 | shock | Housing & Utilities | A plumbing problem | ALL | None |
 | D029 | shock | Childcare & Youth | An unexpected appointment for Maya | JORDAN | None |
 | D030 | shock | Essential Goods & Clothing | A broken laptop | ALL | None |
-| D031 | shock | Essential Goods & Clothing | The car needs a tow | CAR | None |
 | D032 | shock | Housing & Utilities | A larger share to cover | SOFIA | None |
-| D033 | shock | Essential Goods & Clothing | A damaged work item | EMPLOYED | None |
-| D034 | shock | Essential Goods & Clothing | A broken dresser | ALL | Conditional |
-| D035 | shock | Food & Nutrition | Groceries lost | ALL | Conditional |
-| D036 | everyday | Food & Nutrition | A full grocery basket? | ALL | Conditional |
-| D037 | everyday | Employment & Adult Education | Your ride to work falls through | EMPLOYED | None |
-| D038 | everyday | Essential Goods & Clothing | A load of laundry | ALL | None |
-| D039 | everyday | Childcare & Youth | Maya's school trip | JORDAN | None |
-| D040 | everyday | Essential Goods & Clothing | Worn-out shoes | ALL | Conditional |
-| D041 | everyday | Food & Nutrition | Too tired to cook? | ALL | None |
-| D042 | everyday | Childcare & Youth | School supplies for Maya | JORDAN | Conditional |
-| D043 | everyday | Essential Goods & Clothing | A family birthday | ALL | None |
-| D044 | everyday | Employment & Adult Education | Getting to an appointment | ALL | None |
-| D045 | everyday | Childcare & Youth | A coat for Maya | JORDAN | Conditional |
-| D046 | everyday | Food & Nutrition | Packing lunch or buying it? | EMPLOYED | None |
+| D033 | A damaged small kitchen appliance | Essential Goods & Clothing | A damaged work item | EMPLOYED | None |
+| D034 | A broken dresser | Essential Goods & Clothing | A broken dresser | ALL | Conditional |
+| D035 | Groceries lost | Food & Nutrition | Groceries lost | ALL | Conditional |
+| D036 | A full grocery basket? | Food & Nutrition | A full grocery basket? | ALL | Conditional |
+| D039 | School Activities | Childcare & Youth | Maya's school trip | JORDAN | None |
+| D040 | Worn-out coat | Essential Goods & Clothing | Worn-out shoes | ALL | Conditional |
+| D042 | School supplies for Maya | Childcare & Youth | School supplies for Maya | JORDAN | Conditional |
+| D043 | A family birthday | Essential Goods & Clothing | A family birthday | ALL | None |
+| D044 | Getting to an appointment | Employment & Adult Education | Getting to an appointment | ALL | None |
+| D045 | A coat for Maya | Childcare & Youth | A coat for Maya | JORDAN | Conditional |
+| D046 | Packing lunch or buying it? | Food & Nutrition | Packing lunch or buying it? | EMPLOYED | None |
 | D047 | everyday | Essential Goods & Clothing | A broken bag | ALL | None |
-| D048 | everyday | Childcare & Youth | Meals for Maya | JORDAN | Conditional |
+| D048 | Meals for Maya | Childcare & Youth | Meals for Maya | JORDAN | Conditional |
 | D049 | everyday | Financial Literacy & Taxes | A fee to access your money | ALL | None |
 | D050 | everyday | Essential Goods & Clothing | Running low on essentials | ALL | None |
-| D051 | everyday | Employment & Adult Education | A chance to learn | ALL | None |
+| D051 | A chance to learn | Employment & Adult Education | A chance to learn | ALL | None |
 | D052 | everyday | Childcare & Youth | Maya's birthday | JORDAN | None |
-| D053 | everyday | Food & Nutrition | A holiday meal | ALL | Conditional |
+| D053 | A holiday meal | Food & Nutrition | A holiday meal | ALL | Conditional |
 | D054 | everyday | Essential Goods & Clothing | Clothes need replacing | ALL | Conditional |
 | D055 | everyday | Financial Literacy & Taxes | Someone asks for help | ALL | None |
 | D056 | everyday | Childcare & Youth | A holiday gift for Maya | JORDAN | Conditional |
-| D057 | everyday | Employment & Adult Education | A pass or a few fares? | ALL | None |
 | D058 | everyday | Essential Goods & Clothing | Laundry supplies are running low | SOFIA | None |
 | D059 | everyday | Financial Literacy & Taxes | Time with a friend | ALL | None |
-| D060 | everyday | Food & Nutrition | The groceries are running low | ALL | Conditional |
 
 ## D001 — Looking for work
 
@@ -221,13 +220,13 @@ These are complete submitted pathways, not a reading action. Exact UI substeps r
 
 **Type / category:** fixed / Employment & Adult Education. **Persona intent:** ALL. **Eligibility:** Fixed Day 2 immediately after a failed interview and its result.
 
-**Situation:** “The interview did not lead to a job. You still need work. Where will you apply next?”
+**Situation:** The interview did not lead to a job. You still need work. Where will you apply next?
 
 **Timing:** fixed Day 2 immediately after failed D002 and its result; `scheduled`; `default_day=2`. This is the approved exception to one scenario event per day.
 
-| Key | Submitted choice | Money / state | Result |
-| --- | --- | --- | --- |
-| OTHER_JOB | Apply for {job_title} | USD 0.00; record new target, preserve preparation/clothing | “You submitted your application for {job_title}.” |
+| Key | Choice | Financial expression | Outcome | Response |
+| --- | --- | --- | --- | --- |
+| OTHER_JOB | Apply for {job_title} | USD 0.00; record new target, preserve preparation/clothing | Direct effect or engine rule | You submitted your application for {job_title}. |
 
 Expand to every other currently eligible job, excluding the first target, with no fallback tier or wage-rank gate. If no different eligible job exists, this is a catalog gap that blocks the route, not permission to fabricate a job. After the committed reapplication and recap, Continue advances to Day 3. No unrelated Day 2 event, immediate hiring or early paycheck.
 
@@ -276,15 +275,15 @@ Any available valid submitted choice hires the different job on Day 3, regardles
 
 **Type / category:** fixed / Financial Literacy & Taxes. **Persona intent:** ALL. **Eligibility:** Non-scheduled; proposed Day 18; not previously filed.
 
-**Situation:** “It is time to file your taxes. Will you handle the return yourself or get help preparing it?”
+**Situation:** It is time to file your taxes. Will you handle the return yourself or get help preparing it?
 
 **Timing:** Required once per playthrough; scheduled ordinary-day slot, exact day pending. See the required-occurrence decision below.
 
-| Key | Submitted choice | Money / state | Result |
-| --- | --- | --- | --- |
-| TRY | Try my best | Approved USD 0.00; no refund/deduction | “You filed your taxes yourself. You received no refund and paid no preparation fee.” |
-| PAID | Pay someone to prepare taxes | UNRESOLVED approved fee F; require balance ≥ F before charging -F and immediately crediting approved +$1,000.00 once | “You paid the preparation fee and received a $1,000 refund.” |
-| CAC | Get free tax preparation through CAC's VITA program | CAC only; no player-paid fee; approved +$1,000.00 once | “You filed your taxes through CAC's free VITA program and received a $1,000 refund.” |
+| Key | Choice | Financial expression | Outcome | Response |
+| --- | --- | --- | --- | --- |
+| TRY | Try my best | Approved USD 0.00; no refund/deduction | Direct effect or engine rule | You filed your taxes yourself. You received no refund and paid no preparation fee. |
+| PAID | Pay someone to prepare taxes | Approved starting fee F = USD 250.00; require balance ≥ F; monthly CPI fee and all-items-CPI-adjusted household tax credit R; charge -F and credit +R once | Direct effect or engine rule | You paid the preparation fee and received your tax credit. |
+| CAC | Get free tax preparation through CAC's VITA program | CAC only; no preparation fee; apply the all-items-CPI-adjusted household tax credit R once | Direct effect or engine rule | You filed your taxes through CAC's free VITA program and received your tax credit. |
 
 Fee and refund remain separate components, even if their net is stored on the response. The refund cannot fund the prerequisite fee. An unaffordable PAID attempt ends before fee/refund consequences. Filing is not an unpaid bill and cannot be moved to the sidebar. The refund is an explicit simulation credit, not a CAC annual average or guaranteed real refund. Fee, VITA eligibility and binding IDs remain unresolved.
 
@@ -345,17 +344,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “The electricity bill is due. Your household still needs groceries and transportation this month. Which obligation will you carry?”
+**Situation:** The electricity bill is due. Your household still needs groceries and transportation this month. Which obligation will you carry?
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D007-PAY | Pay the bill | -$145.00 | settle_current_bill | “You paid the bill.” |
-| D007-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
-| D007-CAC | Get help paying the electricity bill through CAC eviction prevention | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped bill-support effect; record only actual help used | “You received help paying the electricity bill through CAC eviction prevention. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}.” |
+| D007-PAY | Pay the bill | -$145.00 | settle_current_bill | You paid the bill. |
+| D007-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
+| D007-CAC | Get help paying the electricity bill through CAC eviction prevention | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped bill-support effect; record only actual help used | You received help paying the electricity bill through CAC eviction prevention. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}. |
 
 **CAC mapping:** CAC eviction prevention; user-confirmed rent and utility bill support. Candidate eligible principal is $145.00, still a draft amount. Actual coverage A, household eligibility, availability and edition/service IDs remain to be bound. In CAC mode, assistance may cover the eligible bill in full when A is sufficient; cap support at the eligible remaining expense and charge only the player remainder. No cash payout or stacking. An unaffordable remainder must not be reported as successfully paid. Do not create an unpaid sidebar balance or late fee from a CAC submission; Ignore remains the separate debt-creation choice. No late-fee coverage is inferred.
 
@@ -417,16 +416,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “Your phone plan renews today. Keeping it paid competes with the money you were trying to save for an emergency.”
+**Situation:** Your phone plan renews today. Keeping it paid competes with the money you were trying to save for an emergency.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D009-PAY | Pay the bill | -$55.00 | settle_current_bill | “You paid the bill.” |
-| D009-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D009-PAY | Pay the bill | -$100.00 | settle_current_bill | You paid the bill. |
+| D009-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -484,16 +483,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Financial Literacy & Taxes. **Persona intent:** CAR. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “A car insurance installment is due. Ignoring it preserves cash today while leaving a larger amount unpaid.”
+**Situation:** A car insurance installment is due. Ignoring it preserves cash today while leaving a larger amount unpaid.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D011-PAY | Pay the bill | -$130.00 | settle_current_bill | “You paid the bill.” |
-| D011-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D011-PAY | Pay the bill | -$130.00 | settle_current_bill | You paid the bill. |
+| D011-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -519,16 +518,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “A bill from an earlier clinic visit comes due. The care already happened; ignoring the invoice will not undo the visit.”
+**Situation:** A bill from an earlier clinic visit comes due.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D012-PAY | Pay the bill | -$190.00 | settle_current_bill | “You paid the bill.” |
-| D012-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D012-PAY | Pay the bill | -$190.00 | settle_current_bill | You paid the bill. |
+| D012-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -550,16 +549,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “Maya’s agreed childcare arrangement has an invoice due. Paying it uses money you had hoped to keep available for the rest of the month.”
+**Situation:** Maya’s agreed childcare arrangement has an invoice due. Paying it uses money you had hoped to keep available for the rest of the month.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D013-PAY | Pay the bill | -$260.00 | settle_current_bill | “You paid the bill.” |
-| D013-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D013-PAY | Pay the bill | -$260.00 | settle_current_bill | You paid the bill. |
+| D013-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -581,16 +580,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “Maya's school meal account has a balance due. How will you handle the bill?”
+**Situation:** Maya needs school lunches for the month. How will you handle the bill?
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D014-PAY | Pay the bill | -$32.00 | settle_current_bill | “You paid the bill.” |
-| D014-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D014-PAY | Pay the bill | -$62.00 | settle_current_bill | You paid the bill. |
+| D014-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -641,71 +640,13 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Mutually exclusive with charging the same repair in D021/D026/D031..
 
-## D016 — A pharmacy bill arrives
+## D016 — Retired November 15 2026
 
-**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
+Removed at the user's request. No replacement. Historical published editions retain their own records.
 
-**Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
+## D017 — Retired November 15 2026
 
-**Situation:** “A pharmacy account invoice for an earlier purchase is due. The medicine was already supplied.”
-
-**Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D016-PAY | Pay the bill | -$85.00 | settle_current_bill | “You paid the bill.” |
-| D016-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Unpaid-sidebar proposal:** Ignore records principal $85.00 + proposed late fee $8.00 = **$93.00 owed**, with USD 0.00 deducted today. Pay later settles the current outstanding total once and removes the card from unpaid, retaining the history; it does not edit the original Ignore response or consume a day. Fee recurrence remains unresolved; the displayed total assumes one fee only.
-
-**Draft Day 30 explanation if still unpaid:** “The unpaid pharmacy bill remains a debt.” Show the actual remaining principal/fee/total alongside this explanation. No threatened consequence occurs automatically within the simulated month.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D016` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D016` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** No prescription-payment or medicine-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d016).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Only if a billed pharmacy arrangement is explicitly configured; do not assume pharmacies extend credit..
-
-## D017 — A repayment is due
-
-**Optional historical concept only:** Any bill deferral, fee, settlement or debt-completion language in this section is an undecided illustration, not approved or planned gameplay, a task, or a publication prerequisite.
-
-**Type / category:** bill / Financial Literacy & Taxes. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
-
-**Situation:** “A payment on your existing repayment agreement is due. Paying it leaves less money for your other needs.”
-
-**Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D017-PAY | Pay the bill | -$110.00 | settle_current_bill | “You paid the bill.” |
-| D017-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Unpaid-sidebar proposal:** Ignore records principal $110.00 + proposed late fee $12.00 = **$122.00 owed**, with USD 0.00 deducted today. Pay later settles the current outstanding total once and removes the card from unpaid, retaining the history; it does not edit the original Ignore response or consume a day. Fee recurrence remains unresolved; the displayed total assumes one fee only.
-
-**Draft Day 30 explanation if still unpaid:** “A missed installment could increase debt and affect the relationship with the lender, according to the actual agreement.” Show the actual remaining principal/fee/total alongside this explanation. No threatened consequence occurs automatically within the simulated month.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component, bill principal and late fee; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D017` = UNRESOLVED. Source an approved financial-resilience or tax-context observation. FINRA survey facts need year/question/coding/sample/denominator; a survey is not a price quote. CAC `K-D017` = paired C22 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
-
-**CAC fact text:** “In 2025, 218 students enrolled in Financial Literacy Classes.”
-
-**CAC fact reference:** `cac_service_facts` · service `financial_literacy_classes` · fact `students_enrolled_in_financial_literacy_classes` · year 2025 · `fact_id=d32689c8-067a-4f59-aa48-2424384b7116`. [Pairing rationale](scenario-cac-fact-pairings.md#d017).
-
-**Pairing scope:** Managing an existing repayment installment is a financial-literacy decision. Context only; CAC does not pay or restructure this debt in the draft.
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Staff must approve existence, terms and persona linkage; do not create an automatic loan..
+Removed at the user's request. No replacement. Historical published editions retain their own records.
 
 ## D018 — The gas bill
 
@@ -713,17 +654,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “Your household gas bill is due. Paying it will use some of the money you have set aside for other needs.”
+**Situation:** Your household gas bill is due. Paying it will use some of the money you have set aside for other needs.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D018-PAY | Pay the bill | -$92.00 | settle_current_bill | “You paid the bill.” |
-| D018-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
-| D018-CAC | Get help paying the gas bill through CAC eviction prevention | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped bill-support effect; record only actual help used | “You received help paying the gas bill through CAC eviction prevention. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}.” |
+| D018-PAY | Pay the bill | -$75.00 | settle_current_bill | You paid the bill. |
+| D018-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
+| D018-CAC | Get help paying the gas bill through CAC eviction prevention | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped bill-support effect; record only actual help used | You received help paying the gas bill through CAC eviction prevention. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}. |
 
 **CAC mapping:** CAC eviction prevention; user-confirmed rent and utility bill support. Candidate eligible principal is $92.00, still a draft amount. Actual coverage A, household eligibility, availability and edition/service IDs remain to be bound. In CAC mode, assistance may cover the eligible bill in full when A is sufficient; cap support at the eligible remaining expense and charge only the player remainder. No cash payout or stacking. An unaffordable remainder must not be reported as successfully paid. Do not create an unpaid sidebar balance or late fee from a CAC submission; Ignore remains the separate debt-creation choice. No late-fee coverage is inferred.
 
@@ -749,17 +690,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Housing & Utilities. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “Rent is due just as you start to rebuild a cash buffer. Paying means giving up that buffer; ignoring creates a larger obligation.”
+**Situation:** Rent is due just as you start to rebuild a cash buffer. Paying means giving up that buffer; ignoring creates a larger obligation.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D019-PAY | Pay the bill | -$650.00 | settle_current_bill | “You paid the bill.” |
-| D019-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
-| D019-CAC | Get rent assistance through CAC | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped effect; record only actual help used | “You received help through CAC rent assistance. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}.” |
+| D019-PAY | Pay the bill | -$650.00 | settle_current_bill | You paid the bill. |
+| D019-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
+| D019-CAC | Get rent assistance through CAC | UNRESOLVED: `-(E-min(A,E))`, where E is eligible remaining expense | Apply one approved capped effect; record only actual help used | You received help through CAC rent assistance. Your payment: {player_payment_usd}. Remaining balance on this expense: {remaining_expense_usd}. |
 
 **CAC mapping:** C01; candidate eligible expense is the $650.00 first-option amount, itself unapproved here. Actual coverage amount A, item/service scope and persona eligibility are UNRESOLVED. If approved help leaves an unaffordable remainder, this choice is not reported as successfully paid. Do not add an ad hoc fee waiver.
 
@@ -785,16 +726,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** bill / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Approved billed obligation; not paid, ignored or charged already; no job event on this day.
 
-**Situation:** “A medical bill is due. You can pay it now or leave the balance unpaid.”
+**Situation:** A medical bill is due. You can pay it now or leave the balance unpaid.
 
 **Timing:** scheduled; approved occurrence due day UNRESOLVED. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D020-PAY | Pay the bill | -$320.00 | settle_current_bill | “You paid the bill.” |
-| D020-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | “You left the bill unpaid. A late fee was added to the amount you owe.” |
+| D020-PAY | Pay the bill | -$320.00 | settle_current_bill | You paid the bill. |
+| D020-IGNORE | Ignore the bill for now | $0.00 | create_unpaid_bill | You left the bill unpaid. A late fee was added to the amount you owe. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -814,16 +755,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** shock / Essential Goods & Clothing. **Persona intent:** CAR. **Eligibility:** Car owned; repair not already invoiced; MARTA routes and operating times can cover the configured household trips.
 
-**Situation:** “The car will not start. The repair quote could use much of your remaining money, but you still need a way to get around.”
+**Situation:** The car will not start. The repair quote could use much of your remaining money, but you still need a way to get around.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D021-REPAIR | Pay for the repair | -$620.00 | car_repaired | “You pay for the quoted repair and keep the car available.” |
-| D021-TRANSIT | Leave the car parked and use MARTA | -$50.00 | car_unavailable_marta | “You leave the car unrepaired and use MARTA. Unreliable arrival times and longer waits mean more planning and more time away from home.” |
+| D021-REPAIR | Pay for the repair | -$620.00 | car_repaired | You pay for the quoted repair and keep the car available. |
+| D021-TRANSIT | Use MARTA this month with a 30-day pass | -$95.00 | car_unavailable_marta | You leave the car unrepaired and use MARTA. Unreliable arrival times and longer waits mean more planning and more time away from home. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -860,46 +801,24 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No treatment advice, predicted deterioration or automatic future charge; care alternatives and costs need review..
 
-## D023 — A broken phone
+## D023 — Retired November 15 2026
 
-**Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Phone required; no duplicate handset event.
-
-**Situation:** “Your phone breaks while you are waiting for work and household messages. Replacing it costs much more than the monthly service bill.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D023-REPLACE | Buy a replacement handset | -$240.00 | phone_replaced | “You have a replacement phone and substantially less cash.” |
-| D023-REPAIR | Pay for the repair | -$95.00 | phone_repaired | “You pay for a repair rather than a replacement.” |
-| D023-WAIT | Go without the phone for now | $0.00 | phone_unavailable | “You kept the money, but you still do not have a working phone.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D023` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D023` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** No phone replacement or device-assistance fact. [Gap review](scenario-cac-fact-pairings.md#d023).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
+Removed at the user's request. No replacement. Historical published editions retain their own records.
 
 ## D024 — A family emergency
 
 **Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Fictional relative and travel circumstances approved.
 
-**Situation:** “Someone close to you has a family emergency out of town. You want to be there, but the trip would use money set aside for your own household.”
+**Situation:** Someone close to you has a family emergency out of town. You want to be there, but the trip would use money set aside for your own household.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D024-TRAVEL | Pay for the trip | -$360.00 | family_trip_purchased | “You commit the travel cost and choose to be present.” |
-| D024-REMOTE | Stay home and support them remotely | $0.00 | family_trip_declined | “You preserve the money but cannot be there in person.” |
+| D024-TRAVEL | Pay for the trip | -$360.00 | family_trip_purchased | You commit the travel cost and choose to be present. |
+| D024-REMOTE | Stay home and support them remotely | $0.00 | family_trip_declined | You preserve the money but cannot be there in person. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -961,21 +880,22 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Safety and suitability of both options need staff review; price does not imply a predicted failure rate..
 
-## D027 — Broken glasses
+## D027 — Broken work shoes
 
 **Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Persona explicitly needs corrective glasses.
 
-**Situation:** “Your glasses break. You can choose a standard replacement or a less expensive basic pair.”
+**Situation:** Your work shoes are worn out and beginning to split. You need a usable pair for your next shift.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D027-STANDARD | Buy the standard replacement | -$290.00 | glasses_replaced_standard | “You pay for the standard replacement.” |
-| D027-BASIC | Buy the basic replacement | -$135.00 | glasses_replaced_basic | “You choose the basic replacement and retain more cash.” |
-| D027-DEFER | Delay replacement | $0.00 | glasses_need_unmet | “You did not buy new glasses. Your glasses still need replacing.” |
+| D027-STANDARD | Buy replacement work shoes | -$90.00 | Direct effect or engine rule | You bought replacement work shoes. |
+| D027-REPAIR | Repair your current work shoes | -$25.00 | Direct effect or engine rule | You repaired your current work shoes. |
+| D027-DEFER | Make do with your current shoes for now | $0.00 | Direct effect or engine rule | You kept your current shoes for now. |
+| D027-CAC | Use Canopy Thrift credits for a pair of secondhand work shoes | USD 0.00; free in-kind shoes; no cash credit | Direct effect or engine rule | You used Canopy Thrift credits to get secondhand work shoes. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1041,17 +961,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Laptop owned and used for household/job tasks.
 
-**Situation:** “Your laptop fails. A replacement is expensive, and a repair quote is cheaper but would keep the same older device.”
+**Situation:** Your laptop fails. A replacement is expensive, and a repair quote is cheaper but would keep the same older device.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D030-REPLACE | Buy the replacement | -$450.00 | laptop_replaced | “You pay for a replacement device.” |
-| D030-REPAIR | Pay for the repair | -$180.00 | laptop_repaired | “You repair the existing device.” |
-| D030-DEFER | Manage without it for now | $0.00 | laptop_unavailable | “You keep the money and the laptop remains unavailable.” |
+| D030-REPLACE | Buy the replacement | -$600.00 | laptop_replaced | You pay for a replacement device. |
+| D030-REPAIR | Pay for the repair | -$180.00 | laptop_repaired | You repair the existing device. |
+| D030-DEFER | Manage without it for now | $0.00 | laptop_unavailable | You keep the money and the laptop remains unavailable. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1063,30 +983,9 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; CAC computer classes are not a laptop replacement benefit..
 
-## D031 — The car needs a tow
+## D031 — Retired November 16 2026
 
-**Type / category:** shock / Essential Goods & Clothing. **Persona intent:** CAR. **Eligibility:** Approved towing event; not duplicated with another car scenario.
-
-**Situation:** “The car needs towing. You have quotes to take it to a repair shop or to a parking location. Neither quote includes repairs.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D031-SHOP | Tow it to the repair shop | -$225.00 | car_at_shop_unrepaired | “The towing charge is paid; repairs are not included.” |
-| D031-PARK | Tow it to the parking location | -$140.00 | car_parked_unrepaired | “You pay less for the tow, and the car still needs attention.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D031` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D031` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** No towing or vehicle-recovery assistance fact. [Gap review](scenario-cac-fact-pairings.md#d031).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Both destinations must be feasible; no impound rules, storage fees or later repair costs without approval..
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ## D032 — A larger share to cover
 
@@ -1113,20 +1012,21 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; This is a proposed agreed purchase, not partial bill payment or invented spouse wages; specify actual goods before publication..
 
-## D033 — A damaged work item
+## D033 — A damaged small kitchen appliance
 
-**Type / category:** shock / Essential Goods & Clothing. **Persona intent:** EMPLOYED. **Eligibility:** Hired; approved role actually uses this item.
+**Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** A small household kitchen appliance is damaged; no employment requirement.
 
-**Situation:** “An item you need for work is damaged. You can replace it or pay to have it repaired.”
+**Situation:** One of your small kitchen appliances became damaged and no longer works. You can buy the same version you had or look for something cheaper.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D033-REPLACE | Buy the replacement | -$350.00 | work_item_replaced | “You pay for the replacement.” |
-| D033-REPAIR | Pay for the repair | -$145.00 | work_item_repaired | “You repair the existing item and preserve more cash.” |
+| D033-REPLACE | Buy the same model | -$80.00 | Direct effect or engine rule | You bought the same model of small kitchen appliance. |
+| D033-CHEAPER | Buy a cheaper model | -$50.00 | Direct effect or engine rule | You bought a cheaper small kitchen appliance. |
+| D033-CAC | Check Canopy Thrift for a replacement | $0.00 | Direct effect or engine rule | You checked Canopy Thrift for an available replacement. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1142,18 +1042,18 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** shock / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Owned dresser damaged; no automatic landlord obligation.
 
-**Situation:** “Your dresser breaks, leaving you without enough storage for your clothes. A complete replacement costs more than a basic option.”
+**Situation:** Your dresser breaks, leaving you without enough storage for your clothes. A complete replacement costs more than a basic option.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D034-FULL | Buy the complete replacement | -$390.00 | dresser_replaced_full | “You spend more for the complete replacement.” |
-| D034-BASIC | Buy the basic option | -$165.00 | dresser_replaced_basic | “You choose the basic option and keep more cash.” |
-| D034-DEFER | Make do without replacing it this month | $0.00 | dresser_need_unmet | “You kept the money. Your dresser still needs replacing.” |
-| D034-CAC | Get a dresser through CAC Canopy Thrift assistance | USD 0.00; free in-kind receipt; no cash credit | Record approved dresser received and assistance use | “You received a dresser through CAC Canopy Thrift.” |
+| D034-FULL | Buy the complete replacement | -$390.00 | dresser_replaced_full | You spend more for the complete replacement. |
+| D034-BASIC | Buy the basic option | -$165.00 | dresser_replaced_basic | You choose the basic option and keep more cash. |
+| D034-DEFER | Make do without replacing it this month | $0.00 | dresser_need_unmet | You kept the money. Your dresser still needs replacing. |
+| D034-CAC | Get a dresser through CAC Canopy Thrift assistance | USD 0.00; free in-kind receipt; no cash credit | Record approved dresser received and assistance use | You received a dresser through CAC Canopy Thrift. |
 
 **CAC mapping:** The user confirmed CAC carries household furniture such as dressers, cabinets and chairs, along with home decor. Offer this assistance choice only in CAC mode when an approved dresser is available and household/item eligibility validates. Receipt costs USD 0.00 and creates no cash credit or debt. Confirm the service/edition binding and specific allocation; ordinary retail stock does not automatically establish an assistance allocation.
 
@@ -1169,17 +1069,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** shock / Food & Nutrition. **Persona intent:** ALL. **Eligibility:** Food loss explicitly configured; do not charge appliance repair here.
 
-**Situation:** “A refrigerator failure spoils your groceries. Replacing the food means spending money on something you already bought.”
+**Situation:** A refrigerator failure spoils your groceries. Replacing the food means spending money on something you already bought.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D035-FULL | Replace the full basket | -$165.00 | spoiled_food_replaced_full | “You bought groceries to replace the food you lost.” |
-| D035-SMALL | Buy only the immediate essentials | -$65.00 | spoiled_food_replaced_partial | “You replace fewer items and leave the rest of the basket unfilled.” |
-| D035-CAC | Get replacement groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received replacement groceries from the CAC Mini-Market.” |
+| D035-FULL | Replace all of the items | -$165.00 | spoiled_food_replaced_full | You bought groceries to replace the food you lost. |
+| D035-SMALL | Buy only the immediate essentials | -$65.00 | spoiled_food_replaced_partial | You replace fewer items and leave the rest of the basket unfilled. |
+| D035-CAC | Get replacement groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received replacement groceries from the CAC Mini-Market. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1199,17 +1099,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Food & Nutrition. **Persona intent:** ALL. **Eligibility:** Approved household-sized food basket.
 
-**Situation:** “You have a grocery list, but buying everything on it would leave little money for anything else.”
+**Situation:** You have a grocery list, but buying everything on it would leave little money for anything else.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D036-FULL | Buy the full basket | -$95.00 | food_basket_full | “You buy the full basket.” |
-| D036-SMALL | Buy the smaller basket | -$50.00 | food_basket_reduced | “You spend less and leave some listed food unpurchased.” |
-| D036-CAC | Get groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received groceries from the CAC Mini-Market.” |
+| D036-FULL | Buy all your planned items | -$95.00 | food_basket_full | You buy the full basket. |
+| D036-SMALL | Buy just the items needed for now | -$50.00 | food_basket_reduced | You spend less and leave some listed food unpurchased. |
+| D036-CAC | Get groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received groceries from the CAC Mini-Market. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1225,70 +1125,28 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
-## D037 — Your ride to work falls through
+## D037 — Retired November 16 2026
 
-**Type / category:** everyday / Employment & Adult Education. **Persona intent:** EMPLOYED. **Eligibility:** Hired; ride canceled; both routes feasible.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
-**Situation:** “The ride you arranged to work is canceled. You can pay for a direct ride or use a cheaper route that takes longer.”
+## D038 — Retired November 16 2026
 
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
+## D039 — School Activities
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D037-RIDE | Pay for the direct ride | -$38.00 | work_trip_direct | “You pay more for the direct route.” |
-| D037-TRANSIT | Take the transit route | -$6.00 | work_trip_longer | “You pay less and commit more travel time.” |
+**Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Maya is eligible for the optional school soccer activity.
 
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D037` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D037` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** The transportation measure is workforce-program-specific; this card applies to employed people generally. [Gap review](scenario-cac-fact-pairings.md#d037).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Do not invent lateness, wage loss or dismissal..
-
-## D038 — A load of laundry
-
-**Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Paid laundry facilities required.
-
-**Situation:** “Your clothes need washing. Washing and drying the full load costs more than washing a smaller load and air-drying it.”
+**Situation:** Maya brings home an information sheet for joining the soccer team. The fee is modest compared with rent, but it is another claim on the same money.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D038-FULL | Wash and dry the full load | -$18.00 | laundry_full | “You washed and dried the full load.” |
-| D038-SMALL | Wash the smaller load and air-dry it | -$8.00 | laundry_partial | “You spend less, wash fewer items, and handle drying yourself.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D038` = UNRESOLVED. Source a topic-specific approved observation about the item, care cost or resource pressure. New health/transport sources need approval; do not invent medical facts or use unrelated clothing data. CAC `K-D038` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** No laundry-service or laundry-fee assistance fact; clothing distribution is a different activity. [Gap review](scenario-cac-fact-pairings.md#d038).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
-
-## D039 — Maya's school trip
-
-**Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Optional school trip with approved nonparticipation arrangement.
-
-**Situation:** “Maya brings home an optional school trip notice. The fee is modest compared with rent, but it is another claim on the same money.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D039-PAY | Pay for the trip | -$28.00 | school_trip_paid | “You paid for Maya to go on the school trip.” |
-| D039-DECLINE | Decline the optional trip | $0.00 | school_trip_declined | “You kept the money, and Maya did not go on the trip.” |
+| D039-PAY | Pay the soccer team fee | -$150.00 | Direct effect or engine rule | You paid the fee for Maya to participate in the soccer team. |
+| D039-DECLINE | Do not participate | $0.00 | Direct effect or engine rule | Maya will not participate in the soccer team. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1300,21 +1158,21 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
 
-## D040 — Worn-out shoes
+## D040 — Worn-out coat
 
-**Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Everyday shoes; not interview outfit.
+**Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** An adult household member needs a usable winter coat.
 
-**Situation:** “Your everyday shoes are wearing out. A new pair costs more than repairing the existing pair.”
+**Situation:** Your coat is worn out. You can replace it, repair it, or look for a secondhand coat through Canopy Thrift.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D040-BUY | Buy the replacement shoes | -$70.00 | everyday_shoes_replaced | “You buy the new pair.” |
-| D040-REPAIR | Repair your existing shoes | -$25.00 | everyday_shoes_repaired | “You repair the current pair instead.” |
-| D040-CAC | Get shoes using credits from CAC Canopy Thrift | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You used CAC Canopy Thrift credits to get shoes.” |
+| D040-BUY | Buy a replacement coat | -$60.00 | Direct effect or engine rule | You bought a replacement coat. |
+| D040-REPAIR | Repair your current coat | -$25.00 | Direct effect or engine rule | You repaired your current coat. |
+| D040-CAC | Use Canopy Thrift credits for a coat | $0.00 | Direct effect or engine rule | You used Canopy Thrift credits to get a coat. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1330,50 +1188,25 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Coverage for the specific item requires approval; professional-clothing ownership is unaffected..
 
-## D041 — Too tired to cook?
+## D041 — Retired November 16 2026
 
-**Type / category:** everyday / Food & Nutrition. **Persona intent:** ALL. **Eligibility:** Household-sized meal costs approved.
-
-**Situation:** “You get home tired. Buying a prepared meal saves effort, but ingredients cost less and require cooking.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D041-PREPARED | Buy the prepared meal | -$24.00 | meal_prepared_purchased | “You pay more and avoid cooking this meal.” |
-| D041-COOK | Buy ingredients and cook | -$10.00 | meal_ingredients_purchased | “You spend less and commit the preparation time.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D041` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D041` = paired C05 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
-
-**CAC fact text:** “In 2025, the CAC Mini-Market served 2,995 households.”
-
-**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `households_served_by_the_cac_mini_market` · year 2025 · `fact_id=ec44118c-3be1-46b1-9585-8f34d638bbd9`. [Pairing rationale](scenario-cac-fact-pairings.md#d041).
-
-**Pairing scope:** Buying meal ingredients has relevant household food-access context. Context only; no restaurant, prepared-meal reimbursement or new CAC option.
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No nutrition score or assumed cooking facilities; route requires a usable kitchen for COOK..
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ## D042 — School supplies for Maya
 
 **Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Actual school period and approved item list.
 
-**Situation:** “Maya needs supplies for an upcoming school activity. You can buy the complete set or just the immediate required items.”
+**Situation:** Maya needs supplies for an upcoming school activity. You can buy the complete set or just the immediate required items.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D042-FULL | Buy the full supply set | -$48.00 | school_supplies_full | “You purchase the complete set.” |
-| D042-BASIC | Buy only the immediate items | -$22.00 | school_supplies_partial | “You buy the smaller set and leave the other items unpurchased.” |
-| D042-CAC | Get school supplies through Tools for School | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received school supplies through Tools for School.” |
+| D042-FULL | Buy the full supply set | -$48.00 | school_supplies_full | You purchase the complete set. |
+| D042-BASIC | Buy only some of the items | -$22.00 | school_supplies_partial | You buy the smaller set and leave the other items unpurchased. |
+| D042-CAC | Get school supplies through Tools for School | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received school supplies through Tools for School. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1393,17 +1226,18 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Fictional family occasion approved.
 
-**Situation:** “A family birthday is coming up. You want to acknowledge it while keeping enough money for necessities.”
+**Situation:** A child in your family has a birthday coming up. You can buy the gift you planned, choose a smaller gift, give your time, or use Canopy Thrift credits to find a gift.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D043-GIFT | Buy the gift you planned | -$35.00 | birthday_gift_purchased | “You spend money on the planned gift.” |
-| D043-SMALL | Choose a smaller gift | -$10.00 | birthday_small_gift | “You choose a less expensive gift.” |
-| D043-TIME | Give your time instead | $0.00 | birthday_no_purchase | “You make no purchase and choose a nonfinancial gesture.” |
+| D043-GIFT | Buy the gift you planned | -$35.00 | birthday_gift_purchased | You spend money on the planned gift. |
+| D043-SMALL | Choose a smaller gift | -$10.00 | birthday_small_gift | You choose a less expensive gift. |
+| D043-TIME | Give your time instead | $0.00 | birthday_no_purchase | You make no purchase and choose a nonfinancial gesture. |
+| D043-CAC | Use Canopy Thrift credits to choose a gift | USD 0.00; in-kind gift; no cash credit | Direct effect or engine rule | You used Canopy Thrift credits to choose a gift. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1419,16 +1253,16 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Employment & Adult Education. **Persona intent:** ALL. **Eligibility:** A required household appointment and two feasible travel options are explicitly configured; not a workforce-program or medical-care event.
 
-**Situation:** “You have a household appointment across town. A direct ride costs more, while the transit route takes longer.”
+**Situation:** You have a household appointment across town that you will need a ride to. A direct ride costs more, while the transit route takes longer.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D044-DIRECT | Pay for a direct ride | -$32.00 | household_appointment_trip_direct | “You pay for the direct trip.” |
-| D044-TRANSIT | Take the transit route | -$6.00 | household_appointment_trip_transit | “You spend less and commit more travel time.” |
+| D044-DIRECT | Pay for a direct ride | -$32.00 | household_appointment_trip_direct | You pay for the direct trip. |
+| D044-TRANSIT | Take the transit route | -$6.00 | household_appointment_trip_transit | You spend less and commit more travel time. |
 
 **CAC option:** none in either mode. No assistance or transport benefit is inferred.
 
@@ -1444,17 +1278,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved cold-weather season and need.
 
-**Situation:** “Cold weather is here, and Maya needs a coat. You can buy a new one or a less expensive secondhand coat.”
+**Situation:** Cold weather is here, and Maya needs a coat. You can buy a new one or a less expensive secondhand coat.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D045-NEW | Buy the new coat | -$60.00 | child_coat_new | “You buy the new coat.” |
-| D045-USED | Buy the secondhand coat | -$24.00 | child_coat_secondhand | “You meet the coat need with the lower-cost option.” |
-| D045-CAC | Get a coat for Maya through Coats for Kids | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received a coat for Maya through Coats for Kids.” |
+| D045-NEW | Buy the new coat | -$60.00 | child_coat_new | You buy the new coat. |
+| D045-USED | Buy the secondhand coat | -$24.00 | child_coat_secondhand | You meet the coat need with the lower-cost option. |
+| D045-CAC | Get a coat for Maya through Coats for Kids | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received a coat for Maya through Coats for Kids. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1474,16 +1308,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Food & Nutrition. **Persona intent:** EMPLOYED. **Eligibility:** Hired; feasible cooking/storage assumptions.
 
-**Situation:** “You can prepare lunches ahead of time or buy them during workdays. One option takes more time now; the other costs more money.”
+**Situation:** You can prepare lunches ahead of time or buy them during workdays. One option takes more time now; the other costs more money.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D046-PACK | Buy ingredients and pack lunches | -$26.00 | work_lunches_packed | “You spend less and do the preparation.” |
-| D046-BUY | Buy the workday lunches | -$55.00 | work_lunches_purchased | “You save preparation time and spend more.” |
+| D046-PACK | Buy ingredients and pack lunches | -$26.00 | work_lunches_packed | You spend less and do the preparation. |
+| D046-BUY | Buy the workday lunches | -$55.00 | work_lunches_purchased | You save preparation time and spend more. |
+| D046-CAC | Get lunch ingredients from the CAC Mini-Market | $0.00 | Direct effect or engine rule | You received lunch ingredients from the CAC Mini-Market. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1528,17 +1363,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Approved program season and child meals not already in groceries.
 
-**Situation:** “Maya needs meals during a Meals for Kids program period. You can buy prepared meals or ingredients to cook at home.”
+**Situation:** Maya needs meals during a period when school is out of session.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D048-MEALS | Buy the prepared meal allocation | -$42.00 | child_meals_prepared | “You pay for the prepared meals.” |
-| D048-COOK | Buy ingredients and prepare the meals | -$24.00 | child_meals_home_prepared | “You spend less and commit preparation time.” |
-| D048-CAC | Get meals for Maya through Meals for Kids | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received meals for Maya through Meals for Kids.” |
+| D048-MEALS | Buy the prepared meal allocation | -$42.00 | child_meals_prepared | You pay for the prepared meals. |
+| D048-COOK | Buy ingredients and prepare the meals | -$24.00 | child_meals_home_prepared | You spend less and commit preparation time. |
+| D048-CAC | Get meals for Maya through Meals for Kids | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received meals for Maya through Meals for Kids. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1612,16 +1447,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Employment & Adult Education. **Persona intent:** ALL. **Eligibility:** Approved non-CAC workshop, attendance feasible, no qualification effect.
 
-**Situation:** “There is a skills workshop you would like to attend. The fee would leave less money for other needs.”
+**Situation:** There is a skills workshop you would like to attend. The fee would leave less money for other needs.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D051-ATTEND | Pay for and attend the workshop | -$45.00 | optional_workshop_attended | “You paid the fee and attended the workshop.” |
-| D051-DECLINE | Decline the workshop this month | $0.00 | optional_workshop_declined | “You keep the money and do not attend.” |
+| D051-ATTEND | Pay for and attend the workshop | -$45.00 | optional_workshop_attended | You paid the fee and attended the workshop. |
+| D051-DECLINE | Decline the workshop this month | $0.00 | optional_workshop_declined | You keep the money and do not attend. |
+| D051-CAC | Attend a free CAC Adult Education class | $0.00 | Direct effect or engine rule | You attended a free CAC Adult Education class. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
 
@@ -1666,17 +1502,17 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Type / category:** everyday / Food & Nutrition. **Persona intent:** ALL. **Eligibility:** Approved holiday season and distinct meal need.
 
-**Situation:** “A holiday meal is approaching. You can buy the larger planned basket or a smaller one that costs less.”
+**Situation:** You can buy all the food that is a part of your normal family traditions, or a smaller selection that costs less.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
 **All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
 
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
+| Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
-| D053-FULL | Buy the planned holiday basket | -$85.00 | holiday_meal_full | “You purchase the planned meal ingredients.” |
-| D053-SMALL | Choose the smaller holiday basket | -$38.00 | holiday_meal_small | “You spend less and prepare a smaller meal.” |
-| D053-CAC | Get a holiday food basket through CAC | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received a holiday food basket through CAC.” |
+| D053-FULL | Buy the planned holiday meal | -$85.00 | holiday_meal_full | You purchase the planned meal ingredients. |
+| D053-SMALL | Choose the smaller holiday meal | -$38.00 | holiday_meal_small | You spend less and prepare a smaller meal. |
+| D053-CAC | Get a holiday food basket through CAC | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | You received a holiday food basket through CAC. |
 
 **CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
@@ -1783,30 +1619,9 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Program-supported items and eligibility must be confirmed; no cash benefit..
 
-## D057 — A pass or a few fares?
+## D057 — Retired November 16 2026
 
-**Type / category:** everyday / Employment & Adult Education. **Persona intent:** ALL. **Eligibility:** Transit use and valid fare products approved.
-
-**Situation:** “You need to get around. A transit pass costs more upfront than buying fares for the trips you need right now.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D057-PASS | Buy the pass | -$50.00 | transit_pass_owned | “You bought the transit pass.” |
-| D057-FARES | Buy only the immediate fares | -$12.00 | immediate_fares_purchased | “You keep more cash now without pass coverage for later travel.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D057` = UNRESOLVED. Source an approved employment, skills or commuting observation relevant to this decision; no causal employment guarantee. CAC `K-D057` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** No general bus-pass/fare fact; workforce-specific transportation cannot be generalized to all personas. [Gap review](scenario-cac-fact-pairings.md#d057).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Pass duration, trip coverage and route needs must be configured; no automatic savings invented..
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ## D058 — Laundry supplies are running low
 
@@ -1862,35 +1677,9 @@ Fee and refund remain separate components, even if their net is stored on the re
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Do not frame all discretionary spending as irresponsible or award a virtue score..
 
-## D060 — The groceries are running low
+## D060 — Retired November 16 2026
 
-**Type / category:** everyday / Food & Nutrition. **Persona intent:** ALL. **Eligibility:** Distinct final grocery need; previous purchases reconciled.
-
-**Situation:** “There are still days left in the month, and the household needs food. A full restock costs more than the smaller basket.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D060-FULL | Buy the full restock | -$90.00 | late_food_full | “You purchase the full restock.” |
-| D060-SMALL | Buy the smaller restock | -$45.00 | late_food_partial | “You buy less food and preserve more cash.” |
-| D060-CAC | Get groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit | Record actual approved items received and assistance use | “You received groceries from the CAC Mini-Market.” |
-
-**CAC mapping:** Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D060` = UNRESOLVED. Source an approved food-budget/food-access observation with exact household composition, month, geography, unit and population; match the specific food decision. CAC `K-D060` = paired C26 for review; source identity and proposed display text are below. Exactly these two roles; missing facts block publication.
-
-**CAC fact text:** “In 2025, the CAC Mini-Market served 7,034 individuals.”
-
-**CAC fact reference:** `cac_service_facts` · service `mini_market` · fact `individuals_served_by_the_cac_mini_market` · year 2025 · `fact_id=0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`. [Pairing rationale](scenario-cac-fact-pairings.md#d060).
-
-**Pairing scope:** The scenario is a distinct late-month household food need. Existing conditional food pathway; no personal allocation or duplicate grocery coverage.
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ## Illustrative route and difficulty review
 

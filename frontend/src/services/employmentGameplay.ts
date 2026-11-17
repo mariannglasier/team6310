@@ -134,6 +134,7 @@ export function documentState(value: unknown): Record<string, unknown> {
           'history',
           'creditedDays',
           'reason',
+          'clothingCost',
         ].includes(k),
     )
   )
@@ -217,6 +218,13 @@ export function documentState(value: unknown): Record<string, unknown> {
       )
         throw new UnsupportedEmploymentDocumentError()
     parseUsdCents(s.weeklyIncome, 'weeklyIncome')
+    if (
+      s.clothingCost !== undefined &&
+      (typeof s.clothingCost !== 'string' ||
+        !/^\d+(?:\.\d{1,2})?$/.test(s.clothingCost) ||
+        parseUsdCents(s.clothingCost, 'clothing') <= 0)
+    )
+      throw new UnsupportedEmploymentDocumentError('Invalid clothing price')
   }
   return s
 }
@@ -295,7 +303,7 @@ export async function employmentSnapshot(
     },
     jobs: jobs.map((job) => ({ job })),
     support: run.supportEnabled,
-    clothingCost: parseUsdCents('60.00', 'clothing'),
+    clothingCost: parseUsdCents(s.clothingCost ?? '60.00', 'clothing'),
     stage: run.status === 'ended' ? 'ended' : (s.stage as Walkthrough['stage']),
     day: pregame ? 0 : run.currentDay,
     balance: run.currentBalance,

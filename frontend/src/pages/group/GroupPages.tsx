@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { PageSection } from '../../components/ui/PageSection'
+import { PriceUpdateStatus } from '../../components/simulation/PriceUpdateStatus'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { SelectField, TextField } from '../../components/ui/FormFields'
 import { paths } from '../../app/paths'
@@ -251,6 +252,7 @@ function GroupScenarioShell({
   return (
     <div className="group-scenario-stage">
       <div className="financial-tracking group-scenario-tracking">
+        <PriceUpdateStatus versionId={session.versionId} />
         <ol className="finance-timeline" aria-label="Group question progress">
           {Array.from({ length: 30 }, (_, index) => index + 1).map(
             (question) => (

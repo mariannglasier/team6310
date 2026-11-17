@@ -121,6 +121,18 @@ for (const support of [false, true])
         }
       } else if (url.includes('/auth/v1/user')) body = user
       else if (url.includes('/rpc/start_individual_playthrough')) body = 'run'
+      else if (url.includes('/rpc/get_edition_price_updates'))
+        body = {
+          checkedAt: '2026-12-26T00:00:00Z',
+          items: [
+            {
+              label: 'Electricity',
+              status: 'carried_forward',
+              lastSuccessfulAt: '2026-11-17T00:00:00Z',
+              observationPeriod: '2026-08',
+            },
+          ],
+        }
       else if (url.includes('/rpc/get_bill_snapshot'))
         body = {
           run,
@@ -171,6 +183,23 @@ for (const support of [false, true])
     await page.goto('/simulation/individual')
     await page.getByText('Choose this household').first().click()
     await page.getByRole('button', { name: 'Start simulation' }).click()
+    await page.getByText('Last updated', { exact: true }).click()
+    await expect(
+      page.getByText(/Electricity — Carried forward; last verified/),
+    ).toBeVisible()
+    await expect(
+      page.getByText('1 value carried forward.', { exact: false }),
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true)
+    await page.screenshot({
+      path: testInfo.outputPath('price-update-history.png'),
+      fullPage: true,
+    })
+    await page.getByText('Last updated', { exact: true }).click()
     await expect(
       page.getByText(
         'Some households face difficult choices when energy bills arrive.',
@@ -185,8 +214,10 @@ for (const support of [false, true])
       ),
     ).toBe(true)
     await expect(
-      page.getByRole('link', { name: 'Source', exact: true }),
-    ).toHaveCount(0)
+      page.getByLabel('Scenario facts', { exact: true }).getByRole('link', {
+        name: /Source/,
+      }),
+    ).toHaveCount(support ? 2 : 1)
     const balance = page.locator('.finance-balance')
     await expect(balance).toHaveText('$1,772.00')
     expect(

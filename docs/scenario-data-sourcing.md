@@ -1,3 +1,11 @@
+> **Monthly refresh policy updated November 17, 2026.** Tax-credit baselines USD 989 and Jordan/Maya USD 1989 follow BLS all-items CPI. Validated OEWS wages publish automatically in the monthly edition. Failed components copy their last published amounts and retain their earlier verification dates. The game’s Last updated panel marks carried-forward values.
+
+> **API-only refresh approved November 16, 2026.** Scheduled updates request JSON APIs only. Dedicated APIs supply rent, electricity and modeled EITC. BLS CPI supplies remaining prices, including all-items CPI CUUR0000SA0 for school meals and transit alternatives. Historical website links document facts and starting amounts. Annual statistics retain their reporting year until a supported data source replaces them.
+
+> **Approved part 2 revision — November 16, 2026.** The active catalog now contains 51 cards. D031/D037/D038/D041/D057/D060 are additionally retired without replacement. D033 is a kitchen appliance, D039 school soccer, and D040 an adult coat. Added free CAC options retain a zero cash effect. All retained nonzero prices and fees remain source-bound. This revision supersedes earlier descriptions below.
+
+> **Approved facts and pricing revision November 15, 2026.** The attached facts fixes.docx changes the active catalog to 57 cards, retires D016/D017/D023 without replacements, makes all four households car owners, changes D027 to work shoes, and approves the revised starting prices. Every nonzero scenario price and fee has a monthly source binding. See [the implementation and Supabase setup](supabase-game-data-setup.md). Earlier draft amounts and missing-car restrictions below are historical.
+
 # Scenario data sourcing and API coverage
 
 ## Development gameplay integration - November 9, 2026
@@ -82,7 +90,7 @@ Use the existing first-of-month 12:00 a.m. America/New_York maintenance schedule
 
 An automatic update plan may retrieve a released API observation, ingest a supported published file/rate, or recalculate an approved baseline using a maintained index/formula. Automated validation is the publication gate; routine updates require no staff review or approval. Initial source/formula setup is separate from monthly operation. Rates can remain unchanged when a scheduled check finds no change. A failed check preserves the last approved value and flags staleness; it does not manufacture a new price.
 
-Published fares, school prices, provider fees and contract schedules need a defined machine-readable import or supported extraction job with schema/effective-date validation. These jobs are proposed, not implemented. Where automation is not yet established, the binding is PENDING and cannot be published under this policy. Wages already have an automatic BLS OEWS ingestion implementation (see the job-wage integration section); reuse its hourly-wage and weekly-gross calculation, and extend draft-only publication to the requested automatic edition publication. Any net-income transformation needs its own defined formula. Assistance caps require an automatically maintained CAC source or an approved recalculation method; annual impact totals cannot supply that cap.
+Scheduled price updates use JSON APIs. Costs without a dedicated price API use a validated BLS CPI binding. School meals and transit use the all-items index with their approved starting amounts. Website extraction is excluded. Wages already have an automatic BLS OEWS ingestion implementation (see the job-wage integration section); reuse its hourly-wage and weekly-gross calculation, and extend draft-only publication to the requested automatic edition publication. Any net-income transformation needs its own defined formula. Assistance caps require an automatically maintained CAC source or an approved recalculation method; annual impact totals cannot supply that cap.
 
 For new editions, fictional repayment amounts require an automatically maintained agreement source or approved baseline/formula; voluntary transfer amounts require an approved baseline/index calculation. Already-incurred debt and an active game retain their originating edition and transaction amounts: this protects recorded obligations and does not exempt future editions from automatic maintenance. Zero-dollar choices and free CAC receipts resolve through the maintained no-charge eligibility/service rule; they are not inflation-indexed. Rule checks can confirm zero remains correct without creating a fee.
 
@@ -223,7 +231,7 @@ Source: S18/S19; fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`; service `adult_
 
 ### D002 — An interview today
 
-**Baseline evidence and disposition (November 7):** Unresolved: define garments, sizes, footwear inclusion and all-in local basket. No verified outfit supports $60. Historical amounts audited: Outfit $60. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved November 15 starting outfit cost USD 60.00, updated monthly using apparel CPI. Reuse has zero additional cost.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d002)
 
@@ -241,7 +249,7 @@ Source: S18/S19; fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`; service `adult_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. Between {base observation period} and {latest observation period}, the U.S. price index for apparel changed by {pct}%.”
+**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. Between {base observation period} and {latest observation period}, U.S. prices for apparel were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SAA`
 
@@ -271,11 +279,11 @@ Source: S18/S19; fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`; service `canopy
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “People come back to the job search from different starting points. Some are looking after a job ends, while others are returning after time away from work or seeking their first job.”
+**Player-facing general fact template:** “After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs civilian labor-force participants were unemployed.”
 
-**General fact semantic key:** `employment:jobseekers_different_work_histories`
+**General fact semantic key:** `acs:B23025:unemployment_reapplication`
 
-Source/update: S27, [BLS Current Population Survey concepts and definitions](https://www.bls.gov/cps/definitions.htm), reasons for unemployment: job losers, reentrants and new entrants. Qualitative description of jobseekers, not application advice or a claim about the frequency of any experience. Source checked November 7, 2026. No numerical API binding needed. Scheduled source checks retain the evidence reference and detect definition changes; no automatic free-form rewriting.
+Source/update: https://api.census.gov/data/2024/acs/acs5/groups/B23025.json. Annual ACS 5-year unemployment estimate, B23025_005E / B23025_003E, Georgia place 68516. Refreshed monthly when a new annual release becomes available. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -285,7 +293,7 @@ Source: S18/S19; fact ID `db12c137-fad7-4277-b4ca-6a203b344e38`; service `career
 
 ### D004 — Another interview
 
-**Baseline evidence and disposition (November 7):** Unresolved: same D002 basket, ownership prevents repeat purchase. Historical amounts audited: Outfit $60/reuse $0. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Reuse the edition-bound D002 clothing price and ownership. Starting purchase USD 60.00, apparel CPI updates. Owned clothes have no second charge.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d004)
 
@@ -318,7 +326,7 @@ Source: S18/S19; fact ID `2675ebbd-e014-4506-a0fd-1130a9ffe692`; service `career
 
 ### D005 — Time to file taxes
 
-**Baseline evidence and disposition (November 7):** Unresolved: E14 is only a starting price. Federal/Georgia return fee quote required. Refund depends on household/tax rules or explicit simulation assumption; aggregate CAC refunds do not validate $1,000. Historical amounts audited: Fee F; refund $1,000. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved starting preparation fee USD 250.00, updated through tax-return-preparation CPI SS68023. The fixed simulation credit is USD 989 for Alex, Sofia and Patricia, and a recommended USD 1989 for Jordan and Maya. This replaces the former USD 1000 amount. The observed IRS recipient-average fact retains its stated year.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d005)
 
@@ -327,8 +335,8 @@ Source: S18/S19; fact ID `2675ebbd-e014-4506-a0fd-1130a9ffe692`; service `career
 | Choice/component | Historical draft expression (not verified pricing) |
 | --- | --- |
 | TRY — Try my best | Approved USD 0.00; no refund/deduction |
-| PAID — Pay someone to prepare taxes | UNRESOLVED approved fee F; require balance ≥ F before charging -F and immediately crediting approved +$1,000.00 once |
-| CAC — Get free tax preparation through CAC's VITA program | CAC only; no player-paid fee; approved +$1,000.00 once |
+| PAID — Pay someone to prepare taxes | UNRESOLVED approved fee F; require balance ≥ F before charging -F and immediately crediting authored household credit R once |
+| CAC — Get free tax preparation through CAC's VITA program | CAC only; no player-paid fee; authored household credit R once |
 
 **Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** tax preparation services, if available; otherwise all items. **Required definition:** Quote return complexity and provider fee; give the refund a separate automatically recalculated binding. Proposed simulation-only fallback: approve a November 2026 refund baseline and all-items CPI anchor, then recalculate monthly by the index ratio. The former $1,000 is a candidate baseline requiring review, not a permanent amount or an actual tax entitlement. A real tax calculation would instead require household tax inputs and maintained tax rules; that method is not selected here.
 
@@ -336,15 +344,17 @@ Source: S18/S19; fact ID `2675ebbd-e014-4506-a0fd-1130a9ffe692`; service `career
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Filing a tax return can mean money back for eligible workers and families. The Earned Income Tax Credit can provide a refund to people with low or moderate earnings even when they owe no federal income tax.”
+**Player-facing general fact:** “The Earned Income Tax Credit can help working households keep more of their income. In tax year 2024, recipients nationwide received an average EITC of $2,894.”
 
-**General fact semantic key:** `tax:eitc_refundable_credit_for_workers`
+**General fact semantic key:** `irs:average_eitc`
 
-Source/update: S28, [IRS Topic 601: Earned Income Credit](https://www.irs.gov/taxtopics/tc601). Qualitative fact about refundable tax credits and eligible workers; source checked November 7, 2026. No numerical API binding needed for this passage. Scheduled checks monitor source availability and changes to the credit definition; preserve the verified passage on retrieval failure and revalidate substantive source changes before replacing its meaning. This fact does not set the simulated refund, establish player eligibility or change filing-choice outcomes. Refund amounts retain their separate automatic update plan.
+Source/update: https://www.irs.gov/tax-professionals/eitc-central/statistics-for-tax-returns-with-the-earned-income-tax-credit-eitc. IRS recipient average, tax year 2024 processed in 2025. Retain this dated IRS observation without automatic website requests. The simulation uses authored credit amounts, independently of this observed national average. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
 **Player-facing CAC fact template:** “Tax preparation can connect households with money back at filing time. In 2025, CAC reported 503 tax returns through VITA and $672,056 in combined federal and state refunds.”
+
+**CAC fact semantic key:** `cac:vita:2025:returns_and_refunds`
 
 **Composite CAC fact sources:** S18/S19; service `vita`; 2025 return-count record `5b9132c2-90d6-4dea-9dc0-f2de13a89e2f` = 503 Number; federal-refund record `7f25dabd-f5a5-4a54-9201-fd5f3ccd173d` = USD 582083; state-refund record `d4d72fe4-20b1-4a1b-97a4-dea745b7e4f7` = USD 89973. Derived total: 582083 + 89973 = USD 672056. This is one player-facing CAC passage backed by three observations, not three fact slots. Require matching reporting years, compatible scopes and complete inputs before automatically updating the passage; never add tax-credit totals to refunds, divide this total by 503, or infer 503 unique recipients. Count and refund observations are reported program measures, not a verified matched cohort. Exact original source verification remains pending; the snapshot verifies the stored figures. The passage does not set the simulated household refund. Historical pairing files remain the earlier single-record proposal; this composite supersedes it for D005 final binding.
 
@@ -352,7 +362,7 @@ Source/update: S28, [IRS Topic 601: Earned Income Credit](https://www.irs.gov/ta
 
 ### D006 — Rent is due
 
-**Baseline evidence and disposition (November 7):** Replace: E01 bedroom-specific rent proposal; reject $650 as verified full rent. Historical amounts audited: Rent $650. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** RentCast ZIP 30328 bedroom-specific average listed rent, allocated using documented household shares. One markets request per month. Starting late fee USD 35.00 follows all-items CPI.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d006)
 
@@ -386,7 +396,7 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 ### D007 — Keeping the lights on
 
-**Baseline evidence and disposition (November 7):** Unresolved: supplier/tariff, kWh, billing period and all charges; OpenEI candidate. EIA average alone cannot validate bill. Historical amounts audited: Electricity $145. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Monthly Georgia residential average bill from EIA revenue in million dollars multiplied by 1000000 and divided by residential customer count. The general fact uses the identical observation.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d007)
 
@@ -406,11 +416,11 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Keeping the lights on means making room for electricity in a crowded budget. In {month}, Georgia residential electricity averaged {rate} cents per kilowatt-hour.”
+**Player-facing general fact template:** “Electricity keeps a household running. In {period}, Georgia residential electricity customers paid an average monthly bill of ${monthly_bill}, calculated from EIA residential revenue and customer counts.”
 
-**General fact semantic key:** `eia:GA:RES:monthly_electricity_price`
+**General fact semantic key:** `eia:GA:residential_monthly_bill`
 
-Source/update: S08 / A04. GA residential monthly electricity price; retain cents/kWh and reporting month.  Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://api.eia.gov/v2/electricity/retail-sales/. Use monthly residential Georgia revenue in million dollars divided by residential customer count, multiplied by 1,000,000. This is a Georgia customer average, not a Sandy Springs tariff. Bill amount and fact use the same observation. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -420,7 +430,7 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 ### D008 — The water bill
 
-**Baseline evidence and disposition (November 7):** Unresolved: actual address/provider tariff, consumption, meter/base charges and sewer basis. Provider directory alone is not price evidence. Historical amounts audited: Water/sewer $68. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain the USD 68.00 water baseline and update using BLS water/sewerage CPI CUUR0000SEHG01, the same price category used for the fact.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d008)
 
@@ -440,7 +450,7 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. Between {base observation period} and {latest observation period}, the U.S. price index for water and sewerage maintenance changed by {pct}%.”
+**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. Between {base observation period} and {latest observation period}, U.S. prices for water and sewerage maintenance were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEHG01`
 
@@ -454,7 +464,7 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 ### D009 — Staying connected
 
-**Baseline evidence and disposition (November 7):** Replace proposal: E05 $25 monthly existing-device plan, if selected and compatible; no invented device financing. Historical amounts audited: Phone $55. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved USD 100.00 starting monthly phone cost. Update using wireless services CPI CUUR0000SEED03. Keep the doxo ranking explicitly dated 2026.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d009)
 
@@ -473,21 +483,23 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A phone connection can be part of keeping up with work, family and daily responsibilities. Between {base observation period} and {latest observation period}, the U.S. price index for wireless telephone services changed by {pct}%.”
+**Player-facing general fact template:** “A phone connection can be essential for keeping up with work, family and daily responsibilities. A 2026 doxo analysis ranked mobile phone service as the second most common household bill, behind electricity. Between {base observation period} and {latest observation period}, U.S. wireless telephone service prices were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEED03`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEED03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.bls.gov/cpi/additional-resources/index-publication-level.htm. User supplied Telecompetitor summary https://www.telecompetitor.com/u-s-households-pay-1200-per-year-for-mobile-phone-service-on-average/ reports a $100 monthly median. Retain 2026 for the ranking. CPI-U CUUR0000SEED03 supplies the rolling 12-month category price change. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “Bills can add up and strain the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.”
 
-**Evidence gap:** No phone-plan or telecommunications-service fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`
+
+Source/update: https://ourcac.org/. CAC 2025 repository snapshot. evictions prevented: 1108 Number. Reporting year 2025. Annual refresh requires a CAC-provided report/export. User approved this pairing November 15, 2026. Approved revision from facts fixes.docx, November 15, 2026.
 
 ### D010 — The internet bill
 
-**Baseline evidence and disposition (November 7):** Unresolved: address-specific ordinary plan quote; E06 only if program eligibility is explicitly established. Historical amounts audited: Internet $65. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain USD 65.00 starting internet cost and update using internet services CPI CUUR0000SEEE03.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d010)
 
@@ -521,7 +533,7 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 ### D011 — Car insurance is due
 
-**Baseline evidence and disposition (November 7):** Unresolved: fictional driver/vehicle, coverage, deductible, installment and mandatory fees; no matching quote. Historical amounts audited: Car insurance $130. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** All four personas own a car. Retain USD 130.00 insurance baseline and update through motor vehicle insurance CPI CUUR0000SETE.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d011)
 
@@ -540,11 +552,11 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Car insurance is another cost of keeping a vehicle available. Between {base observation period} and {latest observation period}, the U.S. price index for motor vehicle insurance changed by {pct}%.”
+**Player-facing general fact:** “Car insurance costs vary. Consumer Federation of America research describes how factors such as homeownership, education, occupation and credit history can raise costs for lower-income consumers.”
 
-**General fact semantic key:** `cpi:SETE`
+**General fact semantic key:** `insurance:non_driving_rating_factors`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SETE. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://consumerfed.org/news/testimony-comments/auto-insurance-rating-factors-and-their-effect-on-different-demographics-of-consumers/.  Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -554,7 +566,7 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 ### D012 — A clinic bill arrives
 
-**Baseline evidence and disposition (November 7):** Unresolved: original service/patient responsibility required. E09 $250 is a new basic urgent-care service comparator, not this debt. Historical amounts audited: Clinic balance $190. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain USD 190.00 clinic-invoice baseline and update through physicians services CPI CUUR0000SEMC01. The unnecessary sentence about care already happening is removed.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d012)
 
@@ -587,7 +599,7 @@ Source/update: S30, [Federal Reserve: economic hardships](https://www.federalres
 
 ### D013 — The childcare bill
 
-**Baseline evidence and disposition (November 7):** Unresolved: age, provider, dates/hours and overlap with D025. Hourly babysitting benchmark E10 is not a daycare invoice. Historical amounts audited: Childcare bill $260. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved USD 260.00 starting childcare bill, updated with daycare and preschool CPI CUUR0000SEEB03. The CAC fact describes other child-related support and does not imply CAC pays this childcare bill.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d013)
 
@@ -614,13 +626,15 @@ Source/update: S31, [Federal Reserve: Living Arrangements and Care Work](https:/
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “The costs of raising a child extend beyond a care program. CAC offers Coats for Kids and Tools for School to help families cover clothing and school supplies. In 2025, Coats for Kids served 623 children.”
 
-**Evidence gap:** No daycare/childcare-payment fact; Meals for Kids measures food support. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `e8473e58-6338-4855-93be-7608f27696ab`
+
+Source/update: https://ourcac.org/. CAC 2025 repository snapshot. children served by Coats for Kids: 623 Number. Reporting year 2025. Annual refresh requires a CAC-provided report/export. User approved this pairing November 15, 2026. Approved revision from facts fixes.docx, November 15, 2026.
 
 ### D014 — Maya's school meal balance
 
-**Baseline evidence and disposition (November 7):** Replace formula: E03 meal price times documented unpaid count; no arbitrary balance or fee. Historical amounts audited: Meal debt $32. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Use the published elementary lunch rate times 20 school days. Checked November 15, 2026: USD 3.10 per lunch and USD 62.00 per month for 2026-2027. The $62 baseline now updates through the BLS all-items CPI API, CUUR0000SA0. The school page documents the initial rate.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d014)
 
@@ -639,21 +653,23 @@ Source/update: S31, [Federal Reserve: Living Arrangements and Care Work](https:/
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A school meal balance is another expense to cover while making sure Maya has food during the day. For {school year}, a full-price student lunch at {school level} in Fulton County Schools cost {amount}.”
+**Player-facing general fact:** “School meal programs help improve children’s diets and reduce hunger, supporting their health and readiness to learn. The National School Lunch Program provides eligible students with free or reduced-price meals.”
 
-**General fact semantic key:** `school:FCS:student_lunch_rate`
+**General fact semantic key:** `school:nslp:nutrition_and_learning`
 
-Source/update: S13; configure automatic extraction of the school-year meal rate. Select actual school-level lunch rate and eligibility; no breakfast or adult rate. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.fns.usda.gov/nslp.  Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact template:** “Making sure children have food is a concern that extends beyond a single meal balance. In 2025, Meals for Kids served 1,097 children.”
+**Player-facing CAC fact:** “Children still need meals when school closes for the summer. In 2025, Meals for Kids served 1,097 children.”
 
-Source: S18/S19; fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`; service `meals_for_kids`; key `children_served_by_meals_for_kids`; reporting year 2025; exact stored value `1097` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The child’s meal-account decision has relevant child-food-access context. Context only; Meals for Kids is not represented as paying the school account.
+Source fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`
+
+Source/update: https://ourcac.org/. CAC 2025 repository snapshot. children served by Meals for Kids: 1097 Number. Reporting year 2025. Annual refresh requires a CAC-provided report/export. User approved this pairing November 15, 2026. Approved revision from facts fixes.docx, November 15, 2026.
 
 ### D015 — The repair bill
 
-**Baseline evidence and disposition (November 7):** Unresolved: original repair invoice and remaining liability; E12 cannot price an unspecified repair. Historical amounts audited: Repair balance $240. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved USD 240.00 repair-invoice starting balance, updated using motor vehicle repair CPI CUUR0000SETD03. Enabled for all four car-owning households.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d015)
 
@@ -672,7 +688,7 @@ Source: S18/S19; fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`; service `meals_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. Between {base observation period} and {latest observation period}, the U.S. price index for motor vehicle repair changed by {pct}%.”
+**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. Between {base observation period} and {latest observation period}, U.S. prices for motor vehicle repair were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SETD03`
 
@@ -684,75 +700,17 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **Evidence gap:** No vehicle-repair invoice or automotive-assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
 
-### D016 — A pharmacy bill arrives
+### D016 — Retired November 15 2026
 
-**Baseline evidence and disposition (November 7):** Unresolved: medication/strength/quantity, pharmacy, insurance/discount and original liability. No interchangeable 'prescription price'. Historical amounts audited: Pharmacy balance $85. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+Removed from new editions at the user's request. No replacement.
 
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d016)
+### D017 — Retired November 15 2026
 
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D016-PAY — Pay the bill | -$85.00 |
-| D016-IGNORE — Ignore the bill for now | $0.00 |
-
-**Bill components (draft; fee policy unapproved):** Ignore records principal $85.00 + proposed late fee $8.00 = **$93.00 owed**, with USD 0.00 deducted today. Pay later settles the current outstanding total once and removes the card from unpaid, retaining the history; it does not edit the original Ignore response or consume a day. Fee recurrence remains unresolved; the displayed total assumes one fee only.
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** prescription drugs. **Required definition:** Specify drug, strength, quantity, pharmacy and insurance/discount assumptions; use patient price.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. Bill principal and late fee need separate bindings. Automatically check/import the effective provider/contract fee schedule during monthly maintenance; if a fictional fee has no maintained schedule, define an approved baseline and automatic index/formula plan. The exact fee-source ingestion route remains PENDING; a manual-review-only plan does not satisfy the automatic-update requirement. Recalculate total as outstanding principal plus approved fee; do not fetch or inflate total independently. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact:** “Some U.S. adults reported going without prescription medicine because of its cost in the Federal Reserve's 2025 survey.”
-
-**General fact semantic key:** `health:prescription_cost_barrier`
-
-Source/update: S30, [Federal Reserve: economic hardships](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm). Prescription-medicine item, distinct from overall care and dental items; no treatment recommendation. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** No prescription-payment or medicine-assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
-
-### D017 — A repayment is due
-
-**Baseline evidence and disposition (November 7):** Rule/source: originating agreement balance/payment; no comparable retail price and no CPI change to incurred debt. Future editions need maintained agreement/formula. Historical amounts audited: Repayment $110. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d017)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D017-PAY — Pay the bill | -$110.00 |
-| D017-IGNORE — Ignore the bill for now | $0.00 |
-
-**Bill components (draft; fee policy unapproved):** Ignore records principal $110.00 + proposed late fee $12.00 = **$122.00 owed**, with USD 0.00 deducted today. Pay later settles the current outstanding total once and removes the card from unpaid, retaining the history; it does not edit the original Ignore response or consume a day. Fee recurrence remains unresolved; the displayed total assumes one fee only.
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** none; repayment agreement. **Required definition:** Define fictional loan balance, contract payment and approved fee schedule; CPI cannot change contractual debt.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. Bill principal and late fee need separate bindings. Automatically check/import the effective provider/contract fee schedule during monthly maintenance; if a fictional fee has no maintained schedule, define an approved baseline and automatic index/formula plan. The exact fee-source ingestion route remains PENDING; a manual-review-only plan does not satisfy the automatic-update requirement. Recalculate total as outstanding principal plus approved fee; do not fetch or inflate total independently. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “A repayment coming due can narrow the choices you have for other expenses. In {period}, {pct}% of Sandy Springs residents whose poverty status was determined lived below the poverty threshold.”
-
-**General fact semantic key:** `acs:B17001:poverty`
-
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B17001. Below-poverty population / poverty-status universe. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact template:** “Repayments are one of the commitments a household has to plan around. In 2025, 218 students enrolled in Financial Literacy Classes.”
-
-Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financial_literacy_classes`; key `students_enrolled_in_financial_literacy_classes`; reporting year 2025; exact stored value `218` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Managing an existing repayment installment is a financial-literacy decision. Context only; CAC does not pay or restructure this debt in the draft.
+Removed from new editions at the user's request. No replacement.
 
 ### D018 — The gas bill
 
-**Baseline evidence and disposition (November 7):** Unresolved: address/marketer, therms, contract, delivery and fixed charges; no verified total. Historical amounts audited: Gas $92. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved USD 75.00 gas bill baseline, updated through piped gas CPI CUUR0000SEHF02.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d018)
 
@@ -786,7 +744,7 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 ### D019 — Rent or a cash cushion?
 
-**Baseline evidence and disposition (November 7):** Replace: same E01/D006 binding; prevent duplicate monthly obligation. Historical amounts audited: Rent $650. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Uses the same RentCast rent-cost binding as D006 and creates no duplicate rent occurrence. The educational fact now describes the dated Atlanta disparity study.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d019)
 
@@ -806,11 +764,11 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Paying rent can mean giving up the cash you hoped to keep for an unexpected expense. In {period}, median monthly gross rent in Sandy Springs was {amount}.”
+**Player-facing general fact:** “Lower-cost housing can become harder to afford even when a household’s income changes little. A 2025 Atlanta study reported that rents for low-wage renters rose up to nine times as fast as rents for high earners.”
 
-**General fact semantic key:** `acs:B25064:median_gross_rent`
+**General fact semantic key:** `housing:atlanta:unequal_rent_growth`
 
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B25064. Published median for cash-rent renter units; source-year dollars, not individual rent. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.ajc.com/news/2025/11/study-rents-for-low-wage-atlantans-rose-9-times-faster-than-for-high-earners/. User-approved dated claim. RentCast updates the scenario cost separately. Retain 2025 and do not extrapolate nine times to later periods. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -820,7 +778,7 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 ### D020 — A medical bill remains
 
-**Baseline evidence and disposition (November 7):** Unresolved: service, coverage and prior payments; do not replace an existing balance with E09's new-visit charge. Historical amounts audited: Medical balance $320. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain USD 320.00 medical-invoice baseline, updated through physicians services CPI CUUR0000SEMC01. The displayed fact uses plain language for the ACS population.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d020)
 
@@ -839,21 +797,28 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “An unpaid medical bill can remain part of the budget as new needs arrive. In {period}, {pct}% of Sandy Springs civilian noninstitutionalized residents lacked health insurance.”
+**Player-facing general fact template:** “An unpaid medical bill can remain part of the budget as new needs arrive. In {period}, {pct}% of Sandy Springs civilian residents living outside institutions lacked health insurance.”
+
+**General fact semantic key:** `acs:B27001:uninsured`
+
+Source/update: https://api.census.gov/data/2024/acs/acs5/groups.html. **Player-facing general fact template:** “An unpaid medical bill can remain part of the budget as new needs arrive. In {period}, {pct}% of Sandy Springs civilian noninstitutionalized residents lacked health insurance.”
 
 **General fact semantic key:** `acs:B27001:uninsured`
 
 Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B27001. Sum uninsured sex/age cells / table universe, with no overlapping age cells. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+ Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “Medical bills can put pressure on the money a household needs for housing. In 2025, CAC provided $796,416.64 in financial assistance to prevent homelessness, helping people stay housed during financial crises.”
 
-**Evidence gap:** No medical-bill assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`
+
+Source/update: https://ourcac.org/. CAC 2025 repository snapshot. total financial assistance amount to prevent homelessness: 796416.64 Dollars. Reporting year 2025. Annual refresh requires a CAC-provided report/export. User approved this pairing November 15, 2026. Approved revision from facts fixes.docx, November 15, 2026.
 
 ### D021 — The car will not start
 
-**Baseline evidence and disposition (November 7):** Repair unresolved by fault/vehicle; transit replace with E02 named pass, $23.75 seven-day or $95 thirty-day according to coverage period. Historical amounts audited: Repair $620/transit $50. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Repair USD 620.00 follows motor vehicle maintenance CPI. The alternative explicitly buys the posted MARTA 30-day pass, currently USD 95.00, used as an initial baseline and updated through the BLS all-items CPI API, CUUR0000SA0.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d021)
 
@@ -870,11 +835,11 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “When the car will not start, repair costs compete with the cost of getting around another way. Between {base observation period} and {latest observation period}, the U.S. price index for vehicle maintenance and repair changed by {pct}%.”
+**Player-facing general fact:** “Reliable transit can help workers reach jobs. Urban Institute research describes how transportation barriers limit access to employment for workers with low incomes.”
 
-**General fact semantic key:** `cpi:SETD`
+**General fact semantic key:** `transit:access_to_employment`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SETD. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.urban.org/urban-wire/how-commuters-low-incomes-use-public-transit-and-how-one-city-expanded-ridership.  Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -913,41 +878,13 @@ Source/update: S30, [Federal Reserve: economic hardships](https://www.federalres
 
 **Evidence gap:** No dental-care cost or dental-assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
 
-### D023 — A broken phone
+### D023 — Retired November 15 2026
 
-**Baseline evidence and disposition (November 7):** Unresolved: exact compatible handset/condition and repair fault. Best Buy API candidate for replacement only. Historical amounts audited: Handset $240/repair $95. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d023)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D023-REPLACE — Buy a replacement handset | -$240.00 |
-| D023-REPAIR — Pay for the repair | -$95.00 |
-| D023-WAIT — Go without the phone for now | $0.00 |
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** telephone hardware; repair category availability pending. **Required definition:** Specify handset condition/model and damage; separate replacement and repair quotes.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “A broken phone means weighing a repair against the cost of a replacement. In {period}, {pct}% of Sandy Springs households had a smartphone but no other type of computing device.”
-
-**General fact semantic key:** `acs:B28001:smartphone_only`
-
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B28001. Smartphone-only households / all households; use exclusive category, not all smartphone owners. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** No phone replacement or device-assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Removed from new editions at the user's request. No replacement.
 
 ### D024 — A family emergency
 
-**Baseline evidence and disposition (November 7):** Unresolved: origin/destination, dates, mode, passengers, baggage and booking lead time; local transit fare is not an equivalent family trip. Historical amounts audited: Family trip $360. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** The 2025 SHED adult-caregiving finding is 18 percent. The USD 360.00 travel cost follows public transportation CPI, separately from that annual fact.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d024)
 
@@ -964,11 +901,11 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “In the Federal Reserve's 2025 U.S. survey, people provided unpaid care to relatives or friends who needed help because of illness, disability or aging.”
+**Player-facing general fact:** “In the Federal Reserve’s 2025 U.S. survey, 18% of adults regularly provided unpaid care for an adult relative or friend who needed help because of aging, disability or illness.”
 
 **General fact semantic key:** `care:unpaid_adult_relative_support`
 
-Source/update: S31, [Federal Reserve: care work](https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-living-arrangements-care-work.htm). Adult caregiving observation; no claim about travel, family obligations or the specific emergency. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
+Source/update: https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-living-arrangements-care-work.htm. Overall adults, 2025 SHED. Preserve regular unpaid adult caregiving population. Retain this dated annual observation without automatic website requests. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1013,7 +950,7 @@ Source/update: S32, [Census: childcare challenges](https://www.census.gov/librar
 
 ### D026 — Time for new tires
 
-**Baseline evidence and disposition (November 7):** Unresolved: vehicle, tire dimensions/count/condition, E15 installation, disposal and tax. Historical amounts audited: Tire sets $520/$310. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** New tires USD 520.00 and lower-cost tires USD 310.00 follow tire CPI CUUR0000SETC01.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d026)
 
@@ -1030,7 +967,7 @@ Source/update: S32, [Census: childcare challenges](https://www.census.gov/librar
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. Between {base observation period} and {latest observation period}, the U.S. price index for tires changed by {pct}%.”
+**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. Between {base observation period} and {latest observation period}, U.S. prices for tires were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SETC01`
 
@@ -1044,7 +981,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 ### D027 — Broken glasses
 
-**Baseline evidence and disposition (November 7):** Replace basic-option proposal: E07 $95 restricted two-pair/exam offer; premium option and final local total unresolved. Historical amounts audited: Glasses $290/$135. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Replaced eyeglasses with work shoes. Approved starting replacement USD 90.00 and assumed repair USD 25.00 follow footwear CPI CUUR0000SEAE. Deferral and eligible Canopy Thrift credits have zero cash cost.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d027)
 
@@ -1062,21 +999,23 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Replacing broken glasses means finding an option that meets your needs and fits your budget. Between {base observation period} and {latest observation period}, the U.S. price index for eyeglasses and eye care changed by {pct}%.”
+**Player-facing general fact:** “Lower-quality clothing can wear out quickly. Replacing worn-out items repeatedly can strain a limited budget, even when each purchase seems inexpensive.”
 
-**General fact semantic key:** `cpi:SEMC03`
+**General fact semantic key:** `clothing:quality_and_replacement_cost`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEMC03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://prospect.org/2025/08/29/2025-08-29-how-fast-fashion-keeps-people-poor/.  Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “Canopy Thrift selects donated items for its sales floor, helping neighbors access secondhand clothing and essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
-**Evidence gap:** No vision-care or glasses-replacement assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
+
+Source/update: https://ourcac.org/. CAC 2025 repository snapshot. dollar amount of client credits used at CAC Canopy Thrift: 206768.67 Dollars. Reporting year 2025. Annual refresh requires a CAC-provided report/export. User approved this pairing November 15, 2026. Approved revision from facts fixes.docx, November 15, 2026.
 
 ### D028 — A plumbing problem
 
-**Baseline evidence and disposition (November 7):** Unresolved: exact fault/full and temporary work, property responsibility and local provider quote. Broad online repair ranges do not validate either alternative. Historical amounts audited: Plumbing $410/$75. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain full repair USD 410.00 and temporary workaround USD 75.00. Monthly household-operations CPI updates these simulation prices.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d028)
 
@@ -1107,7 +1046,7 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 ### D029 — An unexpected appointment for Maya
 
-**Baseline evidence and disposition (November 7):** Unresolved: specialty/service, full/initial difference and patient responsibility. E09 urgent care is not proof of equivalent scope. Historical amounts audited: Child appointment $380/$120. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Retain appointment USD 380.00 and initial visit USD 120.00, updated through services by other medical professionals CPI CUUR0000SEMC04.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d029)
 
@@ -1124,7 +1063,7 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. Between {base observation period} and {latest observation period}, the U.S. price index for services by other medical professionals changed by {pct}%.”
+**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. Between {base observation period} and {latest observation period}, U.S. prices for services by other medical professionals were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEMC04`
 
@@ -1138,7 +1077,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 ### D030 — A broken laptop
 
-**Baseline evidence and disposition (November 7):** Unresolved: workload/specifications, exact SKU/condition and fault; Best Buy candidate. A cheap Chromebook is not automatically equivalent. Historical amounts audited: Laptop $450/repair $180. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** User-approved replacement laptop starts at USD 600.00. Retain repair USD 180.00. Both follow computer-equipment CPI CUUR0000SEEE01.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d030)
 
@@ -1156,11 +1095,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A broken laptop means weighing the cost of restoring a tool you use against other expenses. In {period}, {pct}% of Sandy Springs households had a desktop or laptop computer.”
+**Player-facing general fact:** “A smartphone may not be enough for every task. Work and education can require a full computer, keyboard and larger screen. Buying and repairing devices adds pressure to a household budget.”
 
-**General fact semantic key:** `acs:B28001:desktop_laptop`
+**General fact semantic key:** `digital:full_computer_access`
 
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B28001. Inclusive desktop/laptop category / all households; not device-only category. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://publicknowledge.org/the-device-divide-is-hurting-americans-heres-how-we-solve-it/.  Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1168,36 +1107,9 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **Evidence gap:** Computer Classes measures education, not laptop repair or replacement. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
 
-### D031 — The car needs a tow
+### D031 — Retired November 16 2026
 
-**Baseline evidence and disposition (November 7):** Unresolved: two actual routes, vehicle, hookup/mileage/after-hours fees; impound tariffs are not voluntary tow quotes. Historical amounts audited: Tow $225/$140. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d031)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D031-SHOP — Tow it to the repair shop | -$225.00 |
-| D031-PARK — Tow it to the parking location | -$140.00 |
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** motor vehicle maintenance and repair. **Required definition:** Quote each route distance, hookup, mileage and after-hours charges; repairs excluded.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “A tow is another cost to cover before the car can be repaired. Between {base observation period} and {latest observation period}, the U.S. price index for vehicle maintenance and servicing changed by {pct}%.”
-
-**General fact semantic key:** `cpi:SETD02`
-
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SETD02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** No towing or vehicle-recovery assistance fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ### D032 — A larger share to cover
 
@@ -1230,7 +1142,7 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **Evidence gap:** The shared household purchase is unspecified. Define the actual goods before selecting a relevant program fact. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
 
-### D033 — A damaged work item
+### D033 — A damaged small kitchen appliance
 
 **Baseline evidence and disposition (November 7):** Unresolved: item not identified; exact replacement, fault/repair and reimbursement rule required. Historical amounts audited: Work item $350/$145. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
 
@@ -1249,17 +1161,19 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A damaged work item can mean paying to replace equipment you rely on. Tools are one part of the wider cost of work equipment. Between {base observation period} and {latest observation period}, the U.S. price index for tools, hardware and supplies changed by {pct}%.”
+**Player-facing general fact:** “Replacing a broken appliance can strain a limited budget. Energy-efficient appliances can also help reduce utility bills, according to a Habitat for Humanity and Whirlpool study.”
 
-**General fact semantic key:** `cpi:SEHM01`
+**General fact semantic key:** `appliances:replacement_and_energy`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEHM01. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.whirlpoolcorp.com/latest-news/habitat-whirlpool-study-illustrates-energy-efficient-appliances-can-help-low-income-families-lower-utility-bills.html. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “Canopy Thrift helps neighbors access donated clothing and household essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
-**Evidence gap:** The damaged work item is unspecified; clothing and computer classes do not establish equipment coverage. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
+
+Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.
 
 ### D034 — A broken dresser
 
@@ -1282,7 +1196,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. Between {base observation period} and {latest observation period}, the U.S. price index for bedroom furniture changed by {pct}%.”
+**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. Between {base observation period} and {latest observation period}, U.S. prices for bedroom furniture were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEHJ01`
 
@@ -1290,9 +1204,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
+**Player-facing CAC fact:** “Canopy Thrift helps neighbors access donated clothing and household essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
-**Evidence gap:** No suitable dresser/furniture CAC outcome fact is assigned. The user confirmed household furniture availability; retain the fact slot unresolved rather than substituting an unrelated clothing statistic. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
+
+Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.
 
 ### D035 — Groceries lost
 
@@ -1314,7 +1230,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. Between {base observation period} and {latest observation period}, the U.S. price index for groceries purchased for home use changed by {pct}%.”
+**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. Between {base observation period} and {latest observation period}, U.S. prices for groceries purchased for home use were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SAF11`
 
@@ -1358,69 +1274,15 @@ Source/update: S33, [USDA: food-security measurement](https://ers.usda.gov/topic
 
 Source: S18/S19; fact ID `94210a01-4766-46ad-beba-d7400c9fd31e`; service `mini_market`; key `visits_to_the_cac_mini_market`; reporting year 2025; exact stored value `36521` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The decision is grocery access and choosing a food basket. Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
-### D037 — Your ride to work falls through
+### D037 — Retired November 16 2026
 
-**Baseline evidence and disposition (November 7):** Ride unresolved by route/time; transit replace with E02 paid-trip count, e.g. $5 for two standard trips. Historical amounts audited: Ride $38/transit $6. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d037)
+### D038 — Retired November 16 2026
 
-**Numerical inputs and price sources**
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D037-RIDE — Pay for the direct ride | -$38.00 |
-| D037-TRANSIT — Take the transit route | -$6.00 |
-
-**Recommended source/method:** S20/S12; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** transportation services; transit uses published fares. **Required definition:** Specify ride route/time and alternative fare count, transfer rules and feasible arrival.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “When your ride to work falls through, getting to your shift becomes another expense to solve. In {period}, {pct}% of Sandy Springs workers age 16 and older used public transportation to get to work.”
-
-**General fact semantic key:** `acs:B08301:public_transport_commute`
-
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B08301. Public transportation excluding taxicab / all workers age 16+; retain ACS universe. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** The transportation measure is workforce-program-specific; this card applies to employed people generally. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
-
-### D038 — A load of laundry
-
-**Baseline evidence and disposition (November 7):** Replace scope proposal: E04 $4 wash/thirty-minute dry versus $2.50 wash only, same 18-pound capacity; supplies and effective rate unresolved. Historical amounts audited: Laundry $18/$8. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d038)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D038-FULL — Wash and dry the full load | -$18.00 |
-| D038-SMALL — Wash the smaller load and air-dry it | -$8.00 |
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** laundry and dry cleaning services. **Required definition:** Specify wash/dry loads, machine size, supplies inclusion and lower-cost option.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “Clean clothes take a place in the budget alongside food, transportation and bills. Between {base observation period} and {latest observation period}, the U.S. price index for laundry and dry cleaning services changed by {pct}%.”
-
-**General fact semantic key:** `cpi:SEGD03`
-
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEGD03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** No laundry-service or laundry-fee assistance fact; clothing distribution is a different activity. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
-
-### D039 — Maya's school trip
+### D039 — School Activities
 
 **Baseline evidence and disposition (November 7):** Unresolved: dated actual school notice, admission/transport and fee; meal prices cannot validate a trip. Historical amounts audited: School trip $28. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
 
@@ -1439,11 +1301,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Admission fees can be one part of a school outing, alongside travel and other trip costs. Between {base observation period} and {latest observation period}, the U.S. price index for admission fees changed by {pct}%.”
+**Player-facing general fact:** “School activities can support learning, social connections and physical activity. Participation fees can keep children from lower-income families from joining, according to the University of Michigan Mott poll.”
 
-**General fact semantic key:** `cpi:SERF02`
+**General fact semantic key:** `school:activity_participation_barriers`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SERF02. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://mottpoll.org/reports-surveys/pay-participate-limiting-school-activities-lower-income-students. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1451,7 +1313,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **Evidence gap:** Tools for School concerns supplies, not school-trip participation or fees. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
 
-### D040 — Worn-out shoes
+### D040 — Worn-out coat
 
 **Baseline evidence and disposition (November 7):** Unresolved: type/size/condition, exact item and repair work; no verified pair/repair quote. Historical amounts audited: Shoes $70/repair $25. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
 
@@ -1471,48 +1333,23 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Worn-out shoes mean weighing replacement against making the current pair last. Between {base observation period} and {latest observation period}, the U.S. price index for footwear changed by {pct}%.”
+**Player-facing general fact:** “A warm coat is an essential winter expense. Exposure to cold can cause hypothermia; warm, dry clothing helps protect against cold-related illness.”
 
-**General fact semantic key:** `cpi:SEAE`
+**General fact semantic key:** `clothing:winter_cold_protection`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEAE. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact template:** “Finding shoes you can use is one way clothing needs enter the household budget. In 2025, CAC Canopy Thrift served 2,152 households.”
-
-Source: S18/S19; fact ID `5d6bc795-8a41-49ca-862f-9aaf73405b49`; service `canopy_thrift`; key `households_served_by_cac_canopy_thrift`; reporting year 2025; exact stored value `2152` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Replacing everyday shoes connects to the clothing program’s household reach. Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
-
-### D041 — Too tired to cook?
-
-**Baseline evidence and disposition (November 7):** Unresolved: matching servings/menu/basket, pickup/delivery/tax/tip assumptions. E13 does not price a restaurant meal. Historical amounts audited: Prepared meal $24/ingredients $10. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d041)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D041-PREPARED — Buy the prepared meal | -$24.00 |
-| D041-COOK — Buy ingredients and cook | -$10.00 |
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** food away from home for prepared; food at home for ingredients. **Required definition:** Specify equivalent meal servings and kitchen access; price menu charges and ingredient quantities separately.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact:** “In the 2025 U.S. time-use survey, women were more likely than men to spend part of their day preparing food and cleaning up afterward.”
-
-**General fact semantic key:** `time:cooking_gender_participation`
-
-Source/update: S34, [BLS: 2025 American Time Use Survey](https://www.bls.gov/news.release/archives/atus_06252026.htm). Table 1, population age 15 and older; descriptive national pattern, not an expectation about the player. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
+Source/update: https://www.cdc.gov/winter-weather/prevention/index.html. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact template:** “Ingredients for a home-cooked meal are part of a household food budget. In 2025, the CAC Mini-Market served 2,995 households.”
+**Player-facing CAC fact:** “Canopy Thrift helps neighbors access donated clothing and household essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
-Source: S18/S19; fact ID `ec44118c-3be1-46b1-9585-8f34d638bbd9`; service `mini_market`; key `households_served_by_the_cac_mini_market`; reporting year 2025; exact stored value `2995` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Buying meal ingredients has relevant household food-access context. Context only; no restaurant, prepared-meal reimbursement or new CAC option.
+Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
+
+Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.
+
+### D041 — Retired November 16 2026
+
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ### D042 — School supplies for Maya
 
@@ -1534,7 +1371,7 @@ Source: S18/S19; fact ID `ec44118c-3be1-46b1-9585-8f34d638bbd9`; service `mini_m
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. Between {base observation period} and {latest observation period}, the U.S. price index for educational books and supplies changed by {pct}%.”
+**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. Between {base observation period} and {latest observation period}, U.S. prices for educational books and supplies were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEEA`
 
@@ -1548,7 +1385,7 @@ Source: S18/S19; fact ID `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`; service `tools_
 
 ### D043 — A family birthday
 
-**Baseline evidence and disposition (November 7):** Unresolved: exact comparable planned/smaller items and local all-in price; giving time remains $0. Historical amounts audited: Gifts $35/$10. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
+**Baseline evidence and disposition (November 15, 2026):** Add the user-approved eligible Canopy Thrift gift-credit choice at zero cash cost. Paid gift options continue to follow their price binding.
 
 [Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d043)
 
@@ -1566,7 +1403,7 @@ Source: S18/S19; fact ID `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`; service `tools_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. Between {base observation period} and {latest observation period}, the U.S. price index for stationery, supplies and gift wrap changed by {pct}%.”
+**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. Between {base observation period} and {latest observation period}, U.S. prices for stationery, supplies and gift wrap were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SS33032`
 
@@ -1629,11 +1466,11 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A coat is one of the clothing needs to plan for as Maya grows. Between {base observation period} and {latest observation period}, the U.S. price index for girls' apparel changed by {pct}%.”
+**Player-facing general fact:** “Children outgrow coats, and replacing them can strain a tight budget. Clothing insecurity can affect school attendance, health and emotional well-being. Major food and healthcare assistance programs do not cover clothing purchases.”
 
-**General fact semantic key:** `cpi:SEAD`
+**General fact semantic key:** `clothing:child_clothing_insecurity`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEAD. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://noteinthepocket.org/clothing-insecurity/. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1660,7 +1497,7 @@ Source: S18/S19; fact ID `e8473e58-6338-4855-93be-7608f27696ab`; service `coats_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Packing lunches means buying ingredients ahead of time. Sandwich fillings are one part of that shopping list. Between {base observation period} and {latest observation period}, the U.S. price index for lunchmeats changed by {pct}%.”
+**Player-facing general fact template:** “Packing lunches means buying ingredients ahead of time. Sandwich fillings are one part of that shopping list. Between {base observation period} and {latest observation period}, U.S. prices for lunchmeats were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SS0501A`
 
@@ -1668,9 +1505,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact template:** “Packing lunches starts with having groceries available at home. In 2025, the CAC Mini-Market reported 1,140,047 pounds of donated food.”
+**Player-facing CAC fact:** “The CAC Mini-Market helps households obtain groceries, including food to prepare meals. In 2025, it served 7,034 individuals.”
 
-Source: S18; fact ID `f1e16055-cb30-4633-8ce2-89d834ec92d1`; service `mini_market`; key `pounds_of_food_donated_to_the_cac_mini_market`; year 2025; exact stored value `1140047` Pounds. Replaces the duplicate household-count proposal in this sourcing document. Initial source verification pending. Donations are not distributed food, individual benefit amounts or a workplace-lunch subsidy. Historical pairing files are unchanged.
+Source fact ID `0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`
+
+Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.
 
 ### D047 — A broken bag
 
@@ -1691,7 +1530,7 @@ Source: S18; fact ID `f1e16055-cb30-4633-8ce2-89d834ec92d1`; service `mini_marke
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. Between {base observation period} and {latest observation period}, the U.S. price index for miscellaneous personal goods changed by {pct}%.”
+**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. Between {base observation period} and {latest observation period}, U.S. prices for miscellaneous personal goods were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEGE`
 
@@ -1723,11 +1562,11 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Planning meals for Maya means covering food alongside the rest of the household budget. Between {base observation period} and {latest observation period}, the U.S. price index for food at employee sites and schools changed by {pct}%.”
+**Player-facing general fact:** “Hunger can affect children’s growth, learning and mental health. When school is out, families also need to cover meals that school would otherwise provide.”
 
-**General fact semantic key:** `cpi:SEFV03`
+**General fact semantic key:** `food:child_hunger_school_breaks`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SEFV03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.nokidhungry.org/blog/effects-of-hunger-on-the-body. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
@@ -1785,7 +1624,7 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. Between {base observation period} and {latest observation period}, the U.S. price index for personal care products changed by {pct}%.”
+**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. Between {base observation period} and {latest observation period}, U.S. prices for personal care products were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEGB`
 
@@ -1816,17 +1655,19 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A chance to learn can mean weighing an opportunity against an immediate expense. Between {base observation period} and {latest observation period}, the U.S. price index for lesson and instruction fees changed by {pct}%.”
+**Player-facing general fact:** “Learning new skills can open up work opportunities. Course fees and time away from work or family responsibilities can make training harder to access on a limited income.”
 
-**General fact semantic key:** `cpi:SERF03`
+**General fact semantic key:** `education:training_time_and_cost_barriers`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SERF03. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://www.oecd.org/en/publications/trends-in-adult-learning_ec0624a6-en.html. User-approved part 2 revision November 16, 2026. Qualitative educational context; retain source provenance.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact template:** “Taking time to build skills is part of the learning journey. In 2025, CAC reported 610 total students in Adult Education programs.”
+**Player-facing CAC fact:** “CAC Adult Education offers opportunities to develop skills. In 2025, its adult education programs served 610 students.”
 
-Source: S18/S19; fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`; service `adult_education`; key `total_students_in_adult_education_programs`; reporting year 2025; exact stored value `610` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The card asks whether to invest money and time in optional learning. Context only; CAC does not fund the private workshop or grant a qualification in this draft.
+Source fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`
+
+Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.
 
 ### D052 — Maya's birthday
 
@@ -1847,7 +1688,7 @@ Source: S18/S19; fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`; service `adult_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Even a smaller birthday at home can mean finding money for a cake. Between {base observation period} and {latest observation period}, the U.S. price index for fresh cakes and cupcakes changed by {pct}%.”
+**Player-facing general fact template:** “Even a smaller birthday at home can mean finding money for a cake. Between {base observation period} and {latest observation period}, U.S. prices for fresh cakes and cupcakes were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SS02041`
 
@@ -1879,7 +1720,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. Between {base observation period} and {latest observation period}, the U.S. price index for uncooked poultry other than chicken changed by {pct}%.”
+**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. Between {base observation period} and {latest observation period}, U.S. prices for uncooked poultry other than chicken were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEFF02`
 
@@ -1911,7 +1752,7 @@ Source: S18/S19; fact ID `1eec83c9-41ca-4aef-be22-1e36289d9d95`; service `holida
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. Between {base observation period} and {latest observation period}, the U.S. price index for clothing other than footwear changed by {pct}%.”
+**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. Between {base observation period} and {latest observation period}, U.S. prices for clothing other than footwear were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SA311`
 
@@ -1976,7 +1817,7 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. Between {base observation period} and {latest observation period}, the U.S. price index for toys changed by {pct}%.”
+**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. Between {base observation period} and {latest observation period}, U.S. prices for toys were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SERE01`
 
@@ -1988,36 +1829,9 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 Source: S18/S19; fact ID `18b975be-96cb-49ec-901b-ccd04c6c6a5c`; service `hope_for_the_holidays`; key `households_served_by_hope_for_the_holidays`; reporting year 2025; exact stored value `614` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The card explicitly concerns the named holiday program and a child’s holiday gift. Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
 
-### D057 — A pass or a few fares?
+### D057 — Retired November 16 2026
 
-**Baseline evidence and disposition (November 7):** Replace: E02 exact product and trip count; seven-day $23.75, thirty-day $95, four standard trips $10, not arbitrary pass/fare totals. Historical amounts audited: Pass $50/fares $12. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d057)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D057-PASS — Buy the pass | -$50.00 |
-| D057-FARES — Buy only the immediate fares | -$12.00 |
-
-**Recommended source/method:** S12; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** none; published transit fares. **Required definition:** Identify exact pass duration, rider eligibility, fare count and transfer rules; draft $50/$12 must be replaced or justified.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “Buying a transit pass means spending more now in exchange for coverage on later trips. As of {effective date}, the regular MARTA base fare was {amount} per {fare unit}.”
-
-**General fact semantic key:** `marta:MARTA:regular_base_fare`
-
-Source/update: S12; configure automatic extraction of current official fares and effective dates. Use the published base fare and transfer conditions; do not substitute a pass price. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** No general bus-pass/fare fact; workforce-specific transportation cannot be generalized to all personas. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ### D058 — Laundry supplies are running low
 
@@ -2038,7 +1852,7 @@ Source/update: S12; configure automatic extraction of current official fares and
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. Between {base observation period} and {latest observation period}, the U.S. price index for household cleaning products changed by {pct}%.”
+**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. Between {base observation period} and {latest observation period}, U.S. prices for household cleaning products were {pct}% {direction}.”
 
 **General fact semantic key:** `cpi:SEHN01`
 
@@ -2081,106 +1895,9 @@ Source/update: S34, [BLS: 2025 American Time Use Survey](https://www.bls.gov/new
 
 Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financial_literacy_classes`; key `students_enrolled_in_financial_literacy_classes`; reporting year 2025; exact stored value `218` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Choosing between a paid outing and a free alternative is a discretionary-budget tradeoff. Context only; no claim of CAC leisure funding or a judgment about spending.
 
-### D060 — The groceries are running low
+### D060 — Retired November 16 2026
 
-**Baseline evidence and disposition (November 7):** Unresolved: exact full/small baskets and coverage period; reuse D036 unit prices. Historical amounts audited: Grocery restock $90/$45. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d060)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D060-FULL — Buy the full restock | -$90.00 |
-| D060-SMALL — Buy the smaller restock | -$45.00 |
-| D060-CAC — Get groceries from the CAC Mini-Market | USD 0.00; free in-kind receipt; no cash credit |
-
-**Recommended source/method:** S20/S09; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** food at home. **Required definition:** Define full/smaller late-month baskets and days/persons covered; use shared item prices with D036.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact:** “For U.S. households experiencing very low food security, disrupted meals and reduced food intake were usually occasional episodes rather than a constant condition, according to USDA's 2024 report.”
-
-**General fact semantic key:** `food:episodic_shortages`
-
-Source/update: S35, [USDA: Household Food Security in 2024](https://ers.usda.gov/sites/default/files/_laserfiche/publications/113623/ERR-358.pdf). Retain reporting year and very-low-food-security population; do not generalize to every household. Source checked November 7, 2026. Proposed qualitative display copy; initial content verification remains pending. Preserve the dated observation and semantic key on routine refresh; do not regenerate free-form claims automatically. No numerical binding is required for this passage.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact template:** “A late-month food need is another reason a household may turn to food support. In 2025, the CAC Mini-Market served 7,034 individuals.”
-
-Source: S18/S19; fact ID `0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`; service `mini_market`; key `individuals_served_by_the_cac_mini_market`; reporting year 2025; exact stored value `7034` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The scenario is a distinct late-month household food need. Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.
-
-### Fact uniqueness audit
-
-All 60 general slots have distinct semantic fact keys, not merely different introductory wording. The library mixes sourced qualitative observations with numerical templates; neither wording changes nor removing digits makes a repeated underlying claim unique. Remaining CPI candidates use U.S. city-average observations for distinct categories, explicitly labeled U.S.; ACS candidates use distinct measures and population universes. Initial API validation must also reject aliased series and accidental duplicate underlying measures. No new current numerical observations were invented.
-
-D046 now uses the distinct donated-food CAC observation directly in its scenario section. The historical CAC pairing files retain their earlier proposals; this document records the replacement for final edition binding. Other CAC repeats remain permitted where no suitable distinct observation has been established.
-
-| Scenario | General semantic measure key |
-| --- | --- |
-| D001 | acs:B23025:unemployment |
-| D002 | cpi:SAA |
-| D003 | employment:jobseekers_different_work_histories |
-| D004 | acs:B08303:long_commute |
-| D005 | tax:eitc_refundable_credit_for_workers |
-| D006 | acs:B25070:rent_burden |
-| D007 | eia:GA:RES:monthly_electricity_price |
-| D008 | cpi:SEHG01 |
-| D009 | cpi:SEED03 |
-| D010 | digital:adult_daily_internet_use |
-| D011 | cpi:SETE |
-| D012 | health:income_related_forgone_care |
-| D013 | care:childcare_cost_relative_to_housing |
-| D014 | school:FCS:student_lunch_rate |
-| D015 | cpi:SETD03 |
-| D016 | health:prescription_cost_barrier |
-| D017 | acs:B17001:poverty |
-| D018 | energy:unhealthy_home_temperature |
-| D019 | acs:B25064:median_gross_rent |
-| D020 | acs:B27001:uninsured |
-| D021 | cpi:SETD |
-| D022 | health:dental_most_skipped_care |
-| D023 | acs:B28001:smartphone_only |
-| D024 | care:unpaid_adult_relative_support |
-| D025 | care:disruption_work_absence |
-| D026 | cpi:SETC01 |
-| D027 | cpi:SEMC03 |
-| D028 | acs:B25047:lacking_plumbing |
-| D029 | cpi:SEMC04 |
-| D030 | acs:B28001:desktop_laptop |
-| D031 | cpi:SETD02 |
-| D032 | acs:B25010:renter_household_size |
-| D033 | cpi:SEHM01 |
-| D034 | cpi:SEHJ01 |
-| D035 | cpi:SAF11 |
-| D036 | food:reduced_diet_variety |
-| D037 | acs:B08301:public_transport_commute |
-| D038 | cpi:SEGD03 |
-| D039 | cpi:SERF02 |
-| D040 | cpi:SEAE |
-| D041 | time:cooking_gender_participation |
-| D042 | cpi:SEEA |
-| D043 | cpi:SS33032 |
-| D044 | acs:B08201:no_vehicle_households |
-| D045 | cpi:SEAD |
-| D046 | cpi:SS0501A |
-| D047 | cpi:SEGE |
-| D048 | cpi:SEFV03 |
-| D049 | banking:reported_access_barriers |
-| D050 | cpi:SEGB |
-| D051 | cpi:SERF03 |
-| D052 | cpi:SS02041 |
-| D053 | cpi:SEFF02 |
-| D054 | cpi:SA311 |
-| D055 | acs:B17010:family_poverty |
-| D056 | cpi:SERE01 |
-| D057 | marta:MARTA:regular_base_fare |
-| D058 | cpi:SEHN01 |
-| D059 | social:less_daily_socializing |
-| D060 | food:episodic_shortages |
+Removed at the user's request. No replacement. Historical editions retain their original records.
 
 ## Implementation sequence and acceptance checks
 
