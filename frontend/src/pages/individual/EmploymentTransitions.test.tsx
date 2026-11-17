@@ -65,11 +65,23 @@ const snapshot = (state: Walkthrough, revision = 1): CommittedEmployment => ({
 })
 const commit = vi.fn()
 function show(state: Walkthrough) {
-  vi.mocked(employmentSnapshot).mockResolvedValue(snapshot(state))
+  const saved = snapshot(state)
+  saved.run = { ...saved.run, employmentState: { revision: saved.revision } }
+  vi.mocked(employmentSnapshot).mockResolvedValue(saved)
+  const bills: BillSnapshot = {
+    run: saved.run,
+    items: [],
+    paidTotal: usdCents(0),
+    overdueTotal: usdCents(0),
+    outstandingTotal: usdCents(0),
+    upcomingTotal: usdCents(0),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(0),
+  }
   render(
     <MemoryRouter>
       <SetupProvider>
-        <EmploymentPanel run={run} onCommit={commit} />
+        <EmploymentPanel run={saved.run} bills={bills} onCommit={commit} />
       </SetupProvider>
     </MemoryRouter>,
   )

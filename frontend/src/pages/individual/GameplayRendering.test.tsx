@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { BillSimulation } from './BillSimulation'
+import { EmploymentPanel } from './EmploymentPanel'
 import { SetupProvider } from '../../state/SetupProvider'
 import {
   loadBillSnapshot,
@@ -121,6 +122,23 @@ function bills(r = run): BillSnapshot {
     scenarioCharged: usdCents(0),
   }
 }
+function scheduledBills(r: LoadedPlaythrough): BillSnapshot {
+  return {
+    ...bills(r),
+    items: [
+      {
+        id: 'due',
+        name: 'Scheduled bill',
+        principal: usdCents(1000),
+        fee: usdCents(200),
+        dueDay: r.currentDay!,
+        paidAt: null,
+        ignoredAt: null,
+        paymentBalanceAfter: null,
+      },
+    ],
+  }
+}
 function show(initialRun = run) {
   return render(
     <MemoryRouter>
@@ -143,6 +161,137 @@ beforeEach(() => {
     responseText: null,
   })
   vi.mocked(loadScenarioFacts).mockResolvedValue([])
+})
+
+// Rendering consumes the same owned-run/snapshot contract for both identities;
+// Auth/RLS are mocked here and remain covered by the identity service suites.
+it.each(['anonymous', 'staff'])(
+  'restores %s bill days without a placeholder, including after remount',
+  async (identity) => {
+    const restoredRun = {
+      ...run,
+      ownerUserId: `${identity}-owner`,
+      currentScenarioId: null,
+    }
+    const first = deferred<BillSnapshot>()
+    vi.mocked(loadBillSnapshot).mockReturnValueOnce(first.promise)
+    const view = show(restoredRun)
+    expect(screen.getByText('Loading your bills and progress…')).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    await act(async () => first.resolve(scheduledBills(restoredRun)))
+    expect(
+      await screen.findByRole('region', { name: 'Bills due today' }),
+    ).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    view.unmount()
+    const refreshed = deferred<BillSnapshot>()
+    vi.mocked(loadBillSnapshot).mockReturnValueOnce(refreshed.promise)
+    show(restoredRun)
+    expect(screen.getByText('Loading your bills and progress…')).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    await act(async () => refreshed.resolve(scheduledBills(restoredRun)))
+    expect(
+      await screen.findByRole('region', { name: 'Bills due today' }),
+    ).toBeVisible()
+    expect(loadScenario).not.toHaveBeenCalled()
+    expect(submitEmployment).not.toHaveBeenCalled()
+  },
+)
+it.each(['anonymous', 'staff'])(
+  'allows the %s fallback only after a successful empty bill snapshot',
+  async (identity) => {
+    const restoredRun = {
+      ...run,
+      ownerUserId: `${identity}-owner`,
+      currentScenarioId: null,
+    }
+    const financial = deferred<BillSnapshot>()
+    vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
+    show(restoredRun)
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    await act(async () => financial.resolve(bills(restoredRun)))
+    expect(
+      await screen.findByRole('heading', { name: 'Placeholder' }),
+    ).toBeVisible()
+    expect(loadScenario).not.toHaveBeenCalled()
+  },
+)
+it('preserves a bill loading error and retries without showing the fallback', async () => {
+  const restoredRun = { ...run, currentScenarioId: null }
+  vi.mocked(loadBillSnapshot).mockRejectedValueOnce(
+    new Error('Bill service unavailable'),
+  )
+  show(restoredRun)
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Bill service unavailable',
+  )
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  const retry = deferred<BillSnapshot>()
+  vi.mocked(loadBillSnapshot).mockReturnValueOnce(retry.promise)
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Reload saved bills' }),
+  )
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  await act(async () => retry.resolve(scheduledBills(restoredRun)))
+  expect(
+    await screen.findByRole('region', { name: 'Bills due today' }),
+  ).toBeVisible()
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+})
+it.each([undefined, null])(
+  'does not treat a missing bill snapshot (%s) as an empty schedule',
+  async (missing) => {
+    const restoredRun = { ...run, currentScenarioId: null }
+    render(
+      <MemoryRouter>
+        <SetupProvider>
+          <EmploymentPanel
+            run={restoredRun}
+            bills={missing}
+            onCommit={vi.fn()}
+          />
+        </SetupProvider>
+      </MemoryRouter>,
+    )
+    expect(await screen.findByText("Loading today's content…")).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  },
+)
+it('withdraws fallback eligibility while an existing empty snapshot is refreshing', async () => {
+  const restoredRun = { ...run, currentScenarioId: null }
+  const empty = bills(restoredRun)
+  const renderPanel = (billBusy: boolean) => (
+    <MemoryRouter>
+      <SetupProvider>
+        <EmploymentPanel
+          run={restoredRun}
+          bills={empty}
+          billBusy={billBusy}
+          onCommit={vi.fn()}
+        />
+      </SetupProvider>
+    </MemoryRouter>
+  )
+  const view = render(renderPanel(false))
+  expect(
+    await screen.findByRole('heading', { name: 'Placeholder' }),
+  ).toBeVisible()
+  view.rerender(renderPanel(true))
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.getByText("Loading today's content…")).toBeVisible()
+  view.rerender(renderPanel(false))
+  expect(
+    await screen.findByRole('heading', { name: 'Placeholder' }),
+  ).toBeVisible()
+})
+it('shows a real scenario instead of the fallback once an empty bill schedule is known', async () => {
+  const financial = deferred<BillSnapshot>()
+  vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
+  show()
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  await act(async () => financial.resolve(bills()))
+  expect(await screen.findByText(localScenario.description)).toBeVisible()
+  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
 })
 
 it('keeps the scenario description mounted while committed finances and secondary facts load independently', async () => {

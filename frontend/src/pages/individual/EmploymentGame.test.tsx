@@ -47,12 +47,19 @@ function Game({ replay }: { replay: (support: boolean) => void }) {
     createWalkthrough(persona, jobs, false, usdCents(6000)),
   )
   return (
-    <EmploymentGame
-      state={state}
-      dispatch={dispatch}
-      onReplay={replay}
-      recapFacts={<aside>Employment context from the saved edition</aside>}
-    />
+    <>
+      {/* This reducer-only harness acknowledges income without a bill service. */}
+      {state.stage === 'income' && (
+        <button onClick={() => dispatch({ type: 'continue' })}>Next</button>
+      )}
+      <EmploymentGame
+        state={state}
+        dispatch={dispatch}
+        onReplay={replay}
+        recapFacts={<aside>Employment context from the saved edition</aside>}
+        allowPlaceholder={state.stage === 'day'}
+      />
+    </>
   )
 }
 it('keeps unqualified jobs disabled and submits an eligible job from the keyboard', async () => {
@@ -184,6 +191,30 @@ it('shows missing jobs as an actionable blocking state', () => {
     screen.getByRole('button', { name: 'Submit application' }),
   ).toBeDisabled()
 })
+
+it.each(['day', 'income'] as const)(
+  'does not default to a placeholder during an unresolved %s stage',
+  (stage) => {
+    render(
+      <MemoryRouter>
+        <EmploymentGame
+          state={{
+            ...createWalkthrough(persona, jobs, false, usdCents(6000)),
+            stage,
+            day: 4,
+          }}
+          dispatch={vi.fn()}
+          onReplay={vi.fn()}
+        />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent(
+      "Loading today's content",
+    )
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  },
+)
 
 it('displays the restored clothing price and uses exact cents for a purchase', async () => {
   const loadJobs = vi
