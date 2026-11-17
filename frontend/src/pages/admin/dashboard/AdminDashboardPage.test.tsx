@@ -512,7 +512,13 @@ test('shows a loading state, then a retryable error when content cannot load', a
 test('the dashboard is read-only: it offers no edit, save, or delete controls', async () => {
   await ready()
   await screen.findByText('Second edition summary')
-  for (const name of [/edit/i, /save/i, /delete/i, /publish/i, /approve/i])
+  for (const name of [
+    /^edit scenario$/i,
+    /save/i,
+    /delete/i,
+    /publish/i,
+    /approve/i,
+  ])
     expect(screen.queryByRole('button', { name })).toBeNull()
 })
 

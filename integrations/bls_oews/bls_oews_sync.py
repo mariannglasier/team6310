@@ -105,8 +105,11 @@ def resolve_target(
     If the requested/latest version is a draft it is the target. Otherwise a newer
     existing draft is reused; if none exists the caller must stage a new draft.
     """
+    if requested_id and any(v["version_id"] == requested_id and v.get("cms_managed") for v in versions):
+        raise DatabaseError("CMS drafts cannot be maintenance targets")
+    versions = [v for v in versions if not v.get("cms_managed")]
     if not versions:
-        raise DatabaseError("No content versions exist")
+        raise DatabaseError("No maintenance content versions exist")
     ordered = sorted(versions, key=lambda v: v["version_number"], reverse=True)
     if requested_id:
         matches = [v for v in ordered if v["version_id"] == requested_id]
@@ -251,6 +254,10 @@ def _stage_new_draft(
     )
     new_version = client.create_draft_version(source, report.created_version_number or 0, summary)
     assert_writable(new_version)
+    allocated_number = int(new_version["version_number"])
+    if allocated_number != report.created_version_number:
+        report.notes.append(f"Database allocated edition {allocated_number} after concurrent edition creation.")
+    report.created_version_number = allocated_number
     copies: list[dict[str, Any]] = []
     for row in source_rows:
         copy = {k: v for k, v in row.items() if k not in {"job_id", "created_at", "weekly_gross_income"}}

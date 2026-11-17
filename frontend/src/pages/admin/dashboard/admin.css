@@ -651,3 +651,256 @@ button.admin-stat:hover {
     padding: 1rem;
   }
 }
+
+.cms-workspace {
+  display: grid;
+  gap: 1.5rem;
+}
+.cms-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.cms-drafts,
+.cms-editor-fields {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.cms-editor-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.cms-columns {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.cms-columns > section {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.cms-draft-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.cms-library {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 65vh;
+  overflow: auto;
+}
+.cms-library button {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+.cms-library button span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+.cms-library button[aria-current='true'],
+.cms-library button:hover {
+  background: var(--accent-surface);
+}
+@media (max-width: 760px) {
+  .cms-columns,
+  .cms-controls {
+    grid-template-columns: 1fr;
+  }
+  .cms-library {
+    max-height: 35vh;
+  }
+}
+.cms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--divider);
+}
+.cms-header h1 {
+  font-size: 2rem;
+  margin: 0 0 0.4rem;
+}
+.cms-inline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.cms-draft-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.cms-draft-list li {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+}
+.cms-choice {
+  padding: 1rem;
+}
+.cms-choice summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+.cms-choice summary span {
+  display: block;
+  margin-top: 0.35rem;
+}
+.cms-choice details[open] .cms-editor-fields {
+  padding-top: 1rem;
+  border-top: 1px solid var(--divider);
+}
+.cms-choice-section {
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid var(--divider);
+  padding-top: 1.25rem;
+}
+.cms-choice-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.cms-info {
+  border: 0;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+.cms-help {
+  display: block;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: var(--accent-surface);
+  border-radius: 6px;
+}
+.cms-columns .ui-field input,
+.cms-columns .ui-field textarea,
+.cms-columns .ui-field select {
+  border-color: var(--divider);
+  background: var(--surface);
+}
+@media (max-width: 760px) {
+  .cms-inline {
+    grid-template-columns: 1fr;
+  }
+}
+.ui-field-label {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+.cms-info-anchor {
+  display: inline-flex;
+  position: relative;
+}
+.cms-help {
+  position: absolute;
+  z-index: 30;
+  bottom: 100%;
+  right: 0;
+  width: min(260px, 70vw);
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 4px 16px #0003;
+  padding: 0.75rem;
+}
+.cms-choice {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  align-items: start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+.cms-choice-moves .ui-button {
+  min-height: 28px;
+  min-width: 28px;
+  padding: 0.15rem;
+  font-size: 0.875rem;
+}
+.cms-choice-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.cms-choice summary span {
+  display: inline;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+.cms-save-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.cms-unsaved {
+  font-weight: 700;
+  color: #754400;
+  background: #fff3cd;
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+}
+
+.cms-draft-list li {
+  position: relative;
+  padding-top: 2.5rem;
+}
+.cms-draft-delete {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+}
+.cms-scenario-item {
+  position: relative;
+}
+.cms-library .cms-scenario-item > button:first-child {
+  padding-right: 2.5rem;
+}
+.cms-library .cms-scenario-delete {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--border);
+}
+.cms-library .cms-scenario-delete:hover,
+.cms-library .cms-scenario-delete:focus-visible {
+  color: var(--primary);
+  background: transparent;
+}

@@ -191,3 +191,26 @@ def test_client_refuses_to_write_non_allowlisted_fields():
     with pytest.raises(DatabaseError, match="non-allowlisted"):
         client.update_job("j", "v", {"is_approved": True})
     assert set(config.WRITABLE_JOB_FIELDS) == {"median_hourly_wage", "wage_year", "wage_source_url", "last_synced_at"}
+
+
+def test_cms_drafts_are_excluded_and_explicit_target_is_denied():
+    versions = [
+        {"version_id": "published", "version_number": 1, "status": "published", "published_at": "x"},
+        {"version_id": "cms", "version_number": 2, "status": "draft", "published_at": None, "cms_managed": True},
+    ]
+    source, target = resolve_target(versions, None)
+    assert source["version_id"] == "published" and target is None
+    with pytest.raises(Exception, match="CMS drafts cannot be maintenance targets"):
+        resolve_target(versions, "cms")
+
+
+def test_report_uses_database_allocated_edition_number():
+    class ConcurrentStore(FakeStore):
+        def create_draft_version(self, source, number, summary):
+            result = super().create_draft_version(source, number, summary)
+            result["version_number"] = number + 10
+            self.versions[-1]["version_number"] = number + 10
+            return result
+    report = go(ConcurrentStore(status="published"))
+    assert report.created_version_number == 12
+    assert report.target_version == "12"

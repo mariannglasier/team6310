@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { paths } from '../../../app/paths'
 import { AdminTabs } from '../../../components/admin/AdminTabs'
 import {
   Badge,
@@ -7,7 +6,7 @@ import {
   StatCard,
 } from '../../../components/admin/AdminBits'
 import { formatDate, plural } from '../../../components/admin/format'
-import { Button, ButtonLink } from '../../../components/ui/Button'
+import { Button } from '../../../components/ui/Button'
 import { useAdminContent } from '../../../hooks/useAdminContent'
 import { useStaffAuth } from '../../../state/staffAuthContext'
 import type { AdminContent, AdminEdition } from '../../../types/adminContent'
@@ -16,6 +15,7 @@ import { PersonasPanel } from './PersonasPanel'
 import { ScenariosPanel } from './ScenariosPanel'
 import { ServicesPanel } from './ServicesPanel'
 import { StatisticsPanel } from './StatisticsPanel'
+import { ScenarioWorkspace } from './ScenarioWorkspace'
 import './admin.css'
 
 type TabId = 'scenarios' | 'personas' | 'jobs' | 'statistics' | 'services'
@@ -30,52 +30,57 @@ function latestEdition(editions: readonly AdminEdition[]) {
 export function AdminDashboardPage() {
   const { state: auth, signOut } = useStaffAuth()
   const { state, reload } = useAdminContent()
+  const [workspace, setWorkspace] = useState(false)
+  const [cmsDirty, setCmsDirty] = useState(false)
+  const [openedWorkspace, setOpenedWorkspace] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
 
   return (
     <section className="admin" aria-labelledby="page-heading">
-      <header className="admin-hero">
+      <header className="cms-header">
         <div>
-          <p className="admin-hero__eyebrow">CAC staff</p>
           <h1 id="page-heading" tabIndex={-1}>
             Employee dashboard
           </h1>
-          <p className="admin-hero__lead">
-            A read-only view of the simulation content stored in Supabase.
-          </p>
-        </div>
-        <div className="admin-hero__actions">
           {auth.status === 'staff' && (
-            <p className="admin-hero__user">
+            <p>
               Signed in as <strong>{auth.session.email}</strong>
             </p>
           )}
-          <div className="admin-hero__buttons">
-            <Button
-              variant="secondary"
-              onClick={reload}
-              loading={state.status === 'loading'}
-            >
-              Refresh
-            </Button>
-            <ButtonLink to={paths.home} variant="secondary">
-              Main site
-            </ButtonLink>
-            <Button
-              variant="secondary"
-              loading={signingOut}
-              onClick={() => {
-                setSigningOut(true)
-                void signOut()
-              }}
-            >
-              Sign Out
-            </Button>
-          </div>
+        </div>
+        <div className="cms-choice-actions">
+          <Button
+            variant="secondary"
+            aria-label={workspace ? 'Switch to Viewer' : 'Switch to Editor'}
+            onClick={() => {
+              setOpenedWorkspace(true)
+              setWorkspace(!workspace)
+            }}
+          >
+            {workspace ? 'Viewer' : 'Editor'}
+          </Button>
+          <Button
+            variant="secondary"
+            disabled={cmsDirty}
+            loading={signingOut}
+            onClick={() => {
+              setSigningOut(true)
+              void signOut()
+            }}
+          >
+            Sign Out
+          </Button>
         </div>
       </header>
-
-      {state.status === 'loading' && (
+      {openedWorkspace && state.status === 'ready' && (
+        <div hidden={!workspace}>
+          <ScenarioWorkspace
+            editions={state.content.editions}
+            onDirtyChange={setCmsDirty}
+          />
+        </div>
+      )}
+      {!workspace && state.status === 'loading' && (
         <p className="admin-notice" role="status">
           Loading stored content…
         </p>
@@ -88,7 +93,11 @@ export function AdminDashboardPage() {
           </Button>
         </div>
       )}
-      {state.status === 'ready' && <Overview content={state.content} />}
+      {state.status === 'ready' && (
+        <div hidden={workspace}>
+          <Overview content={state.content} />
+        </div>
+      )}
     </section>
   )
 }

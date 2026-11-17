@@ -234,3 +234,30 @@ button.ui-radio-card:not(:disabled):hover {
   background: #fbebed;
   box-shadow: 0 4px 12px #00000018;
 }
+
+.ui-delete-control {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ui-delete-control:not(:disabled):hover,
+.ui-delete-control:not(:disabled):focus-visible {
+  color: var(--primary);
+  background: transparent;
+}
+.ui-delete-control:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.ui-delete-control:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

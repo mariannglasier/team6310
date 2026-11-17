@@ -3,12 +3,14 @@ import './ui.css'
 
 interface FieldDetails {
   label: string
+  labelAction?: ReactNode
   hint?: string
   error?: string
 }
 function FieldFrame({
   id,
   label,
+  labelAction,
   hint,
   error,
   required,
@@ -16,10 +18,13 @@ function FieldFrame({
 }: FieldDetails & { id: string; required?: boolean; children: ReactNode }) {
   return (
     <div className="ui-field">
-      <label htmlFor={id}>
-        {label}
-        {required && <span> (required)</span>}
-      </label>
+      <div className="ui-field-label">
+        <label htmlFor={id}>
+          {label}
+          {required && <span> (required)</span>}
+        </label>
+        {labelAction}
+      </div>
       {hint && (
         <span className="ui-field__hint" id={`${id}-hint`}>
           {hint}
@@ -48,6 +53,7 @@ function description(
 }
 export function TextField({
   label,
+  labelAction,
   hint,
   error,
   id,
@@ -61,6 +67,7 @@ export function TextField({
     <FieldFrame
       id={fieldId}
       label={label}
+      labelAction={labelAction}
       hint={hint}
       error={error}
       required={required}
@@ -77,6 +84,7 @@ export function TextField({
 }
 export function TextAreaField({
   label,
+  labelAction,
   hint,
   error,
   id,
@@ -90,6 +98,7 @@ export function TextAreaField({
     <FieldFrame
       id={fieldId}
       label={label}
+      labelAction={labelAction}
       hint={hint}
       error={error}
       required={required}
@@ -107,6 +116,7 @@ export function TextAreaField({
 }
 export function SelectField({
   label,
+  labelAction,
   hint,
   error,
   id,
@@ -121,6 +131,7 @@ export function SelectField({
     <FieldFrame
       id={fieldId}
       label={label}
+      labelAction={labelAction}
       hint={hint}
       error={error}
       required={required}

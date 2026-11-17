@@ -80,7 +80,7 @@ class SupabaseClient:
     def list_versions(self) -> list[dict[str, Any]]:
         return self._request(
             "GET", "content_versions",
-            params={"select": "version_id,version_number,status,published_at,created_by", "order": "version_number.desc"},
+            params={"select": "version_id,version_number,status,published_at,created_by,cms_managed", "order": "version_number.desc"},
         )
 
     def list_jobs(self, version_id: str) -> list[dict[str, Any]]:
