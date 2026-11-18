@@ -198,9 +198,19 @@
   border: 1px solid var(--divider);
   border-radius: 0.75rem;
 }
-.employment-placeholder {
-  border-style: dashed;
-  background: var(--accent-surface);
+.scenario-loading {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.bill-decision + .bill-decision {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--divider);
+}
+.bill-decision__due {
+  color: var(--text-muted);
+  font-size: 0.875rem;
 }
 .employment-facts {
   margin-top: 1.5rem;

@@ -21,7 +21,7 @@ Source: user-supplied facts fixes part 2.pdf, approved November 16, 2026. The fo
 | D051 | Added free CAC Adult Education choice and 610-student 2025 fact; training cost/time context. |
 | D053 | Family traditions wording; planned holiday meal / smaller holiday meal. |
 
-New CAC choices have zero balance effect and require CAC-enabled mode. Canopy stock checking does not promise that an item is available. Education choices do not automatically invent new wages or credentials. The coat fact uses CDC cold-exposure guidance rather than claiming cold directly causes pneumonia.
+New CAC choices have zero balance effect and require CAC-enabled mode. Canopy stock checking does not promise that an item is available. Education choices do not automatically invent new wages or credentials. The November 17 correction restores the user's supplied coat fact and other authored passages; see [the correction record](authored-fact-and-bill-corrections.md).
 
 Prices use the original October 2026 baseline and latest validated category observation; they do not compound on each refresh. Source failures block publication. CAC figures retain their 2025 reporting year until an approved annual report replaces them.
 

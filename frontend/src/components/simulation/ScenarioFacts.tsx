@@ -5,6 +5,55 @@ import {
 } from '../../services/scenarioFacts'
 import './scenarioFacts.css'
 
+function statistic(text: string) {
+  return (
+    text.match(/\$[\d,]+(?:\.\d+)?/)?.[0] ??
+    text.match(/\b\d+(?:\.\d+)?%/)?.[0] ??
+    text.match(/\b\d+ in \d+\b/)?.[0] ??
+    text.match(
+      /\b\d[\d,]*(?:\.\d+)? (?:(?:pounds|people|households|children|students|visits|returns|individuals)\b)/,
+    )?.[0] ??
+    null
+  )
+}
+function factSentence(text: string) {
+  const number = statistic(text)
+  if (!number) return text
+  const start = text.indexOf(number)
+  return (
+    <>
+      {text.slice(0, start)}
+      <strong className="scenario-facts__stat">{number}</strong>
+      {text.slice(start + number.length)}
+    </>
+  )
+}
+function factTitle(key: string, text: string) {
+  if (key.startsWith('acs:'))
+    return (
+      (
+        {
+          B23025: 'Work in Sandy Springs',
+          B08303: 'Getting to work',
+          B25070: 'Rent and household income',
+          B27001: 'Access to health insurance',
+          B25048: 'Plumbing and housing',
+          B25010: 'Household size',
+          B08201: 'Household transportation',
+          B17010: 'Family poverty',
+        } as Record<string, string>
+      )[key.split(':')[1]] ?? 'Life in Sandy Springs'
+    )
+  if (key.startsWith('cpi:')) {
+    const subject = text.match(
+      /average price of (.+?) (?:increased|decreased|did not change)/,
+    )?.[1]
+    return subject ? `The price of ${subject}` : 'The cost of everyday needs'
+  }
+  if (key.startsWith('social:')) return 'Food and connection'
+  return 'Community fact'
+}
+
 export function ScenarioFacts({
   runId,
   scenarioId,
@@ -59,19 +108,18 @@ export function ScenarioFacts({
         .filter((fact) => fact.role === 'general' || supportEnabled)
         .sort((a, b) => (a.role === b.role ? 0 : a.role === 'general' ? -1 : 1))
         .map((fact) => (
-          <section className="scenario-facts__card" key={fact.role}>
+          <section
+            className={`scenario-facts__card scenario-facts__card--${fact.role}`}
+            key={fact.role}
+          >
             <h3>
               {fact.role === 'cac'
-                ? 'CAC impact'
+                ? `CAC’s response${fact.text.match(/\b20\d{2}\b/) ? ' in ' + fact.text.match(/\b20\d{2}\b/)![0] : ''}`
                 : fact.copyKind === 'context'
                   ? 'About this decision'
-                  : 'Community fact'}
+                  : factTitle(fact.semanticKey, fact.text)}
             </h3>
-            <p>{fact.text}</p>
-            <a href={fact.sourceUrl} target="_blank" rel="noopener noreferrer">
-              Source
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+            <p>{factSentence(fact.text)}</p>
           </section>
         ))}
     </aside>

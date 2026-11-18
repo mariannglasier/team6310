@@ -158,8 +158,7 @@ it('keeps the scenario description mounted while committed finances and secondar
   await userEvent.click(
     screen.getByRole('button', { name: /Receive assistance/ }),
   )
-  expect(submitScenario).not.toHaveBeenCalled()
-  await userEvent.click(screen.getByRole('button', { name: 'Submit decision' }))
+  expect(submitScenario).toHaveBeenCalledOnce()
   expect(description).toBeInTheDocument()
   const committedRun = { ...run, currentBalance: usdCents(12500) }
   vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
@@ -178,7 +177,7 @@ it('keeps the scenario description mounted while committed finances and secondar
   await waitFor(() => expect(loadScenarioFacts).toHaveBeenCalledOnce())
   expect(screen.getByText(localScenario.description)).toBe(description)
   expect(screen.getByRole('region', { name: 'Ordinary scenario' })).toBe(panel)
-  expect(screen.queryByText('Loading scenario…')).toBeNull()
+  expect(screen.queryByText('Loading…')).toBeNull()
   expect(
     screen.getByRole('button', { name: 'Continue to next day' }),
   ).toBeDisabled()
@@ -241,7 +240,7 @@ it('resolves an income transition to a bill day without rendering a scenario pla
   vi.mocked(submitEmployment).mockReturnValue(advance.promise)
   show(incomeRun)
   await waitFor(() => expect(submitEmployment).toHaveBeenCalledOnce())
-  expect(screen.getByText("Opening today's content…")).toBeVisible()
+  expect(screen.getByText('Loading…')).toBeVisible()
   expect(screen.queryByText('Placeholder')).toBeNull()
   const billRun = {
     ...incomeRun,
@@ -287,7 +286,7 @@ it.each(['bill', 'scenario'] as const)(
       employmentState: { stage: 'day', revision: 2 },
     }
     await act(async () => next.resolve(employment(nextRun)))
-    expect(screen.getByText("Loading today's content…")).toBeVisible()
+    expect(screen.getByText('Loading…')).toBeVisible()
     expect(screen.queryByText('Placeholder')).toBeNull()
     expect(screen.queryByRole('region', { name: 'Bills due today' })).toBeNull()
     if (contentType === 'bill') {
@@ -319,7 +318,7 @@ it.each(['bill', 'scenario'] as const)(
       return
     }
     await act(async () => financial.resolve(bills(nextRun)))
-    expect(await screen.findByText('Loading scenario…')).toBeVisible()
+    expect(await screen.findByText('Loading…')).toBeVisible()
     expect(screen.queryByRole('region', { name: 'Bills due today' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     await act(async () => scenario.resolve(localScenario))
@@ -353,11 +352,10 @@ it('updates an overdue payment and financial indicators without remounting the u
   const description = await screen.findByText(localScenario.description)
   const panel = screen.getByRole('region', { name: 'Ordinary scenario' })
   const choice = screen.getByRole('button', { name: /Decline assistance/ })
-  await userEvent.click(choice)
   const pay = screen.getByRole('button', { name: 'Pay Earlier bill' })
   await userEvent.click(pay)
   expect(pay).toBeDisabled()
-  expect(screen.getByRole('button', { name: 'Submit decision' })).toBeDisabled()
+  expect(choice).toBeDisabled()
   await userEvent.click(pay)
   expect(submitBill).toHaveBeenCalledOnce()
   await act(async () =>
@@ -378,7 +376,7 @@ it('updates an overdue payment and financial indicators without remounting the u
   )
   await waitFor(() =>
     expect(
-      screen.getByRole('button', { name: 'Submit decision' }),
+      screen.getByRole('button', { name: /Decline assistance/ }),
     ).toBeEnabled(),
   )
   expect(screen.getByText(localScenario.description)).toBe(description)
@@ -386,7 +384,7 @@ it('updates an overdue payment and financial indicators without remounting the u
   expect(screen.getByRole('button', { name: /Decline assistance/ })).toBe(
     choice,
   )
-  expect(choice).toHaveAttribute('aria-pressed', 'true')
+  expect(choice).toHaveAttribute('aria-pressed', 'false')
   expect(screen.getByText('$88.00')).toBeVisible()
   expect(screen.getByText('Recorded payments')).toBeVisible()
   expect(screen.getByText('Paid')).toBeVisible()

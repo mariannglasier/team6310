@@ -1,5 +1,13 @@
 # Independent bills — approved November 8, 2026
 
+**November 17 presentation update:** Main bill events show their stored descriptions. Activating Pay or Ignore immediately saves the decision and opens its receipt and facts; there is no separate Submit button. Pending actions remain locked against duplicate activation. Continue remains available after the saved recap. All existing bill finances and departure guards remain in effect.
+
+## Six bill cap approved November 17 2026
+
+New individual runs receive at most six independent bill occurrences across Days 1–30. Keep rent, then select up to five other occurrences evenly across the available due-date order, including the first and last. This gives Jordan six bills instead of twelve and the other households six instead of ten. Keep the original amounts, fees and due dates; omitted bills create no debt. Existing run snapshots and payment history remain intact. This cap concerns independent bills, not ordinary spending decisions. Group shared-expense previews are unchanged.
+
+Implemented in `20261118000000_six_bill_run_cap.sql`, verified through the real start RPC by `supabase/tests/six-bill-cap.sql` and the full individual route regression.
+
 ## Approved behavior
 
 Bills are independent of scenarios. `persona_expenses` defines designer-supplied

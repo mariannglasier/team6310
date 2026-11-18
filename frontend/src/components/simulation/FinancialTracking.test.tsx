@@ -81,9 +81,7 @@ it('derives exact totals and future paydays from the committed history without c
   expect(
     screen.getByLabelText('Payday on Day 24').parentElement,
   ).toHaveTextContent(/^\$$/)
-  expect(
-    screen.getByText(/CAC enrollment status: not a client/),
-  ).toBeInTheDocument()
+  expect(screen.queryByText(/CAC enrollment status/)).not.toBeInTheDocument()
 })
 it('renders balance/day and sorts definitions without claiming generated or paid occurrences', () => {
   render(

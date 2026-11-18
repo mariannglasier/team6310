@@ -4,9 +4,11 @@ import { expect, it, vi } from 'vitest'
 import { DueBillsPanel, OverdueBills } from './BillControls'
 import { usdCents } from '../../types/domain'
 import type { Bill, BillSnapshot } from '../../services/billGameplay'
+vi.mock('./ScenarioFacts', () => ({ ScenarioFacts: () => null }))
 const bill: Bill = {
   id: 'rent',
   name: 'Fixture rent',
+  description: 'Your rent is due. Decide how to handle the bill.',
   principal: usdCents(10000),
   fee: usdCents(500),
   dueDay: 2,
@@ -53,6 +55,8 @@ it('keeps simultaneous bills independent and prevents departure before each is r
   await userEvent.click(
     screen.getByRole('button', { name: 'Ignore Fixture rent' }),
   )
+  expect(action).toHaveBeenCalledOnce()
+  expect(screen.getAllByText(bill.description!)).toHaveLength(2)
   expect(action).toHaveBeenCalledWith('rent', 'ignore')
   expect(
     screen.getByRole('button', { name: 'Continue to next day' }),
@@ -68,10 +72,13 @@ it('keeps simultaneous bills independent and prevents departure before each is r
       onContinue={next}
     />,
   )
-  expect(screen.getByRole('status')).toHaveTextContent('$105.00 outstanding')
+  expect(screen.getByLabelText('Decision receipt')).toHaveTextContent(
+    'STILL OWED$105.00',
+  )
   await userEvent.click(
     screen.getByRole('button', { name: 'Pay Fixture utility' }),
   )
+  expect(action).toHaveBeenCalledTimes(2)
   expect(action).toHaveBeenLastCalledWith('utility', 'pay')
   rerender(
     <DueBillsPanel

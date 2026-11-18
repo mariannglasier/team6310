@@ -26,7 +26,7 @@ export function SimulationResult({
         </Button>
         {cacReplay && (
           <Button variant="secondary" onClick={() => onReplay(true)}>
-            Try again with CAC support
+            Try another mode
           </Button>
         )}
       </div>

@@ -30,7 +30,32 @@ beforeEach(() => {
   load.mockResolvedValue(localScenario)
   restore.mockResolvedValue({ run, decision: null, responseText: null })
 })
-it('selects without changing money and offers Continue only after commit', async () => {
+it('blocks duplicate clicks while a decision is saving and shows no optimistic receipt', async () => {
+  let finish!: (value: unknown) => void
+  submit.mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve
+    }),
+  )
+  render(<ScenarioPanel run={run} onCommit={vi.fn()} onContinue={vi.fn()} />)
+  const choice = await screen.findByRole('button', {
+    name: /Receive assistance/,
+  })
+  await userEvent.dblClick(choice)
+  expect(submit).toHaveBeenCalledOnce()
+  expect(screen.queryByLabelText('Decision receipt')).toBeNull()
+  finish({
+    run,
+    decision: {
+      choiceId: 'receive',
+      balanceAfter: usdCents(22500),
+      balanceChangeApplied: usdCents(2500),
+    },
+    responseText: 'Saved',
+  })
+  expect(await screen.findByLabelText('Decision receipt')).toBeVisible()
+})
+it('commits on choice activation and opens a receipt and facts before Continue', async () => {
   const onCommit = vi.fn(),
     onContinue = vi.fn()
   submit.mockResolvedValue({
@@ -48,17 +73,13 @@ it('selects without changing money and offers Continue only after commit', async
   await userEvent.click(
     await screen.findByRole('button', { name: /Receive assistance/ }),
   )
-  expect(onCommit).not.toHaveBeenCalled()
-  expect(screen.queryByLabelText('Scenario facts')).toBeNull()
-  expect(
-    screen.queryByRole('button', { name: 'Continue to next day' }),
-  ).toBeNull()
-  await userEvent.click(screen.getByRole('button', { name: 'Submit decision' }))
+  expect(onCommit).toHaveBeenCalledOnce()
   expect(
     await screen.findByRole('button', { name: 'Continue to next day' }),
   ).toBeVisible()
   expect(screen.queryByText('Decision recorded')).toBeNull()
-  expect(screen.queryByText('Saved result')).toBeNull()
+  expect(screen.getByText('Saved result')).toBeVisible()
+  expect(screen.getByLabelText('Decision receipt')).toBeVisible()
   expect(screen.getByLabelText('Scenario facts')).toBeVisible()
   expect(
     screen

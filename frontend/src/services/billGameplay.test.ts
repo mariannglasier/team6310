@@ -32,6 +32,8 @@ const raw = () => ({
       playthrough_id: 'run',
       version_id: 'edition',
       name_snapshot: 'Fixture bill',
+      description:
+        'A car repair completed before the month has a bill due today.',
       due_day: 2,
       amount_due: '10.00',
       late_fee_amount: '2.00',
@@ -61,6 +63,9 @@ it('restores one exact financial snapshot without creating or submitting anythin
   expect(result.run.currentBalance).toBe(5000)
   expect(result.items[0].principal).toBe(1000)
   expect(result.items[0].fee).toBe(200)
+  expect(result.items[0].description).toBe(
+    'A car repair completed before the month has a bill due today.',
+  )
   expect(rpc).toHaveBeenCalledExactlyOnceWith('get_bill_snapshot', {
     p_run_id: 'run',
   })

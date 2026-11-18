@@ -12,6 +12,8 @@
 
 ## Required tax scenario and combined VITA fact - November 7, 2026
 
+**November 17 starting-cash adjustment:** Alex now starts new runs with $1,500 instead of $350. Other household starting balances are unchanged. Monthly editions preserve the approved starting-cash setting, and existing runs retain their earlier balances. Twenty no-top-up first-payday trials passed across both support modes; see [the rationale and validation](alex-starting-balance.md).
+
 **Required occurrence - user decision, November 7, 2026:** D005 is mandatory once in every playthrough, in both support modes and for every persona. Reserve a scheduled ordinary-day slot; it must not be omitted by random selection, selected again, or collide with employment events. This supersedes earlier non-scheduled/optional sampling instructions for D005. The exact due day remains to be configured; the earlier Day 18 is a proposal, not a newly approved day. Early-ended runs cannot show later days: they may end before reaching the reserved tax event, but every complete route must include it. Existing early-ending rules are unchanged. If literal display before every possible early ending is required, its placement needs a separate explicit change; no new pre-game event is inferred. Verify exactly-once inclusion, all personas/modes, routing and refresh restoration. This is a documentation requirement; scheduling is not implemented here.
 
 D005 may use one composite CAC fact passage combining return count and federal/state refunds. See [the sourcing record](scenario-data-sourcing.md) for all three observation IDs, reporting scope and total formula. This supersedes any requirement that this single passage have only one underlying observation.

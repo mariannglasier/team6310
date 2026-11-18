@@ -177,6 +177,7 @@ export function buildCatalog(library) {
     bind(`tax:${name}`, amount, "SA0");
   return {
     schemaVersion: 1,
+    startingBalances: { Alex: 1500 },
     refreshPolicy: "monthly-carry-forward-v4",
     rentZipCodes: ["30327", "30328", "30338", "30342", "30346", "30350"],
     revision: "facts-fixes-20261116",

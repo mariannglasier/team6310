@@ -213,14 +213,11 @@ export function FinancialTracking({
                 Weekly income:{' '}
                 {committed ? formatUsd(committed.weeklyIncome) : 'Unavailable'}
               </small>
-              <small className="finance-profile-detail">
-                CAC enrollment status:{' '}
-                {support === null
-                  ? 'Unavailable'
-                  : support
-                    ? 'client of the CAC'
-                    : 'not a client'}
-              </small>
+              {support === true && (
+                <small className="finance-profile-detail">
+                  CAC enrollment status: client of the CAC
+                </small>
+              )}
             </section>
             <section className="finance-money" aria-label="Current balance">
               <span className="finance-label">

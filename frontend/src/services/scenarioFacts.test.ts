@@ -11,6 +11,16 @@ const row = {
   source_url: 'https://www.bls.gov/',
 }
 beforeEach(() => vi.clearAllMocks())
+it('repairs punctuation when reading an older pinned fact edition', async () => {
+  rpc.mockResolvedValue({
+    data: [
+      { ...row, display_text: 'The price isnâ€™t the same for every person.' },
+    ],
+    error: null,
+  })
+  const facts = await loadScenarioFacts('run', 'scenario', 'edition', false)
+  expect(facts[0].text).toBe('The price isn’t the same for every person.')
+})
 it('requests the owned committed recap through the protected RPC', async () => {
   rpc.mockResolvedValue({ data: [row], error: null })
   expect(await loadScenarioFacts('run', 'scenario', 'edition', false)).toEqual([

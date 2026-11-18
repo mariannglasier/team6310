@@ -331,15 +331,13 @@ test('staff browser journey preserves identity, dashboard access, restoration an
     expect(ignored).toBeGreaterThan(0)
     expect(returned).toBe(true)
     await expect(
-      page.getByRole('button', { name: 'Try again with CAC support' }),
+      page.getByRole('button', { name: 'Try another mode' }),
     ).toBeVisible()
     await page.screenshot({
       path: testInfo.outputPath('staff-completed.png'),
       fullPage: true,
     })
-    await page
-      .getByRole('button', { name: 'Try again with CAC support' })
-      .click()
+    await page.getByRole('button', { name: 'Try another mode' }).click()
     const replay = await begin(page)
     expect(replay).not.toBe(id)
     await mutate(

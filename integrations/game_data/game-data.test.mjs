@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { buildCatalog } from "./catalog.mjs";
+import { censusResponse } from "./census-fixture.mjs";
 import {
   monthlyCpi,
   cpiPrice,
@@ -20,8 +21,80 @@ const library = JSON.parse(
 );
 const catalog = buildCatalog(library);
 
+test("keeps the approved starting-cash adjustment scoped to Alex", () => {
+  assert.deepEqual(catalog.startingBalances, { Alex: 1500 });
+});
+
+test("uses the newest complete annual fact pair when the newest month has no prior-year observation", () => {
+  const fact = {
+    template:
+      "Between {base observation period} and {latest observation period}, the average price of household cleaning products {change} by {pct}%.",
+  };
+  assert.equal(
+    cpiFact(fact, [
+      { period: "2026-10", value: 155.744 },
+      { period: "2026-09", value: 154.917 },
+      { period: "2025-09", value: 152.491 },
+    ]),
+    "Between 2025-09 and 2026-09, the average price of household cleaning products increased by 1.6%.",
+  );
+});
+
+test("regular-mode scenario descriptions, facts and choices contain no support-service references or corrupted punctuation", () => {
+  const support =
+    /\bCAC\b|Canopy Thrift|Mini-Market|Coats for Kids|Tools for School|Meals for Kids|Hope for the Holidays|Empowerment Center/i;
+  for (const card of catalog.cards) {
+    const regular = [
+      card.description,
+      ...card.facts.filter((f) => f.role === "general").map((f) => f.text),
+      ...card.choices
+        .filter((c) => !c.requires_cac)
+        .flatMap((c) => [c.text, c.response]),
+    ];
+    for (const text of regular) assert.doesNotMatch(text, support, card.key);
+    for (const fact of card.facts)
+      assert.doesNotMatch(fact.template, /â€|Ã|Â|\uFFFD/, card.key);
+  }
+});
+
+test("preserves supplied fact wording through compilation and monthly refresh", async () => {
+  const authored = JSON.parse(
+    fs.readFileSync(
+      new URL(
+        "../../supabase/content/authored-fact-copy.json",
+        import.meta.url,
+      ),
+    ),
+  );
+  for (const [role, passages] of Object.entries(authored)) {
+    for (const [key, text] of Object.entries(passages)) {
+      const fact = catalog.cards
+        .find((card) => card.key === key)
+        .facts.find((fact) => fact.role === role);
+      assert.equal(fact.template, text);
+    }
+  }
+  const previousCatalog = structuredClone(catalog);
+  previousCatalog.cards.find((card) => card.key === "D039").facts[0].text =
+    "Previously paraphrased copy";
+  const result = await refreshCatalog(
+    catalog,
+    {},
+    {
+      previousCatalog,
+      fetcher: async () => {
+        throw new Error("unavailable");
+      },
+    },
+  );
+  assert.equal(
+    result.catalog.cards.find((card) => card.key === "D039").facts[0].text,
+    authored.general.D039,
+  );
+});
+
 test("applies all requested removals, car access, prices, and CAC alternatives", () => {
-  assert.equal(catalog.cards.length, 51);
+  assert.equal(catalog.cards.length, 50);
   assert.ok(catalog.cards.every((c) => c.intent !== "CAR"));
   assert.ok(
     !catalog.cards.some((c) =>
@@ -33,6 +106,7 @@ test("applies all requested removals, car access, prices, and CAC alternatives",
         "D037",
         "D038",
         "D041",
+        "D052",
         "D057",
         "D060",
       ].includes(c.key),
@@ -106,12 +180,19 @@ test("uses a fixed CPI baseline without compounding and an exact 12-month fact i
   )) {
     const copy = cpiFact({ template: card.generalFact.text }, rows);
     assert.doesNotMatch(copy, /\b(?:index|indices)\b|[{}]/i);
-    assert.match(copy, /higher/);
+    assert.match(copy, /increased by 20.0%/);
+    assert.match(copy, /In the past year, the average price/);
+    assert.doesNotMatch(copy, /Between \d{4}-\d{2}/);
     const falling = cpiFact({ template: card.generalFact.text }, [
       { period: "2026-10", value: 80 },
       { period: "2025-10", value: 100 },
     ]);
-    assert.match(falling, /20.0% lower/);
+    assert.match(falling, /decreased by 20.0%/);
+    const unchanged = cpiFact({ template: card.generalFact.text }, [
+      { period: "2026-10", value: 100 },
+      { period: "2025-10", value: 100 },
+    ]);
+    assert.match(unchanged, /did not change\./);
   }
   assert.throws(() => cpiPrice(60, rows, "2024-10"), /baseline/);
 });
@@ -193,11 +274,7 @@ test("fetches providers, applies source results, and keeps API credentials out o
           ],
         },
       };
-    else if (target.includes("census.gov"))
-      body = [
-        ["NAME", "B23025_003E", "B23025_005E"],
-        ["Sandy Springs city, Georgia", "100", "5"],
-      ];
+    else if (target.includes("census.gov")) return censusResponse(target);
     else throw new Error("Unexpected source");
     return new Response(
       typeof body === "string" ? body : JSON.stringify(body),
@@ -243,7 +320,7 @@ test("fetches providers, applies source results, and keeps API credentials out o
   );
   assert.match(
     result.catalog.cards.find((c) => c.key === "D003").facts[0].text,
-    /5.0%/,
+    /25.0%/,
   );
   assert.deepEqual(result.catalog.refunds, {
     Alex: 989,

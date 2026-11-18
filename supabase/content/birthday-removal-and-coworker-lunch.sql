@@ -1,0 +1,24 @@
+-- Authored content change only; reuse published financial observations.
+BEGIN;
+SELECT set_config('request.jwt.claims','{"role":"service_role"}',true);
+DO $edition$
+DECLARE settings jsonb; cards jsonb:='[]'; c jsonb; choices jsonb; facts jsonb; fresh jsonb:=$lunch${"key":"D046","title":"Packing lunch or buying it?","category":"Food & Nutrition","engine":"ordinary","intent":"EMPLOYED","description":"You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.","choices":[{"key":"D046-PACK","text":"Buy ingredients and pack lunches","response":"You spend less and do the preparation.","requires_cac":false,"amount":-26,"upfront_cost":0},{"key":"D046-BUY","text":"Get lunch out with your coworkers","response":"You got lunch out with your coworkers.","requires_cac":false,"amount":-55,"upfront_cost":0},{"key":"D046-CAC","text":"Get lunch ingredients from the CAC Mini-Market","response":"You received lunch ingredients from the CAC Mini-Market.","requires_cac":true,"amount":0,"upfront_cost":0}],"facts":[{"role":"general","text":"Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.","template":"Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.","semantic_key":"social:shared_meals_connection","copy_kind":"fact","source_url":"https://doi.org/10.1007/s40750-017-0061-4","evidence":"**Player-facing general fact:** “Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.”\n\n**General fact semantic key:** `social:shared_meals_connection`\n\nSource/update: https://doi.org/10.1007/s40750-017-0061-4. Dunbar (2017), Breaking Bread: the Functions of Social Eating. UK national survey; association, not proof that buying lunch causes wellbeing or that packed lunches prevent social contact. User approved this passage without “UK” in the displayed wording on November 17, 2026. Static dated research fact; monthly price bindings remain separate.\n"},{"role":"cac","text":"The CAC Mini-Market helps households obtain groceries, including food to prepare meals. In 2025, it served 7,034 individuals.","template":"The CAC Mini-Market helps households obtain groceries, including food to prepare meals. In 2025, it served 7,034 individuals.","semantic_key":"0a3f963a-b2c5-47d6-8b9d-e0d396da6a66","copy_kind":"fact","source_url":"https://ourcac.org/","evidence":"**Player-facing CAC fact:** “The CAC Mini-Market helps households obtain groceries, including food to prepare meals. In 2025, it served 7,034 individuals.”\n\nSource fact ID `0a3f963a-b2c5-47d6-8b9d-e0d396da6a66`\n\nSource/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.\n\n"}]}$lunch$; vid uuid;
+BEGIN
+ SELECT source_snapshot INTO STRICT settings FROM public.scenario_edition_prices WHERE version_id=(SELECT version_id FROM public.content_versions WHERE status='published' ORDER BY version_number DESC LIMIT 1);
+ FOR c IN SELECT * FROM jsonb_array_elements(settings->'cards') LOOP
+  IF c->>'key'='D052' THEN CONTINUE; END IF;
+  IF c->>'key'='D046' THEN
+   SELECT jsonb_agg(old.value||jsonb_build_object('text',authored.value->'text','response',authored.value->'response')) INTO choices
+   FROM jsonb_array_elements(c->'choices') old JOIN jsonb_array_elements(fresh->'choices') authored ON old.value->>'key'=authored.value->>'key';
+   SELECT jsonb_agg(CASE WHEN old.value->>'role'='general' THEN (SELECT value FROM jsonb_array_elements(fresh->'facts') WHERE value->>'role'='general') ELSE old.value END) INTO facts FROM jsonb_array_elements(c->'facts') old;
+   c:=c||jsonb_build_object('description',fresh->'description','choices',choices,'facts',facts);
+  END IF;
+  cards:=cards||jsonb_build_array(c);
+ END LOOP;
+ settings:=settings||jsonb_build_object('cards',cards,'sourceHash','5191a1eaeacb59c010c9762fe6d293660e82a96acbd9cfe9780f4bc0c9c9ff6b',
+  'bindings',(SELECT jsonb_object_agg(key,value) FROM jsonb_each(settings->'bindings') WHERE key NOT LIKE 'D052-%'),
+  'freshness',(SELECT jsonb_object_agg(key,value) FROM jsonb_each(settings->'freshness') WHERE key NOT LIKE 'D052-%'));
+ vid:=public.publish_scenario_source_edition(settings);
+ UPDATE public.content_versions SET change_summary='Remove D052 Maya birthday; update coworker lunch copy and approved shared-meals fact; preserve prices and Alex starting cash.' WHERE version_id=vid;
+END $edition$;
+COMMIT;

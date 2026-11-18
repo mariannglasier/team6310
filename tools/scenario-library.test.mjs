@@ -25,13 +25,13 @@ test("extracts all authored cards and preserves the three existing gameplay engi
     library.cards.find((c) => c.key === "D005").cacFact.semanticKey,
     "cac:vita:2025:returns_and_refunds",
   );
-  assert.equal(library.cards.length, 51);
+  assert.equal(library.cards.length, 50);
   assert.equal(
     library.cards.filter((c) => c.engine === "employment").length,
     4,
   );
   assert.equal(library.cards.filter((c) => c.engine === "bill").length, 13);
-  assert.equal(library.cards.filter((c) => c.engine === "ordinary").length, 34);
+  assert.equal(library.cards.filter((c) => c.engine === "ordinary").length, 33);
   assert.equal(library.cards.find((c) => c.key === "D005").mandatory, true);
 });
 test("does not convert unresolved tax fee/refund or conditional CAC coverage into a guessed balance", () => {
@@ -55,6 +55,7 @@ test("distinguishes a missing CAC observation from authored fact copy and unreso
         "D037",
         "D038",
         "D041",
+        "D052",
         "D057",
         "D060",
       ].includes(c.key),

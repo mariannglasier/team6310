@@ -211,9 +211,13 @@ export function EmploymentPanel({
         className="employment-controls"
       >
         {state?.stage === 'income' ? (
-          <p role="status">Opening today's content…</p>
+          <p className="scenario-loading" role="status">
+            Loading…
+          </p>
         ) : state?.stage === 'day' && !dayContentReady ? (
-          <p role="status">Loading today's content…</p>
+          <p className="scenario-loading" role="status">
+            Loading…
+          </p>
         ) : skipInterviewDay ? (
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
@@ -247,6 +251,7 @@ export function EmploymentPanel({
           />
         ) : snapshot?.state ? (
           <EmploymentGame
+            loading={pending || automatic}
             recapFacts={
               snapshot.run.versionId ? (
                 <ScenarioFacts

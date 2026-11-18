@@ -8,6 +8,10 @@
 
 ## Purpose and authority
 
+**November 17 interaction and recap update:** The user approved direct activation of individual gameplay choices, including ordinary decisions, bills, job applications and interview clothing. Clicking or keyboard-activating an enabled choice immediately sends its existing protected action; no additional Submit button is shown. Pending actions lock controls and duplicate activations cannot charge twice. A confirmed save opens a receipt recap with the actual signed cash change, chosen option and saved balance. Unpaid bills show cash change separately from debt. Continue remains so players can read general/CAC facts before advancing. Setup selection and staff forms retain their existing confirmation flows. This supersedes earlier separate selection/submission instructions for individual gameplay only.
+
+Recaps use a story/receipt layout on wide screens and stacked paper receipt on mobile. Keep the receipt compact with tight spacing so facts appear higher on the page. General and CAC facts have separate cards, uppercase topic headings and supported numerical observations emphasized inline within the original sentence, without repeating the statistic separately; qualitative facts remain prose without invented numbers. Preserve the complete authored text and source reporting periods. CAC passages remain hidden in regular mode. Use brand red for interactive selection, focus and monetary emphasis; the CAC fact card may use muted green. Exact amounts and statistical values come from saved records.
+
 This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
 
 The experience has a pre-game employment stage followed by Days 1–30. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.
@@ -25,7 +29,7 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Setup confirms the selected household with Start simulation on the household page; there is no Review page or multi-step indicator. CAC support is offered after a completed regular run.
 - Every simulation page (`/simulation/*`) and the Explore Data page (`/data`) sit on the scenic stage: the supplied scenic illustration (`frontend/src/assets/scenic-simulation-background.jpg`) fills only the area between the shared header and footer, behind a white rounded content panel with an inset on every side so the scenery shows around it. The image is decorative (no alt text, no content on it); all text and controls stay on the solid white panel at the design tokens. The header and footer never sit on the image.
 - Setup pages fit one screen: header plus stage fill the viewport, the footer follows below the fold, and the page content scales down uniformly (not below 0.7) to fit without reflowing the layout. Below that scale the panel scrolls instead of shrinking text further.
-- Single-choice card sets use keyboard-operable buttons with `aria-pressed`, one selected option, and visible focus. Selecting a card does not advance the screen or commit a financial decision.
+- Single-choice card sets use keyboard-operable buttons with `aria-pressed` and visible focus. Setup selections remain staged. Individual gameplay choices commit through the server when activated and then open the saved recap.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
 - On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
 
@@ -35,9 +39,9 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 | ------------------ | --------- | ------------------------------------------------------------------- |
 | `primary`          | `#B3261E` | CAC branding, primary buttons, destructive action accents           |
 | `primary-hover`    | `#8F1E18` | Primary button hover/pressed state                                  |
-| `accent`           | `#245F8A` | Selected card borders, data accents, links                          |
-| `accent-hover`     | `#194767` | Accent hover/pressed state                                          |
-| `accent-surface`   | `#EAF2F8` | Selected cards and recap surfaces; use primary text on this surface |
+| `accent`           | `#B3261E` | Interactive emphasis, selected borders and links                     |
+| `accent-hover`     | `#8F1E18` | Accent hover/pressed state                                          |
+| `accent-surface`   | `#F8E9E8` | Light red selection surfaces; use primary text on this surface       |
 | `text`             | `#111111` | Primary text and headings                                           |
 | `text-muted`       | `#595959` | Supporting copy and secondary labels                                |
 | `surface`          | `#FFFFFF` | Cards, header, input surfaces, text on filled red/blue buttons      |
@@ -45,9 +49,9 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 | `border`           | `#767676` | Input and interactive-control boundaries                            |
 | `divider`          | `#D9D9D9` | Decorative separators; not the sole control boundary                |
 | `disabled-surface` | `#E0E0E0` | Disabled buttons, with muted text and disabled semantics            |
-| `focus`            | `#245F8A` | Visible focus ring with a white separation gap on filled controls   |
+| `focus`            | `#B3261E` | Visible focus ring with a white separation gap on filled controls   |
 
-White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a blue border plus a selected label/control; keyboard focus uses a separate outer ring. Charts use blue and red with direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
+White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a red border plus a selected label/control; keyboard focus uses a separate outer ring. Chart palettes remain distinct from interaction highlighting and use direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
 
 ## 1. Landing page
 

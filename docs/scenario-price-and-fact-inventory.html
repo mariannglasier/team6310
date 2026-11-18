@@ -2,12 +2,12 @@
 <style>
 *{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#f3f5f7;color:#17212e;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:36px 24px}h1{font-size:36px;line-height:1.2;margin:0 0 18px}h2{font-size:27px;margin:4px 0 18px}h3{font-size:20px;margin:22px 0 10px}h4{font-size:17px;margin:0 0 10px}p{margin:10px 0}a{color:#165a94}a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid #b42318;outline-offset:3px}.intro{max-width:920px}.filters{background:white;padding:20px;border:1px solid #ccd5dd;border-radius:10px;margin:26px 0 16px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}label{font-weight:650;display:block;font-size:14px}input,select,button{width:100%;font:inherit;padding:10px;border:1px solid #7a8998;border-radius:5px;background:white;color:inherit;margin-top:5px}.tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.tools button{width:auto;cursor:pointer;margin:0}.index{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 26px}.index a{padding:4px 9px;border:1px solid #ccd5dd;border-radius:4px;background:white;text-decoration:none;font-size:14px}article{background:white;padding:28px;border:1px solid #ccd5dd;border-radius:10px;margin:24px 0;scroll-margin-top:20px}.label{text-transform:uppercase;letter-spacing:.04em;font-size:12px;font-weight:700;color:#536478}.situation{font-size:18px}.choice{border-left:4px solid #38779a;background:#f7fafc;padding:18px;margin:14px 0}.amount{font-size:18px}.amount span{display:block;font-size:14px;color:#435568}.facts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}.fact{border:1px solid #cfdae4;padding:20px;border-radius:7px;min-width:0}.fact h3{margin-top:0}.numbers{background:#edf3f7;padding:9px 12px;border-radius:4px}.note{background:#fff7e8;padding:12px 16px;border-left:3px solid #aa6b13}summary{cursor:pointer;font-weight:650;padding:8px 0}details{margin:10px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.65 system-ui,sans-serif;background:#f5f7f9;padding:16px}code{overflow-wrap:anywhere}.source{font-size:13px;overflow-wrap:anywhere}.back{font-size:14px;text-align:right}[hidden]{display:none!important}footer{padding:30px 0;font-size:14px;color:#536478}@media(max-width:750px){main{padding:24px 14px}h1{font-size:29px}article{padding:18px}.facts,.filters{grid-template-columns:1fr}}@media print{body{background:white;font-size:10pt}main{max-width:none;padding:0}.filters,.tools,.index,.back{display:none}article{border:0;border-radius:0;padding:0;margin:20px 0;break-before:page}article:first-of-type{break-before:auto}.facts{display:block}.fact{margin:12px 0;break-inside:avoid}details:not([open]){display:none}.choice{break-inside:avoid}a{color:inherit}}
 </style></head><body><main id="top"><h1>Scenario prices and fact numbers</h1>
-<div class="intro"><p>All 51 logical scenarios, prepared November 16, 2026. Read each situation, its prices and outcomes, and both available fact passages together.</p>
+<div class="intro"><p>All 50 logical scenarios, prepared November 17, 2026. Read each situation, its prices and outcomes, and both available fact passages together.</p>
 <p>The authored draft and checked-in development edition contain different amounts and fact copy. Both are included here. Development amounts are provisional where documented. Unresolved template fields remain visible for API planning. Fact numbers include dates and written quantities, with their full sentences for context.</p>
 <p>This inventory reads local source artifacts. Runtime database wages and household starting balances require a database export. The source fact-verification flags remain false.</p></div>
 <form class="filters" onsubmit="return false"><label>Search scenarios prices facts or sources<input id="search" type="search" placeholder="Try rent, $60, 610, D014, or census"></label><label>Category<select id="category"><option value="">All categories</option><option>Employment &amp; Adult Education</option><option>Financial Literacy &amp; Taxes</option><option>Housing &amp; Utilities</option><option>Essential Goods &amp; Clothing</option><option>Childcare &amp; Youth</option><option>Food &amp; Nutrition</option></select></label><label>Show<select id="status"><option value="">All scenarios</option><option value="pending">Unresolved or missing fact</option><option value="cac">CAC fact available</option><option value="no-cac">CAC fact missing</option><option value="bill">Bill cards</option><option value="employment">Employment cards</option><option value="ordinary">Ordinary cards</option></select></label></form>
-<div class="tools"><p id="count" role="status" aria-live="polite">51 of 51 scenarios</p><button id="expand" type="button">Expand all source notes</button><button id="collapse" type="button">Collapse all source notes</button><button type="button" onclick="window.print()">Print or save as PDF</button></div>
-<nav class="index" aria-label="Jump to scenario"><a href="#D001" title="Looking for work">D001</a><a href="#D002" title="An interview today">D002</a><a href="#D003" title="Back to the job search">D003</a><a href="#D004" title="Another interview">D004</a><a href="#D005" title="Time to file taxes">D005</a><a href="#D006" title="Rent is due">D006</a><a href="#D007" title="Keeping the lights on">D007</a><a href="#D008" title="The water bill">D008</a><a href="#D009" title="Staying connected">D009</a><a href="#D010" title="The internet bill">D010</a><a href="#D011" title="Car insurance is due">D011</a><a href="#D012" title="A clinic bill arrives">D012</a><a href="#D013" title="The childcare bill">D013</a><a href="#D014" title="Maya&#39;s school meal balance">D014</a><a href="#D015" title="The repair bill">D015</a><a href="#D018" title="The gas bill">D018</a><a href="#D019" title="Rent or a cash cushion?">D019</a><a href="#D020" title="A medical bill remains">D020</a><a href="#D021" title="The car will not start">D021</a><a href="#D022" title="An unexpected dental expense">D022</a><a href="#D024" title="A family emergency">D024</a><a href="#D025" title="Childcare falls through">D025</a><a href="#D026" title="Time for new tires">D026</a><a href="#D027" title="Broken work shoes">D027</a><a href="#D028" title="A plumbing problem">D028</a><a href="#D029" title="An unexpected appointment for Maya">D029</a><a href="#D030" title="A broken laptop">D030</a><a href="#D032" title="A larger share to cover">D032</a><a href="#D033" title="A damaged small kitchen appliance">D033</a><a href="#D034" title="A broken dresser">D034</a><a href="#D035" title="Groceries lost">D035</a><a href="#D036" title="A full grocery basket?">D036</a><a href="#D039" title="School Activities">D039</a><a href="#D040" title="Worn-out coat">D040</a><a href="#D042" title="School supplies for Maya">D042</a><a href="#D043" title="A family birthday">D043</a><a href="#D044" title="Getting to an appointment">D044</a><a href="#D045" title="A coat for Maya">D045</a><a href="#D046" title="Packing lunch or buying it?">D046</a><a href="#D047" title="A broken bag">D047</a><a href="#D048" title="Meals for Maya">D048</a><a href="#D049" title="A fee to access your money">D049</a><a href="#D050" title="Running low on essentials">D050</a><a href="#D051" title="A chance to learn">D051</a><a href="#D052" title="Maya&#39;s birthday">D052</a><a href="#D053" title="A holiday meal">D053</a><a href="#D054" title="Clothes need replacing">D054</a><a href="#D055" title="Someone asks for help">D055</a><a href="#D056" title="A holiday gift for Maya">D056</a><a href="#D058" title="Laundry supplies are running low">D058</a><a href="#D059" title="Time with a friend">D059</a></nav>
+<div class="tools"><p id="count" role="status" aria-live="polite">50 of 50 scenarios</p><button id="expand" type="button">Expand all source notes</button><button id="collapse" type="button">Collapse all source notes</button><button type="button" onclick="window.print()">Print or save as PDF</button></div>
+<nav class="index" aria-label="Jump to scenario"><a href="#D001" title="Looking for work">D001</a><a href="#D002" title="An interview today">D002</a><a href="#D003" title="Back to the job search">D003</a><a href="#D004" title="Another interview">D004</a><a href="#D005" title="Time to file taxes">D005</a><a href="#D006" title="Rent is due">D006</a><a href="#D007" title="Keeping the lights on">D007</a><a href="#D008" title="The water bill">D008</a><a href="#D009" title="Staying connected">D009</a><a href="#D010" title="The internet bill">D010</a><a href="#D011" title="Car insurance is due">D011</a><a href="#D012" title="A clinic bill arrives">D012</a><a href="#D013" title="The childcare bill">D013</a><a href="#D014" title="Maya&#39;s school meal balance">D014</a><a href="#D015" title="The repair bill">D015</a><a href="#D018" title="The gas bill">D018</a><a href="#D019" title="Rent or a cash cushion?">D019</a><a href="#D020" title="A medical bill remains">D020</a><a href="#D021" title="The car will not start">D021</a><a href="#D022" title="An unexpected dental expense">D022</a><a href="#D024" title="A family emergency">D024</a><a href="#D025" title="Childcare falls through">D025</a><a href="#D026" title="Time for new tires">D026</a><a href="#D027" title="Broken work shoes">D027</a><a href="#D028" title="A plumbing problem">D028</a><a href="#D029" title="An unexpected appointment for Maya">D029</a><a href="#D030" title="A broken laptop">D030</a><a href="#D032" title="A larger share to cover">D032</a><a href="#D033" title="A damaged small kitchen appliance">D033</a><a href="#D034" title="A broken dresser">D034</a><a href="#D035" title="Groceries lost">D035</a><a href="#D036" title="A full grocery basket?">D036</a><a href="#D039" title="School Activities">D039</a><a href="#D040" title="Worn-out coat">D040</a><a href="#D042" title="School supplies for Maya">D042</a><a href="#D043" title="A family birthday">D043</a><a href="#D044" title="Getting to an appointment">D044</a><a href="#D045" title="A coat for Maya">D045</a><a href="#D046" title="Packing lunch or buying it?">D046</a><a href="#D047" title="A broken bag">D047</a><a href="#D048" title="Meals for Maya">D048</a><a href="#D049" title="A fee to access your money">D049</a><a href="#D050" title="Running low on essentials">D050</a><a href="#D051" title="A chance to learn">D051</a><a href="#D053" title="A holiday meal">D053</a><a href="#D054" title="Clothes need replacing">D054</a><a href="#D055" title="Someone asks for help">D055</a><a href="#D056" title="A holiday gift for Maya">D056</a><a href="#D058" title="Laundry supplies are running low">D058</a><a href="#D059" title="Time with a friend">D059</a></nav>
 <article id="D001" data-category="Employment &amp; Adult Education" data-engine="employment" data-pending="true" data-cac="true">
     <header><p class="label">Employment &amp; Adult Education · ALL · employment</p><h2>D001 Looking for work</h2></header>
     <p class="situation">You need work, and money is tight. Look through the job postings and decide where to apply.</p>
@@ -117,13 +117,13 @@ Source: S18/S19; fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`; service `adult_
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>An interview can bring hope and another expense when you need something to wear. Between {base observation period} and {latest observation period}, U.S. prices for apparel were {pct}% {direction}.</p>
+      <p>An interview can bring hope and another expense when you need something to wear. In the past year, the average price of apparel {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SAA</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. Between {base observation period} and {latest observation period}, U.S. prices for apparel were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. In the past year, the average price of apparel {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SAA`
 
@@ -167,7 +167,7 @@ Source: S18/S19; fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`; service `canopy
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. Between {base observation period} and {latest observation period}, U.S. prices for apparel were {pct}% {direction}.”
+**Player-facing general fact template:** “An interview can bring hope and another expense when you need something to wear. In the past year, the average price of apparel {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SAA`
 
@@ -197,31 +197,31 @@ Source: S18/S19; fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`; service `canopy
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs civilian labor-force participants were unemployed.</p>
-      <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
+      <p>After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs residents age 16 and older were not in the labor force.</p>
+      <p class="numbers"><b>Numbers</b> 16</p>
       <p><b>Unresolved fields</b> {period} · {pct}</p>
-      <p><b>Data binding</b> <code>acs:B23025:unemployment_reapplication</code></p>
+      <p><b>Data binding</b> <code>acs:B23025:not_in_labor_force</code></p>
     </details>
     <p class="source"><a href="https://api.census.gov/data/2024/acs/acs5/groups/B23025.json" target="_blank" rel="noopener noreferrer">https://api.census.gov/data/2024/acs/acs5/groups/B23025.json</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs civilian labor-force participants were unemployed.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs residents age 16 and older were not in the labor force.”
 
-**General fact semantic key:** `acs:B23025:unemployment_reapplication`
+**General fact semantic key:** `acs:B23025:not_in_labor_force`
 
-Source/update: https://api.census.gov/data/2024/acs/acs5/groups/B23025.json. Annual ACS 5-year unemployment estimate, B23025_005E / B23025_003E, Georgia place 68516. Refreshed monthly when a new annual release becomes available. Approved revision from facts fixes.docx, November 15, 2026.
+Source/update: https://api.census.gov/data/2024/acs/acs5/groups/B23025.json. Annual ACS five-year not-in-labor-force estimate, B23025_007E / B23025_001E, Georgia place 68516. Refreshed monthly when a new annual release becomes available. Approved revision from facts fixes.docx, November 15, 2026.
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Career support connects with the effort of finding your next opportunity. In 2025, The Empowerment Center&#39;s Career Services helped 229 people.</p>
+    <p>Career support connects with the effort of finding your next opportunity. In 2025, the Empowerment Center&#39;s Career Services helped 229 people.</p>
     <p class="numbers"><b>Numbers</b> 2025, · 229</p>
     <p><b>Snapshot measure</b> people helped by Career Services<br><b>Value</b> 229 Number<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>Career support connects with the effort of finding your next opportunity. In 2025, The Empowerment Center&#39;s Career Services helped 229 people.</p>
+      <p>Career support connects with the effort of finding your next opportunity. In 2025, the Empowerment Center&#39;s Career Services helped 229 people.</p>
       <p class="numbers"><b>Numbers</b> 2025, · 229</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>db12c137-fad7-4277-b4ca-6a203b344e38</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact template:** “Career support connects with the effort of finding your next opportunity. In 2025, The Empowerment Center&#39;s Career Services helped 229 people.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact template:** “Career support connects with the effort of finding your next opportunity. In 2025, the Empowerment Center&#39;s Career Services helped 229 people.”
 
 Source: S18/S19; fact ID `db12c137-fad7-4277-b4ca-6a203b344e38`; service `career_services`; key `people_helped_by_career_services`; reporting year 2025; exact stored value `229` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Reapplying after an unsuccessful interview is directly relevant to career support. Context only; retain no CAC choice and no automatic job placement.
 
@@ -245,15 +245,15 @@ Source: S18/S19; fact ID `db12c137-fad7-4277-b4ca-6a203b344e38`; service `career
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs civilian labor-force participants were unemployed.”
+**Player-facing general fact template:** “After an unsuccessful interview, the search continues. In {period}, {pct}% of Sandy Springs residents age 16 and older were not in the labor force.”
 
-**General fact semantic key:** `acs:B23025:unemployment_reapplication`
+**General fact semantic key:** `acs:B23025:not_in_labor_force`
 
-Source/update: https://api.census.gov/data/2024/acs/acs5/groups/B23025.json. Annual ACS 5-year unemployment estimate, B23025_005E / B23025_003E, Georgia place 68516. Refreshed monthly when a new annual release becomes available. Approved revision from facts fixes.docx, November 15, 2026.
+Source/update: https://api.census.gov/data/2024/acs/acs5/groups/B23025.json. Annual ACS five-year not-in-labor-force estimate, B23025_007E / B23025_001E, Georgia place 68516. Refreshed monthly when a new annual release becomes available. Approved revision from facts fixes.docx, November 15, 2026.
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact template:** “Career support connects with the effort of finding your next opportunity. In 2025, The Empowerment Center&#39;s Career Services helped 229 people.”
+**Player-facing CAC fact template:** “Career support connects with the effort of finding your next opportunity. In 2025, the Empowerment Center&#39;s Career Services helped 229 people.”
 
 Source: S18/S19; fact ID `db12c137-fad7-4277-b4ca-6a203b344e38`; service `career_services`; key `people_helped_by_career_services`; reporting year 2025; exact stored value `229` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Reapplying after an unsuccessful interview is directly relevant to career support. Context only; retain no CAC choice and no automatic job placement.</pre></details>
     <p class="back"><a href="#top">Back to search</a></p></article>
@@ -472,13 +472,13 @@ Source/update: https://www.irs.gov/tax-professionals/eitc-central/statistics-for
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households spent at least 30% of their income on gross rent.</p>
+      <p>When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households with a reported rent-to-income ratio spent at least 30% of their income on gross rent.</p>
       <p class="numbers"><b>Numbers</b> 30%</p>
       <p><b>Unresolved fields</b> {period} · {pct}</p>
       <p><b>Data binding</b> <code>acs:B25070:rent_burden</code></p>
     </details>
     <p class="source"><a href="https://api.census.gov/data/2024/acs/acs5/groups.html" target="_blank" rel="noopener noreferrer">https://api.census.gov/data/2024/acs/acs5/groups.html</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households spent at least 30% of their income on gross rent.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households with a reported rent-to-income ratio spent at least 30% of their income on gross rent.”
 
 **General fact semantic key:** `acs:B25070:rent_burden`
 
@@ -524,7 +524,7 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households spent at least 30% of their income on gross rent.”
+**Player-facing general fact template:** “When rent comes due, keeping a roof over your head can leave less for everything else. In {period}, {pct}% of Sandy Springs renter households with a reported rent-to-income ratio spent at least 30% of their income on gross rent.”
 
 **General fact semantic key:** `acs:B25070:rent_burden`
 
@@ -652,13 +652,13 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A water bill is another essential expense competing for the money you have. Between {base observation period} and {latest observation period}, U.S. prices for water and sewerage maintenance were {pct}% {direction}.</p>
+      <p>A water bill is another essential expense competing for the money you have. In the past year, the average price of water and sewerage maintenance {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEHG01</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. Between {base observation period} and {latest observation period}, U.S. prices for water and sewerage maintenance were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. In the past year, the average price of water and sewerage maintenance {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHG01`
 
@@ -704,7 +704,7 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. Between {base observation period} and {latest observation period}, U.S. prices for water and sewerage maintenance were {pct}% {direction}.”
+**Player-facing general fact template:** “A water bill is another essential expense competing for the money you have. In the past year, the average price of water and sewerage maintenance {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHG01`
 
@@ -734,17 +734,17 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
     <details><summary>Price baseline and source notes</summary><p>User-approved USD 100.00 starting monthly phone cost. Update using wireless services CPI CUUR0000SEED03. Keep the doxo ranking explicitly dated 2026.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · context</p>
-    <p>A phone connection can be essential for keeping up with work, family and daily responsibilities.</p>
+    <p>A phone connection can be mandatory for keeping up with work, family and daily responsibilities.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A phone connection can be essential for keeping up with work, family and daily responsibilities. A 2026 doxo analysis ranked mobile phone service as the second most common household bill, behind electricity. Between {base observation period} and {latest observation period}, U.S. wireless telephone service prices were {pct}% {direction}.</p>
-      <p class="numbers"><b>Numbers</b> 2026 · second</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p>A phone connection can be mandatory for keeping up with work, family and daily responsibilities. It is the second most common household bill, surpassed only by electricity. In the past year, the average price of wireless telephone services {change} by {pct}%.</p>
+      <p class="numbers"><b>Numbers</b> second</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEED03</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p><p class="source"><a href="https://www.telecompetitor.com/u-s-households-pay-1200-per-year-for-mobile-phone-service-on-average/" target="_blank" rel="noopener noreferrer">https://www.telecompetitor.com/u-s-households-pay-1200-per-year-for-mobile-phone-service-on-average/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A phone connection can be essential for keeping up with work, family and daily responsibilities. A 2026 doxo analysis ranked mobile phone service as the second most common household bill, behind electricity. Between {base observation period} and {latest observation period}, U.S. wireless telephone service prices were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A phone connection can be mandatory for keeping up with work, family and daily responsibilities. It is the second most common household bill, surpassed only by electricity. In the past year, the average price of wireless telephone services {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEED03`
 
@@ -752,17 +752,17 @@ Source/update: https://www.bls.gov/cpi/additional-resources/index-publication-le
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Bills can add up and strain the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.</p>
+    <p>Bills can start to add up and cause stress for the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.</p>
     <p class="numbers"><b>Numbers</b> 2025, · 1,108</p>
     <p><b>Snapshot measure</b> evictions prevented<br><b>Value</b> 1108 Number<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>Bills can add up and strain the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.</p>
+      <p>Bills can start to add up and cause stress for the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.</p>
       <p class="numbers"><b>Numbers</b> 2025, · 1,108</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>5fa2bac7-6016-4db8-b705-fc593f6b75ec</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Bills can add up and strain the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Bills can start to add up and cause stress for the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.”
 
 Source fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`
 
@@ -791,7 +791,7 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. evictions prev
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A phone connection can be essential for keeping up with work, family and daily responsibilities. A 2026 doxo analysis ranked mobile phone service as the second most common household bill, behind electricity. Between {base observation period} and {latest observation period}, U.S. wireless telephone service prices were {pct}% {direction}.”
+**Player-facing general fact template:** “A phone connection can be mandatory for keeping up with work, family and daily responsibilities. It is the second most common household bill, surpassed only by electricity. In the past year, the average price of wireless telephone services {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEED03`
 
@@ -799,7 +799,7 @@ Source/update: https://www.bls.gov/cpi/additional-resources/index-publication-le
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** “Bills can add up and strain the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.”
+**Player-facing CAC fact:** “Bills can start to add up and cause stress for the money needed to keep a home. In 2025, CAC reported preventing evictions for 1,108 households.”
 
 Source fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`
 
@@ -913,17 +913,17 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
     <details><summary>Price baseline and source notes</summary><p>All four personas own a car. Retain USD 130.00 insurance baseline and update through motor vehicle insurance CPI CUUR0000SETE.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Car insurance costs vary. Consumer Federation of America research describes how factors such as homeownership, education, occupation and credit history can raise costs for lower-income consumers.</p>
+    <p>The price of car insurance isn’t the same for every person. Factors for higher costs can include being a home renter, having less education, being a blue-collar worker, or having a lower credit score, factors that disproportionately affect lower-income individuals.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Car insurance costs vary. Consumer Federation of America research describes how factors such as homeownership, education, occupation and credit history can raise costs for lower-income consumers.</p>
+      <p>The price of car insurance isn’t the same for every person. Factors for higher costs can include being a home renter, having less education, being a blue-collar worker, or having a lower credit score, factors that disproportionately affect lower-income individuals.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>insurance:non_driving_rating_factors</code></p>
     </details>
     <p class="source"><a href="https://consumerfed.org/news/testimony-comments/auto-insurance-rating-factors-and-their-effect-on-different-demographics-of-consumers/" target="_blank" rel="noopener noreferrer">https://consumerfed.org/news/testimony-comments/auto-insurance-rating-factors-and-their-effect-on-different-demographics-of-consumers/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Car insurance costs vary. Consumer Federation of America research describes how factors such as homeownership, education, occupation and credit history can raise costs for lower-income consumers.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “The price of car insurance isn’t the same for every person. Factors for higher costs can include being a home renter, having less education, being a blue-collar worker, or having a lower credit score, factors that disproportionately affect lower-income individuals.”
 
 **General fact semantic key:** `insurance:non_driving_rating_factors`
 
@@ -968,7 +968,7 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Car insurance costs vary. Consumer Federation of America research describes how factors such as homeownership, education, occupation and credit history can raise costs for lower-income consumers.”
+**Player-facing general fact:** “The price of car insurance isn’t the same for every person. Factors for higher costs can include being a home renter, having less education, being a blue-collar worker, or having a lower credit score, factors that disproportionately affect lower-income individuals.”
 
 **General fact semantic key:** `insurance:non_driving_rating_factors`
 
@@ -1101,17 +1101,17 @@ Source/update: S31, [Federal Reserve: Living Arrangements and Care Work](https:/
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>The costs of raising a child extend beyond a care program. CAC offers Coats for Kids and Tools for School to help families cover clothing and school supplies. In 2025, Coats for Kids served 623 children.</p>
+    <p>Often, childcare costs do not end at the price for a care program. The CAC offers free coats for kids and school supply bags to help families when the costs start to add up. In 2025, Coats for Kids served 623 children.</p>
     <p class="numbers"><b>Numbers</b> 2025, · 623</p>
     <p><b>Snapshot measure</b> children served by Coats for Kids<br><b>Value</b> 623 Number<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>The costs of raising a child extend beyond a care program. CAC offers Coats for Kids and Tools for School to help families cover clothing and school supplies. In 2025, Coats for Kids served 623 children.</p>
+      <p>Often, childcare costs do not end at the price for a care program. The CAC offers free coats for kids and school supply bags to help families when the costs start to add up. In 2025, Coats for Kids served 623 children.</p>
       <p class="numbers"><b>Numbers</b> 2025, · 623</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>e8473e58-6338-4855-93be-7608f27696ab</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “The costs of raising a child extend beyond a care program. CAC offers Coats for Kids and Tools for School to help families cover clothing and school supplies. In 2025, Coats for Kids served 623 children.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Often, childcare costs do not end at the price for a care program. The CAC offers free coats for kids and school supply bags to help families when the costs start to add up. In 2025, Coats for Kids served 623 children.”
 
 Source fact ID `e8473e58-6338-4855-93be-7608f27696ab`
 
@@ -1148,7 +1148,7 @@ Source/update: S31, [Federal Reserve: Living Arrangements and Care Work](https:/
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** “The costs of raising a child extend beyond a care program. CAC offers Coats for Kids and Tools for School to help families cover clothing and school supplies. In 2025, Coats for Kids served 623 children.”
+**Player-facing CAC fact:** “Often, childcare costs do not end at the price for a care program. The CAC offers free coats for kids and school supply bags to help families when the costs start to add up. In 2025, Coats for Kids served 623 children.”
 
 Source fact ID `e8473e58-6338-4855-93be-7608f27696ab`
 
@@ -1172,17 +1172,17 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. children serve
     <details><summary>Price baseline and source notes</summary><p>Use the published elementary lunch rate times 20 school days. Checked November 15, 2026: USD 3.10 per lunch and USD 62.00 per month for 2026-2027. The $62 baseline now updates through the BLS all-items CPI API, CUUR0000SA0. The school page documents the initial rate.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>School meal programs help improve children’s diets and reduce hunger, supporting their health and readiness to learn. The National School Lunch Program provides eligible students with free or reduced-price meals.</p>
+    <p>Studies have demonstrated that school meal programs play an important role in overall student health and academic achievement by improving children’s diets and combatting hunger. The National School Lunch Program helps students have free or reduced-price meals.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>School meal programs help improve children’s diets and reduce hunger, supporting their health and readiness to learn. The National School Lunch Program provides eligible students with free or reduced-price meals.</p>
+      <p>Studies have demonstrated that school meal programs play an important role in overall student health and academic achievement by improving children’s diets and combatting hunger. The National School Lunch Program helps students have free or reduced-price meals.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>school:nslp:nutrition_and_learning</code></p>
     </details>
     <p class="source"><a href="https://www.fns.usda.gov/nslp" target="_blank" rel="noopener noreferrer">https://www.fns.usda.gov/nslp</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “School meal programs help improve children’s diets and reduce hunger, supporting their health and readiness to learn. The National School Lunch Program provides eligible students with free or reduced-price meals.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Studies have demonstrated that school meal programs play an important role in overall student health and academic achievement by improving children’s diets and combatting hunger. The National School Lunch Program helps students have free or reduced-price meals.”
 
 **General fact semantic key:** `school:nslp:nutrition_and_learning`
 
@@ -1190,17 +1190,17 @@ Source/update: https://www.fns.usda.gov/nslp.  Approved revision from facts fixe
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Children still need meals when school closes for the summer. In 2025, Meals for Kids served 1,097 children.</p>
+    <p>Students still need meals even when they are not in school during the summer. In 2025, Meals for Kids served 1,097 children.</p>
     <p class="numbers"><b>Numbers</b> 2025, · 1,097</p>
     <p><b>Snapshot measure</b> children served by Meals for Kids<br><b>Value</b> 1097 Number<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>Children still need meals when school closes for the summer. In 2025, Meals for Kids served 1,097 children.</p>
+      <p>Students still need meals even when they are not in school during the summer. In 2025, Meals for Kids served 1,097 children.</p>
       <p class="numbers"><b>Numbers</b> 2025, · 1,097</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Children still need meals when school closes for the summer. In 2025, Meals for Kids served 1,097 children.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Students still need meals even when they are not in school during the summer. In 2025, Meals for Kids served 1,097 children.”
 
 Source fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`
 
@@ -1229,7 +1229,7 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. children serve
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “School meal programs help improve children’s diets and reduce hunger, supporting their health and readiness to learn. The National School Lunch Program provides eligible students with free or reduced-price meals.”
+**Player-facing general fact:** “Studies have demonstrated that school meal programs play an important role in overall student health and academic achievement by improving children’s diets and combatting hunger. The National School Lunch Program helps students have free or reduced-price meals.”
 
 **General fact semantic key:** `school:nslp:nutrition_and_learning`
 
@@ -1237,7 +1237,7 @@ Source/update: https://www.fns.usda.gov/nslp.  Approved revision from facts fixe
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** “Children still need meals when school closes for the summer. In 2025, Meals for Kids served 1,097 children.”
+**Player-facing CAC fact:** “Students still need meals even when they are not in school during the summer. In 2025, Meals for Kids served 1,097 children.”
 
 Source fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`
 
@@ -1265,13 +1265,13 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. children serve
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A repair bill can keep taking up space in your budget after the car is back on the road. Between {base observation period} and {latest observation period}, U.S. prices for motor vehicle repair were {pct}% {direction}.</p>
+      <p>A repair bill can keep taking up space in your budget after the car is back on the road. In the past year, the average price of motor vehicle repair {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SETD03</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. Between {base observation period} and {latest observation period}, U.S. prices for motor vehicle repair were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. In the past year, the average price of motor vehicle repair {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SETD03`
 
@@ -1316,7 +1316,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. Between {base observation period} and {latest observation period}, U.S. prices for motor vehicle repair were {pct}% {direction}.”
+**Player-facing general fact template:** “A repair bill can keep taking up space in your budget after the car is back on the road. In the past year, the average price of motor vehicle repair {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SETD03`
 
@@ -1440,17 +1440,17 @@ Source: S18/S19; fact ID `5fa2bac7-6016-4db8-b705-fc593f6b75ec`; service `evicti
     <details><summary>Price baseline and source notes</summary><p>Uses the same RentCast rent-cost binding as D006 and creates no duplicate rent occurrence. The educational fact now describes the dated Atlanta disparity study.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Lower-cost housing can become harder to afford even when a household’s income changes little. A 2025 Atlanta study reported that rents for low-wage renters rose up to nine times as fast as rents for high earners.</p>
-    <p class="numbers"><b>Numbers</b> 2025 · nine</p>
+    <p>Rents in lower-cost, unsubsidized &quot;workforce housing&quot; sectors have risen sharply, with a recent study showing rents for low-wage Atlantans increasing up to nine times faster than rents for high earners.</p>
+    <p class="numbers"><b>Numbers</b> nine</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Lower-cost housing can become harder to afford even when a household’s income changes little. A 2025 Atlanta study reported that rents for low-wage renters rose up to nine times as fast as rents for high earners.</p>
-      <p class="numbers"><b>Numbers</b> 2025 · nine</p>
+      <p>Rents in lower-cost, unsubsidized &quot;workforce housing&quot; sectors have risen sharply, with a recent study showing rents for low-wage Atlantans increasing up to nine times faster than rents for high earners.</p>
+      <p class="numbers"><b>Numbers</b> nine</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>housing:atlanta:unequal_rent_growth</code></p>
     </details>
     <p class="source"><a href="https://www.ajc.com/news/2025/11/study-rents-for-low-wage-atlantans-rose-9-times-faster-than-for-high-earners/" target="_blank" rel="noopener noreferrer">https://www.ajc.com/news/2025/11/study-rents-for-low-wage-atlantans-rose-9-times-faster-than-for-high-earners/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Lower-cost housing can become harder to afford even when a household’s income changes little. A 2025 Atlanta study reported that rents for low-wage renters rose up to nine times as fast as rents for high earners.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Rents in lower-cost, unsubsidized &quot;workforce housing&quot; sectors have risen sharply, with a recent study showing rents for low-wage Atlantans increasing up to nine times faster than rents for high earners.”
 
 **General fact semantic key:** `housing:atlanta:unequal_rent_growth`
 
@@ -1496,7 +1496,7 @@ Source: S18/S19; fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`; service `financ
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Lower-cost housing can become harder to afford even when a household’s income changes little. A 2025 Atlanta study reported that rents for low-wage renters rose up to nine times as fast as rents for high earners.”
+**Player-facing general fact:** “Rents in lower-cost, unsubsidized &quot;workforce housing&quot; sectors have risen sharply, with a recent study showing rents for low-wage Atlantans increasing up to nine times faster than rents for high earners.”
 
 **General fact semantic key:** `housing:atlanta:unequal_rent_growth`
 
@@ -1549,17 +1549,17 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Medical bills can put pressure on the money a household needs for housing. In 2025, CAC provided $796,416.64 in financial assistance to prevent homelessness, helping people stay housed during financial crises.</p>
+    <p>Medical bills are a common cause of sudden financial crisis. In 2025, CAC contributed $796,416.64 to prevent homelessness, helping people stay safe and sheltered during times of crisis.</p>
     <p class="numbers"><b>Numbers</b> 2025, · $796,416.64</p>
     <p><b>Snapshot measure</b> total financial assistance amount to prevent homelessness<br><b>Value</b> 796416.64 Dollars<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>Medical bills can put pressure on the money a household needs for housing. In 2025, CAC provided $796,416.64 in financial assistance to prevent homelessness, helping people stay housed during financial crises.</p>
+      <p>Medical bills are a common cause of sudden financial crisis. In 2025, CAC contributed $796,416.64 to prevent homelessness, helping people stay safe and sheltered during times of crisis.</p>
       <p class="numbers"><b>Numbers</b> 2025, · $796,416.64</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>b697ae84-1fd2-4bae-83da-7a10c983ac24</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Medical bills can put pressure on the money a household needs for housing. In 2025, CAC provided $796,416.64 in financial assistance to prevent homelessness, helping people stay housed during financial crises.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Medical bills are a common cause of sudden financial crisis. In 2025, CAC contributed $796,416.64 to prevent homelessness, helping people stay safe and sheltered during times of crisis.”
 
 Source fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`
 
@@ -1601,7 +1601,7 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** “Medical bills can put pressure on the money a household needs for housing. In 2025, CAC provided $796,416.64 in financial assistance to prevent homelessness, helping people stay housed during financial crises.”
+**Player-facing CAC fact:** “Medical bills are a common cause of sudden financial crisis. In 2025, CAC contributed $796,416.64 to prevent homelessness, helping people stay safe and sheltered during times of crisis.”
 
 Source fact ID `b697ae84-1fd2-4bae-83da-7a10c983ac24`
 
@@ -1625,17 +1625,17 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. total financia
     <details><summary>Price baseline and source notes</summary><p>Repair USD 620.00 follows motor vehicle maintenance CPI. The alternative explicitly buys the posted MARTA 30-day pass, currently USD 95.00, used as an initial baseline and updated through the BLS all-items CPI API, CUUR0000SA0.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Reliable transit can help workers reach jobs. Urban Institute research describes how transportation barriers limit access to employment for workers with low incomes.</p>
+    <p>A lack of reliable transit cuts low-income workers off from the majority of the region&#39;s employment opportunities, worsening unemployment and limiting upward mobility.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Reliable transit can help workers reach jobs. Urban Institute research describes how transportation barriers limit access to employment for workers with low incomes.</p>
+      <p>A lack of reliable transit cuts low-income workers off from the majority of the region&#39;s employment opportunities, worsening unemployment and limiting upward mobility.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>transit:access_to_employment</code></p>
     </details>
     <p class="source"><a href="https://www.urban.org/urban-wire/how-commuters-low-incomes-use-public-transit-and-how-one-city-expanded-ridership" target="_blank" rel="noopener noreferrer">https://www.urban.org/urban-wire/how-commuters-low-incomes-use-public-transit-and-how-one-city-expanded-ridership</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Reliable transit can help workers reach jobs. Urban Institute research describes how transportation barriers limit access to employment for workers with low incomes.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “A lack of reliable transit cuts low-income workers off from the majority of the region&#39;s employment opportunities, worsening unemployment and limiting upward mobility.”
 
 **General fact semantic key:** `transit:access_to_employment`
 
@@ -1678,7 +1678,7 @@ Source/update: https://www.urban.org/urban-wire/how-commuters-low-incomes-use-pu
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Reliable transit can help workers reach jobs. Urban Institute research describes how transportation barriers limit access to employment for workers with low incomes.”
+**Player-facing general fact:** “A lack of reliable transit cuts low-income workers off from the majority of the region&#39;s employment opportunities, worsening unemployment and limiting upward mobility.”
 
 **General fact semantic key:** `transit:access_to_employment`
 
@@ -1965,13 +1965,13 @@ Source/update: S32, [Census: childcare challenges](https://www.census.gov/librar
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>New tires are another expense to weigh against keeping the car available. Between {base observation period} and {latest observation period}, U.S. prices for tires were {pct}% {direction}.</p>
+      <p>New tires are another expense to weigh against keeping the car available. In the past year, the average price of tires {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SETC01</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. Between {base observation period} and {latest observation period}, U.S. prices for tires were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. In the past year, the average price of tires {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SETC01`
 
@@ -2014,7 +2014,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. Between {base observation period} and {latest observation period}, U.S. prices for tires were {pct}% {direction}.”
+**Player-facing general fact template:** “New tires are another expense to weigh against keeping the car available. In the past year, the average price of tires {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SETC01`
 
@@ -2052,17 +2052,17 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
     <details><summary>Price baseline and source notes</summary><p>Replaced eyeglasses with work shoes. Approved starting replacement USD 90.00 and assumed repair USD 25.00 follow footwear CPI CUUR0000SEAE. Deferral and eligible Canopy Thrift credits have zero cash cost.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Lower-quality clothing can wear out quickly. Replacing worn-out items repeatedly can strain a limited budget, even when each purchase seems inexpensive.</p>
+    <p>With the rise of fast fashion manufacturing, many clothing items are lower quality and break after fewer wears. Low-income consumers can become trapped in a costly cycle of constantly replacing worn-out clothes.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Lower-quality clothing can wear out quickly. Replacing worn-out items repeatedly can strain a limited budget, even when each purchase seems inexpensive.</p>
+      <p>With the rise of fast fashion manufacturing, many clothing items are lower quality and break after fewer wears. Low-income consumers can become trapped in a costly cycle of constantly replacing worn-out clothes.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>clothing:quality_and_replacement_cost</code></p>
     </details>
     <p class="source"><a href="https://prospect.org/2025/08/29/2025-08-29-how-fast-fashion-keeps-people-poor/" target="_blank" rel="noopener noreferrer">https://prospect.org/2025/08/29/2025-08-29-how-fast-fashion-keeps-people-poor/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Lower-quality clothing can wear out quickly. Replacing worn-out items repeatedly can strain a limited budget, even when each purchase seems inexpensive.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “With the rise of fast fashion manufacturing, many clothing items are lower quality and break after fewer wears. Low-income consumers can become trapped in a costly cycle of constantly replacing worn-out clothes.”
 
 **General fact semantic key:** `clothing:quality_and_replacement_cost`
 
@@ -2070,17 +2070,17 @@ Source/update: https://prospect.org/2025/08/29/2025-08-29-how-fast-fashion-keeps
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Canopy Thrift selects donated items for its sales floor, helping neighbors access secondhand clothing and essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.</p>
+    <p>Canopy Thrift has a selective process to choose the items that make it to the floor, helping people gain access to higher quality items. In 2025, clients used $206,768.67 in Canopy Thrift credits.</p>
     <p class="numbers"><b>Numbers</b> 2025, · $206,768.67</p>
     <p><b>Snapshot measure</b> dollar amount of client credits used at CAC Canopy Thrift<br><b>Value</b> 206768.67 Dollars<br><b>Reporting year</b> 2025</p>
     <details ><summary>Full authored fact or template</summary>
-      <p>Canopy Thrift selects donated items for its sales floor, helping neighbors access secondhand clothing and essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.</p>
+      <p>Canopy Thrift has a selective process to choose the items that make it to the floor, helping people gain access to higher quality items. In 2025, clients used $206,768.67 in Canopy Thrift credits.</p>
       <p class="numbers"><b>Numbers</b> 2025, · $206,768.67</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>859b8cec-1e1c-4887-9f55-fd55f1bb349c</code></p>
     </details>
     <p class="source"><a href="https://ourcac.org/" target="_blank" rel="noopener noreferrer">https://ourcac.org/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Canopy Thrift selects donated items for its sales floor, helping neighbors access secondhand clothing and essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** “Canopy Thrift has a selective process to choose the items that make it to the floor, helping people gain access to higher quality items. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
 Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
 
@@ -2108,7 +2108,7 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. dollar amount 
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Lower-quality clothing can wear out quickly. Replacing worn-out items repeatedly can strain a limited budget, even when each purchase seems inexpensive.”
+**Player-facing general fact:** “With the rise of fast fashion manufacturing, many clothing items are lower quality and break after fewer wears. Low-income consumers can become trapped in a costly cycle of constantly replacing worn-out clothes.”
 
 **General fact semantic key:** `clothing:quality_and_replacement_cost`
 
@@ -2116,7 +2116,7 @@ Source/update: https://prospect.org/2025/08/29/2025-08-29-how-fast-fashion-keeps
 
 **CAC fact (separate from price and general fact)**
 
-**Player-facing CAC fact:** “Canopy Thrift selects donated items for its sales floor, helping neighbors access secondhand clothing and essentials. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
+**Player-facing CAC fact:** “Canopy Thrift has a selective process to choose the items that make it to the floor, helping people gain access to higher quality items. In 2025, clients used $206,768.67 in Canopy Thrift credits.”
 
 Source fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`
 
@@ -2147,14 +2147,14 @@ Source/update: https://ourcac.org/. CAC 2025 repository snapshot. dollar amount 
       <p>A plumbing problem can bring an expense that was never part of your plan for the month. In {period}, {pct}% of occupied homes in Sandy Springs lacked complete plumbing facilities.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> {period} · {pct}</p>
-      <p><b>Data binding</b> <code>acs:B25047:lacking_plumbing</code></p>
+      <p><b>Data binding</b> <code>acs:B25048:lacking_plumbing</code></p>
     </details>
     <p class="source"><a href="https://api.census.gov/data/2024/acs/acs5/groups.html" target="_blank" rel="noopener noreferrer">https://api.census.gov/data/2024/acs/acs5/groups.html</a></p>
     <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A plumbing problem can bring an expense that was never part of your plan for the month. In {period}, {pct}% of occupied homes in Sandy Springs lacked complete plumbing facilities.”
 
-**General fact semantic key:** `acs:B25047:lacking_plumbing`
+**General fact semantic key:** `acs:B25048:lacking_plumbing`
 
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B25047. Occupied units lacking complete plumbing / all occupied units; does not measure temporary plumbing failures. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B25048. Occupied units lacking complete plumbing / all occupied units; does not measure temporary plumbing failures. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · unavailable</p>
@@ -2195,9 +2195,9 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
 
 **Player-facing general fact template:** “A plumbing problem can bring an expense that was never part of your plan for the month. In {period}, {pct}% of occupied homes in Sandy Springs lacked complete plumbing facilities.”
 
-**General fact semantic key:** `acs:B25047:lacking_plumbing`
+**General fact semantic key:** `acs:B25048:lacking_plumbing`
 
-Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B25047. Occupied units lacking complete plumbing / all occupied units; does not measure temporary plumbing failures. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024/acs/acs5/groups.html), table B25048. Occupied units lacking complete plumbing / all occupied units; does not measure temporary plumbing failures. Resolve exact estimate/MOE cells and Sandy Springs place geography against the selected annual five-year release; reject missing/suppressed values and zero denominators. Observation retrieval remains pending. Initial binding verification is pending; subsequent validated observations update and publish automatically.
 
 **CAC fact (separate from price and general fact)**
 
@@ -2227,13 +2227,13 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>An unexpected appointment for Maya means finding money for care alongside other family needs. Between {base observation period} and {latest observation period}, U.S. prices for services by other medical professionals were {pct}% {direction}.</p>
+      <p>An unexpected appointment for Maya means finding money for care alongside other family needs. In the past year, the average price of services by other medical professionals {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEMC04</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. Between {base observation period} and {latest observation period}, U.S. prices for services by other medical professionals were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. In the past year, the average price of services by other medical professionals {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEMC04`
 
@@ -2276,7 +2276,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. Between {base observation period} and {latest observation period}, U.S. prices for services by other medical professionals were {pct}% {direction}.”
+**Player-facing general fact template:** “An unexpected appointment for Maya means finding money for care alongside other family needs. In the past year, the average price of services by other medical professionals {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEMC04`
 
@@ -2310,17 +2310,17 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
     <details><summary>Price baseline and source notes</summary><p>User-approved replacement laptop starts at USD 600.00. Retain repair USD 180.00. Both follow computer-equipment CPI CUUR0000SEEE01.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>A smartphone may not be enough for every task. Work and education can require a full computer, keyboard and larger screen. Buying and repairing devices adds pressure to a household budget.</p>
+    <p>Lacking a full computer restricts workers from building digital skills, running heavy work software, and reliably completing remote employment or educational tasks that require larger screens and physical keyboards. Having more devices means more purchasing and repair costs that can strain families.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>A smartphone may not be enough for every task. Work and education can require a full computer, keyboard and larger screen. Buying and repairing devices adds pressure to a household budget.</p>
+      <p>Lacking a full computer restricts workers from building digital skills, running heavy work software, and reliably completing remote employment or educational tasks that require larger screens and physical keyboards. Having more devices means more purchasing and repair costs that can strain families.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>digital:full_computer_access</code></p>
     </details>
     <p class="source"><a href="https://publicknowledge.org/the-device-divide-is-hurting-americans-heres-how-we-solve-it/" target="_blank" rel="noopener noreferrer">https://publicknowledge.org/the-device-divide-is-hurting-americans-heres-how-we-solve-it/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “A smartphone may not be enough for every task. Work and education can require a full computer, keyboard and larger screen. Buying and repairing devices adds pressure to a household budget.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Lacking a full computer restricts workers from building digital skills, running heavy work software, and reliably completing remote employment or educational tasks that require larger screens and physical keyboards. Having more devices means more purchasing and repair costs that can strain families.”
 
 **General fact semantic key:** `digital:full_computer_access`
 
@@ -2364,7 +2364,7 @@ Source/update: https://publicknowledge.org/the-device-divide-is-hurting-american
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “A smartphone may not be enough for every task. Work and education can require a full computer, keyboard and larger screen. Buying and repairing devices adds pressure to a household budget.”
+**Player-facing general fact:** “Lacking a full computer restricts workers from building digital skills, running heavy work software, and reliably completing remote employment or educational tasks that require larger screens and physical keyboards. Having more devices means more purchasing and repair costs that can strain families.”
 
 **General fact semantic key:** `digital:full_computer_access`
 
@@ -2481,17 +2481,17 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
     <details><summary>Price baseline and source notes</summary><p>Unresolved: item not identified; exact replacement, fault/repair and reimbursement rule required. Historical amounts audited: Work item $350/$145. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Replacing a broken appliance can strain a limited budget. Energy-efficient appliances can also help reduce utility bills, according to a Habitat for Humanity and Whirlpool study.</p>
+    <p>When cheap or older appliances break down completely, many low-income households cannot afford immediate replacements, forcing them to go without necessities. Older and cheaper appliances can also be less energy efficient, costing people even more in energy bills.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Replacing a broken appliance can strain a limited budget. Energy-efficient appliances can also help reduce utility bills, according to a Habitat for Humanity and Whirlpool study.</p>
+      <p>When cheap or older appliances break down completely, many low-income households cannot afford immediate replacements, forcing them to go without necessities. Older and cheaper appliances can also be less energy efficient, costing people even more in energy bills.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>appliances:replacement_and_energy</code></p>
     </details>
     <p class="source"><a href="https://www.whirlpoolcorp.com/latest-news/habitat-whirlpool-study-illustrates-energy-efficient-appliances-can-help-low-income-families-lower-utility-bills.html" target="_blank" rel="noopener noreferrer">https://www.whirlpoolcorp.com/latest-news/habitat-whirlpool-study-illustrates-energy-efficient-appliances-can-help-low-income-families-lower-utility-bills.html</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Replacing a broken appliance can strain a limited budget. Energy-efficient appliances can also help reduce utility bills, according to a Habitat for Humanity and Whirlpool study.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “When cheap or older appliances break down completely, many low-income households cannot afford immediate replacements, forcing them to go without necessities. Older and cheaper appliances can also be less energy efficient, costing people even more in energy bills.”
 
 **General fact semantic key:** `appliances:replacement_and_energy`
 
@@ -2536,7 +2536,7 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Replacing a broken appliance can strain a limited budget. Energy-efficient appliances can also help reduce utility bills, according to a Habitat for Humanity and Whirlpool study.”
+**Player-facing general fact:** “When cheap or older appliances break down completely, many low-income households cannot afford immediate replacements, forcing them to go without necessities. Older and cheaper appliances can also be less energy efficient, costing people even more in energy bills.”
 
 **General fact semantic key:** `appliances:replacement_and_energy`
 
@@ -2580,13 +2580,13 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Replacing a broken dresser means choosing how much of your budget to spend on a household need. Between {base observation period} and {latest observation period}, U.S. prices for bedroom furniture were {pct}% {direction}.</p>
+      <p>Replacing a broken dresser means choosing how much of your budget to spend on a household need. In the past year, the average price of bedroom furniture {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEHJ01</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. Between {base observation period} and {latest observation period}, U.S. prices for bedroom furniture were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. In the past year, the average price of bedroom furniture {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHJ01`
 
@@ -2633,7 +2633,7 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. Between {base observation period} and {latest observation period}, U.S. prices for bedroom furniture were {pct}% {direction}.”
+**Player-facing general fact template:** “Replacing a broken dresser means choosing how much of your budget to spend on a household need. In the past year, the average price of bedroom furniture {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHJ01`
 
@@ -2673,13 +2673,13 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Losing groceries means paying again for food you had already planned to use. Between {base observation period} and {latest observation period}, U.S. prices for groceries purchased for home use were {pct}% {direction}.</p>
+      <p>Losing groceries means paying again for food you had already planned to use. In the past year, the average price of groceries purchased for home use {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SAF11</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. Between {base observation period} and {latest observation period}, U.S. prices for groceries purchased for home use were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. In the past year, the average price of groceries purchased for home use {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SAF11`
 
@@ -2723,7 +2723,7 @@ Source: S18/S19; fact ID `efaf231b-3db3-4c4d-b276-758006af8aab`; service `mini_m
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. Between {base observation period} and {latest observation period}, U.S. prices for groceries purchased for home use were {pct}% {direction}.”
+**Player-facing general fact template:** “Losing groceries means paying again for food you had already planned to use. In the past year, the average price of groceries purchased for home use {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SAF11`
 
@@ -2841,17 +2841,17 @@ Source: S18/S19; fact ID `94210a01-4766-46ad-beba-d7400c9fd31e`; service `mini_m
     <details><summary>Price baseline and source notes</summary><p>Unresolved: dated actual school notice, admission/transport and fee; meal prices cannot validate a trip. Historical amounts audited: School trip $28. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>School activities can support learning, social connections and physical activity. Participation fees can keep children from lower-income families from joining, according to the University of Michigan Mott poll.</p>
+    <p>Participating in school activities can provide social, emotional, physical and intellectual benefits for children. School activities also strengthen the connections with peers and with their school community, enhancing the likelihood of graduation and preventing dropouts. The costs for these activities can leave students out.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>School activities can support learning, social connections and physical activity. Participation fees can keep children from lower-income families from joining, according to the University of Michigan Mott poll.</p>
+      <p>Participating in school activities can provide social, emotional, physical and intellectual benefits for children. School activities also strengthen the connections with peers and with their school community, enhancing the likelihood of graduation and preventing dropouts. The costs for these activities can leave students out.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>school:activity_participation_barriers</code></p>
     </details>
     <p class="source"><a href="https://mottpoll.org/reports-surveys/pay-participate-limiting-school-activities-lower-income-students" target="_blank" rel="noopener noreferrer">https://mottpoll.org/reports-surveys/pay-participate-limiting-school-activities-lower-income-students</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “School activities can support learning, social connections and physical activity. Participation fees can keep children from lower-income families from joining, according to the University of Michigan Mott poll.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Participating in school activities can provide social, emotional, physical and intellectual benefits for children. School activities also strengthen the connections with peers and with their school community, enhancing the likelihood of graduation and preventing dropouts. The costs for these activities can leave students out.”
 
 **General fact semantic key:** `school:activity_participation_barriers`
 
@@ -2894,7 +2894,7 @@ Source/update: https://mottpoll.org/reports-surveys/pay-participate-limiting-sch
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “School activities can support learning, social connections and physical activity. Participation fees can keep children from lower-income families from joining, according to the University of Michigan Mott poll.”
+**Player-facing general fact:** “Participating in school activities can provide social, emotional, physical and intellectual benefits for children. School activities also strengthen the connections with peers and with their school community, enhancing the likelihood of graduation and preventing dropouts. The costs for these activities can leave students out.”
 
 **General fact semantic key:** `school:activity_participation_barriers`
 
@@ -2908,7 +2908,7 @@ Source/update: https://mottpoll.org/reports-surveys/pay-participate-limiting-sch
     <p class="back"><a href="#top">Back to search</a></p></article>
 <article id="D040" data-category="Essential Goods &amp; Clothing" data-engine="ordinary" data-pending="false" data-cac="true">
     <header><p class="label">Essential Goods &amp; Clothing · ALL · ordinary</p><h2>D040 Worn-out coat</h2></header>
-    <p class="situation">Your coat is worn out. You can replace it, repair it, or look for a secondhand coat through Canopy Thrift.</p>
+    <p class="situation">Your coat is worn out. You can replace it or repair it.</p>
     <details><summary>Eligibility and timing</summary><p>An adult household member needs a usable winter coat.</p><p>non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.</p></details>
     <h3>Prices fees and outcomes</h3>
     
@@ -2928,17 +2928,17 @@ Source/update: https://mottpoll.org/reports-surveys/pay-participate-limiting-sch
     <details><summary>Price baseline and source notes</summary><p>Unresolved: type/size/condition, exact item and repair work; no verified pair/repair quote. Historical amounts audited: Shoes $70/repair $25. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>A warm coat is an essential winter expense. Exposure to cold can cause hypothermia; warm, dry clothing helps protect against cold-related illness.</p>
+    <p>Cold weather makes the body work harder, putting stress on the heart to ensure the body stays warm, and exposure to the cold predisposes people to infections like pneumonia. Coats are an essential part of staying safe and healthy during the winter months.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>A warm coat is an essential winter expense. Exposure to cold can cause hypothermia; warm, dry clothing helps protect against cold-related illness.</p>
+      <p>Cold weather makes the body work harder, putting stress on the heart to ensure the body stays warm, and exposure to the cold predisposes people to infections like pneumonia. Coats are an essential part of staying safe and healthy during the winter months.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>clothing:winter_cold_protection</code></p>
     </details>
     <p class="source"><a href="https://www.cdc.gov/winter-weather/prevention/index.html" target="_blank" rel="noopener noreferrer">https://www.cdc.gov/winter-weather/prevention/index.html</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “A warm coat is an essential winter expense. Exposure to cold can cause hypothermia; warm, dry clothing helps protect against cold-related illness.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Cold weather makes the body work harder, putting stress on the heart to ensure the body stays warm, and exposure to the cold predisposes people to infections like pneumonia. Coats are an essential part of staying safe and healthy during the winter months.”
 
 **General fact semantic key:** `clothing:winter_cold_protection`
 
@@ -2984,7 +2984,7 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “A warm coat is an essential winter expense. Exposure to cold can cause hypothermia; warm, dry clothing helps protect against cold-related illness.”
+**Player-facing general fact:** “Cold weather makes the body work harder, putting stress on the heart to ensure the body stays warm, and exposure to the cold predisposes people to infections like pneumonia. Coats are an essential part of staying safe and healthy during the winter months.”
 
 **General fact semantic key:** `clothing:winter_cold_protection`
 
@@ -3024,13 +3024,13 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>School supplies create another shopping list when the household budget is already committed. Between {base observation period} and {latest observation period}, U.S. prices for educational books and supplies were {pct}% {direction}.</p>
+      <p>School supplies create another shopping list when the household budget is already committed. In the past year, the average price of educational books and supplies {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEEA</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. Between {base observation period} and {latest observation period}, U.S. prices for educational books and supplies were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. In the past year, the average price of educational books and supplies {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEEA`
 
@@ -3074,7 +3074,7 @@ Source: S18/S19; fact ID `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`; service `tools_
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. Between {base observation period} and {latest observation period}, U.S. prices for educational books and supplies were {pct}% {direction}.”
+**Player-facing general fact template:** “School supplies create another shopping list when the household budget is already committed. In the past year, the average price of educational books and supplies {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEEA`
 
@@ -3088,7 +3088,7 @@ Source: S18/S19; fact ID `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`; service `tools_
     <p class="back"><a href="#top">Back to search</a></p></article>
 <article id="D043" data-category="Essential Goods &amp; Clothing" data-engine="ordinary" data-pending="true" data-cac="false">
     <header><p class="label">Essential Goods &amp; Clothing · ALL · ordinary</p><h2>D043 A family birthday</h2></header>
-    <p class="situation">A child in your family has a birthday coming up. You can buy the gift you planned, choose a smaller gift, give your time, or use Canopy Thrift credits to find a gift.</p>
+    <p class="situation">A child in your family has a birthday coming up. You can buy the gift you planned, choose a smaller gift, or give your time.</p>
     <details><summary>Eligibility and timing</summary><p>Fictional family occasion approved.</p><p>non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.</p></details>
     <h3>Prices fees and outcomes</h3>
     
@@ -3116,13 +3116,13 @@ Source: S18/S19; fact ID `c6a72bf1-47ac-4d53-9adc-8ad68dd120c4`; service `tools_
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A family birthday can mean balancing a gesture of care with money needed for essentials. Between {base observation period} and {latest observation period}, U.S. prices for stationery, supplies and gift wrap were {pct}% {direction}.</p>
+      <p>A family birthday can mean balancing a gesture of care with money needed for essentials. In the past year, the average price of stationery, supplies and gift wrap {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SS33032</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. Between {base observation period} and {latest observation period}, U.S. prices for stationery, supplies and gift wrap were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. In the past year, the average price of stationery, supplies and gift wrap {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SS33032`
 
@@ -3166,7 +3166,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. Between {base observation period} and {latest observation period}, U.S. prices for stationery, supplies and gift wrap were {pct}% {direction}.”
+**Player-facing general fact template:** “A family birthday can mean balancing a gesture of care with money needed for essentials. In the past year, the average price of stationery, supplies and gift wrap {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SS33032`
 
@@ -3283,17 +3283,17 @@ Source/update: S05 / A02; [S26 table catalogue](https://api.census.gov/data/2024
     <details><summary>Price baseline and source notes</summary><p>Unresolved: child size/material/warmth, new/used condition and exact offers. A toddler promotion cannot price Maya&#39;s unspecified coat. Historical amounts audited: Coat $60/$24. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Children outgrow coats, and replacing them can strain a tight budget. Clothing insecurity can affect school attendance, health and emotional well-being. Major food and healthcare assistance programs do not cover clothing purchases.</p>
+    <p>Coats are often the most expensive item in a child’s wardrobe, yet they tend to outgrow them quickly. Tight budgets can leave little room for seasonal clothing, yet clothing is not covered by major federal safety nets as food and healthcare are. Not having a coat can lead to school absences, physical health risks, or poor emotional well-being.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Children outgrow coats, and replacing them can strain a tight budget. Clothing insecurity can affect school attendance, health and emotional well-being. Major food and healthcare assistance programs do not cover clothing purchases.</p>
+      <p>Coats are often the most expensive item in a child’s wardrobe, yet they tend to outgrow them quickly. Tight budgets can leave little room for seasonal clothing, yet clothing is not covered by major federal safety nets as food and healthcare are. Not having a coat can lead to school absences, physical health risks, or poor emotional well-being.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>clothing:child_clothing_insecurity</code></p>
     </details>
     <p class="source"><a href="https://noteinthepocket.org/clothing-insecurity/" target="_blank" rel="noopener noreferrer">https://noteinthepocket.org/clothing-insecurity/</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Children outgrow coats, and replacing them can strain a tight budget. Clothing insecurity can affect school attendance, health and emotional well-being. Major food and healthcare assistance programs do not cover clothing purchases.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Coats are often the most expensive item in a child’s wardrobe, yet they tend to outgrow them quickly. Tight budgets can leave little room for seasonal clothing, yet clothing is not covered by major federal safety nets as food and healthcare are. Not having a coat can lead to school absences, physical health risks, or poor emotional well-being.”
 
 **General fact semantic key:** `clothing:child_clothing_insecurity`
 
@@ -3337,7 +3337,7 @@ Source: S18/S19; fact ID `e8473e58-6338-4855-93be-7608f27696ab`; service `coats_
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Children outgrow coats, and replacing them can strain a tight budget. Clothing insecurity can affect school attendance, health and emotional well-being. Major food and healthcare assistance programs do not cover clothing purchases.”
+**Player-facing general fact:** “Coats are often the most expensive item in a child’s wardrobe, yet they tend to outgrow them quickly. Tight budgets can leave little room for seasonal clothing, yet clothing is not covered by major federal safety nets as food and healthcare are. Not having a coat can lead to school absences, physical health risks, or poor emotional well-being.”
 
 **General fact semantic key:** `clothing:child_clothing_insecurity`
 
@@ -3349,9 +3349,9 @@ Source/update: https://noteinthepocket.org/clothing-insecurity/. User-approved p
 
 Source: S18/S19; fact ID `e8473e58-6338-4855-93be-7608f27696ab`; service `coats_for_kids`; key `children_served_by_coats_for_kids`; reporting year 2025; exact stored value `623` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. The need is a child’s warm coat in the program’s season. Free in-kind receipt: player balance change USD 0.00; no fee, cash deposit, cash-equivalent refund or debt. Record only the approved items/quantity actually received. Eligibility, availability, item scope and edition/service bindings remain pending; no entitlement to the priced retail alternative or complete basket is inferred. If the approved allocation meets only part of the need, record that need as partly unmet without charging a remainder or inventing a follow-up purchase. Any separately approved retail purchase is a distinct cost, never a CAC service fee. Annual facts do not determine individual quantities or benefit values.</pre></details>
     <p class="back"><a href="#top">Back to search</a></p></article>
-<article id="D046" data-category="Food &amp; Nutrition" data-engine="ordinary" data-pending="true" data-cac="true">
+<article id="D046" data-category="Food &amp; Nutrition" data-engine="ordinary" data-pending="false" data-cac="true">
     <header><p class="label">Food &amp; Nutrition · EMPLOYED · ordinary</p><h2>D046 Packing lunch or buying it?</h2></header>
-    <p class="situation">You can prepare lunches ahead of time or buy them during workdays. One option takes more time now; the other costs more money.</p>
+    <p class="situation">You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.</p>
     <details><summary>Eligibility and timing</summary><p>Hired; feasible cooking/storage assumptions.</p><p>non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.</p></details>
     <h3>Prices fees and outcomes</h3>
     
@@ -3359,33 +3359,33 @@ Source: S18/S19; fact ID `e8473e58-6338-4855-93be-7608f27696ab`; service `coats_
       <p><b>Authored financial expression</b> -$26.00</p>
       <p class="amount"><b>Development balance change</b> -$26.00<span>Upfront requirement $0.00</span></p>
       <p><b>Outcome</b> work_lunches_packed</p>
-      <p><b>Response</b> You spend less and do the preparation.</p></section><section class="choice"><h4>D046-BUY · Buy the workday lunches</h4>
+      <p><b>Response</b> You spend less and do the preparation.</p></section><section class="choice"><h4>D046-BUY · Get lunch out with your coworkers</h4>
       <p><b>Authored financial expression</b> -$55.00</p>
       <p class="amount"><b>Development balance change</b> -$55.00<span>Upfront requirement $0.00</span></p>
       <p><b>Outcome</b> work_lunches_purchased</p>
-      <p><b>Response</b> You save preparation time and spend more.</p></section><section class="choice"><h4>D046-CAC · Get lunch ingredients from the CAC Mini-Market</h4>
+      <p><b>Response</b> You got lunch out with your coworkers.</p></section><section class="choice"><h4>D046-CAC · Get lunch ingredients from the CAC Mini-Market</h4>
       <p><b>Authored financial expression</b> $0.00</p>
       <p class="amount"><b>Development balance change</b> $0.00<span>Upfront requirement $0.00 · CAC only</span></p>
       <p><b>Outcome</b> Direct effect or engine rule</p>
       <p><b>Response</b> You received lunch ingredients from the CAC Mini-Market.</p></section>
     <details><summary>Price baseline and source notes</summary><p>Unresolved: lunch count, servings and actual ingredients/menu prices. Historical amounts audited: Lunch ingredients $26/bought $55. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
-    <p class="label">Development edition · context</p>
-    <p>Packing lunches means buying ingredients ahead of time.</p>
-    <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
+    <p class="label">Development edition · fact</p>
+    <p>Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.</p>
+    <p class="numbers"><b>Numbers</b> 2017</p>
     
-    <details open><summary>Full authored fact or template</summary>
-      <p>Packing lunches means buying ingredients ahead of time. Sandwich fillings are one part of that shopping list. Between {base observation period} and {latest observation period}, U.S. prices for lunchmeats were {pct}% {direction}.</p>
-      <p class="numbers"><b>Numbers</b> one</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
-      <p><b>Data binding</b> <code>cpi:SS0501A</code></p>
+    <details ><summary>Full authored fact or template</summary>
+      <p>Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.</p>
+      <p class="numbers"><b>Numbers</b> 2017</p>
+      <p><b>Unresolved fields</b> None.</p>
+      <p><b>Data binding</b> <code>social:shared_meals_connection</code></p>
     </details>
-    <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Packing lunches means buying ingredients ahead of time. Sandwich fillings are one part of that shopping list. Between {base observation period} and {latest observation period}, U.S. prices for lunchmeats were {pct}% {direction}.”
+    <p class="source"><a href="https://doi.org/10.1007/s40750-017-0061-4" target="_blank" rel="noopener noreferrer">https://doi.org/10.1007/s40750-017-0061-4</a></p>
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.”
 
-**General fact semantic key:** `cpi:SS0501A`
+**General fact semantic key:** `social:shared_meals_connection`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SS0501A. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://doi.org/10.1007/s40750-017-0061-4. Dunbar (2017), Breaking Bread: the Functions of Social Eating. UK national survey; association, not proof that buying lunch causes wellbeing or that packed lunches prevent social contact. User approved this passage without “UK” in the displayed wording on November 17, 2026. Static dated research fact; monthly price bindings remain separate.
 </pre></details>
   </section><section class="fact"><h3>CAC fact</h3>
     <p class="label">Development edition · fact</p>
@@ -3418,7 +3418,7 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 | Choice/component | Historical draft expression (not verified pricing) |
 | --- | --- |
 | D046-PACK — Buy ingredients and pack lunches | -$26.00 |
-| D046-BUY — Buy the workday lunches | -$55.00 |
+| D046-BUY — Get lunch out with your coworkers | -$55.00 |
 
 **Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** food at home for packed; food away from home for purchased. **Required definition:** Define workday lunch count and servings; separate ingredient basket and local menu quotes.
 
@@ -3426,11 +3426,11 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Packing lunches means buying ingredients ahead of time. Sandwich fillings are one part of that shopping list. Between {base observation period} and {latest observation period}, U.S. prices for lunchmeats were {pct}% {direction}.”
+**Player-facing general fact:** “Sharing a meal can be about more than food. A 2017 study found that people who ate with others more often reported greater life satisfaction and more friends they could rely on.”
 
-**General fact semantic key:** `cpi:SS0501A`
+**General fact semantic key:** `social:shared_meals_connection`
 
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SS0501A. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
+Source/update: https://doi.org/10.1007/s40750-017-0061-4. Dunbar (2017), Breaking Bread: the Functions of Social Eating. UK national survey; association, not proof that buying lunch causes wellbeing or that packed lunches prevent social contact. User approved this passage without “UK” in the displayed wording on November 17, 2026. Static dated research fact; monthly price bindings remain separate.
 
 **CAC fact (separate from price and general fact)**
 
@@ -3462,13 +3462,13 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
     <p class="numbers"><b>Numbers</b> one</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A replacement bag is one of the personal goods that can become an unexpected purchase. Between {base observation period} and {latest observation period}, U.S. prices for miscellaneous personal goods were {pct}% {direction}.</p>
+      <p>A replacement bag is one of the personal goods that can become an unexpected purchase. In the past year, the average price of miscellaneous personal goods {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> one</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEGE</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. Between {base observation period} and {latest observation period}, U.S. prices for miscellaneous personal goods were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. In the past year, the average price of miscellaneous personal goods {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEGE`
 
@@ -3511,7 +3511,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. Between {base observation period} and {latest observation period}, U.S. prices for miscellaneous personal goods were {pct}% {direction}.”
+**Player-facing general fact template:** “A replacement bag is one of the personal goods that can become an unexpected purchase. In the past year, the average price of miscellaneous personal goods {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEGE`
 
@@ -3545,17 +3545,17 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
     <details><summary>Price baseline and source notes</summary><p>Unresolved: meal count and retail/school context; use E03 only for actual school meals. CAC allocation separate. Historical amounts audited: Prepared meals $42/ingredients $24. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Hunger can affect children’s growth, learning and mental health. When school is out, families also need to cover meals that school would otherwise provide.</p>
+    <p>Missing meals and experiencing chronic hunger significantly impact children&#39;s physical growth, cognitive development, and mental health. This becomes a larger issue when school is out of session and it is up to households to find a child’s next meal.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Hunger can affect children’s growth, learning and mental health. When school is out, families also need to cover meals that school would otherwise provide.</p>
+      <p>Missing meals and experiencing chronic hunger significantly impact children&#39;s physical growth, cognitive development, and mental health. This becomes a larger issue when school is out of session and it is up to households to find a child’s next meal.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>food:child_hunger_school_breaks</code></p>
     </details>
     <p class="source"><a href="https://www.nokidhungry.org/blog/effects-of-hunger-on-the-body" target="_blank" rel="noopener noreferrer">https://www.nokidhungry.org/blog/effects-of-hunger-on-the-body</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Hunger can affect children’s growth, learning and mental health. When school is out, families also need to cover meals that school would otherwise provide.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Missing meals and experiencing chronic hunger significantly impact children&#39;s physical growth, cognitive development, and mental health. This becomes a larger issue when school is out of session and it is up to households to find a child’s next meal.”
 
 **General fact semantic key:** `food:child_hunger_school_breaks`
 
@@ -3599,7 +3599,7 @@ Source: S18/S19; fact ID `9496c5fe-de45-4ce7-96a9-4d6ba7f2ac01`; service `meals_
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Hunger can affect children’s growth, learning and mental health. When school is out, families also need to cover meals that school would otherwise provide.”
+**Player-facing general fact:** “Missing meals and experiencing chronic hunger significantly impact children&#39;s physical growth, cognitive development, and mental health. This becomes a larger issue when school is out of session and it is up to households to find a child’s next meal.”
 
 **General fact semantic key:** `food:child_hunger_school_breaks`
 
@@ -3716,13 +3716,13 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Running low on essentials means deciding how much you can buy with the cash available. Between {base observation period} and {latest observation period}, U.S. prices for personal care products were {pct}% {direction}.</p>
+      <p>Running low on essentials means deciding how much you can buy with the cash available. In the past year, the average price of personal care products {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEGB</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. Between {base observation period} and {latest observation period}, U.S. prices for personal care products were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. In the past year, the average price of personal care products {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEGB`
 
@@ -3765,7 +3765,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. Between {base observation period} and {latest observation period}, U.S. prices for personal care products were {pct}% {direction}.”
+**Player-facing general fact template:** “Running low on essentials means deciding how much you can buy with the cash available. In the past year, the average price of personal care products {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEGB`
 
@@ -3799,17 +3799,17 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
     <details><summary>Price baseline and source notes</summary><p>Unresolved: actual course/provider/date/material fees; no generic education price. Historical amounts audited: Workshop $45. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
     <div class="facts"><section class="fact"><h3>General fact</h3>
     <p class="label">Development edition · fact</p>
-    <p>Learning new skills can open up work opportunities. Course fees and time away from work or family responsibilities can make training harder to access on a limited income.</p>
+    <p>Training can give people valuable skills for the workplace. Because they cannot afford the upfront time or money to participate, low-income families can miss out on income boosts from having advanced skills.</p>
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details ><summary>Full authored fact or template</summary>
-      <p>Learning new skills can open up work opportunities. Course fees and time away from work or family responsibilities can make training harder to access on a limited income.</p>
+      <p>Training can give people valuable skills for the workplace. Because they cannot afford the upfront time or money to participate, low-income families can miss out on income boosts from having advanced skills.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
       <p><b>Unresolved fields</b> None.</p>
       <p><b>Data binding</b> <code>education:training_time_and_cost_barriers</code></p>
     </details>
     <p class="source"><a href="https://www.oecd.org/en/publications/trends-in-adult-learning_ec0624a6-en.html" target="_blank" rel="noopener noreferrer">https://www.oecd.org/en/publications/trends-in-adult-learning_ec0624a6-en.html</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Learning new skills can open up work opportunities. Course fees and time away from work or family responsibilities can make training harder to access on a limited income.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact:** “Training can give people valuable skills for the workplace. Because they cannot afford the upfront time or money to participate, low-income families can miss out on income boosts from having advanced skills.”
 
 **General fact semantic key:** `education:training_time_and_cost_barriers`
 
@@ -3854,7 +3854,7 @@ Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2
 
 **General fact (separate from price)**
 
-**Player-facing general fact:** “Learning new skills can open up work opportunities. Course fees and time away from work or family responsibilities can make training harder to access on a limited income.”
+**Player-facing general fact:** “Training can give people valuable skills for the workplace. Because they cannot afford the upfront time or money to participate, low-income families can miss out on income boosts from having advanced skills.”
 
 **General fact semantic key:** `education:training_time_and_cost_barriers`
 
@@ -3867,89 +3867,6 @@ Source/update: https://www.oecd.org/en/publications/trends-in-adult-learning_ec0
 Source fact ID `7cb64039-5726-43da-8f15-fbf8b63e8f83`
 
 Source/update: https://ourcac.org/. User-approved part 2 revision November 16, 2026. CAC 2025 repository snapshot; annual report refresh remains required. This program fact does not guarantee item availability.</pre></details>
-    <p class="back"><a href="#top">Back to search</a></p></article>
-<article id="D052" data-category="Childcare &amp; Youth" data-engine="ordinary" data-pending="true" data-cac="false">
-    <header><p class="label">Childcare &amp; Youth · JORDAN · ordinary</p><h2>D052 Maya&#39;s birthday</h2></header>
-    <p class="situation">Maya wants a birthday celebration. You can pay for the original plan or choose a smaller celebration at home.</p>
-    <details><summary>Eligibility and timing</summary><p>Fictional birthday occurs this month.</p><p>non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.</p></details>
-    <h3>Prices fees and outcomes</h3>
-    
-    <section class="choice"><h4>D052-PLAN · Pay for the original plan</h4>
-      <p><b>Authored financial expression</b> -$80.00</p>
-      <p class="amount"><b>Development balance change</b> -$80.00<span>Upfront requirement $0.00</span></p>
-      <p><b>Outcome</b> child_birthday_original</p>
-      <p><b>Response</b> You spend the money on the original celebration.</p></section><section class="choice"><h4>D052-HOME · Choose the smaller home celebration</h4>
-      <p><b>Authored financial expression</b> -$20.00</p>
-      <p class="amount"><b>Development balance change</b> -$20.00<span>Upfront requirement $0.00</span></p>
-      <p><b>Outcome</b> child_birthday_home</p>
-      <p><b>Response</b> You choose the less expensive celebration.</p></section>
-    <details><summary>Price baseline and source notes</summary><p>Unresolved: attendees/activity/food/items and respective all-in costs. Historical amounts audited: Birthday $80/$20. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.</p></details>
-    <div class="facts"><section class="fact"><h3>General fact</h3>
-    <p class="label">Development edition · context</p>
-    <p>Even a smaller birthday at home can mean finding money for a cake.</p>
-    <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-    
-    <details open><summary>Full authored fact or template</summary>
-      <p>Even a smaller birthday at home can mean finding money for a cake. Between {base observation period} and {latest observation period}, U.S. prices for fresh cakes and cupcakes were {pct}% {direction}.</p>
-      <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
-      <p><b>Data binding</b> <code>cpi:SS02041</code></p>
-    </details>
-    <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Even a smaller birthday at home can mean finding money for a cake. Between {base observation period} and {latest observation period}, U.S. prices for fresh cakes and cupcakes were {pct}% {direction}.”
-
-**General fact semantic key:** `cpi:SS02041`
-
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SS02041. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-</pre></details>
-  </section><section class="fact"><h3>CAC fact</h3>
-    <p class="label">Development edition · unavailable</p>
-    <p>Awaiting a supported topic-matched fact.</p>
-    <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-    
-    <details open><summary>Full authored fact or template</summary>
-      <p>Awaiting a supported topic-matched observation.</p>
-      <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> None.</p>
-      <p><b>Data binding</b> <code>Not assigned</code></p>
-    </details>
-    
-    <details><summary>Evidence and update method</summary><pre>**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** Holiday-program facts do not establish birthday-party support. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.
-
-</pre></details>
-  </section></div>
-    <details><summary>Complete scenario sourcing section</summary><pre>### D052 — Maya&#39;s birthday
-
-**Baseline evidence and disposition (November 7):** Unresolved: attendees/activity/food/items and respective all-in costs. Historical amounts audited: Birthday $80/$20. Evidence IDs refer to the [checked online price evidence](#checked-online-price-evidence) below.
-
-[Original scenario](scenario-draft-library.md) · [CAC pairing/gap](scenario-cac-fact-pairings.md#d052)
-
-**Numerical inputs and price sources**
-
-| Choice/component | Historical draft expression (not verified pricing) |
-| --- | --- |
-| D052-PLAN — Pay for the original plan | -$80.00 |
-| D052-HOME — Choose the smaller home celebration | -$20.00 |
-
-**Recommended source/method:** S20; CPI fallback via A01 (or A05) only where appropriate. **Candidate index category:** category pending birthday goods/activity selection. **Required definition:** Specify child birthday alternatives, attendees and included items; do not infer CAC birthday support.
-
-**Update/review:** Local quotes follow the baseline policy; official rates follow effective dates; statistical sources follow release dates. Baseline/evidence ID, exact API variables/series where applicable, and reviewer are PENDING. 
-
-**General fact (separate from price)**
-
-**Player-facing general fact template:** “Even a smaller birthday at home can mean finding money for a cake. Between {base observation period} and {latest observation period}, U.S. prices for fresh cakes and cupcakes were {pct}% {direction}.”
-
-**General fact semantic key:** `cpi:SS02041`
-
-Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/additional-resources/index-publication-level.htm). Candidate CPI-U non-seasonally-adjusted series CUUR0000SS02041. U.S. city average, not a Sandy Springs observation. Calculate 100 * (latest nonmissing index / base index - 1), using the same published series and a configured comparison period. Category is factual context, not the exact scenario product price. Endpoint observations/series availability still require validation before display. Initial binding verification is pending; subsequent validated observations update and publish automatically.
-
-**CAC fact (separate from price and general fact)**
-
-**Player-facing CAC fact:** Awaiting a supported topic-matched observation.
-
-**Evidence gap:** Holiday-program facts do not establish birthday-party support. Source: S19. Ask CAC for a topic-matched dated observation and its original evidence, or obtain an explicit change to the two-fact publication policy. Do not substitute an unrelated service fact. No API or numerical CAC sentence is currently supported.</pre></details>
     <p class="back"><a href="#top">Back to search</a></p></article>
 <article id="D053" data-category="Food &amp; Nutrition" data-engine="ordinary" data-pending="true" data-cac="true">
     <header><p class="label">Food &amp; Nutrition · ALL · ordinary</p><h2>D053 A holiday meal</h2></header>
@@ -3977,13 +3894,13 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
     <p class="numbers"><b>Numbers</b> one</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Turkey can be one of the ingredients to budget for when planning a holiday meal. Between {base observation period} and {latest observation period}, U.S. prices for uncooked poultry other than chicken were {pct}% {direction}.</p>
+      <p>Turkey can be one of the ingredients to budget for when planning a holiday meal. In the past year, the average price of uncooked poultry other than chicken {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> one</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEFF02</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. Between {base observation period} and {latest observation period}, U.S. prices for uncooked poultry other than chicken were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. In the past year, the average price of uncooked poultry other than chicken {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEFF02`
 
@@ -4027,7 +3944,7 @@ Source: S18/S19; fact ID `1eec83c9-41ca-4aef-be22-1e36289d9d95`; service `holida
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. Between {base observation period} and {latest observation period}, U.S. prices for uncooked poultry other than chicken were {pct}% {direction}.”
+**Player-facing general fact template:** “Turkey can be one of the ingredients to budget for when planning a holiday meal. In the past year, the average price of uncooked poultry other than chicken {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEFF02`
 
@@ -4065,13 +3982,13 @@ Source: S18/S19; fact ID `1eec83c9-41ca-4aef-be22-1e36289d9d95`; service `holida
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Replacing worn clothing means balancing what you need now with money needed elsewhere. Between {base observation period} and {latest observation period}, U.S. prices for clothing other than footwear were {pct}% {direction}.</p>
+      <p>Replacing worn clothing means balancing what you need now with money needed elsewhere. In the past year, the average price of clothing other than footwear {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SA311</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. Between {base observation period} and {latest observation period}, U.S. prices for clothing other than footwear were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. In the past year, the average price of clothing other than footwear {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SA311`
 
@@ -4115,7 +4032,7 @@ Source: S18/S19; fact ID `859b8cec-1e1c-4887-9f55-fd55f1bb349c`; service `canopy
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. Between {base observation period} and {latest observation period}, U.S. prices for clothing other than footwear were {pct}% {direction}.”
+**Player-facing general fact template:** “Replacing worn clothing means balancing what you need now with money needed elsewhere. In the past year, the average price of clothing other than footwear {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SA311`
 
@@ -4245,13 +4162,13 @@ Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financ
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>A holiday gift can be meaningful while still competing with everyday expenses. Between {base observation period} and {latest observation period}, U.S. prices for toys were {pct}% {direction}.</p>
+      <p>A holiday gift can be meaningful while still competing with everyday expenses. In the past year, the average price of toys {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SERE01</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. Between {base observation period} and {latest observation period}, U.S. prices for toys were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. In the past year, the average price of toys {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SERE01`
 
@@ -4296,7 +4213,7 @@ Source: S18/S19; fact ID `18b975be-96cb-49ec-901b-ccd04c6c6a5c`; service `hope_f
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. Between {base observation period} and {latest observation period}, U.S. prices for toys were {pct}% {direction}.”
+**Player-facing general fact template:** “A holiday gift can be meaningful while still competing with everyday expenses. In the past year, the average price of toys {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SERE01`
 
@@ -4330,13 +4247,13 @@ Source: S18/S19; fact ID `18b975be-96cb-49ec-901b-ccd04c6c6a5c`; service `hope_f
     <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
     
     <details open><summary>Full authored fact or template</summary>
-      <p>Buying laundry supplies means balancing what you need now against the cost of a larger pack. Between {base observation period} and {latest observation period}, U.S. prices for household cleaning products were {pct}% {direction}.</p>
+      <p>Buying laundry supplies means balancing what you need now against the cost of a larger pack. In the past year, the average price of household cleaning products {change} by {pct}%.</p>
       <p class="numbers"><b>Numbers</b> No explicit numeric value.</p>
-      <p><b>Unresolved fields</b> {base observation period} · {latest observation period} · {pct} · {direction}</p>
+      <p><b>Unresolved fields</b> {change} · {pct}</p>
       <p><b>Data binding</b> <code>cpi:SEHN01</code></p>
     </details>
     <p class="source"><a href="https://www.bls.gov/cpi/additional-resources/index-publication-level.htm" target="_blank" rel="noopener noreferrer">https://www.bls.gov/cpi/additional-resources/index-publication-level.htm</a></p>
-    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. Between {base observation period} and {latest observation period}, U.S. prices for household cleaning products were {pct}% {direction}.”
+    <details><summary>Evidence and update method</summary><pre>**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. In the past year, the average price of household cleaning products {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHN01`
 
@@ -4379,7 +4296,7 @@ Source/update: S01 / A01; [S25 category catalogue](https://www.bls.gov/cpi/addit
 
 **General fact (separate from price)**
 
-**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. Between {base observation period} and {latest observation period}, U.S. prices for household cleaning products were {pct}% {direction}.”
+**Player-facing general fact template:** “Buying laundry supplies means balancing what you need now against the cost of a larger pack. In the past year, the average price of household cleaning products {change} by {pct}%.”
 
 **General fact semantic key:** `cpi:SEHN01`
 
@@ -4474,7 +4391,7 @@ Source/update: S34, [BLS: 2025 American Time Use Survey](https://www.bls.gov/new
 
 Source: S18/S19; fact ID `d32689c8-067a-4f59-aa48-2424384b7116`; service `financial_literacy_classes`; key `students_enrolled_in_financial_literacy_classes`; reporting year 2025; exact stored value `218` Number. Status: existing pairing for review, not publication approval. Update through a CAC-approved report/export and protected backend ingestion; no public CAC API has been established. Require original report/page or staff certification before final factual review. Choosing between a paid outing and a free alternative is a discretionary-budget tradeoff. Context only; no claim of CAC leisure funding or a judgment about spending.</pre></details>
     <p class="back"><a href="#top">Back to search</a></p></article>
-<footer><p>Sources include the structured scenario draft, development SQL content artifact, full scenario sourcing document, CAC 2025 fact snapshot, and employment-engine SQL.</p><p>Source hash f735d21f30a77ce1a874a4bcd4f185d7669808996ff76113204cb3bee6c47dc0</p></footer></main>
+<footer><p>Sources include the structured scenario draft, development SQL content artifact, full scenario sourcing document, CAC 2025 fact snapshot, and employment-engine SQL.</p><p>Source hash 5191a1eaeacb59c010c9762fe6d293660e82a96acbd9cfe9780f4bc0c9c9ff6b</p></footer></main>
 <script>
 const cards = [...document.querySelectorAll('article')];
 const search = document.querySelector('#search');
@@ -4493,7 +4410,7 @@ function filter() {
     document.querySelector('.index a[href="#' + card.id + '"]').hidden = !visible;
     if (visible) count++;
   });
-  document.querySelector('#count').textContent = count + ' of 51 scenarios';
+  document.querySelector('#count').textContent = count + ' of 50 scenarios';
 }
 search.addEventListener('input', filter);
 category.addEventListener('change', filter);

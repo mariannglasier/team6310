@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { PageSection } from '../../components/ui/PageSection'
 import { PriceUpdateStatus } from '../../components/simulation/PriceUpdateStatus'
+import { scenarioDescription } from '../../lib/gameplayText'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { SelectField, TextField } from '../../components/ui/FormFields'
 import { paths } from '../../app/paths'
@@ -319,7 +320,7 @@ function GroupScenarioShell({
               <span>
                 {session.cacSupportEnabled
                   ? 'Playing with CAC support'
-                  : 'Playing without CAC support'}
+                  : 'Standard mode'}
               </span>
             </section>
           </aside>
@@ -588,7 +589,13 @@ export function HostPage() {
               ) : (
                 <>
                   <h1 id="page-heading">{question?.title}</h1>
-                  <p className="group-lead">{question?.description}</p>
+                  <p className="group-lead">
+                    {question?.description &&
+                      scenarioDescription(
+                        question.description,
+                        session.cacSupportEnabled === true,
+                      )}
+                  </p>
                   <div className="group-vote-options group-decision-cards">
                     {question?.choices.map((choice) => (
                       <div
@@ -788,7 +795,7 @@ export function HostPage() {
               <strong>
                 {session.cacSupportEnabled
                   ? 'With CAC support'
-                  : 'Without CAC support'}
+                  : 'Standard mode'}
               </strong>
             </p>
           </div>
@@ -932,7 +939,11 @@ export function JoinPage() {
                   <>
                     <h1 id="page-heading">{session.question?.title}</h1>
                     <p className="group-lead">
-                      {session.question?.description}
+                      {session.question?.description &&
+                        scenarioDescription(
+                          session.question.description,
+                          session.cacSupportEnabled === true,
+                        )}
                     </p>
                     <div className="group-vote-options group-decision-cards">
                       {session.question?.choices.map((choice) => (

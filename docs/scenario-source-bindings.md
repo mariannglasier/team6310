@@ -76,8 +76,6 @@ All retained nonzero scenario prices and fees use these bindings. Baseline obser
 | D050-LARGE | 32.00 | cpi | CUUR0000SEGB |
 | D050-SMALL | 14.00 | cpi | CUUR0000SEGB |
 | D051-ATTEND | 45.00 | cpi | CUUR0000SERF03 |
-| D052-PLAN | 80.00 | cpi | CUUR0000SS02041 |
-| D052-HOME | 20.00 | cpi | CUUR0000SS02041 |
 | D053-FULL | 85.00 | cpi | CUUR0000SEFF02 |
 | D053-SMALL | 38.00 | cpi | CUUR0000SEFF02 |
 | D054-NEW | 55.00 | cpi | CUUR0000SA311 |

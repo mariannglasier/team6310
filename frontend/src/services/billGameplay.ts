@@ -7,6 +7,7 @@ import { usdCents, type UsdCents } from '../types/domain'
 export interface Bill {
   id: string
   name: string
+  description?: string | null
   principal: UsdCents
   fee: UsdCents
   dueDay: number
@@ -107,6 +108,7 @@ export async function loadBillSnapshot(
     return {
       id,
       name: text(b.name_snapshot),
+      description: b.description == null ? null : text(b.description),
       principal: money(b.amount_due),
       fee: money(b.late_fee_amount),
       dueDay: Number(b.due_day),

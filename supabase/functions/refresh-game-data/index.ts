@@ -1,5 +1,10 @@
 import catalog from "../_shared/game-data-catalog.json" with { type: "json" };
 import { refreshCatalog } from "../_shared/game-data.mjs";
+import {
+  fetchCensusFacts,
+  applyCensusFacts,
+  censusBindings,
+} from "../_shared/census-facts.mjs";
 
 const headers = { "Content-Type": "application/json" };
 const reply = (value: unknown, status = 200) =>
@@ -74,9 +79,81 @@ Deno.serve(async (request: Request) => {
     const raw = await request.text();
     if (raw.length > 1024) return reply({ error: "Request too large" }, 413);
     const body = raw ? JSON.parse(raw) : {};
+    if (body.operation === "census-status")
+      return reply({
+        censusKeyConfigured: Boolean(Deno.env.get("CENSUS_API_KEY")),
+      });
     if (body.dryRun !== undefined && typeof body.dryRun !== "boolean")
       return reply({ error: "dryRun must be boolean" }, 400);
     const dryRun = body.dryRun !== false;
+    if (body.operation === "census-facts") {
+      let census;
+      try {
+        census = await fetchCensusFacts({
+          CENSUS_API_KEY: Deno.env.get("CENSUS_API_KEY"),
+        });
+      } catch (error) {
+        return reply(
+          {
+            status: "blocked",
+            error:
+              "Census facts unavailable. Check the configured Census key and annual release availability.",
+            diagnostics:
+              error instanceof Error && "diagnostics" in error
+                ? error.diagnostics
+                : [],
+          },
+          424,
+        );
+      }
+      const latest = (
+        await admin(
+          "content_versions?status=eq.published&order=version_number.desc&limit=1&select=version_id",
+        )
+      )[0];
+      const previous = (
+        await admin(
+          `scenario_edition_prices?version_id=eq.${latest.version_id}&select=source_snapshot`,
+        )
+      )[0].source_snapshot;
+      const candidate = structuredClone(previous);
+      for (const card of candidate.cards) {
+        if (!(card.key in censusBindings)) continue;
+        const authored = catalog.cards
+          .find((c) => c.key === card.key)!
+          .facts.find((f) => f.role === "general")!;
+        const fact = card.facts.find(
+          (f: { role: string }) => f.role === "general",
+        );
+        fact.template = authored.template;
+        fact.semantic_key = authored.semantic_key;
+        fact.evidence = authored.evidence;
+      }
+      candidate.sourceHash = catalog.sourceHash;
+      const complete = applyCensusFacts(candidate, census, previous);
+      if (complete !== 9)
+        return reply(
+          { status: "blocked", error: "Nine complete Census facts required" },
+          424,
+        );
+      if (dryRun)
+        return reply({
+          status: "ready",
+          facts: complete,
+          period: census.period,
+        });
+      const versionId = await admin(
+        "rpc/publish_scenario_source_edition",
+        "POST",
+        { p_catalog: candidate },
+      );
+      return reply({
+        status: "published",
+        facts: complete,
+        period: census.period,
+        versionId,
+      });
+    }
     const previous = (await admin(`${row}&select=*`))[0];
     if (
       previous?.status === "published" &&

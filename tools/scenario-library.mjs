@@ -12,6 +12,7 @@ export const retiredScenarioKeys = new Set([
   "D037",
   "D038",
   "D041",
+  "D052",
   "D057",
   "D060",
 ]);

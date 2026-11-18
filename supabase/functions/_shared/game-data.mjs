@@ -1,4 +1,5 @@
 // Uses fixed provider endpoints. Credentials are supplied only by the server.
+import { fetchCensusFacts, applyCensusFacts } from "./census-facts.mjs";
 const endpoints = {
   bls: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
   rentcast: "https://api.rentcast.io/v1/markets",
@@ -39,7 +40,13 @@ export function cpiPrice(amount, observations, baseline) {
   return money((amount * observations[0].value) / base.value);
 }
 export function cpiFact(fact, observations) {
-  const latest = observations[0];
+  const latest = observations.find((candidate) =>
+    observations.some(
+      (row) =>
+        row.period ===
+        `${Number(candidate.period.slice(0, 4)) - 1}${candidate.period.slice(4)}`,
+    ),
+  );
   const prior = observations.find(
     (row) =>
       row.period ===
@@ -52,6 +59,11 @@ export function cpiFact(fact, observations) {
     .replaceAll("{base observation period}", prior.period)
     .replaceAll("{latest observation period}", latest.period)
     .replaceAll("{pct}", Math.abs(percent).toFixed(1))
+    .replaceAll("{change}", percent < 0 ? "decreased" : "increased")
+    .replace(
+      /(?:increased|decreased) by 0\.0%\./,
+      percent === 0 ? "did not change." : "$&",
+    )
     .replaceAll("{direction}", percent < 0 ? "lower" : "higher")
     .replace(
       /the U\.S\. price index for (.+?) changed by ([\d.]+)%\./,
@@ -418,45 +430,7 @@ export async function refreshCatalog(input, env, options = {}) {
   });
   const censusRequest = attempt(
     "census",
-    async () => {
-      let body;
-      let year;
-      for (
-        year = now.getUTCFullYear() - 1;
-        year >= now.getUTCFullYear() - 3;
-        year--
-      ) {
-        const url = new URL(`https://api.census.gov/data/${year}/acs/acs5`);
-        url.searchParams.set("get", "NAME,B23025_003E,B23025_005E");
-        url.searchParams.set("for", "place:68516");
-        url.searchParams.set("in", "state:13");
-        if (env.CENSUS_API_KEY) url.searchParams.set("key", env.CENSUS_API_KEY);
-        try {
-          body = await request(url);
-          break;
-        } catch {
-          /* Try the next available annual release. */
-        }
-      }
-      if (
-        !Array.isArray(body) ||
-        body.length !== 2 ||
-        !body[1][0].includes("Sandy Springs")
-      )
-        throw new Error("ACS unemployment unavailable");
-      const denominator = positive(body[1][1], "civilian labor force");
-      const numerator = Number(body[1][2]);
-      if (
-        !Number.isFinite(numerator) ||
-        numerator < 0 ||
-        numerator > denominator
-      )
-        throw new Error("Invalid unemployment count");
-      return {
-        period: `${year - 4}–${year}`,
-        percent: ((100 * numerator) / denominator).toFixed(1),
-      };
-    },
+    () => fetchCensusFacts(env, { now, fetcher }),
     false,
   );
   const wageRequest = refreshWages(request, options.jobs ?? [], env, now);
@@ -577,7 +551,7 @@ export async function refreshCatalog(input, env, options = {}) {
             previous.role === fact.role &&
             previous.semantic_key === fact.semantic_key,
         );
-      if (priorFact?.copy_kind === "fact") {
+      if (fact.template.includes("{") && priorFact?.copy_kind === "fact") {
         fact.text = priorFact.text;
         fact.copy_kind = priorFact.copy_kind;
       }
@@ -595,12 +569,6 @@ export async function refreshCatalog(input, env, options = {}) {
           });
         }
       }
-      if (["D001", "D003"].includes(card.key) && sources.census) {
-        fact.text = fact.template
-          .replaceAll("{period}", sources.census.period)
-          .replaceAll("{pct}", sources.census.percent);
-        fact.copy_kind = "fact";
-      }
       if (card.key === "D007" && sources.electricity) {
         fact.text = fact.template
           .replaceAll("{period}", sources.electricity.period)
@@ -610,6 +578,12 @@ export async function refreshCatalog(input, env, options = {}) {
     }
   }
   result.freshness = freshness;
+  applyCensusFacts(
+    result,
+    sources.census,
+    options.previousCatalog,
+    now.toISOString(),
+  );
   result.checkedAt = now.toISOString();
   return {
     catalog: result,

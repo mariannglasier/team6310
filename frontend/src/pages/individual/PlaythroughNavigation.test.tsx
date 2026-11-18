@@ -264,9 +264,7 @@ it.each([false, true])(
     const page = show()
     await userEvent.click(
       await screen.findByRole('button', {
-        name: support
-          ? 'Try again with CAC support'
-          : 'Replay from household selection',
+        name: support ? 'Try another mode' : 'Replay from household selection',
       }),
     )
     expect(

@@ -94,7 +94,7 @@ BEGIN
  first_id:=public.publish_scenario_source_edition(payload);
  second_id:=public.publish_scenario_source_edition(payload);
  IF first_id IS DISTINCT FROM second_id THEN RAISE EXCEPTION 'Publication retry created another edition'; END IF;
- IF (SELECT count(DISTINCT library_key) FROM public.scenario_library_metadata WHERE version_id=first_id)<>51
+ IF (SELECT count(DISTINCT library_key) FROM public.scenario_library_metadata WHERE version_id=first_id)<>50
  THEN RAISE EXCEPTION 'Incomplete refreshed edition'; END IF;
  BEGIN
   UPDATE public.scenario_edition_prices SET clothing_cost=clothing_cost+1 WHERE version_id=first_id;

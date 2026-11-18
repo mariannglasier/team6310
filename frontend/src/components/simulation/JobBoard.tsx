@@ -60,7 +60,10 @@ export function JobBoard({
                 title={job.description ?? undefined}
                 aria-pressed={selected === job.id}
                 disabled={!eligible}
-                onClick={() => select(job.id)}
+                onClick={() => {
+                  select(job.id)
+                  onApply(job.id)
+                }}
                 key={job.id}
                 className={`employment-posting${eligible ? '' : ' is-locked'}`}
               >
@@ -94,14 +97,6 @@ export function JobBoard({
           })}
         </div>
       </div>
-      <Button
-        disabled={selected === null || !eligibleIds.includes(selected)}
-        onClick={() => {
-          if (selected !== null) onApply(selected)
-        }}
-      >
-        Submit application
-      </Button>
       {eligibleIds.length === 0 && (
         <p role="alert">
           No eligible jobs are available for this step. Check the household’s

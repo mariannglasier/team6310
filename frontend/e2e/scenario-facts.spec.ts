@@ -17,7 +17,7 @@ for (const support of [false, true])
       version_id: 'version',
       name: 'Alex',
       description: 'Synthetic visual fixture',
-      general_starting_balance: 250,
+      general_starting_balance: 1832,
       weekly_income: 0,
       starting_job_id: null,
     }
@@ -73,13 +73,13 @@ for (const support of [false, true])
         playthrough_id: 'run',
         version_id: 'version',
         name_snapshot: 'Utilities',
-        amount_due: 20,
+        amount_due: 60,
         late_fee_amount: 2,
         due_day: 3,
-        ignored_at: '2026-11-08T12:00:00Z',
-        paid_at: null,
-        paid_day: null,
-        payment_balance_after: null,
+        ignored_at: null,
+        paid_at: '2026-11-08T12:00:00Z',
+        paid_day: 3,
+        payment_balance_after: 1772,
       },
       {
         playthrough_expense_id: 'future',
@@ -137,9 +137,9 @@ for (const support of [false, true])
         body = {
           run,
           bills,
-          paid_total: 0,
+          paid_total: 60,
           overdue_total: 55,
-          outstanding_total: 75,
+          outstanding_total: 55,
           upcoming_total: 10,
           scenario_income: 0,
           scenario_charged: 0,
@@ -150,10 +150,10 @@ for (const support of [false, true])
             scenario_id: 'scenario',
             version_id: 'version',
             fact_role: 'general',
-            semantic_key: 'energy:cost',
+            semantic_key: 'acs:B25070:rent_burden',
             display_text:
-              'Some households face difficult choices when energy bills arrive.',
-            source_url: 'https://www.eia.gov/',
+              'An energy bill isnâ€™t the same for every household. In 2020–2024, 44.7% of Sandy Springs renters with a reported ratio spent at least 30% of their income on rent.',
+            source_url: 'https://api.census.gov/',
           },
           ...(support
             ? [
@@ -163,7 +163,7 @@ for (const support of [false, true])
                   fact_role: 'cac',
                   semantic_key: 'cac:housing',
                   display_text:
-                    'CAC helps households maintain housing stability.',
+                    'CAC helps households maintain housing stability. In 2025, CAC reported preventing evictions for 1,108 households.',
                   source_url: 'https://www.ourcac.org/',
                 },
               ]
@@ -201,13 +201,15 @@ for (const support of [false, true])
     })
     await page.getByText('Last updated', { exact: true }).click()
     await expect(
-      page.getByText(
-        'Some households face difficult choices when energy bills arrive.',
-      ),
+      page.getByText('An energy bill isn’t the same for every household.'),
     ).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'CAC impact' })).toHaveCount(
+    await expect(page).not.toHaveTitle(/one day at a time/i)
+    await expect(page.getByText(/CAC enrollment status/)).toHaveCount(
       support ? 1 : 0,
     )
+    await expect(
+      page.getByRole('heading', { name: /CAC’s response/ }),
+    ).toHaveCount(support ? 1 : 0)
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -217,7 +219,7 @@ for (const support of [false, true])
       page.getByLabel('Scenario facts', { exact: true }).getByRole('link', {
         name: /Source/,
       }),
-    ).toHaveCount(support ? 2 : 1)
+    ).toHaveCount(0)
     const balance = page.locator('.finance-balance')
     await expect(balance).toHaveText('$1,772.00')
     expect(

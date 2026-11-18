@@ -161,7 +161,7 @@ function factMarkdown(fact) {
 const md = [
   "# Scenario prices and fact numbers",
   "",
-  "Prepared November 16, 2026. All 51 logical scenario cards are included.",
+  `Prepared November 17, 2026. All ${records.length} logical scenario cards are included.`,
   "",
   "This inventory compares the authored draft with the checked-in development SQL artifact. Development amounts are provisional where documented. The full fact templates retain unresolved fields. The development edition uses shorter context copy where observations remain pending. The source fact-verification flags remain historical review flags. These changes are prepared for deployment. Runtime database values were not queried.",
   "",
@@ -287,11 +287,11 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta n
 <style>
 *{box-sizing:border-box}body{overflow-wrap:anywhere;margin:0;background:#f3f5f7;color:#17212e;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:36px 24px}h1{font-size:36px;line-height:1.2;margin:0 0 18px}h2{font-size:27px;margin:4px 0 18px}h3{font-size:20px;margin:22px 0 10px}h4{font-size:17px;margin:0 0 10px}p{margin:10px 0}a{color:#165a94}a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid #b42318;outline-offset:3px}.intro{max-width:920px}.filters{background:white;padding:20px;border:1px solid #ccd5dd;border-radius:10px;margin:26px 0 16px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}label{font-weight:650;display:block;font-size:14px}input,select,button{width:100%;font:inherit;padding:10px;border:1px solid #7a8998;border-radius:5px;background:white;color:inherit;margin-top:5px}.tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.tools button{width:auto;cursor:pointer;margin:0}.index{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 26px}.index a{padding:4px 9px;border:1px solid #ccd5dd;border-radius:4px;background:white;text-decoration:none;font-size:14px}article{background:white;padding:28px;border:1px solid #ccd5dd;border-radius:10px;margin:24px 0;scroll-margin-top:20px}.label{text-transform:uppercase;letter-spacing:.04em;font-size:12px;font-weight:700;color:#536478}.situation{font-size:18px}.choice{border-left:4px solid #38779a;background:#f7fafc;padding:18px;margin:14px 0}.amount{font-size:18px}.amount span{display:block;font-size:14px;color:#435568}.facts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}.fact{border:1px solid #cfdae4;padding:20px;border-radius:7px;min-width:0}.fact h3{margin-top:0}.numbers{background:#edf3f7;padding:9px 12px;border-radius:4px}.note{background:#fff7e8;padding:12px 16px;border-left:3px solid #aa6b13}summary{cursor:pointer;font-weight:650;padding:8px 0}details{margin:10px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.65 system-ui,sans-serif;background:#f5f7f9;padding:16px}code{overflow-wrap:anywhere}.source{font-size:13px;overflow-wrap:anywhere}.back{font-size:14px;text-align:right}[hidden]{display:none!important}footer{padding:30px 0;font-size:14px;color:#536478}@media(max-width:750px){main{padding:24px 14px}h1{font-size:29px}article{padding:18px}.facts,.filters{grid-template-columns:1fr}}@media print{body{background:white;font-size:10pt}main{max-width:none;padding:0}.filters,.tools,.index,.back{display:none}article{border:0;border-radius:0;padding:0;margin:20px 0;break-before:page}article:first-of-type{break-before:auto}.facts{display:block}.fact{margin:12px 0;break-inside:avoid}details:not([open]){display:none}.choice{break-inside:avoid}a{color:inherit}}
 </style></head><body><main id="top"><h1>Scenario prices and fact numbers</h1>
-<div class="intro"><p>All 51 logical scenarios, prepared November 16, 2026. Read each situation, its prices and outcomes, and both available fact passages together.</p>
+<div class="intro"><p>All ${records.length} logical scenarios, prepared November 17, 2026. Read each situation, its prices and outcomes, and both available fact passages together.</p>
 <p>The authored draft and checked-in development edition contain different amounts and fact copy. Both are included here. Development amounts are provisional where documented. Unresolved template fields remain visible for API planning. Fact numbers include dates and written quantities, with their full sentences for context.</p>
 <p>This inventory reads local source artifacts. Runtime database wages and household starting balances require a database export. The source fact-verification flags remain false.</p></div>
 <form class="filters" onsubmit="return false"><label>Search scenarios prices facts or sources<input id="search" type="search" placeholder="Try rent, $60, 610, D014, or census"></label><label>Category<select id="category"><option value="">All categories</option>${categories.map((category) => `<option>${escape(category)}</option>`).join("")}</select></label><label>Show<select id="status"><option value="">All scenarios</option><option value="pending">Unresolved or missing fact</option><option value="cac">CAC fact available</option><option value="no-cac">CAC fact missing</option><option value="bill">Bill cards</option><option value="employment">Employment cards</option><option value="ordinary">Ordinary cards</option></select></label></form>
-<div class="tools"><p id="count" role="status" aria-live="polite">51 of 51 scenarios</p><button id="expand" type="button">Expand all source notes</button><button id="collapse" type="button">Collapse all source notes</button><button type="button" onclick="window.print()">Print or save as PDF</button></div>
+<div class="tools"><p id="count" role="status" aria-live="polite">${records.length} of ${records.length} scenarios</p><button id="expand" type="button">Expand all source notes</button><button id="collapse" type="button">Collapse all source notes</button><button type="button" onclick="window.print()">Print or save as PDF</button></div>
 <nav class="index" aria-label="Jump to scenario">${records.map(({ card }) => `<a href="#${card.key}" title="${escape(card.title)}">${card.key}</a>`).join("")}</nav>
 ${cardsHtml}
 <footer><p>Sources include the structured scenario draft, development SQL content artifact, full scenario sourcing document, CAC 2025 fact snapshot, and employment-engine SQL.</p><p>Source hash ${escape(library.sourceHash)}</p></footer></main>
@@ -313,7 +313,7 @@ function filter() {
     document.querySelector('.index a[href="#' + card.id + '"]').hidden = !visible;
     if (visible) count++;
   });
-  document.querySelector('#count').textContent = count + ' of 51 scenarios';
+  document.querySelector('#count').textContent = count + ' of ${records.length} scenarios';
 }
 search.addEventListener('input', filter);
 category.addEventListener('change', filter);
@@ -323,7 +323,7 @@ document.querySelector('#collapse').addEventListener('click', () => document.que
 </script></body></html>`;
 
 if (
-  records.length !== 51 ||
+  records.length !== library.cards.length ||
   records.some(({ card }) => !sourceSections.has(card.key))
 ) {
   throw new Error("Incomplete scenario coverage");

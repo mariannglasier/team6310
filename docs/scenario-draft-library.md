@@ -155,7 +155,6 @@ The fee examples provisionally show **one fee on the initial Ignore submission**
 | D049 | everyday | Financial Literacy & Taxes | A fee to access your money | ALL | None |
 | D050 | everyday | Essential Goods & Clothing | Running low on essentials | ALL | None |
 | D051 | A chance to learn | Employment & Adult Education | A chance to learn | ALL | None |
-| D052 | everyday | Childcare & Youth | Maya's birthday | JORDAN | None |
 | D053 | A holiday meal | Food & Nutrition | A holiday meal | ALL | Conditional |
 | D054 | everyday | Essential Goods & Clothing | Clothes need replacing | ALL | Conditional |
 | D055 | everyday | Financial Literacy & Taxes | Someone asks for help | ALL | None |
@@ -1162,7 +1161,7 @@ Removed at the user's request. No replacement. Historical editions retain their 
 
 **Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** An adult household member needs a usable winter coat.
 
-**Situation:** Your coat is worn out. You can replace it, repair it, or look for a secondhand coat through Canopy Thrift.
+**Situation:** Your coat is worn out. You can replace it or repair it.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
@@ -1226,7 +1225,7 @@ Removed at the user's request. No replacement. Historical editions retain their 
 
 **Type / category:** everyday / Essential Goods & Clothing. **Persona intent:** ALL. **Eligibility:** Fictional family occasion approved.
 
-**Situation:** A child in your family has a birthday coming up. You can buy the gift you planned, choose a smaller gift, give your time, or use Canopy Thrift credits to find a gift.
+**Situation:** A child in your family has a birthday coming up. You can buy the gift you planned, choose a smaller gift, or give your time.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
@@ -1308,7 +1307,7 @@ Removed at the user's request. No replacement. Historical editions retain their 
 
 **Type / category:** everyday / Food & Nutrition. **Persona intent:** EMPLOYED. **Eligibility:** Hired; feasible cooking/storage assumptions.
 
-**Situation:** You can prepare lunches ahead of time or buy them during workdays. One option takes more time now; the other costs more money.
+**Situation:** You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 
@@ -1317,7 +1316,7 @@ Removed at the user's request. No replacement. Historical editions retain their 
 | Key | Choice | Financial expression | Outcome | Response |
 | --- | --- | --- | --- | --- |
 | D046-PACK | Buy ingredients and pack lunches | -$26.00 | work_lunches_packed | You spend less and do the preparation. |
-| D046-BUY | Buy the workday lunches | -$55.00 | work_lunches_purchased | You save preparation time and spend more. |
+| D046-BUY | Get lunch out with your coworkers | -$55.00 | work_lunches_purchased | You got lunch out with your coworkers. |
 | D046-CAC | Get lunch ingredients from the CAC Mini-Market | $0.00 | Direct effect or engine rule | You received lunch ingredients from the CAC Mini-Market. |
 
 **CAC option:** none in either mode. No service or financial effect is inferred for this expense.
@@ -1473,30 +1472,9 @@ Removed at the user's request. No replacement. Historical editions retain their 
 
 **Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; Not the fixed CAC preparation; content value and fee need review..
 
-## D052 — Maya's birthday
+## D052 — Retired November 17 2026
 
-**Type / category:** everyday / Childcare & Youth. **Persona intent:** JORDAN. **Eligibility:** Fictional birthday occurs this month.
-
-**Situation:** “Maya wants a birthday celebration. You can pay for the original plan or choose a smaller celebration at home.”
-
-**Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
-
-**All numerical amounts in this table are DRAFT assumptions requiring approval.** Every row is a submitted answer.
-
-| Key | Choice | Immediate balance change | Proposed committed outcome | Result text |
-| --- | --- | --- | --- | --- |
-| D052-PLAN | Pay for the original plan | -$80.00 | child_birthday_original | “You spend the money on the original celebration.” |
-| D052-HOME | Choose the smaller home celebration | -$20.00 | child_birthday_home | “You choose the less expensive celebration.” |
-
-**CAC option:** none in either mode. No service or financial effect is inferred for this expense.
-
-**Cost bindings:** create separate pending assumption bindings for each numerical choice component; no external price evidence is claimed. Resolve exact quantities and household mapping before publication. **State/routing:** the chosen row commits its proposed outcome; recap then Continue to the next day. No hidden financial penalty or automatic follow-up.
-
-**Facts:** general `G-D052` = UNRESOLVED. Source an approved child-household, school-cost or care-access observation matching the need, child population and geography; do not imply CAC daycare coverage. CAC `K-D052` = UNRESOLVED — no suitable topic-matched CAC observation assigned; no assistance inferred. Exactly these two roles; missing facts block publication.
-
-**CAC fact gap:** Holiday-program facts do not establish birthday-party support. [Gap review](scenario-cac-fact-pairings.md#d052).
-
-**Review blockers:** actual edition/scenario/category/persona/choice IDs; both approved facts; supported transitions and state predicates; approve all draft prices and circumstances, alternative feasibility and financial consequences; No happiness score or judgment about parenting..
+Removed completely from new editions at the user's request. No replacement. Historical runs retain their original edition.
 
 ## D053 — A holiday meal
 
@@ -1713,7 +1691,6 @@ The following is an **unapproved editorial route for Jordan**, assuming the nece
 | 19 | D049 | Payment-access tradeoff if applicable |
 | 20 | D050 | Hygiene supplies |
 | 21 | D025 | Childcare shock; no duplicate care period |
-| 22 | D052 | Child birthday only if appropriate |
 | 23 | D048 | Meals for Kids period must apply |
 | 24 | D012 | Medical invoice, not a duplicate of dental treatment |
 | 25 | D054 | Everyday clothing |

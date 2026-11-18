@@ -1,4 +1,5 @@
 import { getSupabaseClient } from './supabase'
+import { gameplayText } from '../lib/gameplayText'
 
 export interface ScenarioFact {
   role: 'general' | 'cac'
@@ -44,7 +45,7 @@ export async function loadScenarioFacts(
     return {
       role: row.fact_role,
       semanticKey: row.semantic_key,
-      text: row.display_text,
+      text: gameplayText(row.display_text),
       sourceUrl: row.source_url,
       ...(row.copy_kind ? { copyKind: row.copy_kind } : {}),
     }

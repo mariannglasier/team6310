@@ -2,11 +2,13 @@
 
 # Scenario data connections and Supabase setup
 
-The published fact audit on November 17 found no index terminology in player-facing fact text. All 17 remaining index-worded source templates, plus the phone-price template, now use plain price language with higher/lower direction. Tests cover both directions and reject index terminology in general fact templates. The current 51 logical cards have 25 general fact passages and 26 context-only general passages. There are 33 CAC fact passages, leaving 18 cards without a CAC fact. Context passages preserve useful prose when a numerical observation is unresolved. Historical CAC figures retain their reporting year. The searchable inventory has been regenerated with the plain-language templates.
+Edition 9 now has 51 complete general fact passages and zero context-only general passages. All nine Census facts are live using the 2020–2024 five-year release; see [the Census integration and published observations](census-fact-integration.md). Price-change templates use the requested average-price wording and actual comparison dates. There are still 33 CAC passages, leaving 18 cards without a CAC fact. Census observations do not replace CAC program facts. Historical CAC figures retain their reporting year.
 
-The November 17 refresh successfully published edition 6 with version ID `f755edde-3679-4c5b-ba7f-0867ecd85d2d`. It contains the approved 51-card catalog, six-ZIP weighted rents, refreshed prices and CPI-adjusted simulation tax credits. Start a new game to use this edition.
+The latest November 17 publication is edition 9, version ID `74aa2bd4-ac41-1ce8-696d-87a8ddd38c09`. It preserves the approved 51-card catalog, six-ZIP weighted rents, prices, wages and tax credits from the earlier price refresh and completes the general facts. Start a new game to use this edition.
 
 ## Tax scenario baselines
+
+Alex's approved starting cash is now $1,500 for new runs, carried into future monthly editions as a design setting. Other households are unchanged. See [the starting-cash adjustment](alex-starting-balance.md).
 
 | Household | October 2026 baseline credit, USD |
 | --- | --- |
@@ -32,7 +34,7 @@ Provider credentials belong in Supabase Dashboard → Edge Functions → Secrets
 | BLS_API_KEY | Registered access to the BLS JSON API for CPI. Small unregistered requests are also supported. | [BLS](https://data.bls.gov/registrationEngine/) |
 | EIA_API_KEY | Georgia residential electricity data. Live retrieval passed. | [EIA](https://www.eia.gov/opendata/register.php) |
 | RENTCAST_API_KEY | Six approved ZIP market requests monthly. Live retrieval passed. | [RentCast](https://app.rentcast.io/) |
-| CENSUS_API_KEY | Optional Census access for supported ACS facts. Missing facts retain context. | [Census](https://api.census.gov/data/key_signup.html) |
+| CENSUS_API_KEY | Activated Census API key for all nine ACS facts. Live verification and publication passed after activation. Failures retain prior complete facts and their dates. | [Census](https://api.census.gov/data/key_signup.html) |
 | GAME_DATA_REFRESH_TOKEN | Optional separate token for manual calls. The installed cron uses its Vault token. | A private random token of at least 32 characters |
 
 Supabase supplies SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to the function. The browser uses its existing publishable key. The refresh calls JSON APIs only. School meals and transit use BLS all-items CPI; category prices fall back to all-items CPI when category observations are unavailable. CPI calculations use the original October 2026 baseline. Website links document sources, registration or API usage.

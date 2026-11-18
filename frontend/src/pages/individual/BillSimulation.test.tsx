@@ -123,14 +123,14 @@ it('reconciles a lost payment response and restores a saved receipt on remount w
   )
   vi.mocked(loadBillSnapshot).mockResolvedValue(paid)
   await userEvent.click(pay)
-  expect(await screen.findByText('Paid $10.00')).toBeInTheDocument()
-  expect(screen.getByText('$90.00')).toBeInTheDocument()
+  expect(await screen.findByLabelText('Decision receipt')).toBeInTheDocument()
+  expect(screen.getAllByText('$90.00').length).toBeGreaterThan(0)
   expect(
     screen.getByRole('button', { name: 'Continue to next day' }),
   ).toBeEnabled()
   view.unmount()
   show()
-  expect(await screen.findByText('Paid $10.00')).toBeInTheDocument()
+  expect(await screen.findByLabelText('Decision receipt')).toBeInTheDocument()
   expect(submitBill).toHaveBeenCalledOnce()
 })
 it('reports Day 30 unpaid obligations while preserving remaining cash', async () => {

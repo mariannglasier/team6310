@@ -139,8 +139,11 @@ it('keeps pending decisions quiet and prevents duplicate submission before showi
   show({ ...base, stage: 'day', day: 1 })
   const next = await screen.findByRole('button', { name: 'Next' })
   await userEvent.click(next)
-  expect(next).toBeDisabled()
-  expect(next.closest('fieldset')).toHaveAttribute('aria-busy', 'true')
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  expect(screen.getByText('Loading…').closest('fieldset')).toHaveAttribute(
+    'aria-busy',
+    'true',
+  )
   expect(screen.queryByText(/Saving your decision/)).toBeNull()
   await userEvent.click(next)
   expect(submitEmployment).toHaveBeenCalledOnce()
@@ -150,7 +153,7 @@ it('keeps pending decisions quiet and prevents duplicate submission before showi
   })
   expect(
     await screen.findByRole('heading', {
-      name: 'What will you wear to the interview?',
+      name: 'Your interview is today! What will you wear?',
     }),
   ).toBeInTheDocument()
   expect(
@@ -202,7 +205,7 @@ it('stops an uncertain automatic submission and reconciles it explicitly without
   const retry = await screen.findByRole('button', {
     name: 'Reconcile pending submission',
   })
-  expect(screen.getByText("Opening today's content…")).toBeVisible()
+  expect(screen.getByText('Loading…')).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   expect(commit).not.toHaveBeenCalled()
   await userEvent.click(retry)

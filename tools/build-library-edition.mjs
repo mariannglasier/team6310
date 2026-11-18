@@ -41,7 +41,7 @@ BEGIN
  WHERE status='published' AND published_at IS NOT NULL ORDER BY version_number DESC LIMIT 1;
  INSERT INTO public.content_versions(version_id,version_number,status,created_by,created_at,published_at,change_summary)
  SELECT new_version,max(version_number)+1,'draft',NULL,now(),NULL,
- 'November 16 scenario and fact fixes; all households own a car; D016/D017/D023/D031/D037/D038/D041/D057/D060 retired; monthly source bindings.' FROM public.content_versions;
+ 'Scenario and fact fixes; all households own a car; D016/D017/D023/D031/D037/D038/D041/D052/D057/D060 retired; monthly source bindings.' FROM public.content_versions;
  INSERT INTO public.scenario_edition_prices(version_id,clothing_cost,source_snapshot)
  VALUES(new_version,(settings->>'clothing')::numeric,settings);
  INSERT INTO public.jobs(job_id,version_id,soc_code,title,description,area_code,area_name,geography_level,wage_year,
@@ -66,7 +66,7 @@ BEGIN
    AND (wage.value->>'year')::integer>=j.wage_year;
  END IF;
  INSERT INTO public.personas(persona_id,name,description,general_starting_balance,weekly_income,version_id,starting_job_id,has_english_skills,has_computer_skills)
- SELECT md5(new_version::text||persona_id::text)::uuid,name,description,general_starting_balance,weekly_income,new_version,
+ SELECT md5(new_version::text||persona_id::text)::uuid,name,description,coalesce((settings->'startingBalances'->>name)::numeric,general_starting_balance),weekly_income,new_version,
  CASE WHEN starting_job_id IS NULL THEN NULL ELSE md5(new_version::text||starting_job_id::text)::uuid END,has_english_skills,has_computer_skills
  FROM public.personas WHERE version_id=source_version;
  FOR p IN SELECT * FROM public.personas WHERE version_id=new_version LOOP

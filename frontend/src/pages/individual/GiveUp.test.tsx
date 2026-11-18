@@ -307,9 +307,7 @@ it('gives up before employment without initialization and restores/replays the t
     ).getByText('$100.00'),
   ).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Give Up' })).toBeNull()
-  expect(
-    screen.queryByRole('button', { name: 'Try again with CAC support' }),
-  ).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Try another mode' })).toBeNull()
   page.unmount()
   show()
   expect(
@@ -476,6 +474,7 @@ it.each(['pay', 'ignore'] as const)(
         name: `${action === 'pay' ? 'Pay' : 'Ignore'} Rent`,
       }),
     )
+    expect(submitBill).toHaveBeenCalledOnce()
     expect(screen.getByRole('button', { name: 'Give Up' })).toBeDisabled()
     await userEvent.click(screen.getByRole('button', { name: 'Give Up' }))
     expect(rpc).not.toHaveBeenCalled()
@@ -526,7 +525,6 @@ it('blocks Give Up while a scenario mutation or its outcome is uncertain', async
   await userEvent.click(
     await screen.findByRole('button', { name: /Decline assistance/ }),
   )
-  await userEvent.click(screen.getByRole('button', { name: 'Submit decision' }))
   expect(screen.getByRole('button', { name: 'Give Up' })).toBeDisabled()
   vi.mocked(restoreScenario).mockRejectedValueOnce(new Error('offline'))
   await act(async () => pending.reject(new Error('response lost')))
