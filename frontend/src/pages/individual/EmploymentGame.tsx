@@ -34,6 +34,7 @@ export function EmploymentGame({
   recapFacts,
   runId,
   loading = false,
+  allowPlaceholder = false,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
@@ -41,6 +42,8 @@ export function EmploymentGame({
   recapFacts?: ReactNode
   runId?: string
   loading?: boolean
+  // The caller must resolve bills and real scenarios before allowing fallback.
+  allowPlaceholder?: boolean
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -179,7 +182,7 @@ export function EmploymentGame({
             </div>
           )}
           {(state.stage === 'day' || state.stage === 'income') &&
-            (loading ? (
+            (loading || state.stage === 'income' || !allowPlaceholder ? (
               <p className="scenario-loading" role="status">
                 Loading…
               </p>

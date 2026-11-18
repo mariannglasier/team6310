@@ -74,27 +74,26 @@ export function EmploymentPanel({
   }, [pending, onPendingChange])
   // Content identity is independent of financial synchronization. A payment or
   // decision can change cash/revision without changing the mounted day's panel.
-  // An explicit null snapshot is unresolved; undefined preserves standalone use.
-  const dayContentReady =
-    bills === undefined ||
+  // Missing snapshots never establish that a day has no scheduled bills.
+  const dayContentReady = Boolean(
+    bills &&
+    snapshot &&
+    run.id === snapshot.run.id &&
+    run.versionId === snapshot.run.versionId &&
+    bills.run.id === snapshot.run.id &&
+    bills.run.versionId === snapshot.run.versionId &&
+    bills.run.currentDay === snapshot.run.currentDay &&
+    bills.run.currentScenarioId === snapshot.run.currentScenarioId,
+  )
+  const billsReady =
+    dayContentReady &&
     Boolean(
       bills &&
       snapshot &&
-      bills.run.id === snapshot.run.id &&
-      bills.run.versionId === snapshot.run.versionId &&
-      bills.run.currentDay === snapshot.run.currentDay &&
-      bills.run.currentScenarioId === snapshot.run.currentScenarioId,
+      bills.run.currentBalance === snapshot.run.currentBalance &&
+      (bills.run.employmentState as { revision?: number })?.revision ===
+        snapshot.revision,
     )
-  const billsReady =
-    dayContentReady &&
-    (bills === undefined ||
-      Boolean(
-        bills &&
-        snapshot &&
-        bills.run.currentBalance === snapshot.run.currentBalance &&
-        (bills.run.employmentState as { revision?: number })?.revision ===
-          snapshot.revision,
-      ))
   const dueToday =
     bills?.items.some((b) => b.dueDay === snapshot?.run.currentDay) ?? false
   useEffect(() => {
@@ -177,6 +176,13 @@ export function EmploymentPanel({
     mutation.busy,
   ])
   const state = snapshot?.state
+  const allowPlaceholder =
+    billsReady &&
+    !billBusy &&
+    !uncertain &&
+    !error &&
+    !dueToday &&
+    !snapshot?.run.currentScenarioId
   const skipInterviewDay =
     state?.stage === 'day' &&
     billsReady &&
@@ -211,13 +217,10 @@ export function EmploymentPanel({
         className="employment-controls"
       >
         {state?.stage === 'income' ? (
-          <p className="scenario-loading" role="status">
-            Loading…
-          </p>
-        ) : state?.stage === 'day' && !dayContentReady ? (
-          <p className="scenario-loading" role="status">
-            Loading…
-          </p>
+          <p role="status">Opening today's content…</p>
+        ) : state?.stage === 'day' &&
+          (!dayContentReady || (dueToday && !onBillAction)) ? (
+          <p role="status">Loading today's content…</p>
         ) : skipInterviewDay ? (
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
@@ -272,6 +275,7 @@ export function EmploymentPanel({
               ) : undefined
             }
             state={snapshot.state}
+            allowPlaceholder={allowPlaceholder}
             dispatch={(a) => {
               void send(a)
             }}

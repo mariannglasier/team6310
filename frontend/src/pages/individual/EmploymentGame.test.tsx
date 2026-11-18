@@ -10,6 +10,9 @@ import {
   type WalkthroughJob,
 } from '../../state/employmentWalkthrough'
 import { usdCents, type Persona } from '../../types/domain'
+import { employmentSnapshot } from '../../services/employmentGameplay'
+import { contentService } from '../../services/contentService'
+import hostedDocument from '../../services/fixtures/hostedEmploymentDocument.json'
 
 const persona: Persona = {
   id: 'p1',
@@ -44,12 +47,19 @@ function Game({ replay }: { replay: (support: boolean) => void }) {
     createWalkthrough(persona, jobs, false, usdCents(6000)),
   )
   return (
-    <EmploymentGame
-      state={state}
-      dispatch={dispatch}
-      onReplay={replay}
-      recapFacts={<aside>Employment context from the saved edition</aside>}
-    />
+    <>
+      {/* This reducer-only harness acknowledges income without a bill service. */}
+      {state.stage === 'income' && (
+        <button onClick={() => dispatch({ type: 'continue' })}>Next</button>
+      )}
+      <EmploymentGame
+        state={state}
+        dispatch={dispatch}
+        onReplay={replay}
+        recapFacts={<aside>Employment context from the saved edition</aside>}
+        allowPlaceholder={state.stage === 'day'}
+      />
+    </>
   )
 }
 it('uses the current day instead of a slogan in the browser tab', () => {
@@ -197,4 +207,96 @@ it('shows missing jobs as an actionable blocking state', () => {
   expect(
     screen.queryByRole('button', { name: 'Submit application' }),
   ).toBeNull()
+})
+
+it.each(['day', 'income'] as const)(
+  'does not default to a placeholder during an unresolved %s stage',
+  (stage) => {
+    render(
+      <MemoryRouter>
+        <EmploymentGame
+          state={{
+            ...createWalkthrough(persona, jobs, false, usdCents(6000)),
+            stage,
+            day: 4,
+          }}
+          dispatch={vi.fn()}
+          onReplay={vi.fn()}
+        />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent(
+      "Loading today's content",
+    )
+    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  },
+)
+
+it('displays the restored clothing price and uses exact cents for a purchase', async () => {
+  const loadJobs = vi
+    .spyOn(contentService, 'loadJobs')
+    .mockResolvedValue(jobs.map(({ job }) => job))
+  try {
+    const snapshot = await employmentSnapshot({
+      id: 'run',
+      ownerUserId: 'owner',
+      personaId: persona.id,
+      versionId: persona.versionId,
+      persona,
+      currentDay: 2,
+      currentBalance: usdCents(10000),
+      currentScenarioId: null,
+      currentJobId: null,
+      sessionId: null,
+      supportEnabled: false,
+      status: 'active',
+      startedAt: null,
+      employmentState: {
+        ...hostedDocument,
+        stage: 'interview',
+        targetId: jobs[0].job.id,
+        initialTargetId: jobs[0].job.id,
+        clothingCost: '83.27',
+      },
+    })
+    if (!snapshot.state) throw new Error('Expected restored employment')
+    const dispatch = vi.fn()
+    render(
+      <MemoryRouter>
+        <EmploymentGame
+          state={snapshot.state}
+          dispatch={dispatch}
+          onReplay={vi.fn()}
+        />
+      </MemoryRouter>,
+    )
+    const user = userEvent.setup()
+    await user.click(
+      screen.getByRole('button', {
+        name: /Buy professional clothes.*\$83\.27/,
+      }),
+    )
+    expect(dispatch).not.toHaveBeenCalled()
+    await user.click(
+      screen.getByRole('button', { name: 'Submit clothing decision' }),
+    )
+    expect(dispatch).toHaveBeenCalledExactlyOnceWith({
+      type: 'interview',
+      choice: 'purchase',
+    })
+    const result = walkthroughReducer(snapshot.state, dispatch.mock.calls[0][0])
+    expect(result.balance).toBe(1673)
+    expect(result.history).toEqual(
+      expect.arrayContaining([expect.objectContaining({ change: -8327 })]),
+    )
+    const insufficient = walkthroughReducer(
+      { ...snapshot.state, balance: usdCents(8326) },
+      { type: 'interview', choice: 'purchase' },
+    )
+    expect(insufficient.stage).toBe('ended')
+    expect(insufficient.balance).toBe(8326)
+  } finally {
+    loadJobs.mockRestore()
+  }
 })

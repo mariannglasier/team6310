@@ -8,7 +8,9 @@ import {
   rememberedReplay,
   submitEmployment,
   employmentSnapshot,
+  UnsupportedEmploymentDocumentError,
 } from './employmentGameplay'
+import hostedDocument from './fixtures/hostedEmploymentDocument.json'
 import { contentService } from './contentService'
 import { getSupabaseClient } from './supabase'
 import type { LoadedPlaythrough } from '../types/playthrough'
@@ -77,6 +79,77 @@ it.each([
   },
 ])('rejects incompatible documents without initializing: %j', (value) => {
   expect(() => documentState(value)).toThrow()
+})
+// Hosted board-document shape, with a synthetic request UUID and no owner data.
+it.each([
+  ['60', 6000],
+  ['60.00', 6000],
+  ['83.27', 8327],
+  ['0.01', 1],
+  ['999999.99', 99999999],
+])(
+  'restores a hosted document with clothingCost %s without submitting',
+  async (clothingCost, cents) => {
+    vi.spyOn(contentService, 'loadJobs').mockResolvedValue([])
+    const document = { ...hostedDocument, clothingCost }
+    const original = structuredClone(document)
+    const snapshot = await employmentSnapshot({
+      ...run,
+      supportEnabled: false,
+      employmentState: document,
+    })
+    expect(snapshot.state?.clothingCost).toBe(cents)
+    expect(snapshot.revision).toBe(1)
+    expect(snapshot.state?.stage).toBe('board')
+    expect(document).toEqual(original)
+    expect(rpc).not.toHaveBeenCalled()
+  },
+)
+it('restores a legacy document with the backend fixed-price fallback', async () => {
+  vi.spyOn(contentService, 'loadJobs').mockResolvedValue([])
+  const legacy: Record<string, unknown> = { ...hostedDocument }
+  delete legacy.clothingCost
+  const snapshot = await employmentSnapshot({
+    ...run,
+    supportEnabled: false,
+    employmentState: legacy,
+  })
+  expect(snapshot.state?.clothingCost).toBe(6000)
+  expect(legacy).not.toHaveProperty('clothingCost')
+})
+it('still rejects unrelated unknown properties in hosted documents', () => {
+  expect(() => documentState({ ...hostedDocument, unexpected: true })).toThrow(
+    'Unfamiliar employment document',
+  )
+})
+it.each([
+  undefined,
+  null,
+  60,
+  {},
+  [],
+  '',
+  ' 60 ',
+  '0',
+  '0.00',
+  '-1',
+  '60.001',
+  '1e2',
+  'NaN',
+  'Infinity',
+  '$60.00',
+  '1,000.00',
+  '1000000',
+  '9007199254740993',
+])('rejects malformed or out-of-range clothingCost %j', (clothingCost) => {
+  expect(() => documentState({ ...hostedDocument, clothingCost })).toThrow(
+    UnsupportedEmploymentDocumentError,
+  )
+})
+it('does not allow clothingCost to alter the fresh initialization marker', () => {
+  expect(() => documentState({ ...initial, clothingCost: '60' })).toThrow(
+    UnsupportedEmploymentDocumentError,
+  )
 })
 it('scopes the run locator to the verified participant', async () => {
   await rememberRun('run')

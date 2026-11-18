@@ -141,6 +141,17 @@ export function documentState(value: unknown): Record<string, unknown> {
     throw new UnsupportedEmploymentDocumentError(
       'Unfamiliar employment document',
     )
+  // Hosted edition prices are positive USD strings below $1,000,000.
+  // Bounding the digits also keeps conversion to integer cents exact and safe.
+  if (
+    'clothingCost' in s &&
+    (typeof s.clothingCost !== 'string' ||
+      !/^\d{1,6}(?:\.\d{1,2})?$/.test(s.clothingCost) ||
+      parseUsdCents(s.clothingCost, 'clothingCost') <= 0)
+  )
+    throw new UnsupportedEmploymentDocumentError(
+      'Invalid employment clothing cost',
+    )
   for (const value of Object.values(s.receipts as Record<string, unknown>)) {
     if (!value || typeof value !== 'object' || Array.isArray(value))
       throw new UnsupportedEmploymentDocumentError()
@@ -303,7 +314,8 @@ export async function employmentSnapshot(
     },
     jobs: jobs.map((job) => ({ job })),
     support: run.supportEnabled,
-    clothingCost: parseUsdCents(s.clothingCost ?? '60.00', 'clothing'),
+    // Legacy documents use the same fixed price as the backend's fallback.
+    clothingCost: parseUsdCents(s.clothingCost ?? '60.00', 'clothingCost'),
     stage: run.status === 'ended' ? 'ended' : (s.stage as Walkthrough['stage']),
     day: pregame ? 0 : run.currentDay,
     balance: run.currentBalance,

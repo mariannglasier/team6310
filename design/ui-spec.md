@@ -126,6 +126,12 @@ Submitting commits the choice and its defined effects once. Every displayed answ
 
 Use financial outcomes and expense schedules supplied by the simulation model. Do not invent amounts, income dates, affordability rules, or consequences in presentation components.
 
+The individual scenario placeholder is an explicit fallback: show it only after
+a matching bill snapshot has loaded successfully, with no bills due today and no
+assigned real scenario. Missing snapshots, refreshes in progress, bill-load errors,
+and automatic income transitions must not establish fallback eligibility. Preserve
+the existing bill/scenario panels during unchanged financial synchronization.
+
 ## 8. Inline decision recap
 
 Keep the chosen card highlighted and show a recap directly beneath the options. This is a state of the decision screen, not a separate page.
