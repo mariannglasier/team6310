@@ -9,9 +9,9 @@ Current scope: persisted draft creation/reopening, scenario fields and schedulin
 choices/direct effects, compact controls, and protected scenario/draft deletion.
 Publication is absent; published editions and gameplay remain isolated.
 
-Next: supporting-copy authoring inside Scenario Editor, informed by
+Implemented: supporting-copy authoring inside Scenario Editor, informed by
 [cms-post-choice-flow.md](cms-post-choice-flow.md). This includes source/period and
-Eligible for gameplay display, without editorial roles or approval workflows.
+Eligible for gameplay display, without editorial roles or approval workflows. See [scenario fact authoring](cms-scenario-facts.md) for fields and persistence.
 Ordinary response text is authored/loaded but currently hidden during normal
 recap; deciding to render it is separate gameplay/UI work.
 

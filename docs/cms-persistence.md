@@ -57,3 +57,8 @@ Verification: format/lint/typecheck/build, 463 frontend tests (two skipped), and
 the local Chromium persistence/deletion/mobile/control-position journey passed.
 
 Scenario management now also includes protected scenario deletion; see [the current roadmap](cms-roadmap.md) and [actual post-choice trace](cms-post-choice-flow.md). Timeline/node visualization is shelved.
+
+Scenario facts now save with scenario/choice changes through the content-save RPC.
+See [scenario fact authoring](cms-scenario-facts.md) for composite identity, source
+copying, eligibility defaults and evidence preservation. Annual CAC facts remain
+outside this editor.

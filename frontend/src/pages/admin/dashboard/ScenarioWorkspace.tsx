@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ScenarioFactsEditor } from './ScenarioFactsEditor'
 import { ChoiceEditor } from './ChoiceEditor'
 import { Button } from '../../../components/ui/Button'
 import { DeleteControl } from '../../../components/ui/DeleteControl'
@@ -138,6 +139,10 @@ export function ScenarioWorkspace({
   }
   function edit(scenario: CmsScenario | null, loaded = content) {
     const next = {
+      facts:
+        loaded?.facts
+          ?.filter((f) => f.scenario_id === scenario?.scenario_id)
+          .map((f) => ({ ...f, original_role: f.fact_role })) ?? [],
       schedule_type: scenario?.schedule_type ?? 'non_scheduled',
       default_day: scenario?.default_day ?? null,
       choices:
@@ -520,6 +525,10 @@ export function ScenarioWorkspace({
                       onChange={(e) =>
                         setInput({ ...input, description: e.target.value })
                       }
+                    />
+                    <ScenarioFactsEditor
+                      facts={input.facts ?? []}
+                      onChange={(facts) => setInput({ ...input, facts })}
                     />
                     <ChoiceEditor
                       choices={input.choices ?? []}

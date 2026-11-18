@@ -904,3 +904,74 @@ button.admin-stat:hover {
   color: var(--primary);
   background: transparent;
 }
+.cms-facts {
+  display: grid;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--divider);
+}
+.cms-fact {
+  display: grid;
+  gap: 1rem;
+}
+.cms-fact h4 {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.cms-fact pre {
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+}
+.cms-fact-eligibility {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+/* Exact palette and rule expression from the gameplay financial tracking scope.
+   Gameplay chooses color by displayed position, not by role. */
+.cms-facts {
+  --finance-blue: #dcebf9;
+  --finance-green: #e6eadc;
+  --finance-rule: color-mix(in srgb, #0f4e7c 18%, transparent);
+}
+.cms-facts .cms-fact.scenario-facts__card {
+  position: relative;
+  display: block;
+  padding: 1rem;
+  border-color: var(--finance-rule);
+  background: var(--finance-blue);
+  color: #10121a;
+}
+.cms-facts .cms-fact.cms-fact--second {
+  background: var(--finance-green);
+}
+.cms-fact-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.cms-fact-details > summary {
+  padding-right: 1.5rem;
+  cursor: pointer;
+}
+.cms-fact-summary,
+.cms-fact-preview {
+  display: block;
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.cms-fact-preview {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.cms-fact-details > .cms-editor-fields {
+  margin-top: 1rem;
+}

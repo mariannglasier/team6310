@@ -75,6 +75,61 @@ test('CMS draft creation, scenario persistence, reopening and mobile layout', as
   await expect(page.getByRole('note')).toContainText(
     'not an additional deduction',
   )
+  await page.getByRole('button', { name: 'Add general fact' }).click()
+  await page.getByText('General supporting copy', { exact: true }).click()
+  await page
+    .getByLabel('general fact text', { exact: false })
+    .fill('A supporting scenario fact.')
+  await page
+    .getByLabel('general source URL', { exact: false })
+    .fill('https://example.org/scenario-source')
+  await page.getByLabel('general reporting period').fill('2026')
+  await page.getByText('General supporting copy', { exact: true }).click()
+  await expect(
+    page.getByLabel('general fact text', { exact: false }),
+  ).not.toBeVisible()
+  await page.getByText('General supporting copy', { exact: true }).click()
+  await expect(
+    page.getByLabel('general fact text', { exact: false }),
+  ).toHaveValue('A supporting scenario fact.')
+  const generalCard = page
+    .locator('.cms-fact')
+    .filter({ hasText: 'General supporting copy' })
+  await expect(generalCard).toHaveCSS('background-color', 'rgb(220, 235, 249)')
+  await page
+    .getByRole('checkbox', { name: /Eligible for gameplay display/ })
+    .check()
+  await page.getByRole('button', { name: 'Add cac fact' }).click()
+  const cacCard = page
+    .locator('.cms-fact')
+    .filter({ hasText: 'CAC impact supporting copy' })
+  await expect(cacCard).toHaveCSS('background-color', 'rgb(230, 234, 220)')
+  await page.setViewportSize({ width: 390, height: 844 })
+  const cacSummary = cacCard.locator('summary').first()
+  await cacSummary.focus()
+  await cacSummary.press('Enter')
+  await expect(page.getByLabel('cac fact text', { exact: false })).toBeVisible()
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true)
+  await cacSummary.press('Enter')
+  await expect(
+    page.getByLabel('cac fact text', { exact: false }),
+  ).not.toBeVisible()
+  await page.setViewportSize({ width: 1280, height: 900 })
+
+  await page
+    .getByRole('checkbox', { name: /Eligible for gameplay display/ })
+    .uncheck()
+  await expect(cacCard).toHaveCSS('background-color', 'rgb(220, 235, 249)')
+  await page.getByRole('button', { name: 'Remove cac scenario fact' }).click()
+  await page.getByRole('button', { name: 'Remove fact', exact: true }).click()
+
+  await expect(
+    page.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
+  ).not.toBeChecked()
   await page.getByRole('button', { name: 'Save Changes', exact: true }).click()
   await expect(
     page.getByText('Saved and reloaded from the database.'),
@@ -88,9 +143,22 @@ test('CMS draft creation, scenario persistence, reopening and mobile layout', as
     .getByRole('searchbox', { name: 'Search scenarios', exact: true })
     .fill('A new household decision')
   await page.getByRole('button', { name: /^A new household decision/ }).click()
+  await page.getByText('General supporting copy', { exact: true }).click()
   await expect(page.getByLabel('Scenario description')).toHaveValue(
     'A saved scenario description for interface review.',
   )
+  await expect(
+    page.getByLabel('general fact text', { exact: false }),
+  ).toHaveValue('A supporting scenario fact.')
+  await expect(
+    page.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
+  ).not.toBeChecked()
+  await page
+    .getByLabel('general fact text', { exact: false })
+    .fill('Edited supporting fact.')
+  await page
+    .getByRole('checkbox', { name: /Eligible for gameplay display/ })
+    .check()
   await page.getByLabel('Scenario title').fill('An edited household decision')
   await page.getByRole('button', { name: 'Save Changes', exact: true }).click()
   await expect(
@@ -104,6 +172,39 @@ test('CMS draft creation, scenario persistence, reopening and mobile layout', as
   await expect(page.getByLabel('Scenario title')).toHaveValue(
     'An edited household decision',
   )
+  await page.reload()
+  await page.getByRole('button', { name: 'Switch to Editor' }).click()
+  await page.getByRole('button', { name, exact: true }).click()
+  await page
+    .getByRole('button', { name: /^An edited household decision/ })
+    .click()
+  await page.getByText('General supporting copy', { exact: true }).click()
+  await expect(
+    page.getByLabel('general fact text', { exact: false }),
+  ).toHaveValue('Edited supporting fact.')
+  await expect(
+    page.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
+  ).toBeChecked()
+  await page
+    .getByRole('button', { name: 'Remove general scenario fact' })
+    .click()
+  await expect(
+    page.getByRole('dialog', { name: 'Remove scenario fact?' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Remove fact', exact: true }).click()
+  await page.getByRole('button', { name: 'Save Changes', exact: true }).click()
+  await expect(
+    page.getByText('Saved and reloaded from the database.'),
+  ).toBeVisible()
+  await page.reload()
+  await page.getByRole('button', { name: 'Switch to Editor' }).click()
+  await page.getByRole('button', { name, exact: true }).click()
+  await page
+    .getByRole('button', { name: /^An edited household decision/ })
+    .click()
+  await expect(
+    page.getByRole('button', { name: 'Add general fact' }),
+  ).toBeVisible()
   await page.screenshot({
     path: testInfo.outputPath('cms-desktop.png'),
     fullPage: true,

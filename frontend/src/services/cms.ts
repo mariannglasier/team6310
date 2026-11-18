@@ -7,6 +7,19 @@ export interface CmsDraft {
   revision: number
   updated_at: string
 }
+export interface CmsFact {
+  scenario_id?: string
+  version_id?: string
+  original_role?: 'general' | 'cac' | null
+  fact_role: 'general' | 'cac'
+  semantic_key?: string
+  display_text: string
+  source_url: string
+  reporting_period: string | null
+  copy_kind: 'fact' | 'context'
+  verified: boolean
+  evidence?: unknown
+}
 export interface CmsChoice {
   choice_id: string | null
   scenario_id?: string
@@ -28,6 +41,7 @@ export interface CmsScenario {
 }
 export interface CmsContent {
   workspace: CmsDraft
+  facts?: CmsFact[]
   choices?: CmsChoice[]
   scenarios: CmsScenario[]
   personas: { persona_id: string; name: string }[]
@@ -39,6 +53,7 @@ export type ScenarioInput = Pick<
 > & {
   schedule_type?: string
   default_day?: number | null
+  facts?: CmsFact[]
   choices?: CmsChoice[]
 }
 async function rpc<T>(
@@ -80,20 +95,37 @@ export const saveCmsScenario = (
   request: string,
   id: string | null,
   input: ScenarioInput,
-) =>
-  rpc<{ scenario_id: string; revision: number }>('cms_save_scenario_bundle', {
-    p_schedule: input.schedule_type ?? 'non_scheduled',
-    p_day: input.default_day ?? null,
-    p_choices: input.choices ?? [],
-    p_version: version,
-    p_revision: revision,
-    p_request: request,
-    p_scenario: id,
-    p_title: input.title,
-    p_description: input.description,
-    p_category: input.category_id,
-    p_persona: input.persona_intent,
-  })
+) => {
+  if (!Array.isArray(input.facts))
+    throw new Error(
+      'Scenario facts are missing. Reload the draft before saving; no changes were sent.',
+    )
+  return rpc<{ scenario_id: string; revision: number }>(
+    'cms_save_scenario_content',
+    {
+      p_schedule: input.schedule_type ?? 'non_scheduled',
+      p_day: input.default_day ?? null,
+      p_choices: input.choices ?? [],
+      p_facts: (input.facts ?? []).map((f) => ({
+        original_role: f.original_role ?? null,
+        fact_role: f.fact_role,
+        display_text: f.display_text,
+        source_url: f.source_url,
+        reporting_period: f.reporting_period,
+        copy_kind: f.copy_kind,
+        verified: f.verified,
+      })),
+      p_version: version,
+      p_revision: revision,
+      p_request: request,
+      p_scenario: id,
+      p_title: input.title,
+      p_description: input.description,
+      p_category: input.category_id,
+      p_persona: input.persona_intent,
+    },
+  )
+}
 
 export const deleteCmsDraft = (id: string, revision: number) =>
   rpc<void>('cms_delete_draft', { p_version: id, p_revision: revision })
