@@ -151,9 +151,32 @@ def main():
 
         h.rpc('cms_save_persona_bundle', bundle(np, {}, []), staff)
         assert not owned(np)
+        # Real protected persona deletion: ownership, authorization, blockers and retries.
+        def deletion(pid):
+            return {'p_version': draft, 'p_revision': read()['workspace']['revision'],
+                    'p_request': str(uuid.uuid4()), 'p_persona': pid}
+        for actor in [outsider, anonymous]:
+            h.rpc('cms_delete_persona', deletion(np), actor, denied=True)
+        sql(f"UPDATE public.cac_staff SET active=false WHERE user_id='{staff2['id']}'")
+        h.rpc('cms_delete_persona', deletion(np), staff2, denied=True)
+        sql(f"UPDATE public.cac_staff SET active=true WHERE user_id='{staff2['id']}'")
+        untouched = read()
+        h.rpc('cms_delete_persona', deletion(pid), staff, denied=True)
+        h.rpc('cms_delete_persona', deletion(persona), staff, denied=True)
+        assert untouched == read()
+        disposable = h.rpc('cms_save_persona_bundle', bundle(None, {**fields, 'name': 'Deletion fixture'}, [row]), staff)
+        dp = disposable['persona_id']
+        de = owned(dp)[0]['expense_id']
+        remove = deletion(dp)
+        deleted = h.rpc('cms_delete_persona', remove, staff)
+        assert deleted == h.rpc('cms_delete_persona', remove, staff)
+        h.rpc('cms_delete_persona', remove, staff2, denied=True)
+        assert not any(p['persona_id'] == dp for p in read()['personas'])
+        assert not any(e['expense_id'] == de for e in read()['expenses'])
+        assert h.request('/rest/v1/rpc/cms_delete_persona', {**remove, 'p_request': str(uuid.uuid4())}, staff, allowed=(500,))['code'] == '40001'
         assert source_before == sql(f"SELECT to_jsonb(p)::text || (SELECT jsonb_agg(to_jsonb(e))::text FROM public.persona_expenses e WHERE version_id='{source}') FROM public.personas p WHERE persona_id='{persona}'")
         assert before == history_digest()
-        print('PASS: genuine local API copy/create/edit/delete/reopen, isolation, validation, authorization, revocation, retry and overlapping scenario/persona concurrency')
+        print('PASS: genuine local API copy/create/edit/delete/reopen, isolation, validation, authorization, revocation, retry, protected persona deletion and overlapping scenario/persona concurrency')
     finally:
         # Remove only explicitly tracked fixture content and new Auth identities.
         if draft:

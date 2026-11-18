@@ -70,13 +70,64 @@ export interface CmsPersonaExpense {
   repeat_interval_days: number | null
   late_fee_amount: string | number
 }
+export interface CmsExpenseInput extends Omit<
+  CmsPersonaExpense,
+  'expense_id' | 'persona_id' | 'first_due_day' | 'repeat_interval_days'
+> {
+  expense_id: string | null
+  persona_id: string | null
+  client_key?: string
+  first_due_day: number | string
+  repeat_interval_days: number | string | null
+}
+export interface CmsJob {
+  job_id: string
+  version_id: string
+  soc_code: string
+  title: string
+  description: string | null
+  area_code: string
+  area_name: string
+  geography_level: 'MSA' | 'STATE'
+  wage_year: number | null
+  median_hourly_wage: number | string | null
+  hours_per_week: number | string
+  weekly_gross_income: number | string | null
+  entry_education: string | null
+  related_experience: string | null
+  on_job_training: string | null
+  simulation_requirements: Record<string, unknown>
+  wage_source_url: string
+  requirements_source_url: string | null
+  reviewed_at: string | null
+  last_synced_at: string | null
+  created_at: string
+  is_approved: boolean
+  is_active: boolean
+  needs_english_skills: boolean | null
+  needs_computer_skills: boolean | null
+}
+export type CmsJobFields = Partial<
+  Omit<
+    CmsJob,
+    | 'job_id'
+    | 'version_id'
+    | 'weekly_gross_income'
+    | 'created_at'
+    | 'last_synced_at'
+    | 'simulation_requirements'
+  > & { requirements_notes: string | null }
+>
+export class CmsJobSaveUncertain extends Error {}
 export interface CmsContent {
   workspace: CmsDraft
+  jobs?: CmsJob[]
   facts?: CmsFact[]
   choices?: CmsChoice[]
   scenarios: CmsScenario[]
   personas: CmsPersona[]
   expenses?: CmsPersonaExpense[]
+  bill_links?: { expense_id: string; scenario_id: string; version_id: string }[]
   categories: { category_id: string; name: string }[]
 }
 export type ScenarioInput = Pick<
@@ -98,6 +149,10 @@ async function rpc<T>(
   try {
     response = await client.rpc(name, args)
   } catch (failure) {
+    if (name === 'cms_save_job')
+      throw new CmsJobSaveUncertain(
+        'Unable to confirm the job save. Retry Save Changes to recover the same request before editing further.',
+      )
     if (name === 'cms_save_persona_bundle')
       throw new CmsPersonaSaveUncertain(
         'Unable to confirm the persona save. Retry Save Changes to recover the same request before editing further.',
@@ -113,10 +168,43 @@ async function rpc<T>(
       throw new Error(
         'This content is referenced by other records and cannot be deleted. Nothing was removed.',
       )
+    if (name === 'cms_save_job' || name === 'cms_delete_job') {
+      if (error.code === '42501')
+        throw new Error(
+          'Staff access is required. Sign in again before continuing; your edits are retained.',
+        )
+      if (error.code === '23505')
+        throw new Error(
+          'This SOC code already exists in this draft. Choose a different code; no changes were saved.',
+        )
+      if (error.code === 'P0001') throw new Error(error.message)
+      if (error.code === 'P0002')
+        throw new Error(
+          'This draft is no longer available. Reopen a saved draft; your edits are retained.',
+        )
+      if (
+        ['23514', '23502', '22003', '22007', '22008', '22P02'].includes(
+          error.code,
+        )
+      )
+        throw new Error(
+          'Check job values: SOC NN-NNNN, geography MSA/STATE, wage year 2000–2100, finite exact wage/hours, valid review timestamp and active-job requirements. No changes were saved.',
+        )
+      if (error.code === '55P03')
+        throw new Error(
+          'The draft is busy. Wait a moment and retry the same operation.',
+        )
+      if (error.code !== '40001' && name === 'cms_save_job')
+        throw new CmsJobSaveUncertain(
+          'Unable to confirm the job save. Retry Save Changes before editing further.',
+        )
+    }
     if (error.code === '40001')
       throw new Error(
         'This draft changed. Reload the draft before saving again. Your edits are still here.',
       )
+    if (name === 'cms_delete_persona' && error.code === 'P0001')
+      throw new Error(`Persona could not be deleted: ${error.message}`)
     if (name === 'cms_save_persona_bundle') {
       if (error.code === '42501')
         throw new Error(
@@ -129,6 +217,13 @@ async function rpc<T>(
       if (error.code === '55P03')
         throw new Error(
           'The draft is busy. Wait a moment and retry the same save. Your edits are still here.',
+        )
+      if (
+        error.code === 'P0001' &&
+        error.message?.includes('external dependencies')
+      )
+        throw new Error(
+          'An expense is linked to a bill recap or another record and cannot be removed. No changes were saved. Restore the expense or reload the draft; your edits are still here.',
         )
       if (error.code === 'P0001')
         throw new Error(
@@ -207,14 +302,14 @@ export const deleteCmsScenario = (
     p_scenario: scenario,
   })
 
-// Stage 2: expenses are an immutable snapshot passed through the existing bundle.
+// One atomic persona/expense bundle. Existing identities and ownership are retained.
 export function saveCmsPersona(
   version: string,
   revision: number,
   request: string,
   id: string | null,
   fields: PersonaFields,
-  expenses: readonly CmsPersonaExpense[] | undefined,
+  expenses: readonly CmsExpenseInput[] | undefined,
 ) {
   if (!Array.isArray(expenses))
     throw new Error(
@@ -222,12 +317,50 @@ export function saveCmsPersona(
     )
   if (
     expenses.some(
-      (e) => e.persona_id !== id || e.version_id !== version || !e.expense_id,
+      (e) =>
+        e.persona_id !== id ||
+        e.version_id !== version ||
+        (e.expense_id === null ? !e.client_key : !e.expense_id),
     )
   )
     throw new Error(
       'Expense relationships do not match this persona draft. Reload before saving; no changes were sent.',
     )
+  const day = (value: number | string, label: string) => {
+    if (
+      !/^[0-9]+$/.test(String(value)) ||
+      Number(value) < 1 ||
+      Number(value) > 32767
+    )
+      throw new Error(`${label} must be a whole day from 1 to 32767.`)
+    return Number(value)
+  }
+  const money = (value: string | number, label: string) => {
+    if (
+      !/^[0-9]+(\.[0-9]{1,2})?$/.test(String(value)) ||
+      Number(value) >= 10000000000
+    )
+      throw new Error(
+        `${label} must be a nonnegative USD amount below $10 billion with at most two decimal places.`,
+      )
+    return value
+  }
+  const payload = expenses.map((e) => {
+    if (!e.name.trim())
+      throw new Error('Enter a name for each scheduled expense.')
+    return {
+      expense_id: e.expense_id,
+      ...(e.expense_id === null ? { client_key: e.client_key } : {}),
+      name: e.name,
+      amount: money(e.amount, `${e.name} amount`),
+      first_due_day: day(e.first_due_day, `${e.name} first due day`),
+      repeat_interval_days:
+        e.repeat_interval_days === null
+          ? null
+          : day(e.repeat_interval_days, `${e.name} repeat interval`),
+      late_fee_amount: money(e.late_fee_amount, `${e.name} late fee`),
+    }
+  })
   return rpc<{ persona_id: string; revision: number }>(
     'cms_save_persona_bundle',
     {
@@ -236,14 +369,47 @@ export function saveCmsPersona(
       p_request: request,
       p_persona: id,
       p_fields: fields,
-      p_expenses: expenses.map((e) => ({
-        expense_id: e.expense_id,
-        name: e.name,
-        amount: e.amount,
-        first_due_day: e.first_due_day,
-        repeat_interval_days: e.repeat_interval_days,
-        late_fee_amount: e.late_fee_amount,
-      })),
+      p_expenses: payload,
     },
   )
 }
+
+export const deleteCmsPersona = (
+  version: string,
+  revision: number,
+  request: string,
+  persona: string,
+) =>
+  rpc<{ persona_id: string; revision: number }>('cms_delete_persona', {
+    p_version: version,
+    p_revision: revision,
+    p_request: request,
+    p_persona: persona,
+  })
+
+export const saveCmsJob = (
+  version: string,
+  revision: number,
+  request: string,
+  job: string | null,
+  fields: CmsJobFields,
+) =>
+  rpc<{ job_id: string; revision: number }>('cms_save_job', {
+    p_version: version,
+    p_revision: revision,
+    p_request: request,
+    p_job: job,
+    p_fields: fields,
+  })
+export const deleteCmsJob = (
+  version: string,
+  revision: number,
+  request: string,
+  job: string,
+) =>
+  rpc<{ job_id: string; revision: number }>('cms_delete_job', {
+    p_version: version,
+    p_revision: revision,
+    p_request: request,
+    p_job: job,
+  })

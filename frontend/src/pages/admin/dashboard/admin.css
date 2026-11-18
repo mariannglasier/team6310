@@ -790,21 +790,6 @@ button.admin-stat:hover {
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-.cms-info {
-  border: 0;
-  color: var(--accent);
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-  padding: 0.3rem;
-}
-.cms-help {
-  display: block;
-  font-size: 0.875rem;
-  padding: 0.5rem;
-  background: var(--accent-surface);
-  border-radius: 6px;
-}
 .cms-columns .ui-field input,
 .cms-columns .ui-field textarea,
 .cms-columns .ui-field select {
@@ -815,26 +800,6 @@ button.admin-stat:hover {
   .cms-inline {
     grid-template-columns: 1fr;
   }
-}
-.ui-field-label {
-  display: flex;
-  gap: 0.25rem;
-  align-items: center;
-}
-.cms-info-anchor {
-  display: inline-flex;
-  position: relative;
-}
-.cms-help {
-  position: absolute;
-  z-index: 30;
-  bottom: 100%;
-  right: 0;
-  width: min(260px, 70vw);
-  background: var(--surface);
-  border: 1px solid var(--divider);
-  box-shadow: 0 4px 16px #0003;
-  padding: 0.75rem;
 }
 .cms-choice {
   display: grid;
@@ -987,4 +952,88 @@ button.admin-stat:hover {
 
 .cms-persona-finances {
   align-items: start;
+}
+
+.cms-persona-avatar {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+}
+.cms-persona-avatar .persona-avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.cms-expenses {
+  display: grid;
+  gap: 0.75rem;
+}
+.cms-expense {
+  position: relative;
+  min-width: 0;
+  padding: 0.85rem;
+}
+.cms-expense-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.cms-expense summary {
+  padding-right: 1.75rem;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.cms-expense summary .admin-muted {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+}
+.cms-expense .cms-editor-fields {
+  margin-top: 1rem;
+}
+
+.cms-save-status {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: start;
+}
+.cms-info-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+/* The heading and its information button share the same baseline/section rule. */
+.cms-expenses > .cms-info-heading {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--divider);
+}
+.cms-info-heading > h4 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.cms-job-section {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+/* Three workspace tabs and job forms must shrink within narrow screens. */
+.cms-workspace > * {
+  min-width: 0;
+}
+.cms-job-section {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cms-job-section > h4,
+.cms-job-section > .ui-field:has(textarea) {
+  grid-column: 1 / -1;
+}
+@media (max-width: 760px) {
+  .cms-job-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

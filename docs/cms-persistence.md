@@ -70,3 +70,19 @@ retry requests recover uncertain saves before further editing. A narrow forward
 migration skips unchanged expense updates to preserve their exact stored content.
 See [Persona Editor records](cms-persona-editor-design.md) for the Stage 2 contract,
 legacy handling, local migration and verification.
+
+Stage 3 adds authored expense rows to that same persona bundle: existing IDs are
+retained and new rows use client keys plus server-generated IDs. Named expense
+removal is staged until Save; reference failures roll back persona and expense
+changes together. Known recap links block removal in the UI, and pending removals
+can be restored without discarding other changes. Persona deletion uses the new
+staff-only `cms_delete_persona` RPC with shared revision/receipts, dependency locks
+and explicit owned-row deletion; scenario/recap/history references block deletion.
+See the Stage 3 implementation record for the local migration and test coverage.
+
+Jobs now use the same draft read, workspace revision and retry receipts through
+`cms_save_job` and `cms_delete_job`. Saves patch only authored fields, preserve
+unknown requirements metadata and re-read PostgreSQL-generated weekly income.
+Referenced jobs cannot be deleted; published/source rows and persona income remain
+unchanged. See [Job Editor contract](cms-job-editor.md) for the field inventory,
+copying, historical-reference protection, locking and local verification coverage.

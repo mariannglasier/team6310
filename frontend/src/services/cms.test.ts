@@ -1,10 +1,20 @@
 import { beforeEach, expect, test, vi } from 'vitest'
-import { saveCmsScenario, saveCmsPersona, type CmsPersonaExpense } from './cms'
+import {
+  saveCmsScenario,
+  saveCmsJob,
+  deleteCmsJob,
+  CmsJobSaveUncertain,
+  saveCmsPersona,
+  deleteCmsPersona,
+  type CmsPersonaExpense,
+} from './cms'
 const rpc = vi.hoisted(() => vi.fn())
 vi.mock('./supabase', () => ({
   getSupabaseClient: vi.fn(async () => ({ rpc })),
 }))
-beforeEach(() => rpc.mockReset())
+beforeEach(() => {
+  rpc.mockReset()
+})
 test('missing facts cannot silently clear supporting copy during unrelated save', () => {
   expect(() =>
     saveCmsScenario('draft', 1, 'request', 'scenario', {
@@ -98,3 +108,141 @@ test.each([
     ).rejects.toThrow(expected)
   },
 )
+
+test('new expenses use client keys and no client-assigned database identity', async () => {
+  rpc.mockResolvedValue({
+    data: { persona_id: 'persona', revision: 1 },
+    error: null,
+  })
+  await saveCmsPersona('draft', 0, 'r', 'persona', {}, [
+    {
+      ...expense,
+      expense_id: null,
+      client_key: 'local-key',
+      first_due_day: '2',
+      repeat_interval_days: '7',
+    },
+  ])
+  expect(rpc).toHaveBeenCalledWith(
+    'cms_save_persona_bundle',
+    expect.objectContaining({
+      p_expenses: [
+        expect.objectContaining({
+          expense_id: null,
+          client_key: 'local-key',
+          first_due_day: 2,
+          repeat_interval_days: 7,
+        }),
+      ],
+    }),
+  )
+})
+test.each(['-1', '1.001', 'NaN', 'Infinity', '10000000000', ''])(
+  'invalid expense amount %s fails without a write',
+  (amount) => {
+    expect(() =>
+      saveCmsPersona('draft', 0, 'r', 'persona', {}, [{ ...expense, amount }]),
+    ).toThrow('USD amount')
+    expect(() =>
+      saveCmsPersona('draft', 0, 'r', 'persona', {}, [
+        { ...expense, late_fee_amount: amount },
+      ]),
+    ).toThrow('USD amount')
+    expect(rpc).not.toHaveBeenCalled()
+  },
+)
+test.each(['0', '-1', '1.5', '32768', ''])(
+  'invalid expense schedule %s fails without a write',
+  (day) => {
+    expect(() =>
+      saveCmsPersona('draft', 0, 'r', 'persona', {}, [
+        { ...expense, first_due_day: day },
+      ]),
+    ).toThrow('whole day')
+    expect(() =>
+      saveCmsPersona('draft', 0, 'r', 'persona', {}, [
+        { ...expense, repeat_interval_days: day },
+      ]),
+    ).toThrow('whole day')
+    expect(rpc).not.toHaveBeenCalled()
+  },
+)
+test('linked expense failures explain the blocker and retain changes', async () => {
+  rpc.mockResolvedValue({
+    data: null,
+    error: {
+      code: 'P0001',
+      message:
+        'Expense has external dependencies, including possible bill recap links; nothing was removed',
+    },
+  })
+  await expect(
+    saveCmsPersona('draft', 0, 'r', 'persona', {}, []),
+  ).rejects.toThrow('bill recap or another record')
+})
+test('persona deletion uses the protected RPC and explains a scenario blocker', async () => {
+  rpc.mockResolvedValueOnce({
+    data: { persona_id: 'persona', revision: 2 },
+    error: null,
+  })
+  await deleteCmsPersona('draft', 1, 'request', 'persona')
+  expect(rpc).toHaveBeenCalledWith('cms_delete_persona', {
+    p_version: 'draft',
+    p_revision: 1,
+    p_request: 'request',
+    p_persona: 'persona',
+  })
+  rpc.mockResolvedValueOnce({
+    data: null,
+    error: {
+      code: 'P0001',
+      message: 'Persona still has linked scenarios. Nothing was deleted',
+    },
+  })
+  await expect(
+    deleteCmsPersona('draft', 1, 'request', 'persona'),
+  ).rejects.toThrow('linked scenarios')
+})
+
+test('job operations use protected RPCs with revision, identity and unchanged decimal strings', async () => {
+  rpc.mockResolvedValue({ data: { job_id: 'job', revision: 3 }, error: null })
+  await saveCmsJob('draft', 2, 'request', 'job', {
+    median_hourly_wage: '12.34',
+    requirements_notes: 'Updated',
+  })
+  expect(rpc).toHaveBeenCalledWith('cms_save_job', {
+    p_version: 'draft',
+    p_revision: 2,
+    p_request: 'request',
+    p_job: 'job',
+    p_fields: { median_hourly_wage: '12.34', requirements_notes: 'Updated' },
+  })
+  await deleteCmsJob('draft', 3, 'delete', 'job')
+  expect(rpc).toHaveBeenLastCalledWith('cms_delete_job', {
+    p_version: 'draft',
+    p_revision: 3,
+    p_request: 'delete',
+    p_job: 'job',
+  })
+})
+test.each([
+  ['40001', 'stale', 'changed'],
+  ['42501', 'permission denied', 'staff'],
+  ['23505', 'duplicate', 'SOC'],
+  ['23514', 'constraint', 'job'],
+  ['P0001', 'Job is referenced by a persona', 'persona'],
+])(
+  'job server error %s has actionable feedback',
+  async (code, message, expected) => {
+    rpc.mockResolvedValue({ data: null, error: { code, message } })
+    await expect(saveCmsJob('draft', 0, 'r', 'job', {})).rejects.toThrow(
+      new RegExp(expected, 'i'),
+    )
+  },
+)
+test('unknown job save outcome is recoverable using the same request', async () => {
+  rpc.mockRejectedValue(new TypeError('Failed to fetch'))
+  await expect(
+    saveCmsJob('draft', 0, 'r', null, { title: 'New' }),
+  ).rejects.toBeInstanceOf(CmsJobSaveUncertain)
+})

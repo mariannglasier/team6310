@@ -16,8 +16,8 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
       : route.abort()
   })
   await page.goto('/admin/login')
-  await page.getByLabel('Work email').fill(fixture.email)
-  await page.getByLabel('Password').fill(fixture.password)
+  await page.getByLabel(/^Work email/).fill(fixture.email)
+  await page.getByLabel(/^Password/).fill(fixture.password)
   await page.getByRole('button', { name: 'Sign In', exact: true }).click()
   await page
     .getByRole('button', { name: 'Switch to Editor', exact: true })
@@ -29,7 +29,7 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
     await page
       .getByRole('button', { name: 'Create new draft', exact: true })
       .click()
-    await page.getByLabel('Draft name', { exact: false }).fill(name)
+    await page.getByLabel(/^Draft name/, { exact: false }).fill(name)
     const created = page.waitForResponse((r) =>
       r.url().endsWith('/rpc/cms_read_draft'),
     )
@@ -62,30 +62,62 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
         exact: false,
       })
       .click()
-    const current = page.getByLabel('Persona name', { exact: false })
+    const current = page.getByLabel(/^Persona name/, { exact: false })
     await expect(current).toHaveValue(original.name)
+    const personaForm = page.getByRole('form', {
+      name: 'Persona editor',
+      exact: true,
+    })
+    await expect(personaForm.locator('.admin-technical')).toHaveCount(0)
+    await page
+      .getByRole('button', {
+        name: 'About Starting balance (USD)',
+        exact: true,
+      })
+      .focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('note')).toContainText(
+      'Starting balance applies to future playthroughs',
+    )
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('note')).toHaveCount(0)
+    await page
+      .getByRole('button', { name: 'About Scheduled expenses', exact: true })
+      .click()
+    await expect(page.getByRole('note')).toContainText(
+      'ordered by first due day',
+    )
+    await page.keyboard.press('Escape')
+    await expect(
+      page.getByRole('button', { name: 'Add expense', exact: true }),
+    ).toHaveClass(/ui-button--secondary/)
+
     await expect(page.getByText('Weekly income · Read-only')).toBeVisible()
     await expect(
       page.getByRole('textbox', { name: /Weekly income|Starting job/ }),
     ).toHaveCount(0)
     await expect(
       page.getByRole('button', {
-        name: /Add expense|Remove expense|Delete expense/,
+        name: /Back to persona library/,
       }),
     ).toHaveCount(0)
     const editedName = `${original.name} CMS review`
     await current.fill(editedName)
+    await expect(
+      personaForm.locator('.cms-save-status > :last-child'),
+    ).toHaveClass('ui-required-legend')
+    expect(await personaForm.textContent()).not.toContain('(required)')
     await page
-      .getByLabel('Persona description')
+      .getByLabel(/^Persona description/)
       .fill('An explicitly authored persona description.')
     await page
-      .getByLabel('Starting balance (USD)', { exact: false })
+      .getByLabel(/^Starting balance \(USD\)/, { exact: false })
       .fill('321.09')
     await page
-      .getByLabel('English skills', { exact: false })
+      .getByLabel(/^English skills/, { exact: false })
       .selectOption('yes')
     await page
-      .getByLabel('Computer skills', { exact: false })
+      .getByLabel(/^Computer skills/, { exact: false })
       .selectOption('no')
     await page.getByRole('button', { name: 'New persona', exact: true }).click()
     await expect(
@@ -127,7 +159,7 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
       fullPage: true,
     })
     await page.setViewportSize({ width: 390, height: 844 })
-    await expect(page.getByLabel('Persona description')).toBeVisible()
+    await expect(page.getByLabel(/^Persona description/)).toBeVisible()
     await page.screenshot({
       path: testInfo.outputPath('persona-mobile.png'),
       fullPage: true,
@@ -172,32 +204,34 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
       })
       .click()
     await expect(current).toHaveValue(editedName)
-    await expect(page.getByLabel('Persona description')).toHaveValue(
+    await expect(page.getByLabel(/^Persona description/)).toHaveValue(
       'An explicitly authored persona description.',
     )
     await expect(
-      page.getByLabel('Starting balance (USD)', { exact: false }),
+      page.getByLabel(/^Starting balance \(USD\)/, { exact: false }),
     ).toHaveValue('321.09')
 
     // A new persona has no invented balance/skills or automatically generated content.
     await page.getByRole('button', { name: 'New persona', exact: true }).click()
     await expect(
-      page.getByLabel('Starting balance (USD)', { exact: false }),
+      page.getByLabel(/^Starting balance \(USD\)/, { exact: false }),
     ).toHaveValue('')
     await expect(
-      page.getByLabel('English skills', { exact: false }),
+      page.getByLabel(/^English skills/, { exact: false }),
     ).toHaveValue('')
     const newName = `New household ${Date.now()}`
     await current.fill(newName)
     await page
-      .getByLabel('Persona description')
+      .getByLabel(/^Persona description/)
       .fill('Author-provided new household.')
     await page
-      .getByLabel('Starting balance (USD)', { exact: false })
+      .getByLabel(/^Starting balance \(USD\)/, { exact: false })
       .fill('150.25')
-    await page.getByLabel('English skills', { exact: false }).selectOption('no')
     await page
-      .getByLabel('Computer skills', { exact: false })
+      .getByLabel(/^English skills/, { exact: false })
+      .selectOption('no')
+    await page
+      .getByLabel(/^Computer skills/, { exact: false })
       .selectOption('yes')
     // Commit succeeds but the following read is interrupted; retry must not create a duplicate.
     await page.route(
@@ -265,14 +299,14 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
       },
     )
     expect(external.ok()).toBeTruthy()
-    await page.getByLabel('Persona description').fill('My unsaved local edit.')
+    await page.getByLabel(/^Persona description/).fill('My unsaved local edit.')
     await page
       .getByRole('button', { name: 'Save Changes', exact: true })
       .click()
     await expect(page.getByRole('alert')).toContainText(
       'This draft changed. Reload the draft',
     )
-    await expect(page.getByLabel('Persona description')).toHaveValue(
+    await expect(page.getByLabel(/^Persona description/)).toHaveValue(
       'My unsaved local edit.',
     )
     await page
@@ -287,15 +321,15 @@ test('Persona details use shared drafts, preserve expenses, save/reopen, and pro
         exact: false,
       })
       .click()
-    await expect(page.getByLabel('Persona description')).toHaveValue(
+    await expect(page.getByLabel(/^Persona description/)).toHaveValue(
       'Saved from another editor.',
     )
-    await page
-      .getByRole('button', { name: 'Back to persona library', exact: true })
-      .click()
     await expect(
-      page.getByRole('heading', { name: 'Select a persona', exact: true }),
-    ).toBeVisible()
+      page.getByRole('button', {
+        name: 'Back to persona library',
+        exact: true,
+      }),
+    ).toHaveCount(0)
     // Keyboard tab switching reuses AdminTabs.
     await page.getByRole('tab', { name: /^Personas/ }).focus()
     await page.keyboard.press('ArrowLeft')

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FieldInfo } from '../../../components/ui/FieldInfo'
 import { Button } from '../../../components/ui/Button'
 import { DeleteControl } from '../../../components/ui/DeleteControl'
 import { Dialog } from '../../../components/ui/Dialog'
@@ -38,11 +39,13 @@ export function ScenarioFactsEditor({
       className="cms-facts"
       aria-labelledby="scenario-facts-editor-heading"
     >
-      <h3 id="scenario-facts-editor-heading">Scenario facts</h3>
-      <p className="admin-muted">
-        Supporting copy for this scenario. One general and one CAC impact entry
-        are supported. These are separate from the CAC service facts registry.
-      </p>
+      <div className="cms-info-heading">
+        <h3 id="scenario-facts-editor-heading">Scenario facts</h3>{' '}
+        <FieldInfo
+          label="Scenario facts"
+          text="Supporting copy for this scenario. One general and one CAC impact entry are supported. These are separate from the CAC service facts registry."
+        />
+      </div>
       {facts
         .map((f, i) => ({ f, i }))
         .sort((a, b) =>
@@ -93,10 +96,21 @@ export function ScenarioFactsEditor({
                   maxLength={20000}
                   value={f.display_text}
                   onChange={(e) => update(i, { display_text: e.target.value })}
-                  hint="Enter final display text, without unresolved {placeholders}."
+                  labelAction={
+                    <FieldInfo
+                      label={`${f.fact_role} fact text`}
+                      text={`${f.fact_role === 'general' ? 'General supporting copy appears as Community fact for fact copy, or About this decision for context copy.' : 'CAC supporting copy appears as CAC impact in supported CAC-mode recaps.'} Enter final display text, without unresolved {placeholders}. Display eligibility is controlled separately; this text does not automatically bind to statistics.`}
+                    />
+                  }
                 />
                 <TextField
                   label={`${f.fact_role} source URL`}
+                  labelAction={
+                    <FieldInfo
+                      label={`${f.fact_role} source URL`}
+                      text="HTTPS source attribution for the displayed copy. It does not update the underlying statistics or financial amounts."
+                    />
+                  }
                   type="url"
                   pattern="https://[^\s]+"
                   required
@@ -106,6 +120,12 @@ export function ScenarioFactsEditor({
                 <div className="cms-inline">
                   <TextField
                     label={`${f.fact_role} reporting period`}
+                    labelAction={
+                      <FieldInfo
+                        label={`${f.fact_role} reporting period`}
+                        text="Optional reporting-period attribution for this copy. It is stored separately from structured statistical observations."
+                      />
+                    }
                     value={f.reporting_period ?? ''}
                     onChange={(e) =>
                       update(i, { reporting_period: e.target.value || null })
@@ -113,6 +133,12 @@ export function ScenarioFactsEditor({
                   />
                   <SelectField
                     label={`${f.fact_role} copy type`}
+                    labelAction={
+                      <FieldInfo
+                        label={`${f.fact_role} copy type`}
+                        text="Fact or authored context. General fact copy is headed Community fact; general context is headed About this decision. CAC copy uses CAC impact. This does not change eligibility or gameplay effects."
+                      />
+                    }
                     value={f.copy_kind}
                     onChange={(e) =>
                       update(i, {
@@ -124,15 +150,23 @@ export function ScenarioFactsEditor({
                     <option value="context">Context</option>
                   </SelectField>
                 </div>
-                <label className="cms-fact-eligibility">
-                  <input
-                    type="checkbox"
-                    checked={f.verified}
-                    onChange={(e) => update(i, { verified: e.target.checked })}
-                  />{' '}
-                  Eligible for gameplay display{' '}
-                  <span className="admin-muted">({f.fact_role})</span>
-                </label>
+                <div className="ui-field-label">
+                  <label className="cms-fact-eligibility">
+                    <input
+                      type="checkbox"
+                      checked={f.verified}
+                      onChange={(e) =>
+                        update(i, { verified: e.target.checked })
+                      }
+                    />{' '}
+                    Eligible for gameplay display{' '}
+                    <span className="admin-muted">({f.fact_role})</span>
+                  </label>
+                  <FieldInfo
+                    label={`${f.fact_role} display eligibility`}
+                    text="Eligible copy can be returned by gameplay recap functions. CAC copy also depends on CAC support for the run. New entries start ineligible; unrelated edits preserve the stored eligibility and evidence. This is not a separate approval workflow."
+                  />
+                </div>
                 <details>
                   <summary>Technical details (read-only)</summary>
                   <p>Role: {f.fact_role}</p>

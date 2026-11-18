@@ -1,4 +1,4 @@
-import { useState, useId } from 'react'
+import { FieldInfo as Info } from '../../../components/ui/FieldInfo'
 import { DeleteControl } from '../../../components/ui/DeleteControl'
 import { Button } from '../../../components/ui/Button'
 import {
@@ -7,34 +7,6 @@ import {
   SelectField,
 } from '../../../components/ui/FormFields'
 import type { CmsChoice, CmsScenario } from '../../../services/cms'
-function Info({ label, text }: { label: string; text: string }) {
-  const [open, setOpen] = useState(false)
-  const id = useId()
-  return (
-    <span
-      className="cms-info-anchor"
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') setOpen(false)
-      }}
-    >
-      <button
-        type="button"
-        className="cms-info"
-        aria-label={`About ${label}`}
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => setOpen(!open)}
-      >
-        ⓘ
-      </button>
-      {open && (
-        <span id={id} className="cms-help" role="note">
-          {text}
-        </span>
-      )}
-    </span>
-  )
-}
 export function ChoiceEditor({
   choices,
   scenarios,
@@ -53,10 +25,13 @@ export function ChoiceEditor({
   }
   return (
     <section className="cms-choice-section">
-      <h3>Choices</h3>
-      <p className="admin-muted">
-        Order is saved for the CMS. Gameplay currently orders choices by ID.
-      </p>
+      <div className="cms-info-heading">
+        <h3>Choices</h3>{' '}
+        <Info
+          label="Choices"
+          text="Order is saved for the CMS. Gameplay currently orders choices by ID."
+        />
+      </div>
       {choices.map((c, i) => (
         <article
           className="admin-card cms-choice"

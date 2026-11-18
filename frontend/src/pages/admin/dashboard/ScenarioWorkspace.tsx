@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { ScenarioFactsEditor } from './ScenarioFactsEditor'
 import { ChoiceEditor } from './ChoiceEditor'
 import { PersonaEditor } from './PersonaEditor'
+import { JobEditor } from './JobEditor'
 import { AdminTabs } from '../../../components/admin/AdminTabs'
 import { Button } from '../../../components/ui/Button'
 import { DeleteControl } from '../../../components/ui/DeleteControl'
 import { Dialog } from '../../../components/ui/Dialog'
 import {
   Form,
+  RequiredFieldLegend,
   SelectField,
   TextAreaField,
   TextField,
@@ -35,6 +37,7 @@ export function ScenarioWorkspace({
 }) {
   const [section, setSection] = useState('scenarios')
   const [personaDirty, setPersonaDirty] = useState(false)
+  const [jobDirty, setJobDirty] = useState(false)
   const [personaSession, setPersonaSession] = useState(0)
   const [removingScenario, setRemovingScenario] = useState<{
     scenario: CmsScenario
@@ -74,7 +77,8 @@ export function ScenarioWorkspace({
     payload: string
     request: string
   } | null>(null)
-  const dirty = (editing && JSON.stringify(input) !== baseline) || personaDirty
+  const dirty =
+    (editing && JSON.stringify(input) !== baseline) || personaDirty || jobDirty
   useEffect(() => {
     onDirtyChange?.(dirty)
   }, [dirty, onDirtyChange])
@@ -139,6 +143,7 @@ export function ScenarioWorkspace({
     setContent(loaded)
     setPersonaSession((value) => value + 1)
     setPersonaDirty(false)
+    setJobDirty(false)
     setEditing(false)
     setSelected(null)
     setPersona('all')
@@ -238,6 +243,7 @@ export function ScenarioWorkspace({
         <fieldset disabled={busy} className="cms-editor-fields">
           <Form
             aria-label="Create CMS draft"
+            requiredIndicator="asterisk"
             onSubmit={(event) => {
               event.preventDefault()
               navigate(
@@ -258,6 +264,7 @@ export function ScenarioWorkspace({
               )
             }}
           >
+            <RequiredFieldLegend show={creating} />
             <SelectField
               label="Published source edition"
               value={source}
@@ -319,6 +326,7 @@ export function ScenarioWorkspace({
                 label: 'Personas',
                 count: content.personas.length,
               },
+              { id: 'jobs', label: 'Jobs', count: content.jobs?.length ?? 0 },
             ]}
             active={section}
             disabled={busy}
@@ -329,6 +337,7 @@ export function ScenarioWorkspace({
                 setEditing(false)
                 setSelected(null)
                 setPersonaDirty(false)
+                setJobDirty(false)
                 setNotice('')
                 setError('')
               })
@@ -346,11 +355,30 @@ export function ScenarioWorkspace({
                   setError('')
                   setNotice('')
                 }}
-                onSaved={async (loaded) => {
+                onSaved={async (loaded, message) => {
                   const drafts = await listCmsDrafts()
                   setContent(loaded)
                   setDrafts(drafts)
-                  setNotice('Saved and reloaded from the database.')
+                  setNotice(message ?? 'Saved and reloaded from the database.')
+                }}
+              />
+            ) : section === 'jobs' ? (
+              <JobEditor
+                key={`${content.workspace.version_id}:${personaSession}`}
+                content={content}
+                busy={busy}
+                navigate={navigate}
+                perform={perform}
+                onDirtyChange={setJobDirty}
+                onEdit={() => {
+                  setError('')
+                  setNotice('')
+                }}
+                onSaved={async (loaded, message) => {
+                  const drafts = await listCmsDrafts()
+                  setContent(loaded)
+                  setDrafts(drafts)
+                  setNotice(message ?? 'Saved and reloaded from the database.')
                 }}
               />
             ) : (
@@ -439,6 +467,7 @@ export function ScenarioWorkspace({
                   ) : (
                     <Form
                       aria-label="Scenario editor"
+                      requiredIndicator="asterisk"
                       onSubmit={(event) => {
                         event.preventDefault()
                         void perform(async () => {
@@ -481,12 +510,16 @@ export function ScenarioWorkspace({
                         <Button type="submit" loading={busy}>
                           Save Changes
                         </Button>
-                        <span
-                          aria-live="polite"
-                          className={dirty ? 'cms-unsaved' : 'admin-muted'}
-                        >
-                          {dirty ? 'Unsaved changes' : 'No unsaved changes'}
-                        </span>
+                        <div className="cms-save-status">
+                          {' '}
+                          <span
+                            aria-live="polite"
+                            className={dirty ? 'cms-unsaved' : 'admin-muted'}
+                          >
+                            {dirty ? 'Unsaved changes' : 'No unsaved changes'}
+                          </span>
+                          <RequiredFieldLegend />
+                        </div>
                       </div>
                       <h3>
                         {selected ? 'Edit scenario' : 'New ordinary scenario'}
@@ -664,6 +697,7 @@ export function ScenarioWorkspace({
               if (content?.workspace.version_id === deleting.version_id) {
                 setContent(null)
                 setPersonaDirty(false)
+                setJobDirty(false)
                 setEditing(false)
                 setSelected(null)
               }

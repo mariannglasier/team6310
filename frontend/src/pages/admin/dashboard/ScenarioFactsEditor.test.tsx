@@ -24,9 +24,12 @@ test('new facts default to ineligible; roles are limited and normal fields edita
   expect(
     screen.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
   ).not.toBeChecked()
-  await user.type(screen.getByLabelText(/general fact text/), 'Supporting text')
   await user.type(
-    screen.getByLabelText(/general source URL/),
+    screen.getByLabelText(/^general fact text/),
+    'Supporting text',
+  )
+  await user.type(
+    screen.getByLabelText(/^general source URL/),
     'https://example.org',
   )
   await user.click(
@@ -36,7 +39,7 @@ test('new facts default to ineligible; roles are limited and normal fields edita
     screen.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
   ).toBeChecked()
   expect(screen.queryByRole('button', { name: 'Add general fact' })).toBeNull()
-  expect(screen.getByLabelText(/general fact text/)).toHaveValue(
+  expect(screen.getByLabelText(/^general fact text/)).toHaveValue(
     'Supporting text',
   )
 })
@@ -60,7 +63,7 @@ test('editing text preserves eligibility and evidence; removing requires confirm
     />,
   )
   await user.click(screen.getByText('General supporting copy', { exact: true }))
-  await user.type(screen.getByLabelText(/general fact text/), ' edited')
+  await user.type(screen.getByLabelText(/^general fact text/), ' edited')
   expect(
     screen.getByRole('checkbox', { name: /Eligible for gameplay display/ }),
   ).toBeChecked()
@@ -69,7 +72,7 @@ test('editing text preserves eligibility and evidence; removing requires confirm
     screen.getByRole('button', { name: 'Remove general scenario fact' }),
   )
   await user.click(screen.getByRole('button', { name: 'Cancel' }))
-  expect(screen.getByLabelText(/general fact text/)).toHaveValue(
+  expect(screen.getByLabelText(/^general fact text/)).toHaveValue(
     'Original edited',
   )
   await user.click(
@@ -84,14 +87,17 @@ test('collapse keeps edits and both roles remain identifiable', async () => {
   render(<Harness />)
   await user.click(screen.getByRole('button', { name: 'Add general fact' }))
   await user.click(screen.getByText('General supporting copy', { exact: true }))
-  await user.type(screen.getByLabelText(/general fact text/), 'Unsaved content')
+  await user.type(
+    screen.getByLabelText(/^general fact text/),
+    'Unsaved content',
+  )
   await user.click(screen.getByText('General supporting copy', { exact: true }))
-  expect(screen.getByLabelText(/general fact text/)).not.toBeVisible()
+  expect(screen.getByLabelText(/^general fact text/)).not.toBeVisible()
   expect(
     screen.getByText('Unsaved content', { selector: '.cms-fact-preview' }),
   ).toBeVisible()
   await user.click(screen.getByText('General supporting copy', { exact: true }))
-  expect(screen.getByLabelText(/general fact text/)).toHaveValue(
+  expect(screen.getByLabelText(/^general fact text/)).toHaveValue(
     'Unsaved content',
   )
   await user.click(screen.getByRole('button', { name: 'Add cac fact' }))

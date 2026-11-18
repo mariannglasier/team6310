@@ -261,3 +261,60 @@ button.ui-radio-card:not(:disabled):hover {
   opacity: 0.45;
   cursor: default;
 }
+
+.ui-field-label {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+.ui-required-marker {
+  color: var(--primary, #b42318);
+  font-weight: 700;
+  margin-inline-start: 0.2em;
+}
+.ui-required-legend {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+.ui-required-legend .ui-required-marker {
+  margin-inline-start: 0;
+}
+.ui-field-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0.2rem;
+  border: 0;
+  border-radius: 5px;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.ui-field-info:hover,
+.ui-field-info:focus-visible {
+  background: var(--accent-surface);
+}
+.ui-field-info-content {
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  width: min(280px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 0.75rem;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 16px #0003;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+}

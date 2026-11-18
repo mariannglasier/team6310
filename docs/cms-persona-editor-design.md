@@ -1,11 +1,11 @@
 # CMS Persona Editor design — November 17, 2026
 
-**Status: Stages 1 and 2 implemented locally; expense editing remains Stage 3.**
-Persona details now use the existing draft-only CMS workspace, protected bundle
-persistence and staff boundary. Expense definitions are shown read-only and retained
-unchanged. No expense management, appearance customization, publication or gameplay
-changes are included. The design below records the investigation and approved
-architecture; the implementation records describe completed stages.
+**Status: Stages 1–3 implemented locally, including integrated expense management
+and protected persona deletion.** The Scenario and Persona sections share the
+existing draft-only workspace and protected persistence. Expense editing lives
+inside the Persona form. Avatar mappings remain hardcoded; no appearance
+configuration, publication or gameplay behavior was added. Earlier design/stage
+records below are historical where superseded by the Stage 3 record.
 
 ## Evidence and scope
 
@@ -548,3 +548,146 @@ columns or persistence architecture were introduced.
 To inspect locally, sign in to the existing dashboard, switch to Editor, explicitly
 create/reopen a CMS draft, then choose Personas. Stage 3 remains unimplemented.
 No hosted changes, deployment, commits or pushes were performed.
+
+## Stage 3 implementation record — November 18, 2026
+
+### Persona refinements and navigation
+
+The monogram formerly used `name.charAt(0)`, producing a bracket for local fixture
+names beginning with `[LOCAL TEST]`. It is replaced with the existing
+`PersonaAvatar` profile variant beside the persona name and linked-scenario count.
+`components/simulation/avatars.ts` still owns the unchanged first-word name mapping
+and artwork. Alex/Jordan/Patricia/Sofia use their existing assets; unmatched names,
+including names with unrecognized prefixes, retain the existing generic fallback.
+There is no image upload, database icon/color field or background-color change.
+
+The Back to persona library button is removed. The searchable library stays in
+the workspace and tabs remain available. Persona selection, persona-delete X,
+tab changes and draft reload/reopen all use the existing shared unsaved-change
+guard. Expense edits now participate in the same dirty state and browser warning.
+
+### Integrated scheduled expenses
+
+`PersonaExpenseCards.tsx` is a presentation component inside `PersonaEditor.tsx`'s
+single form and disabled/recovery fieldset. It has no route, independent save,
+draft identity or persistence calls. It uses the Choices convention of native
+`details`/`summary`, compact title/effect summary, and the shared right-hand X.
+Collapsing leaves controls mounted; invalid native fields open the relevant entry.
+
+The editor exposes exactly the existing authored fields: name, principal amount
+per occurrence, first due day, one-time/repeating selection, optional positive
+repeat interval in days, and fixed late fee. IDs, ownership and editions are not
+editable controls. New name/amount/fee/day inputs start blank; the author must
+enter principal and fee explicitly, including zero. One-time recurrence is NULL;
+choosing repeating requires an explicitly entered interval. No category,
+description column, monthly-frequency conversion or financial formula is invented.
+Days 1–32767 remain allowed, with a note for definitions after Day 30.
+
+`personaExpenses.ts` sorts a copy for presentation: first due day ascending,
+then expense name using English collation, then the existing expense ID or stable
+new-row client key. Entries without a valid day sort last. No drag-and-drop,
+manual ordering, reorder arrows or persisted order metadata exists. Stable React
+keys retain expansion/input state when changing a day moves a card.
+
+New entries use local client keys; Save sends null expense_id and the key to the
+existing server operation. Existing records keep their IDs and relationship
+metadata. The service strips ownership fields from the payload, validates exact
+USD and integer-day bounds, and sends the complete explicit expense list with
+the changed persona fields to `cms_save_persona_bundle` in one request. New DB
+IDs are generated server-side; re-read selects the committed IDs and revision.
+
+Removal is staged only after named confirmation and takes effect on Save. Known
+bill recap links block removal in the confirmation with an explanation, retaining
+the record and other edits. The database remains authoritative for every reference:
+unknown/stale blockers reject the entire bundle. Pending persisted removals have
+a Restore action, allowing recovery without discarding other form edits. Recap
+links/content are never deleted or reassigned automatically. Unchanged expenses
+continue to bypass UPDATE through the Stage 2 preservation migration.
+
+All detail and expense changes commit atomically with the shared revision and
+namespaced receipt. Stale/validation/reference failures retain input. Unknown
+save outcomes and failed readback preserve the same request/revision and lock
+fields until retry/reload confirms content. No gameplay occurrence, financial
+calculation, starting job or starting income is edited.
+
+### Protected persona deletion
+
+Forward migration `20261118043202_cms_persona_deletion.sql`, applied locally only,
+adds `cms_delete_persona(version,revision,request,persona)`. No existing migration,
+expense save architecture or gameplay function was replaced.
+
+The RPC rechecks active staff, locks the shared workspace, validates CMS-managed
+unpublished draft ownership and expected revision, and uses actor/input-bound
+idempotent receipts. It locks both owned tables and every table with an inbound
+FK before inspecting dependencies. The complete verified inbound set includes:
+
+- `scenarios.persona_intent`;
+- `playthroughs.persona_id`, `group_participants.persona_id`, and
+  `group_sessions.selected_persona_id`;
+- owned `persona_expenses.persona_id`;
+- `playthrough_expenses(expense_id,version_id)` and
+  `scenario_bill_links.expense_id` for those expenses.
+
+Deletion refuses linked scenarios with instructions to reassign in Scenario Editor,
+refuses bill recap links, and checks all remaining/current/future FK references
+against the exact owned persona/expense rows. Any unexpected dependency blocks
+removal, including inherited cascading FKs. It explicitly removes only owned
+expense/persona lineage, owned unreferenced expense definitions, and the persona,
+then increments revision once and records the result. Jobs, scenarios, recap
+content, shared references, source editions, receipts and historical gameplay
+are not cascaded. Any error rolls back the entire transaction.
+
+The library's shared X is separate from its select button and opens named
+confirmation. Blocked/failed deletion stays in the dialog with a reason and keeps
+the form. Retry uses the original request/revision; successful deletion reloads
+the workspace and returns the editor to selection. There is no persona-delete
+browser table write and no deletion of published or non-CMS personas.
+
+### Stage 3 verification and boundaries
+
+- 505 frontend tests passed; two existing opt-in tests skipped. Coverage includes
+  the exact avatar source, Back-button removal, expense blank defaults, collapse,
+  add/edit/confirmed removal and restore, reference explanations, chronological
+  and same-day identity ordering, invalid monetary/day values, one-bundle saving,
+  persona X/confirmation, blockers, protected service calls and prior retry/stale
+  and nullable-value behavior.
+- All seven rollback-only CMS SQL suites passed. New
+  `supabase/tests/cms-persona-deletion.sql` covers owned expenses/lineage, scenario
+  and recap blockers, an actual group-session reference, unexpected cascading
+  dependencies, revision/receipt rollback, source preservation, stale/retry/request
+  reuse, staff revocation and execution grants. Existing expense money, reference,
+  collision, copy and atomicity suites remain green.
+- `tools/test_cms_personas_local_api.py` now also tests genuine unauthorized/revoked
+  persona-delete calls, linked-scenario/foreign-persona rejection, deletion with
+  owned expenses, actor-bound retries and stale requests. Historical gameplay
+  fingerprints match after tracked fixture cleanup. Prior API concurrency checks
+  still prove overlapping Persona/Scenario saves serialize with one stale loser.
+- Three genuine local Chromium journeys passed: Scenario regression; Persona
+  details/reload/retry/stale regression; and new `cms-expenses.spec.ts`, which
+  uses a disposable local source fixture with real recap links. It verifies
+  expanded/collapsed editing, chronological insertion and same-day ordering,
+  combined saves/reopening, cancel/confirm removal, blocked recap/persona deletion,
+  real collision rollback of simultaneous persona text, unreferenced persona and
+  expense deletion, source isolation, keyboard toggling and 390px no-overflow
+  layout. The mobile screenshot was visually inspected. Fixtures are cleaned up.
+- Formatting, lint, TypeScript and production build passed. Only local verification
+  credentials and the fixed isolated Docker database/API were used. Run mutating
+  API suites before browser suites so temporary published fixtures cannot alter
+  a browser's source-edition list mid-test.
+
+Limitations are deliberate: linked personas/expenses cannot be force-deleted;
+reassigning/authoring bill recap links is not added by this milestone. Job editing,
+statistics, CAC service facts, publication, timeline and gameplay changes remain
+out of scope. No hosted migration, deployment, commit or push occurred.
+
+## Editor UI refinement — November 18, 2026
+
+Superseding the earlier presentation records, Persona Technical details is removed
+from the interface, with identifiers retained internally. Starting balance and
+expense explanations now use the shared `FieldInfo` beside labels/headings; the
+Add expense secondary button is at the list bottom. Scenario and Persona forms
+use red required asterisks and the same conditional legend below save status.
+Actual native required expressions, save/reload/retry and expense/deletion
+semantics are unchanged. See [the CMS information policy](cms-editor-information-policy.md)
+for the complete moved-copy inventory, visible-warning exceptions, implementation
+conventions and local verification. No migration was added by this UI pass.

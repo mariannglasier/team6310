@@ -1,5 +1,13 @@
-import { useId, type ComponentProps, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useId,
+  type ComponentProps,
+  type ReactNode,
+} from 'react'
 import './ui.css'
+
+const RequiredIndicator = createContext<'text' | 'asterisk'>('text')
 
 interface FieldDetails {
   label: string
@@ -16,12 +24,20 @@ function FieldFrame({
   required,
   children,
 }: FieldDetails & { id: string; required?: boolean; children: ReactNode }) {
+  const indicator = useContext(RequiredIndicator)
   return (
     <div className="ui-field">
       <div className="ui-field-label">
         <label htmlFor={id}>
           {label}
-          {required && <span> (required)</span>}
+          {required &&
+            (indicator === 'asterisk' ? (
+              <span className="ui-required-marker" aria-hidden="true">
+                *
+              </span>
+            ) : (
+              <span> (required)</span>
+            ))}
         </label>
         {labelAction}
       </div>
@@ -149,6 +165,22 @@ export function SelectField({
   )
 }
 
-export function Form({ className = '', ...props }: ComponentProps<'form'>) {
-  return <form {...props} className={`ui-form ${className}`} />
+export function Form({
+  className = '',
+  requiredIndicator = 'text',
+  ...props
+}: ComponentProps<'form'> & { requiredIndicator?: 'text' | 'asterisk' }) {
+  return (
+    <RequiredIndicator.Provider value={requiredIndicator}>
+      <form {...props} className={`ui-form ${className}`} />
+    </RequiredIndicator.Provider>
+  )
+}
+
+export function RequiredFieldLegend({ show = true }: { show?: boolean }) {
+  return show ? (
+    <span className="ui-required-legend">
+      <span className="ui-required-marker">*</span> is a required field
+    </span>
+  ) : null
 }
