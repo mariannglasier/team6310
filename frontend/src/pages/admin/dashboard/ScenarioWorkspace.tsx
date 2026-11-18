@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ScenarioFactsEditor } from './ScenarioFactsEditor'
 import { ChoiceEditor } from './ChoiceEditor'
+import { PersonaEditor } from './PersonaEditor'
+import { AdminTabs } from '../../../components/admin/AdminTabs'
 import { Button } from '../../../components/ui/Button'
 import { DeleteControl } from '../../../components/ui/DeleteControl'
 import { Dialog } from '../../../components/ui/Dialog'
@@ -31,6 +33,9 @@ export function ScenarioWorkspace({
   onDirtyChange?: (dirty: boolean) => void
   editions: readonly AdminEdition[]
 }) {
+  const [section, setSection] = useState('scenarios')
+  const [personaDirty, setPersonaDirty] = useState(false)
+  const [personaSession, setPersonaSession] = useState(0)
   const [removingScenario, setRemovingScenario] = useState<{
     scenario: CmsScenario
     request: string
@@ -69,7 +74,7 @@ export function ScenarioWorkspace({
     payload: string
     request: string
   } | null>(null)
-  const dirty = editing && JSON.stringify(input) !== baseline
+  const dirty = (editing && JSON.stringify(input) !== baseline) || personaDirty
   useEffect(() => {
     onDirtyChange?.(dirty)
   }, [dirty, onDirtyChange])
@@ -97,7 +102,7 @@ export function ScenarioWorkspace({
       if (
         event.target instanceof Element &&
         event.target.closest('a[href]') &&
-        !window.confirm('Discard unsaved scenario changes?')
+        !window.confirm('Discard unsaved content changes?')
       ) {
         event.preventDefault()
         event.stopImmediatePropagation()
@@ -132,6 +137,8 @@ export function ScenarioWorkspace({
   async function open(id: string) {
     const loaded = await readCmsDraft(id)
     setContent(loaded)
+    setPersonaSession((value) => value + 1)
+    setPersonaDirty(false)
     setEditing(false)
     setSelected(null)
     setPersona('all')
@@ -179,7 +186,7 @@ export function ScenarioWorkspace({
     >
       <header>
         <p className="admin-muted">Content workspace · Drafts only</p>
-        <h2 id="cms-heading">Scenario workspace</h2>
+        <h2 id="cms-heading">CMS workspace</h2>
         <p>Create a draft from a published edition, or reopen a saved draft.</p>
       </header>
       {error && (
@@ -298,248 +305,301 @@ export function ScenarioWorkspace({
               Reload draft
             </Button>
           </div>
-          <div className="cms-columns">
-            <section aria-label="Scenario library" className="admin-card">
-              <div className="cms-draft-heading">
-                <h3>Scenario library</h3>
-                <Button
-                  disabled={busy}
-                  onClick={() => navigate(() => edit(null))}
-                >
-                  New scenario
-                </Button>
-              </div>
-              <TextField
-                label="Search scenarios"
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
+          <AdminTabs
+            idPrefix="cms-content"
+            label="Draft content"
+            tabs={[
+              {
+                id: 'scenarios',
+                label: 'Scenarios',
+                count: content.scenarios.length,
+              },
+              {
+                id: 'personas',
+                label: 'Personas',
+                count: content.personas.length,
+              },
+            ]}
+            active={section}
+            disabled={busy}
+            onChange={(next) => {
+              if (next === section) return
+              navigate(() => {
+                setSection(next)
+                setEditing(false)
+                setSelected(null)
+                setPersonaDirty(false)
+                setNotice('')
+                setError('')
+              })
+            }}
+          >
+            {section === 'personas' ? (
+              <PersonaEditor
+                key={`${content.workspace.version_id}:${personaSession}`}
+                content={content}
+                busy={busy}
+                navigate={navigate}
+                perform={perform}
+                onDirtyChange={setPersonaDirty}
+                onEdit={() => {
+                  setError('')
+                  setNotice('')
+                }}
+                onSaved={async (loaded) => {
+                  const drafts = await listCmsDrafts()
+                  setContent(loaded)
+                  setDrafts(drafts)
+                  setNotice('Saved and reloaded from the database.')
+                }}
               />
-              <SelectField
-                label="Filter by persona"
-                value={persona}
-                onChange={(e) => setPersona(e.target.value)}
-              >
-                <option value="all">All personas</option>
-                <option value="general">General / unassigned</option>
-                {content.personas.map((p) => (
-                  <option key={p.persona_id} value={p.persona_id}>
-                    {p.name}
-                  </option>
-                ))}
-              </SelectField>
-              <p className="admin-muted">{filtered.length} scenarios</p>
-              <ul className="cms-library">
-                {filtered.map((s) => (
-                  <li key={s.scenario_id} className="cms-scenario-item">
-                    <button
-                      type="button"
+            ) : (
+              <div className="cms-columns">
+                <section aria-label="Scenario library" className="admin-card">
+                  <div className="cms-draft-heading">
+                    <h3>Scenario library</h3>
+                    <Button
                       disabled={busy}
-                      aria-current={
-                        selected?.scenario_id === s.scenario_id
-                          ? 'true'
-                          : undefined
-                      }
-                      onClick={() => navigate(() => edit(s))}
+                      onClick={() => navigate(() => edit(null))}
                     >
-                      <strong>{s.title}</strong>
-                      <span>
-                        {content.personas.find(
-                          (p) => p.persona_id === s.persona_intent,
-                        )?.name ?? 'General / unassigned'}{' '}
-                        ·{' '}
-                        {s.schedule_type === 'scheduled'
-                          ? 'Scheduled'
-                          : 'Unscheduled'}
-                      </span>
-                    </button>
-                    <DeleteControl
-                      className="cms-scenario-delete"
-                      disabled={busy}
-                      label={`Delete scenario ${s.title}`}
-                      onClick={() =>
-                        navigate(() =>
-                          setRemovingScenario({
-                            scenario: s,
-                            request: crypto.randomUUID(),
-                          }),
-                        )
-                      }
-                    />
-                  </li>
-                ))}
-              </ul>
-              {!filtered.length && <p>No scenarios match these filters.</p>}
-            </section>
-            <section className="admin-card" aria-label="Scenario editor">
-              {!editing ? (
-                <>
-                  <h3>Select a scenario</h3>
-                  <p>
-                    Choose a library item to edit its content, or create an
-                    ordinary scenario.
-                  </p>
-                </>
-              ) : (
-                <Form
-                  aria-label="Scenario editor"
-                  onSubmit={(event) => {
-                    event.preventDefault()
-                    void perform(async () => {
-                      const payload = JSON.stringify([
-                        content.workspace.version_id,
-                        content.workspace.revision,
-                        selected?.scenario_id,
-                        input,
-                      ])
-                      const request =
-                        saveRequest?.payload === payload
-                          ? saveRequest.request
-                          : crypto.randomUUID()
-                      setSaveRequest({ payload, request })
-                      const result = await saveCmsScenario(
-                        content.workspace.version_id,
-                        content.workspace.revision,
-                        request,
-                        selected?.scenario_id ?? null,
-                        input,
-                      )
-                      const loaded = await readCmsDraft(
-                        content.workspace.version_id,
-                      )
-                      setContent(loaded)
-                      const saved = loaded.scenarios.find(
-                        (s) => s.scenario_id === result.scenario_id,
-                      )
-                      if (!saved)
-                        throw new Error(
-                          'Saved scenario could not be reloaded. Reload the draft to recover.',
-                        )
-                      edit(saved, loaded)
-                      setDrafts(await listCmsDrafts())
-                      setNotice('Saved and reloaded from the database.')
-                    })
-                  }}
-                >
-                  <div className="cms-save-controls">
-                    <Button type="submit" loading={busy}>
-                      Save Changes
+                      New scenario
                     </Button>
-                    <span
-                      aria-live="polite"
-                      className={dirty ? 'cms-unsaved' : 'admin-muted'}
-                    >
-                      {dirty ? 'Unsaved changes' : 'No unsaved changes'}
-                    </span>
                   </div>
-                  <h3>
-                    {selected ? 'Edit scenario' : 'New ordinary scenario'}
-                  </h3>
-                  <fieldset disabled={busy} className="cms-editor-fields">
-                    <TextField
-                      label="Scenario title"
-                      value={input.title}
-                      required
-                      maxLength={200}
-                      onChange={(e) =>
-                        setInput({ ...input, title: e.target.value })
-                      }
-                    />
-                    <div className="cms-inline">
-                      <SelectField
-                        label="Schedule type"
-                        value={input.schedule_type ?? 'non_scheduled'}
-                        onChange={(e) =>
-                          setInput({
-                            ...input,
-                            schedule_type: e.target.value,
-                            default_day:
-                              e.target.value === 'scheduled'
-                                ? (input.default_day ?? 1)
-                                : null,
-                          })
-                        }
-                      >
-                        <option value="non_scheduled">Unscheduled</option>
-                        <option value="scheduled">Scheduled</option>
-                      </SelectField>
-                      <TextField
-                        label="Default day"
-                        type="number"
-                        min="1"
-                        max="30"
-                        disabled={input.schedule_type !== 'scheduled'}
-                        required={input.schedule_type === 'scheduled'}
-                        value={input.default_day ?? ''}
-                        onChange={(e) =>
-                          setInput({
-                            ...input,
-                            default_day: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          })
-                        }
-                      />
-                      <SelectField
-                        label="Category"
-                        value={input.category_id ?? ''}
-                        required
-                        onChange={(e) =>
-                          setInput({
-                            ...input,
-                            category_id: e.target.value || null,
-                          })
-                        }
-                      >
-                        <option value="">Choose a category</option>
-                        {content.categories.map((c) => (
-                          <option key={c.category_id} value={c.category_id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </SelectField>
-                    </div>
-                    <SelectField
-                      label="Persona applicability"
-                      value={input.persona_intent ?? ''}
-                      onChange={(e) =>
-                        setInput({
-                          ...input,
-                          persona_intent: e.target.value || null,
+                  <TextField
+                    label="Search scenarios"
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                  <SelectField
+                    label="Filter by persona"
+                    value={persona}
+                    onChange={(e) => setPersona(e.target.value)}
+                  >
+                    <option value="all">All personas</option>
+                    <option value="general">General / unassigned</option>
+                    {content.personas.map((p) => (
+                      <option key={p.persona_id} value={p.persona_id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                  <p className="admin-muted">{filtered.length} scenarios</p>
+                  <ul className="cms-library">
+                    {filtered.map((s) => (
+                      <li key={s.scenario_id} className="cms-scenario-item">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          aria-current={
+                            selected?.scenario_id === s.scenario_id
+                              ? 'true'
+                              : undefined
+                          }
+                          onClick={() => navigate(() => edit(s))}
+                        >
+                          <strong>{s.title}</strong>
+                          <span>
+                            {content.personas.find(
+                              (p) => p.persona_id === s.persona_intent,
+                            )?.name ?? 'General / unassigned'}{' '}
+                            ·{' '}
+                            {s.schedule_type === 'scheduled'
+                              ? 'Scheduled'
+                              : 'Unscheduled'}
+                          </span>
+                        </button>
+                        <DeleteControl
+                          className="cms-scenario-delete"
+                          disabled={busy}
+                          label={`Delete scenario ${s.title}`}
+                          onClick={() =>
+                            navigate(() =>
+                              setRemovingScenario({
+                                scenario: s,
+                                request: crypto.randomUUID(),
+                              }),
+                            )
+                          }
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                  {!filtered.length && <p>No scenarios match these filters.</p>}
+                </section>
+                <section className="admin-card" aria-label="Scenario editor">
+                  {!editing ? (
+                    <>
+                      <h3>Select a scenario</h3>
+                      <p>
+                        Choose a library item to edit its content, or create an
+                        ordinary scenario.
+                      </p>
+                    </>
+                  ) : (
+                    <Form
+                      aria-label="Scenario editor"
+                      onSubmit={(event) => {
+                        event.preventDefault()
+                        void perform(async () => {
+                          const payload = JSON.stringify([
+                            content.workspace.version_id,
+                            content.workspace.revision,
+                            selected?.scenario_id,
+                            input,
+                          ])
+                          const request =
+                            saveRequest?.payload === payload
+                              ? saveRequest.request
+                              : crypto.randomUUID()
+                          setSaveRequest({ payload, request })
+                          const result = await saveCmsScenario(
+                            content.workspace.version_id,
+                            content.workspace.revision,
+                            request,
+                            selected?.scenario_id ?? null,
+                            input,
+                          )
+                          const loaded = await readCmsDraft(
+                            content.workspace.version_id,
+                          )
+                          setContent(loaded)
+                          const saved = loaded.scenarios.find(
+                            (s) => s.scenario_id === result.scenario_id,
+                          )
+                          if (!saved)
+                            throw new Error(
+                              'Saved scenario could not be reloaded. Reload the draft to recover.',
+                            )
+                          edit(saved, loaded)
+                          setDrafts(await listCmsDrafts())
+                          setNotice('Saved and reloaded from the database.')
                         })
-                      }
+                      }}
                     >
-                      <option value="">General / unassigned</option>
-                      {content.personas.map((p) => (
-                        <option key={p.persona_id} value={p.persona_id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </SelectField>
-                    <TextAreaField
-                      label="Scenario description"
-                      value={input.description ?? ''}
-                      required
-                      maxLength={20000}
-                      rows={10}
-                      onChange={(e) =>
-                        setInput({ ...input, description: e.target.value })
-                      }
-                    />
-                    <ScenarioFactsEditor
-                      facts={input.facts ?? []}
-                      onChange={(facts) => setInput({ ...input, facts })}
-                    />
-                    <ChoiceEditor
-                      choices={input.choices ?? []}
-                      scenarios={content.scenarios}
-                      onChange={(choices) => setInput({ ...input, choices })}
-                    />
-                  </fieldset>
-                </Form>
-              )}
-            </section>
-          </div>
+                      <div className="cms-save-controls">
+                        <Button type="submit" loading={busy}>
+                          Save Changes
+                        </Button>
+                        <span
+                          aria-live="polite"
+                          className={dirty ? 'cms-unsaved' : 'admin-muted'}
+                        >
+                          {dirty ? 'Unsaved changes' : 'No unsaved changes'}
+                        </span>
+                      </div>
+                      <h3>
+                        {selected ? 'Edit scenario' : 'New ordinary scenario'}
+                      </h3>
+                      <fieldset disabled={busy} className="cms-editor-fields">
+                        <TextField
+                          label="Scenario title"
+                          value={input.title}
+                          required
+                          maxLength={200}
+                          onChange={(e) =>
+                            setInput({ ...input, title: e.target.value })
+                          }
+                        />
+                        <div className="cms-inline">
+                          <SelectField
+                            label="Schedule type"
+                            value={input.schedule_type ?? 'non_scheduled'}
+                            onChange={(e) =>
+                              setInput({
+                                ...input,
+                                schedule_type: e.target.value,
+                                default_day:
+                                  e.target.value === 'scheduled'
+                                    ? (input.default_day ?? 1)
+                                    : null,
+                              })
+                            }
+                          >
+                            <option value="non_scheduled">Unscheduled</option>
+                            <option value="scheduled">Scheduled</option>
+                          </SelectField>
+                          <TextField
+                            label="Default day"
+                            type="number"
+                            min="1"
+                            max="30"
+                            disabled={input.schedule_type !== 'scheduled'}
+                            required={input.schedule_type === 'scheduled'}
+                            value={input.default_day ?? ''}
+                            onChange={(e) =>
+                              setInput({
+                                ...input,
+                                default_day: e.target.value
+                                  ? Number(e.target.value)
+                                  : null,
+                              })
+                            }
+                          />
+                          <SelectField
+                            label="Category"
+                            value={input.category_id ?? ''}
+                            required
+                            onChange={(e) =>
+                              setInput({
+                                ...input,
+                                category_id: e.target.value || null,
+                              })
+                            }
+                          >
+                            <option value="">Choose a category</option>
+                            {content.categories.map((c) => (
+                              <option key={c.category_id} value={c.category_id}>
+                                {c.name}
+                              </option>
+                            ))}
+                          </SelectField>
+                        </div>
+                        <SelectField
+                          label="Persona applicability"
+                          value={input.persona_intent ?? ''}
+                          onChange={(e) =>
+                            setInput({
+                              ...input,
+                              persona_intent: e.target.value || null,
+                            })
+                          }
+                        >
+                          <option value="">General / unassigned</option>
+                          {content.personas.map((p) => (
+                            <option key={p.persona_id} value={p.persona_id}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </SelectField>
+                        <TextAreaField
+                          label="Scenario description"
+                          value={input.description ?? ''}
+                          required
+                          maxLength={20000}
+                          rows={10}
+                          onChange={(e) =>
+                            setInput({ ...input, description: e.target.value })
+                          }
+                        />
+                        <ScenarioFactsEditor
+                          facts={input.facts ?? []}
+                          onChange={(facts) => setInput({ ...input, facts })}
+                        />
+                        <ChoiceEditor
+                          choices={input.choices ?? []}
+                          scenarios={content.scenarios}
+                          onChange={(choices) =>
+                            setInput({ ...input, choices })
+                          }
+                        />
+                      </fieldset>
+                    </Form>
+                  )}
+                </section>
+              </div>
+            )}
+          </AdminTabs>
         </>
       )}
       <Dialog
@@ -603,6 +663,7 @@ export function ScenarioWorkspace({
               }
               if (content?.workspace.version_id === deleting.version_id) {
                 setContent(null)
+                setPersonaDirty(false)
                 setEditing(false)
                 setSelected(null)
               }
@@ -618,7 +679,7 @@ export function ScenarioWorkspace({
       <Dialog
         open={leave !== null}
         title="Discard unsaved changes?"
-        description="Your unsaved scenario edits will be lost."
+        description="Your unsaved content edits will be lost."
         onDismiss={() => setLeave(null)}
         dismissLabel="Keep editing"
       >

@@ -39,12 +39,44 @@ export interface CmsScenario {
   persona_intent: string | null
   schedule_type: string | null
 }
+export interface CmsPersona {
+  persona_id: string
+  version_id: string
+  name: string
+  description: string | null
+  general_starting_balance: string | number | null
+  weekly_income: string | number | null
+  starting_job_id: string | null
+  has_english_skills: boolean | null
+  has_computer_skills: boolean | null
+}
+export type PersonaFields = Partial<
+  Pick<
+    CmsPersona,
+    | 'name'
+    | 'description'
+    | 'general_starting_balance'
+    | 'has_english_skills'
+    | 'has_computer_skills'
+  >
+>
+export interface CmsPersonaExpense {
+  expense_id: string
+  persona_id: string
+  version_id: string
+  name: string
+  amount: string | number
+  first_due_day: number
+  repeat_interval_days: number | null
+  late_fee_amount: string | number
+}
 export interface CmsContent {
   workspace: CmsDraft
   facts?: CmsFact[]
   choices?: CmsChoice[]
   scenarios: CmsScenario[]
-  personas: { persona_id: string; name: string }[]
+  personas: CmsPersona[]
+  expenses?: CmsPersonaExpense[]
   categories: { category_id: string; name: string }[]
 }
 export type ScenarioInput = Pick<
@@ -56,12 +88,23 @@ export type ScenarioInput = Pick<
   facts?: CmsFact[]
   choices?: CmsChoice[]
 }
+export class CmsPersonaSaveUncertain extends Error {}
 async function rpc<T>(
   name: string,
   args?: Record<string, unknown>,
 ): Promise<T> {
   const client = await getSupabaseClient()
-  const { data, error } = await client.rpc(name, args)
+  let response
+  try {
+    response = await client.rpc(name, args)
+  } catch (failure) {
+    if (name === 'cms_save_persona_bundle')
+      throw new CmsPersonaSaveUncertain(
+        'Unable to confirm the persona save. Retry Save Changes to recover the same request before editing further.',
+      )
+    throw failure
+  }
+  const { data, error } = response
   if (error) {
     if (
       (name === 'cms_delete_draft' || name === 'cms_delete_scenario') &&
@@ -74,6 +117,27 @@ async function rpc<T>(
       throw new Error(
         'This draft changed. Reload the draft before saving again. Your edits are still here.',
       )
+    if (name === 'cms_save_persona_bundle') {
+      if (error.code === '42501')
+        throw new Error(
+          'Your staff access could not be confirmed. Sign in again before saving. Your edits are still here.',
+        )
+      if (error.code === 'P0002')
+        throw new Error(
+          'This draft is no longer available. Reopen a saved draft before continuing. Your edits are still here.',
+        )
+      if (error.code === '55P03')
+        throw new Error(
+          'The draft is busy. Wait a moment and retry the same save. Your edits are still here.',
+        )
+      if (error.code === 'P0001')
+        throw new Error(
+          `Persona could not be saved: ${error.message}. Your edits are still here.`,
+        )
+      throw new CmsPersonaSaveUncertain(
+        'Unable to confirm the persona save. Your edits are still here. Retry Save Changes; if it already saved, the same request will recover it.',
+      )
+    }
     throw new Error(
       'The draft operation could not be completed. Check your staff access and try again.',
     )
@@ -142,3 +206,44 @@ export const deleteCmsScenario = (
     p_request: request,
     p_scenario: scenario,
   })
+
+// Stage 2: expenses are an immutable snapshot passed through the existing bundle.
+export function saveCmsPersona(
+  version: string,
+  revision: number,
+  request: string,
+  id: string | null,
+  fields: PersonaFields,
+  expenses: readonly CmsPersonaExpense[] | undefined,
+) {
+  if (!Array.isArray(expenses))
+    throw new Error(
+      'Expense data is missing. Reload the draft before saving; no changes were sent.',
+    )
+  if (
+    expenses.some(
+      (e) => e.persona_id !== id || e.version_id !== version || !e.expense_id,
+    )
+  )
+    throw new Error(
+      'Expense relationships do not match this persona draft. Reload before saving; no changes were sent.',
+    )
+  return rpc<{ persona_id: string; revision: number }>(
+    'cms_save_persona_bundle',
+    {
+      p_version: version,
+      p_revision: revision,
+      p_request: request,
+      p_persona: id,
+      p_fields: fields,
+      p_expenses: expenses.map((e) => ({
+        expense_id: e.expense_id,
+        name: e.name,
+        amount: e.amount,
+        first_due_day: e.first_due_day,
+        repeat_interval_days: e.repeat_interval_days,
+        late_fee_amount: e.late_fee_amount,
+      })),
+    },
+  )
+}

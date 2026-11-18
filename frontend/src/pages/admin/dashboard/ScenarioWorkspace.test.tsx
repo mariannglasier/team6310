@@ -31,7 +31,20 @@ const content: cms.CmsContent = {
       default_day: 4,
     },
   ],
-  personas: [{ persona_id: 'alex', name: 'Alex' }],
+  personas: [
+    {
+      persona_id: 'alex',
+      version_id: 'draft',
+      name: 'Alex',
+      description: null,
+      general_starting_balance: null,
+      weekly_income: 0,
+      starting_job_id: null,
+      has_english_skills: null,
+      has_computer_skills: null,
+    },
+  ],
+  expenses: [],
   categories: [{ category_id: 'housing', name: 'Housing' }],
 }
 beforeEach(() => {

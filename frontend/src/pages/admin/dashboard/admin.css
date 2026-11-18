@@ -975,3 +975,16 @@ button.admin-stat:hover {
 .cms-fact-details > .cms-editor-fields {
   margin-top: 1rem;
 }
+
+/* Keep the read-only expense table inside its scroll container on narrow screens. */
+.cms-persona-editor .cms-editor-fields > section,
+.cms-persona-editor .admin-card__header > div {
+  min-width: 0;
+}
+.cms-persona-editor .admin-card__header strong {
+  overflow-wrap: anywhere;
+}
+
+.cms-persona-finances {
+  align-items: start;
+}

@@ -15,8 +15,10 @@ Eligible for gameplay display, without editorial roles or approval workflows. Se
 Ordinary response text is authored/loaded but currently hidden during normal
 recap; deciding to render it is separate gameplay/UI work.
 
-Persona editing and expense management are planned together: persona expenses
-belong inside the Persona Editor. Job editing will have its own editor.
+Persona details editing is implemented locally (Stage 2), using the shared draft
+workspace and protected persona bundle. Existing expenses are read-only and retained.
+Expense management remains Stage 3, integrated inside Persona Editor; it is not a
+separate editor. See [Persona Editor design and implementation](cms-persona-editor-design.md). Job editing will have its own editor.
 Statistics remain read-only. Unsupported legacy effects need gameplay decisions,
 not speculative editing controls. No authoritative run state becomes editable.
 

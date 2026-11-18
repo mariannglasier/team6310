@@ -62,3 +62,11 @@ Scenario facts now save with scenario/choice changes through the content-save RP
 See [scenario fact authoring](cms-scenario-facts.md) for composite identity, source
 copying, eligibility defaults and evidence preservation. Annual CAC facts remain
 outside this editor.
+
+Persona details now use the same workspace and revision through
+`cms_save_persona_bundle`. The UI submits only changed persona fields and passes
+existing expenses through unchanged; expense management remains Stage 3. Identical
+retry requests recover uncertain saves before further editing. A narrow forward
+migration skips unchanged expense updates to preserve their exact stored content.
+See [Persona Editor records](cms-persona-editor-design.md) for the Stage 2 contract,
+legacy handling, local migration and verification.

@@ -9,12 +9,16 @@ export interface AdminTab {
 // WAI-ARIA tabs: one tab stop, arrow/Home/End to move, panel linked by id.
 export function AdminTabs({
   label,
+  idPrefix = 'admin',
+  disabled = false,
   tabs,
   active,
   onChange,
   children,
 }: {
   label: string
+  idPrefix?: string
+  disabled?: boolean
   tabs: readonly AdminTab[]
   active: string
   onChange: (id: string) => void
@@ -23,6 +27,7 @@ export function AdminTabs({
   const refs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   function move(event: KeyboardEvent<HTMLDivElement>) {
+    if (disabled) return
     const index = tabs.findIndex((tab) => tab.id === active)
     const last = tabs.length - 1
     const target: Record<string, number> = {
@@ -54,9 +59,10 @@ export function AdminTabs({
             }}
             type="button"
             role="tab"
-            id={`admin-tab-${tab.id}`}
+            disabled={disabled}
+            id={`${idPrefix}-tab-${tab.id}`}
             aria-selected={tab.id === active}
-            aria-controls={`admin-panel-${tab.id}`}
+            aria-controls={`${idPrefix}-panel-${tab.id}`}
             tabIndex={tab.id === active ? 0 : -1}
             className="admin-tabs__tab"
             onClick={() => onChange(tab.id)}
@@ -72,8 +78,8 @@ export function AdminTabs({
       </div>
       <div
         role="tabpanel"
-        id={`admin-panel-${active}`}
-        aria-labelledby={`admin-tab-${active}`}
+        id={`${idPrefix}-panel-${active}`}
+        aria-labelledby={`${idPrefix}-tab-${active}`}
         tabIndex={0}
         className="admin-tabs__panel"
       >
