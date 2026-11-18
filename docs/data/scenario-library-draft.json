@@ -2370,7 +2370,7 @@
       "category": "Food & Nutrition",
       "type": "everyday",
       "personaIntent": "EMPLOYED",
-      "situation": "You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.",
+      "situation": "You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.",
       "eligibility": "Hired; feasible cooking/storage assumptions.",
       "timing": "non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.",
       "engine": "ordinary",

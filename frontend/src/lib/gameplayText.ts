@@ -18,6 +18,10 @@ export function gameplayText(value: string): string {
       value,
     )
     .replace(
+      'You can prepare lunches ahead of time or get lunch out with your coworkers.',
+      "You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches.",
+    )
+    .replace(
       /Between \d{4}-\d{2} and \d{4}-\d{2}, (?=the average price of )/g,
       'In the past year, ',
     )

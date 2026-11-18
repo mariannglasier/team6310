@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import { Button, ExternalButtonLink } from '../ui/Button'
+import pantryPhoto from '../../assets/foodpantry2.png'
 import { externalLinks } from '../../app/externalLinks'
 import { paths } from '../../app/paths'
 import { formatUsd } from '../../lib/money'
@@ -23,32 +24,40 @@ export function SimulationResult({
 }) {
   return (
     <div className="simulation-result">
+      {reason && <p className="simulation-result__reason">{reason}</p>}
       <section
         className="simulation-result__help"
         aria-labelledby="result-help"
       >
-        <h3 id="result-help">When money is tight, CAC can help.</h3>
-        <p>
-          The Community Assistance Center helps neighbors facing financial
-          hardship with essentials such as food and housing. Try a new run with
-          CAC assistance to see how options like job preparation and interview
-          clothing can change the choices available to your household.
-        </p>
-        <div className="simulation-result__actions">
-          <Button onClick={() => onReplay(true)}>
-            Play with CAC assistance
-          </Button>
-          <ExternalButtonLink href={externalLinks.learn}>
-            Learn more about CAC
-          </ExternalButtonLink>
-          <ExternalButtonLink href={externalLinks.donate}>
-            Donate to CAC
-          </ExternalButtonLink>
+        <div className="simulation-result__help-content">
+          <h3 id="result-help">When money is tight, CAC can help.</h3>
+          <p>
+            The Community Assistance Center helps neighbors facing financial
+            hardship with essentials such as food and housing. Try a new run
+            with CAC assistance to see how options like job preparation and
+            interview clothing can change the choices available to your
+            household.
+          </p>
+          <div className="simulation-result__actions">
+            <Button onClick={() => onReplay(true)}>
+              Play with CAC assistance
+            </Button>
+            <ExternalButtonLink href={externalLinks.learn}>
+              Learn more about CAC
+            </ExternalButtonLink>
+            <ExternalButtonLink href={externalLinks.donate}>
+              Donate to CAC
+            </ExternalButtonLink>
+          </div>
         </div>
+        <img
+          className="simulation-result__help-photo"
+          src={pantryPhoto}
+          alt=""
+        />
       </section>
 
       <section className="simulation-result__outcome" aria-label="Your outcome">
-        {reason && <p>{reason}</p>}
         <p>
           Ending balance <strong>{formatUsd(balance)}</strong>
         </p>
@@ -61,7 +70,7 @@ export function SimulationResult({
       </section>
 
       {runId && <ResultComparisons key={runId} runId={runId} />}
-      <ExternalButtonLink href={paths.data} variant="text">
+      <ExternalButtonLink href={paths.data} variant="secondary">
         Explore data visualizations
       </ExternalButtonLink>
     </div>
@@ -95,9 +104,8 @@ function ResultComparisons({ runId }: { runId: string }) {
     >
       <h3 id="result-comparison">How others answered</h3>
       <p>
-        One saved decision per category you answered, compared with other
-        players using the same household, content version, and assistance
-        setting.
+        Decisions you answered, compared with other players using the same
+        household and assistance setting.
       </p>
       {failed ? (
         <div>
@@ -126,7 +134,10 @@ function ResultComparisons({ runId }: { runId: string }) {
                 <strong>Your answer</strong> <span>{row.answer}</span>
               </p>
               {row.responses === null ? (
-                <p>Insufficient responses to show percentages.</p>
+                <p>
+                  Percentages appear once five other comparable runs have
+                  answered this question.
+                </p>
               ) : (
                 <>
                   <p>{row.responses} other runs answered</p>

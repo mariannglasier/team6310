@@ -30,6 +30,30 @@ beforeEach(() => {
   load.mockResolvedValue(localScenario)
   restore.mockResolvedValue({ run, decision: null, responseText: null })
 })
+it('shows scenario choices from the highest upfront cost to the lowest', async () => {
+  const options = [
+    { id: 'free', text: 'Pack with what you have', cost: 0, change: 0 },
+    { id: 'pack', text: 'Buy ingredients', cost: 0, change: -2600 },
+    { id: 'buy', text: 'Buy lunch out', cost: 5500, change: 1000 },
+  ]
+  load.mockResolvedValue({
+    ...localScenario,
+    choices: options.map(({ id, text, cost, change }) => ({
+      ...localScenario.choices[0],
+      id,
+      text,
+      upfrontCost: usdCents(cost),
+      balanceChange: usdCents(change),
+      requiresCac: false,
+    })),
+  })
+  render(<ScenarioPanel run={run} onCommit={vi.fn()} onContinue={vi.fn()} />)
+  const choices = await screen.findAllByRole('button')
+  expect(choices).toHaveLength(3)
+  expect(choices[0]).toHaveTextContent('Buy lunch out')
+  expect(choices[1]).toHaveTextContent('Buy ingredients')
+  expect(choices[2]).toHaveTextContent('Pack with what you have')
+})
 it('blocks duplicate clicks while a decision is saving and shows no optimistic receipt', async () => {
   let finish!: (value: unknown) => void
   submit.mockReturnValue(

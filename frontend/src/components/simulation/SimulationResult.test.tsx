@@ -29,11 +29,22 @@ it('offers both replay paths and shows percentages only where available', async 
     <SimulationResult
       runId="run"
       balance={usdCents(33500)}
-      reason={null}
+      reason="Your household could not afford this choice."
       onReplay={replay}
     />,
   )
   const user = userEvent.setup()
+  const reason = screen.getByText(
+    'Your household could not afford this choice.',
+  )
+  const help = screen.getByRole('region', {
+    name: 'When money is tight, CAC can help.',
+  })
+  expect(reason.nextElementSibling).toBe(help)
+  expect(help.querySelector('img')).toHaveAttribute(
+    'src',
+    expect.stringContaining('foodpantry2'),
+  )
   await user.click(
     screen.getByRole('button', { name: 'Play with CAC assistance' }),
   )
@@ -45,7 +56,7 @@ it('offers both replay paths and shows percentages only where available', async 
   expect(within(food!).getByText('80%')).toBeInTheDocument()
   expect(within(transportation!).getByText('Take the bus')).toBeInTheDocument()
   expect(
-    within(transportation!).getByText(/Insufficient responses/),
+    within(transportation!).getByText(/five other comparable runs/),
   ).toBeInTheDocument()
   expect(within(transportation!).queryByRole('progressbar')).toBeNull()
 })

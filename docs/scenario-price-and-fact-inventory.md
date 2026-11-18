@@ -5134,7 +5134,7 @@ Source: S18/S19; fact ID `e8473e58-6338-4855-93be-7608f27696ab`; service `coats_
 
 Category — Food & Nutrition. Household scope — EMPLOYED. Engine — ordinary.
 
-You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.
+You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.
 
 Eligibility — Hired; feasible cooking/storage assumptions.
 

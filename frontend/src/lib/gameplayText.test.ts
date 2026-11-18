@@ -1,6 +1,17 @@
 import { expect, it } from 'vitest'
 import { gameplayText, scenarioDescription } from './gameplayText'
 
+it('clarifies the lunch decision in previously published editions', () => {
+  expect(
+    scenarioDescription(
+      'You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.',
+      false,
+    ),
+  ).toBe(
+    "You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.",
+  )
+})
+
 it('uses the past-year wording for saved annual price facts while retaining other dated facts', () => {
   expect(
     gameplayText(

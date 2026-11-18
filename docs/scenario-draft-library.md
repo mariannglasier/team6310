@@ -1307,7 +1307,7 @@ Removed at the user's request. No replacement. Historical editions retain their 
 
 **Type / category:** everyday / Food & Nutrition. **Persona intent:** EMPLOYED. **Eligibility:** Hired; feasible cooking/storage assumptions.
 
-**Situation:** You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.
+**Situation:** You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.
 
 **Timing:** non_scheduled; eligible ordinary day selected by the approved route. No automatic day number is invented. Exclude Day 2 and conditional interview Day 3.
 

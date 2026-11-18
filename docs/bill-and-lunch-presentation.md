@@ -14,7 +14,7 @@ The unselected “Select option” label is removed throughout the shared RadioG
 
 ## Lunch
 
-D046 now says: “You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.” The purchase option says “Get lunch out with your coworkers.” Existing price amounts and monthly bindings are preserved.
+D046 now says: “You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.” The purchase option says “Get lunch out with your coworkers.” Existing price amounts and monthly bindings are preserved.
 
 The user approved the following replacement general fact, with “UK” omitted from displayed copy:
 

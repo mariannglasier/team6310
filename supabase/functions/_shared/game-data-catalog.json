@@ -1529,7 +1529,7 @@
       "category": "Food & Nutrition",
       "engine": "ordinary",
       "intent": "EMPLOYED",
-      "description": "You can prepare lunches ahead of time or get lunch out with your coworkers. One option takes more time now; the other costs more money.",
+      "description": "You can prepare lunches ahead of time or get lunch out with your coworkers for this week's lunches. One option takes more time now; the other costs more money.",
       "choices": [
         {
           "key": "D046-PACK",

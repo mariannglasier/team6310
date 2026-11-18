@@ -170,6 +170,11 @@ export function ScenarioPanel({
                     (choice) =>
                       !choice.requiresCac || run.supportEnabled === true,
                   )
+                  .sort(
+                    (first, second) =>
+                      (second.upfrontCost || -second.balanceChange) -
+                      (first.upfrontCost || -first.balanceChange),
+                  )
                   .map((choice) => ({
                     value: choice.id,
                     label: choice.text,
