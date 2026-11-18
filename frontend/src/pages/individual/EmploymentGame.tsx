@@ -1,23 +1,24 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Button, ButtonLink } from '../../components/ui/Button'
+import { Button } from '../../components/ui/Button'
 import { JobBoard } from '../../components/simulation/JobBoard'
-import { paths } from '../../app/paths'
 import { formatUsd } from '../../lib/money'
 import {
   availableJobs,
+  cacInterviewClothingLabel,
   clothingOptions,
   type Action,
   type Clothing,
   type Walkthrough,
 } from '../../state/employmentWalkthrough'
 import '../../components/simulation/employment.css'
+import { SimulationResult } from '../../components/simulation/SimulationResult'
 
 const headings = {
   board: 'Find your next opportunity.',
   'preparation-result': 'Your preparation is complete.',
   'application-result': 'Your application is in.',
-  day: 'One day at a time.',
-  interview: 'What will you wear to the interview?',
+  day: 'Your household decisions.',
+  interview: 'Your interview is today! What will you wear?',
   'interview-result': 'Your interview result.',
   reapply: 'A different opportunity.',
   'reapply-result': 'Your application is in.',
@@ -31,11 +32,18 @@ export function EmploymentGame({
   dispatch,
   onReplay,
   recapFacts,
+  allowPlaceholder = false,
+  runId,
+  loading = false,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
   onReplay: (support: boolean) => void
   recapFacts?: ReactNode
+  // The caller must resolve bills and real scenarios before allowing fallback.
+  allowPlaceholder?: boolean
+  runId?: string
+  loading?: boolean
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -43,21 +51,18 @@ export function EmploymentGame({
     const panel = heading.current?.closest('.stage__panel')
     if (panel) panel.scrollTop = 0
     if (document.scrollingElement) document.scrollingElement.scrollTop = 0
-    document.title = `${headings[state.stage]} | CAC Poverty Simulation`
+    document.title =
+      state.stage === 'day'
+        ? `Day ${state.day} | CAC Poverty Simulation`
+        : `${headings[state.stage]} | CAC Poverty Simulation`
   }, [state.stage, state.day])
   const advance = () => dispatch({ type: 'continue' })
   const target = state.jobs.find((item) => item.job.id === state.targetId)?.job
   const finished = state.stage === 'complete' || state.stage === 'ended'
-  const result = [
-    'preparation-result',
-    'application-result',
-    'interview-result',
-    'reapply-result',
-  ].includes(state.stage)
   const labels: Record<Clothing, string> = {
     purchase: 'Buy professional clothes',
     current: 'Make my current clothes work',
-    cac: 'Use the CAC clothing closet',
+    cac: cacInterviewClothingLabel,
     owned: 'Wear my professional clothes',
   }
   return (
@@ -117,7 +122,10 @@ export function EmploymentGame({
                 You received an email asking to come in-person for your
                 interview on Day 2.
               </p>
-              <Button onClick={advance}>Start Day 1</Button>
+              {recapFacts}
+              <Button className="scenario-continue" onClick={advance}>
+                Start Day 1
+              </Button>
             </div>
           )}
           {state.stage === 'interview' && (
@@ -152,7 +160,8 @@ export function EmploymentGame({
               {state.hiredDay !== null && (
                 <p>Weekly pay: {formatUsd(state.weeklyIncome)}.</p>
               )}
-              <Button onClick={advance}>
+              {recapFacts}
+              <Button className="scenario-continue" onClick={advance}>
                 {state.hiredDay === null
                   ? 'Search open jobs'
                   : `Continue to Day ${state.day + 1}`}
@@ -166,51 +175,32 @@ export function EmploymentGame({
                 You received an email asking you to come in-person for your
                 interview on Day 3.
               </p>
-              <Button onClick={advance}>Continue to Day 3</Button>
-            </div>
-          )}
-          {(state.stage === 'day' || state.stage === 'income') && (
-            <div className="employment-placeholder">
-              <span className="placeholder-label">
-                Day {state.day} · End-of-day scenario
-              </span>
-              <h2>Placeholder</h2>
-              <p>
-                This day’s remaining scenarios have not been implemented.
-                Continuing does not charge any expenses or record a scenario
-                response.
-              </p>
-              <Button onClick={advance}>
-                {state.day === 30 ? 'Finish Day 30' : 'Next'}
+              {recapFacts}
+              <Button className="scenario-continue" onClick={advance}>
+                Continue to Day 3
               </Button>
             </div>
           )}
-          {result && state.stage !== 'preparation-result' && recapFacts}
-          {finished && (
-            <>
-              <p>{state.reason ?? 'You reached the end of the month.'}</p>
-              <p>
-                Ending balance: <strong>{formatUsd(state.balance)}</strong>
+          {(state.stage === 'day' || state.stage === 'income') &&
+            (loading || state.stage === 'income' || !allowPlaceholder ? (
+              <p className="scenario-loading" role="status">
+                Loading…
               </p>
-              <div className="employment-actions">
-                <Button onClick={() => onReplay(false)}>
-                  Replay from household selection
+            ) : (
+              <div>
+                <p className="scenario-loading">No more decisions today.</p>
+                <Button onClick={advance}>
+                  {state.day === 30 ? 'Finish Day 30' : 'Next'}
                 </Button>
-                {state.stage === 'complete' && !state.support && (
-                  <Button variant="secondary" onClick={() => onReplay(true)}>
-                    Try again with CAC support
-                  </Button>
-                )}
-                <ButtonLink to={paths.home}>Return home</ButtonLink>
               </div>
-            </>
-          )}
-          {!finished && (
-            <div className="employment-actions">
-              <Button variant="text" onClick={() => dispatch({ type: 'end' })}>
-                End walkthrough
-              </Button>
-            </div>
+            ))}
+          {finished && (
+            <SimulationResult
+              reason={state.reason}
+              balance={state.balance}
+              runId={runId}
+              onReplay={onReplay}
+            />
           )}
         </section>
       </div>
@@ -236,7 +226,10 @@ function ClothingDecision({
           key={choice}
           className="employment-choice"
           aria-pressed={selected === choice}
-          onClick={() => select(choice)}
+          onClick={() => {
+            select(choice)
+            onSubmit(choice)
+          }}
         >
           <strong>
             {labels[choice]}
@@ -253,14 +246,6 @@ function ClothingDecision({
           </span>
         </button>
       ))}
-      <Button
-        disabled={selected === null}
-        onClick={() => {
-          if (selected !== null) onSubmit(selected)
-        }}
-      >
-        Submit clothing decision
-      </Button>
     </>
   )
 }

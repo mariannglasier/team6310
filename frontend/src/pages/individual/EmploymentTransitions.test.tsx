@@ -24,6 +24,9 @@ vi.mock('../../services/employmentGameplay', async (original) => ({
   submitEmployment: vi.fn(),
   hasPending: vi.fn(),
   rememberedRun: vi.fn().mockResolvedValue(null),
+  rememberedReplay: vi.fn().mockResolvedValue(undefined),
+  rememberReplay: vi.fn().mockResolvedValue(undefined),
+  forgetRun: vi.fn().mockResolvedValue(undefined),
 }))
 const base = createWalkthrough(
   {
@@ -62,11 +65,23 @@ const snapshot = (state: Walkthrough, revision = 1): CommittedEmployment => ({
 })
 const commit = vi.fn()
 function show(state: Walkthrough) {
-  vi.mocked(employmentSnapshot).mockResolvedValue(snapshot(state))
+  const saved = snapshot(state)
+  saved.run = { ...saved.run, employmentState: { revision: saved.revision } }
+  vi.mocked(employmentSnapshot).mockResolvedValue(saved)
+  const bills: BillSnapshot = {
+    run: saved.run,
+    items: [],
+    paidTotal: usdCents(0),
+    overdueTotal: usdCents(0),
+    outstandingTotal: usdCents(0),
+    upcomingTotal: usdCents(0),
+    scenarioIncome: usdCents(0),
+    scenarioCharged: usdCents(0),
+  }
   render(
     <MemoryRouter>
       <SetupProvider>
-        <EmploymentPanel run={run} onCommit={commit} />
+        <EmploymentPanel run={saved.run} bills={bills} onCommit={commit} />
       </SetupProvider>
     </MemoryRouter>,
   )
@@ -115,10 +130,7 @@ it('opens the end screen for an unaffordable scenario and lets the player replay
   expect(
     await screen.findByRole('heading', { name: 'Simulation ended early.' }),
   ).toBeVisible()
-  expect(screen.getByRole('link', { name: 'Return home' })).toHaveAttribute(
-    'href',
-    '/',
-  )
+  expect(screen.queryByRole('link', { name: 'Return home' })).toBeNull()
   expect(screen.queryByText('Opening your results…')).toBeNull()
   await userEvent.click(
     screen.getByRole('button', { name: 'Replay from household selection' }),
@@ -139,8 +151,11 @@ it('keeps pending decisions quiet and prevents duplicate submission before showi
   show({ ...base, stage: 'day', day: 1 })
   const next = await screen.findByRole('button', { name: 'Next' })
   await userEvent.click(next)
-  expect(next).toBeDisabled()
-  expect(next.closest('fieldset')).toHaveAttribute('aria-busy', 'true')
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  expect(screen.getByText('Loading…').closest('fieldset')).toHaveAttribute(
+    'aria-busy',
+    'true',
+  )
   expect(screen.queryByText(/Saving your decision/)).toBeNull()
   await userEvent.click(next)
   expect(submitEmployment).toHaveBeenCalledOnce()
@@ -150,7 +165,7 @@ it('keeps pending decisions quiet and prevents duplicate submission before showi
   })
   expect(
     await screen.findByRole('heading', {
-      name: 'What will you wear to the interview?',
+      name: 'Your interview is today! What will you wear?',
     }),
   ).toBeInTheDocument()
   expect(
@@ -202,7 +217,8 @@ it('stops an uncertain automatic submission and reconciles it explicitly without
   const retry = await screen.findByRole('button', {
     name: 'Reconcile pending submission',
   })
-  expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  expect(screen.getByText('Loading…')).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   expect(commit).not.toHaveBeenCalled()
   await userEvent.click(retry)
   await waitFor(() => expect(commit).toHaveBeenCalledExactlyOnceWith(next))

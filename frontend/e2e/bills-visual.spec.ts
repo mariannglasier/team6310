@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('bills reuse Coming Up rows with responsive controls and no duplicate sidebar summary', async ({
+test('bills show narrative decision cards with confirmation and compact overdue rows', async ({
   page,
 }, testInfo) => {
   const api = 'http://127.0.0.1:54321'
@@ -72,6 +72,8 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
       playthrough_id: 'run',
       version_id: 'version',
       name_snapshot: 'Utilities',
+      description:
+        'Your electricity bill is due. Decide how to handle the bill.',
       amount_due: 20,
       late_fee_amount: 2,
       due_day: 3,
@@ -94,6 +96,7 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
       payment_balance_after: null,
     },
   ]
+  let committed = false
   await page.route(`${api}/**`, async (route) => {
     const url = route.request().url()
     const headers = {
@@ -120,13 +123,34 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
       }
     } else if (url.includes('/auth/v1/user')) body = user
     else if (url.includes('/rpc/start_individual_playthrough')) body = 'run'
+    else if (url.includes('/rpc/ignore_bill')) {
+      committed = true
+      body = {}
+    } else if (url.includes('/rpc/get_event_recap_facts'))
+      body = [
+        {
+          scenario_id: 's',
+          version_id: 'version',
+          fact_role: 'general',
+          semantic_key: 'housing:cost',
+          display_text:
+            'In 2020–2024, 44.7% of Sandy Springs renters with a reported ratio spent at least 30% of their income on rent.',
+          source_url: 'https://api.census.gov/',
+        },
+      ]
     else if (url.includes('/rpc/get_bill_snapshot'))
       body = {
         run,
-        bills,
+        bills: committed
+          ? bills.map((b) =>
+              b.playthrough_expense_id === 'due'
+                ? { ...b, ignored_at: '2026-11-08T12:00:00Z' }
+                : b,
+            )
+          : bills,
         paid_total: 0,
-        overdue_total: 55,
-        outstanding_total: 75,
+        overdue_total: committed ? 77 : 55,
+        outstanding_total: committed ? 77 : 75,
         upcoming_total: 10,
         scenario_income: 0,
         scenario_charged: 0,
@@ -151,6 +175,14 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
   await expect(
     due.getByRole('button', { name: 'Ignore Utilities' }),
   ).toBeEnabled()
+  await expect(
+    due.getByText(
+      'Your electricity bill is due. Decide how to handle the bill.',
+    ),
+  ).toBeVisible()
+  await expect(due.locator('.bill-decision__due')).toHaveCount(0)
+  await expect(due.getByRole('button', { name: /Submit/ })).toHaveCount(0)
+  await expect(page.getByText('Select option', { exact: true })).toHaveCount(0)
   await expect(overdue.locator('.finance-expense-amount')).toHaveText('$55.00')
   await expect(
     page.getByText('Unpaid obligations', { exact: true }),
@@ -160,7 +192,7 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
   await expect(page.getByRole('heading', { name: 'Coming up' })).toBeVisible()
   const geometry = await page.evaluate(() => {
     const row = document.querySelector('.finance-expense--overdue')!
-    const due = document.querySelector('.finance-expense--due')!
+    const due = document.querySelector('.bill-decision')!
     const box = (parent: Element, selector: string) => {
       const r = parent.querySelector(selector)!.getBoundingClientRect()
       return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }
@@ -169,27 +201,31 @@ test('bills reuse Coming Up rows with responsive controls and no duplicate sideb
       width: innerWidth,
       overflow: document.documentElement.scrollWidth > innerWidth,
       pay: box(row, 'button'),
-      amount: box(due, '.finance-expense-amount'),
-      actions: box(due, '.bill-actions'),
-      duePay: box(due, 'button'),
-      ignore: box(due, '.ui-button--secondary'),
+      story: box(due, '.decision-summary__story'),
+      actions: box(due, '.ui-radio-options'),
     }
   })
   expect(geometry.overflow).toBe(false)
   await expect(overdue.locator('svg')).toHaveCount(0)
   await expect(overdue.getByText(/Due Day/)).toHaveCount(0)
-  if (geometry.width > 760) {
-    expect(geometry.actions.x).toBeGreaterThanOrEqual(geometry.amount.right)
-  } else {
-    expect(geometry.actions.y).toBeGreaterThanOrEqual(geometry.amount.bottom)
-    expect(geometry.duePay.y).toBe(geometry.ignore.y)
-  }
+  expect(geometry.actions.y).toBeGreaterThanOrEqual(geometry.story.bottom)
   await expect(overdue.getByRole('button')).toHaveCSS(
     'background-color',
     'rgb(181, 9, 53)',
   )
   await page.screenshot({
     path: testInfo.outputPath('bills.png'),
+    fullPage: true,
+  })
+  await due.getByRole('button', { name: 'Ignore Utilities' }).click()
+  await expect(due.getByLabel('Decision receipt')).toBeVisible()
+  await expect(due.getByText('$0.00', { exact: true }).first()).toBeVisible()
+  await expect(due.getByText('STILL OWED')).toBeVisible()
+  await expect(
+    due.getByRole('button', { name: 'Continue to next day' }),
+  ).toBeEnabled()
+  await page.screenshot({
+    path: testInfo.outputPath('bill-recap.png'),
     fullPage: true,
   })
 })

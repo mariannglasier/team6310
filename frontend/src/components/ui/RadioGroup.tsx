@@ -6,6 +6,7 @@ interface Option {
   label: string
   description?: string
   disabled?: boolean
+  ariaLabel?: string
 }
 interface RadioGroupProps {
   label: string
@@ -44,6 +45,7 @@ export function RadioGroup({
             type="button"
             data-group={name}
             aria-pressed={value === option.value}
+            aria-label={option.ariaLabel}
             disabled={option.disabled}
             aria-invalid={error ? true : undefined}
             onClick={() => onChange(option.value)}
@@ -55,9 +57,9 @@ export function RadioGroup({
               {option.description && (
                 <span className="ui-field__hint">{option.description}</span>
               )}
-              <span className="ui-radio-status">
-                {value === option.value ? 'Selected' : 'Select option'}
-              </span>
+              {value === option.value && (
+                <span className="ui-radio-status">Selected</span>
+              )}
             </span>
           </button>
         ))}

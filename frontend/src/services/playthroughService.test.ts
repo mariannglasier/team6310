@@ -1,21 +1,21 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { createIndividualPlaythrough } from './playthroughService'
 import {
-  ensureParticipantSession,
-  ParticipantSessionError,
-} from './participantSession'
+  ensureIndividualSession,
+  IndividualSessionError,
+} from './individualSession'
 import { getSupabaseClient } from './supabase'
 
-vi.mock('./participantSession', async (original) => ({
-  ...(await original<typeof import('./participantSession')>()),
-  ensureParticipantSession: vi.fn(),
+vi.mock('./individualSession', async (original) => ({
+  ...(await original<typeof import('./individualSession')>()),
+  ensureIndividualSession: vi.fn(),
 }))
 vi.mock('./supabase', () => ({ getSupabaseClient: vi.fn() }))
 const rpc = vi.fn()
 
 beforeEach(() => {
   vi.resetAllMocks()
-  vi.mocked(ensureParticipantSession).mockResolvedValue(undefined)
+  vi.mocked(ensureIndividualSession).mockResolvedValue(undefined)
   vi.mocked(getSupabaseClient).mockResolvedValue({
     rpc,
     auth: {
@@ -29,21 +29,21 @@ beforeEach(() => {
 })
 
 it('establishes the participant session before calling the RPC with only the selected persona', async () => {
-  vi.mocked(ensureParticipantSession).mockImplementation(async () => {
+  vi.mocked(ensureIndividualSession).mockImplementation(async () => {
     expect(rpc).not.toHaveBeenCalled()
   })
   await expect(createIndividualPlaythrough('selected-persona')).resolves.toBe(
     'new-playthrough-id',
   )
-  expect(ensureParticipantSession).toHaveBeenCalledOnce()
+  expect(ensureIndividualSession).toHaveBeenCalledOnce()
   expect(rpc).toHaveBeenCalledExactlyOnceWith('start_individual_playthrough', {
     p_persona_id: 'selected-persona',
   })
 })
 
 it('does not insert when participant authentication is denied', async () => {
-  vi.mocked(ensureParticipantSession).mockRejectedValue(
-    new ParticipantSessionError('A participant session is required.'),
+  vi.mocked(ensureIndividualSession).mockRejectedValue(
+    new IndividualSessionError('A participant session is required.'),
   )
   await expect(createIndividualPlaythrough('p1')).rejects.toThrow(
     'participant session',

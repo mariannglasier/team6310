@@ -8,6 +8,10 @@
 
 ## Purpose and authority
 
+**November 17 interaction and recap update:** The user approved direct activation of individual gameplay choices, including ordinary decisions, bills, job applications and interview clothing. Clicking or keyboard-activating an enabled choice immediately sends its existing protected action; no additional Submit button is shown. Pending actions lock controls and duplicate activations cannot charge twice. A confirmed save opens a receipt recap with the actual signed cash change, chosen option and saved balance. Unpaid bills show cash change separately from debt. Continue remains so players can read general/CAC facts before advancing. Setup selection and staff forms retain their existing confirmation flows. This supersedes earlier separate selection/submission instructions for individual gameplay only.
+
+Recaps use a story/receipt layout on wide screens and stacked paper receipt on mobile. Keep the receipt compact with tight spacing so facts appear higher on the page. General and CAC facts have separate cards, uppercase topic headings and supported numerical observations emphasized inline within the original sentence, without repeating the statistic separately; qualitative facts remain prose without invented numbers. Preserve the complete authored text and source reporting periods. CAC passages remain hidden in regular mode. Use brand red for interactive selection, focus and monetary emphasis; the CAC fact card may use muted green. Exact amounts and statistical values come from saved records.
+
 This standing specification defines the interface for the Community Assistance Center (CAC) poverty simulation. Use it together with [User flows](./user-flows.md). Agents must follow these rules without needing external images or conversation history. Architecture, financial calculation rules, data schemas, interfaces, and authorization belong in the project's corresponding technical specifications. Release priorities belong in the iteration plan rather than this standing design file.
 
 The experience has a pre-game employment stage followed by Days 1–30. It teaches trade-offs involving money, work, care, housing, transportation, and limited resources without judging the player or presenting one perfect path. It supports individual players, facilitated groups, and authorized CAC content administrators.
@@ -22,10 +26,10 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 - Show selection through a control or text label as well as a border. Keyboard focus must remain distinct from selection.
 - Use semantic headings, labeled inputs, keyboard-operable controls, visible focus, sufficient contrast, and readable error messages. Never rely on color alone.
 - All application routes, including placeholders and future pages, use the same shared header: CAC logo on the left and Learn About CAC, Explore Data, and Donate on the right. Both the header and footer CAC logos link to the application landing route `/`. Learn and Donate use configured CAC-approved external destinations.
-- Setup confirms the selected household with Start simulation on the household page; there is no Review page or multi-step indicator. CAC support is offered after a completed regular run.
+- Setup confirms the selected household with Start simulation on the household page; there is no Review page or multi-step indicator. CAC assistance is available as a replay from either individual ending.
 - Every simulation page (`/simulation/*`) and the Explore Data page (`/data`) sit on the scenic stage: the supplied scenic illustration (`frontend/src/assets/scenic-simulation-background.jpg`) fills only the area between the shared header and footer, behind a white rounded content panel with an inset on every side so the scenery shows around it. The image is decorative (no alt text, no content on it); all text and controls stay on the solid white panel at the design tokens. The header and footer never sit on the image.
 - Setup pages fit one screen: header plus stage fill the viewport, the footer follows below the fold, and the page content scales down uniformly (not below 0.7) to fit without reflowing the layout. Below that scale the panel scrolls instead of shrinking text further.
-- Single-choice card sets use keyboard-operable buttons with `aria-pressed`, one selected option, and visible focus. Selecting a card does not advance the screen or commit a financial decision.
+- Single-choice card sets use keyboard-operable buttons with `aria-pressed` and visible focus. Setup selections remain staged. Individual gameplay choices commit through the server when activated and then open the saved recap.
 - Back navigation within setup preserves selections. Required choices must be valid before Continue becomes available.
 - On narrow screens, stack columns and cards, place setup progress above content, and wrap navigation and actions. Keep all choices, financial values, and source information accessible. Admin tables may use a contained horizontal scroll region.
 
@@ -35,9 +39,9 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 | ------------------ | --------- | ------------------------------------------------------------------- |
 | `primary`          | `#B3261E` | CAC branding, primary buttons, destructive action accents           |
 | `primary-hover`    | `#8F1E18` | Primary button hover/pressed state                                  |
-| `accent`           | `#245F8A` | Selected card borders, data accents, links                          |
-| `accent-hover`     | `#194767` | Accent hover/pressed state                                          |
-| `accent-surface`   | `#EAF2F8` | Selected cards and recap surfaces; use primary text on this surface |
+| `accent`           | `#B3261E` | Interactive emphasis, selected borders and links                     |
+| `accent-hover`     | `#8F1E18` | Accent hover/pressed state                                          |
+| `accent-surface`   | `#F8E9E8` | Light red selection surfaces; use primary text on this surface       |
 | `text`             | `#111111` | Primary text and headings                                           |
 | `text-muted`       | `#595959` | Supporting copy and secondary labels                                |
 | `surface`          | `#FFFFFF` | Cards, header, input surfaces, text on filled red/blue buttons      |
@@ -45,9 +49,9 @@ The frontend uses React and TypeScript, with Supabase/PostgreSQL for content and
 | `border`           | `#767676` | Input and interactive-control boundaries                            |
 | `divider`          | `#D9D9D9` | Decorative separators; not the sole control boundary                |
 | `disabled-surface` | `#E0E0E0` | Disabled buttons, with muted text and disabled semantics            |
-| `focus`            | `#245F8A` | Visible focus ring with a white separation gap on filled controls   |
+| `focus`            | `#B3261E` | Visible focus ring with a white separation gap on filled controls   |
 
-White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a blue border plus a selected label/control; keyboard focus uses a separate outer ring. Charts use blue and red with direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
+White text is used on filled primary/accent controls. Black text is used on light surfaces. Selected cards use a red border plus a selected label/control; keyboard focus uses a separate outer ring. Chart palettes remain distinct from interaction highlighting and use direct labels or patterns so color alone never conveys the group. Maintain contrast when composing tokens; decorative dividers must not replace accessible control outlines.
 
 ## 1. Landing page
 
@@ -97,6 +101,8 @@ If an optional choice is attempted and unaffordable, end the run even if it is t
 
 Between scenario, recap and day screens, use a brief 260 ms fade-in with an 8 px upward entrance. Animate only the main scenario content; keep the timeline and financial sidebars stable. Honor reduced-motion preferences. Omit the visible “Saving your decision” message; keep controls disabled and expose `aria-busy` while protected submissions are pending. Animate the next screen only when its committed state is available, without adding a delay to financial operations.
 
+Keep unchanged scenario and bill panels mounted while same-day financial snapshots synchronize. Scenario descriptions remain visible as committed decision facts load independently, without additional preloading or caching. Resolve a new day's mutually exclusive scenario or scheduled-bill content from saved progress and bill occurrences; show loading feedback while unresolved, including during automatic income acknowledgement, rather than briefly displaying a generic scenario placeholder. Financial synchronization and existing submission, payment, and advancement protections still govern when controls become available.
+
 The CAC preparation action reads “Join CAC Adult Education classes”. Show this smaller text directly beneath/beside it, without a dropdown: “The CAC offers a variety of adult education programs. English as a Second or Other Language classes or computer skills classes could help you be more qualified for jobs.” Keep gameplay copy immersive; omit unsolicited real-world disclaimers and explanations of scripted rules. Put review and implementation caveats in staff documentation. Hiring recaps omit first-payday/no-pay-on-hiring-day commentary, and end screens omit the employment and financial history list. Retain committed history for restoration and financial totals.
 
 November 4 presentation revision: use native button cards with explicit selected states and keyboard focus, rather than radio controls. Selection still requires a separate submission. Use thin borders, soft gray shadows and a subtle red hover background. Keep unavailable jobs visible and disabled during reapplication. Place CAC preparation above the job board. Center the initial “It's time to start your job search!” heading and “See who's hiring” button together in the main gameplay panel, with compact spacing. Application recaps show “You got an interview!” and the interview day.
@@ -120,6 +126,12 @@ Submitting commits the choice and its defined effects once. Every displayed answ
 
 Use financial outcomes and expense schedules supplied by the simulation model. Do not invent amounts, income dates, affordability rules, or consequences in presentation components.
 
+The individual scenario placeholder is an explicit fallback: show it only after
+a matching bill snapshot has loaded successfully, with no bills due today and no
+assigned real scenario. Missing snapshots, refreshes in progress, bill-load errors,
+and automatic income transitions must not establish fallback eligibility. Preserve
+the existing bill/scenario panels during unchanged financial synchronization.
+
 ## 8. Inline decision recap
 
 Keep the chosen card highlighted and show a recap directly beneath the options. This is a state of the decision screen, not a separate page.
@@ -132,11 +144,13 @@ Individual players use Continue to next day below the fact boxes to advance. Gro
 
 ## 8. Results summary
 
-Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run. An unaffordable ordinary choice must open this end screen with Replay from household selection and Return home, rather than leave the player on a disabled scenario. Restore already-ended runs to this screen using the saved terminal status, day and balance; replay creates a new attempt.
+Show results after normal completion or when a run ends early. Normal completion is labeled Day 30/month complete. Early termination is labeled Simulation ended early and shows the actual day reached; never display 30/30 for a partial run. An unaffordable ordinary choice must open this end screen with Replay from household selection, rather than leave the player on a disabled scenario. Restore already-ended runs to this screen using the saved terminal status, day and balance; replay creates a new attempt.
 
 Include days completed, ending/current balance, completed decisions and consequences, CAC support availability and actual use, and applicable comparisons. Do not fabricate results for unanswered questions.
 
-Provide Replay, View Data Visualization, Donate to CAC, Visit CAC Site, and Return Home. Replay returns to household setup so the player can choose a household and support setting again. A new run resets balance, day, decision history, circumstances, and expense state.
+Lead with how CAC helps during financial hardship and give assisted replay the primary action. Put the CAC learn and donate links alongside it. Offer an unsupported restart from household selection and give the link to the educational data explorer lower visual emphasis. For each category with saved scenario answers, show the earliest committed answer and compare it with individual runs from other owners in the same household, edition, and assistance setting. Show percentages whenever at least one other run answered, and label the player's own result when no comparable runs answered.
+
+Provide Replay, View Data Visualization, Donate to CAC, and Visit CAC Site. Use the shared CAC/home logos for home navigation; omit the redundant terminal Return Home control. For completed or ended individual runs, await selected-run cleanup before navigating home; retain the database record and anonymous authentication. Active runs remain selected and resumable. If status verification or cleanup fails, retain the current page with recoverable error feedback. Replay awaits the same cleanup before household setup, invalidates pending restoration, and preserves CAC replay intent across refresh using an owner-scoped locator. A new run resets balance, day, decision history, circumstances, and expense state only after household confirmation. The old employment-specific End Walkthrough control is removed; general End Simulation remains separate implementation work.
 
 ## 9. Interactive data visualization page
 

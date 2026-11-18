@@ -65,6 +65,8 @@ function renderPage(
           supportForNext: false,
           replay: vi.fn(),
           leavePlaythrough: vi.fn(),
+          prepareHomeNavigation: vi.fn(),
+          setupRestoring: false,
         }}
       >
         <SimulationPage />

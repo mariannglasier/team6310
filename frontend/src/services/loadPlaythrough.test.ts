@@ -4,6 +4,7 @@ import { getSupabaseClient } from './supabase'
 
 vi.mock('./supabase', () => ({ getSupabaseClient: vi.fn() }))
 const getUser = vi.fn()
+const rpc = vi.fn()
 const from = vi.fn()
 const run = {
   playthrough_id: 'run',
@@ -24,6 +25,7 @@ let records: Record<string, { data: unknown; error: unknown }>
 let filters: Record<string, unknown[][]>
 beforeEach(() => {
   vi.resetAllMocks()
+  rpc.mockResolvedValue({ data: false, error: null })
   records = {
     playthroughs: { data: { ...run }, error: null },
     personas: {
@@ -55,6 +57,7 @@ beforeEach(() => {
   })
   vi.mocked(getSupabaseClient).mockResolvedValue({
     auth: { getUser },
+    rpc,
     from,
   } as unknown as Awaited<ReturnType<typeof getSupabaseClient>>)
 })
@@ -175,4 +178,25 @@ it('rejects mismatched content instead of displaying a different edition', async
     description: null,
   }
   await expect(loadPlaythrough('run')).rejects.toThrow('Unable to load')
+})
+
+it('restores an authorized staff run with its existing owner', async () => {
+  getUser.mockResolvedValue({
+    data: { user: { id: 'owner', is_anonymous: false } },
+    error: null,
+  })
+  rpc.mockResolvedValue({ data: true, error: null })
+  await expect(loadPlaythrough('run')).resolves.toMatchObject({
+    id: 'run',
+    ownerUserId: 'owner',
+  })
+  expect(rpc).toHaveBeenCalledExactlyOnceWith('is_cac_staff')
+})
+it('denies a revoked staff owner before reading the run', async () => {
+  getUser.mockResolvedValue({
+    data: { user: { id: 'owner', is_anonymous: false } },
+    error: null,
+  })
+  await expect(loadPlaythrough('run')).rejects.toThrow('Unable to load')
+  expect(from).not.toHaveBeenCalled()
 })

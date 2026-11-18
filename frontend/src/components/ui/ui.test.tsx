@@ -111,6 +111,7 @@ test('choice cards require explicit selection and support Tab and Space', async 
     )
   }
   render(<Example />)
+  expect(screen.queryByText('Select option')).toBeNull()
   const radios = screen.getAllByRole('button')
   radios.forEach((radio) =>
     expect(radio).toHaveAttribute('aria-pressed', 'false'),

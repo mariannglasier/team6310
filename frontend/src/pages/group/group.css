@@ -513,12 +513,12 @@
 }
 
 .group-vote-option[aria-pressed='true'] {
-  border-color: var(--finance-blue-ink);
-  background: var(--finance-blue);
+  border-color: var(--primary);
+  background: var(--accent-surface);
 }
 
 .group-vote-option:focus-visible {
-  outline: 3px solid #245f8a;
+  outline: 3px solid var(--primary);
   outline-offset: 3px;
 }
 

@@ -7,6 +7,8 @@ import { GroupUpcomingExpenses } from './GroupBills'
 import { GroupRoundDebrief } from './GroupRoundDebrief'
 import { groupSessionService } from '../../services/groupSessionService'
 import type { GroupSession } from '../../services/groupSessionService'
+import { loadScenarioFacts } from '../../services/scenarioFacts'
+vi.mock('../../services/scenarioFacts', () => ({ loadScenarioFacts: vi.fn() }))
 vi.mock('../../services/groupSessionService', () => ({
   groupSessionService: {
     restore: vi.fn(),
@@ -716,6 +718,58 @@ test('join errors permit retry and success waits for the database', async () => 
   expect(screen.getByText('90 seconds')).toBeInTheDocument()
 })
 
+test.each(['host', 'participant'] as const)(
+  'shows scenario facts under the vote results for the %s',
+  async (viewer) => {
+    const result: GroupSession = {
+      ...session,
+      isHost: viewer === 'host',
+      participantId: viewer === 'participant' ? 'participant' : null,
+      cacSupportEnabled: true,
+      roundState: 'results',
+      currentDay: 4,
+      question: {
+        scenarioId: 'scenario',
+        title: 'Plan your lunches',
+        description: 'Decide how to handle lunch.',
+        choices: [{ choiceId: 'choice', text: 'Pack lunch', voteCount: 2 }],
+      },
+    }
+    vi.mocked(loadScenarioFacts).mockResolvedValue([
+      {
+        role: 'cac',
+        semanticKey: 'food',
+        text: 'CAC helped 610 students.',
+        sourceUrl: 'https://ourcac.org/',
+      },
+    ])
+    vi.mocked(groupSessionService.restore).mockResolvedValue(result)
+    vi.mocked(groupSessionService.join).mockResolvedValue(result)
+    render(
+      <MemoryRouter>
+        {viewer === 'host' ? <HostPage /> : <JoinPage />}
+      </MemoryRouter>,
+    )
+    if (viewer === 'participant') {
+      const user = userEvent.setup()
+      await user.type(screen.getByLabelText(/Session code/), session.joinCode)
+      await user.click(screen.getByRole('button', { name: /Join session/ }))
+    }
+    const fact = await screen.findByText('610 students')
+    expect(
+      screen.getByText('2 votes').compareDocumentPosition(fact) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(loadScenarioFacts).toHaveBeenCalledWith(
+      'session',
+      'scenario',
+      'edition',
+      true,
+      'group',
+    )
+  },
+)
+
 test('shows the shared voting countdown to the host', async () => {
   vi.mocked(groupSessionService.restore).mockResolvedValue({
     ...session,
@@ -795,7 +849,7 @@ test.each(['voting', 'results', 'empty results'] as const)(
         },
         {
           optionId: 'cac',
-          text: 'Use the CAC clothing closet',
+          text: 'Legacy interview clothing label',
           cost: 0,
           voteCount: voting ? null : hasVotes ? 1 : 0,
         },
@@ -814,7 +868,9 @@ test.each(['voting', 'results', 'empty results'] as const)(
       }),
     ).toBeInTheDocument()
     expect(screen.getByText('Buy professional clothes')).toBeInTheDocument()
-    expect(screen.getByText('Use the CAC clothing closet')).toBeInTheDocument()
+    expect(
+      screen.getByText("Find interview clothes at CAC's Canopy Thrift"),
+    ).toBeInTheDocument()
     expect(screen.getByText('$1,200.00')).toBeInTheDocument()
     if (hasVotes) {
       expect(screen.getByText('2 votes (66.7%)')).toBeVisible()

@@ -1,3 +1,4 @@
+import { individualPlayerId } from './individualSession'
 import type { Scenario, CommittedDecision } from '../types/domain'
 import type { LoadedPlaythrough } from '../types/playthrough'
 import { getSupabaseClient } from './supabase'
@@ -13,9 +14,7 @@ export async function restoreScenario(
 ): Promise<ScenarioRunSnapshot> {
   const id = expected.id
   const client = await getSupabaseClient()
-  const { data: identity, error: authError } = await client.auth.getUser()
-  if (authError || !identity.user?.is_anonymous)
-    throw new Error('Anonymous participant required')
+  const owner = await individualPlayerId()
   const { data, error } = await client.rpc('restore_scenario_decision', {
     p_run_id: id,
     p_scenario_id: expected.currentScenarioId,
@@ -25,7 +24,7 @@ export async function restoreScenario(
   if (
     !r ||
     r.playthrough_id !== id ||
-    r.owner_user_id !== identity.user.id ||
+    r.owner_user_id !== owner ||
     r.version_id !== expected.versionId ||
     r.current_scenario_id !== expected.currentScenarioId ||
     typeof r.cac_support_enabledabled !== 'boolean' ||

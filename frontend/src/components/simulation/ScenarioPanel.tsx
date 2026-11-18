@@ -11,6 +11,9 @@ import { RadioGroup } from '../ui/RadioGroup'
 import { Button } from '../ui/Button'
 import { formatUsd } from '../../lib/money'
 import { ScenarioFacts } from './ScenarioFacts'
+import { scenarioDescription } from '../../lib/gameplayText'
+import { useSimulationMutation } from '../../state/simulationMutation'
+import { DecisionRecap } from './DecisionRecap'
 
 export function ScenarioPanel({
   run,
@@ -18,7 +21,7 @@ export function ScenarioPanel({
   onContinue,
 }: {
   run: LoadedPlaythrough
-  onCommit: (run: LoadedPlaythrough) => void
+  onCommit: (run: LoadedPlaythrough) => void | Promise<void>
   onContinue: () => void
 }) {
   const [scenario, setScenario] = useState<Scenario | null>(null)
@@ -27,6 +30,8 @@ export function ScenarioPanel({
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
   const busy = useRef(false)
+  const mutation = useSimulationMutation()
+  const [uncertain, setUncertain] = useState(false)
   useEffect(() => {
     let active = true
     void (async () => {
@@ -41,7 +46,7 @@ export function ScenarioPanel({
           setScenario(content)
           setSaved(snapshot)
           if (snapshot.run.currentBalance !== run.currentBalance)
-            onCommit(snapshot.run)
+            await onCommit(snapshot.run)
         }
       } catch {
         if (active) setError('Unable to load this scenario. Reload to retry.')
@@ -53,43 +58,104 @@ export function ScenarioPanel({
     // Run/scenario identity controls restoration; balance updates must not reset selection.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.id, run.currentScenarioId, run.versionId])
-  async function submit() {
-    if (!scenario || !selected || busy.current || saved?.decision) return
+  async function submit(choiceId: string) {
+    if (
+      !scenario ||
+      !choiceId ||
+      busy.current ||
+      saved?.decision ||
+      !mutation.begin()
+    )
+      return
     busy.current = true
+    select(choiceId)
     setPending(true)
     setError('')
     try {
-      const value = await submitScenario(run, scenario, selected)
+      const value = await submitScenario(run, scenario, choiceId)
       setSaved(value)
-      onCommit(value.run)
+      await onCommit(value.run)
     } catch {
       setError('Unable to confirm your decision. Reload or retry.')
       try {
         const value = await restoreScenario(run, scenario)
         setSaved(value)
-        onCommit(value.run)
+        await onCommit(value.run)
       } catch {
-        /* retain last confirmed snapshot */
+        setUncertain(true)
+        mutation.uncertain('scenario', true)
       }
     } finally {
       busy.current = false
       setPending(false)
+      mutation.finish()
+    }
+  }
+  async function reconcile() {
+    if (!scenario || busy.current || !mutation.begin(true)) return
+    busy.current = true
+    setPending(true)
+    try {
+      const value = await restoreScenario(run, scenario)
+      setSaved(value)
+      await onCommit(value.run)
+      setUncertain(false)
+      mutation.uncertain('scenario', false)
+      setError('')
+    } catch {
+      setError('Unable to confirm your decision. Reload or retry.')
+    } finally {
+      busy.current = false
+      setPending(false)
+      mutation.finish()
     }
   }
   return (
     <section className="employment-game" aria-label="Ordinary scenario">
       {error && <p role="alert">{error}</p>}
-      {!scenario && !error && <p role="status">Loading scenario…</p>}
+      {uncertain && (
+        <Button disabled={pending} onClick={() => void reconcile()}>
+          Reload saved decision
+        </Button>
+      )}
+      {!scenario && !error && (
+        <p className="scenario-loading" role="status">
+          Loading…
+        </p>
+      )}
       {scenario && (
         <>
-          <h2>{scenario.title}</h2>
-          <p>{scenario.description}</p>
+          <DecisionRecap
+            title={scenario.title}
+            description={scenarioDescription(
+              scenario.description,
+              run.supportEnabled === true,
+            )}
+            day={run.currentDay ?? 1}
+            outcome={saved?.decision ? saved.responseText : null}
+            receipt={
+              saved?.decision
+                ? {
+                    choice:
+                      scenario.choices.find(
+                        (c) => c.id === saved.decision!.choiceId,
+                      )?.text ?? 'Your decision',
+                    change: saved.decision.balanceChangeApplied,
+                    balanceAfter: saved.decision.balanceAfter,
+                  }
+                : undefined
+            }
+          />
           {!scenario.choices.length ? (
             <p role="alert">Choices are unavailable.</p>
           ) : !saved?.decision ? (
             <fieldset
               disabled={
-                pending || !!saved?.decision || saved?.run.status === 'ended'
+                pending ||
+                uncertain ||
+                mutation.busy ||
+                !!saved?.decision ||
+                saved?.run.status === 'ended'
               }
               aria-busy={pending}
               className="employment-controls scenario-choice-controls"
@@ -98,11 +164,16 @@ export function ScenarioPanel({
                 label="Your decision"
                 name="scenario-choice"
                 value={saved?.decision?.choiceId ?? selected}
-                onChange={select}
+                onChange={(choiceId) => void submit(choiceId)}
                 options={scenario.choices
                   .filter(
                     (choice) =>
                       !choice.requiresCac || run.supportEnabled === true,
+                  )
+                  .sort(
+                    (first, second) =>
+                      (second.upfrontCost || -second.balanceChange) -
+                      (first.upfrontCost || -first.balanceChange),
                   )
                   .map((choice) => ({
                     value: choice.id,
@@ -114,12 +185,6 @@ export function ScenarioPanel({
                         : `${choice.balanceChange > 0 ? '+' : ''}${formatUsd(choice.balanceChange)}`,
                   }))}
               />
-              <Button
-                disabled={!selected || pending || !!saved?.decision}
-                onClick={() => void submit()}
-              >
-                Submit decision
-              </Button>
             </fieldset>
           ) : null}
           {saved?.run.status === 'ended' && (

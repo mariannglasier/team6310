@@ -236,7 +236,6 @@ test('integrated employment keeps saved finances and supports a full local month
     await page
       .getByRole('button', { name: `Choose ${title}`, exact: true })
       .click()
-    await page.getByRole('button', { name: 'Submit application' }).click()
   }
   await setupPreview()
   const checkBoardReadability = async (name: string) => {
@@ -258,7 +257,7 @@ test('integrated employment keeps saved finances and supports a full local month
         ).toBe(true)
       }
       await page
-        .getByRole('button', { name: 'Submit application' })
+        .getByRole('group', { name: 'Available jobs' })
         .scrollIntoViewIfNeeded()
       await page.screenshot({
         path: testInfo.outputPath(`${name}-${viewport.width}.png`),
@@ -274,12 +273,11 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.getByRole('button', { name: 'Start Day 1' }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await page.getByRole('button', { name: /Buy professional clothes/ }).click()
-  await expect(page.locator('.finance-balance')).toHaveText('$200.00')
-  await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
   await page
     .getByRole('link', { name: 'CAC Poverty Simulation', exact: true })
     .click()
+  await expect(page).toHaveURL('http://127.0.0.1:4173/')
   await page.goBack()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
   await page.reload()
@@ -307,7 +305,6 @@ test('integrated employment keeps saved finances and supports a full local month
   await page
     .getByRole('button', { name: /Wear my professional clothes/ })
     .click()
-  await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(page.locator('.finance-balance')).toHaveText('$140.00')
   await page.getByRole('button', { name: 'Continue to Day 4' }).click()
   await page.locator('.finance-timeline').scrollIntoViewIfNeeded()
@@ -381,7 +378,7 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.screenshot({
     path: testInfo.outputPath('employment-complete.png'),
   })
-  await page.getByRole('button', { name: 'Try again with CAC support' }).click()
+  await page.getByRole('button', { name: 'Play with CAC assistance' }).click()
   await page.getByText('Choose this household').first().click()
   await page.getByRole('button', { name: 'Start simulation' }).click()
   await setupPreview()
@@ -400,9 +397,10 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.getByRole('button', { name: 'Start Day 1' }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await page
-    .getByRole('button', { name: /Use the CAC clothing closet/ })
+    .getByRole('button', {
+      name: /Find interview clothes at CAC's Canopy Thrift/,
+    })
     .click()
-  await page.getByRole('button', { name: 'Submit clothing decision' }).click()
   await expect(
     page.getByRole('heading', { name: 'You got the Office job job.' }),
   ).toBeVisible()
@@ -411,19 +409,25 @@ test('integrated employment keeps saved finances and supports a full local month
   await expect(
     page.locator('.finance-timeline [aria-current="step"]'),
   ).toHaveText('3')
-  await expect(page.getByRole('heading', { name: 'Placeholder' })).toBeVisible()
+  await expect(
+    page.getByText('No more decisions today.', { exact: true }),
+  ).toBeVisible()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true)
-  await page.getByRole('button', { name: 'End walkthrough' }).click()
   await expect(
-    page.getByRole('heading', { name: 'Your walkthrough ended early.' }),
-  ).toBeVisible()
+    page.getByRole('button', { name: 'End walkthrough' }),
+  ).toHaveCount(0)
+  await page
+    .getByRole('link', { name: 'CAC Poverty Simulation', exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/$/)
+  await page.goto('/simulation')
   await page.reload()
   await expect(
-    page.getByRole('heading', { name: 'Your walkthrough ended early.' }),
+    page.getByText('No more decisions today.', { exact: true }),
   ).toBeVisible()
   expect(inserts).toBe(2)
 })

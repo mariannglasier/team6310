@@ -25,11 +25,19 @@ it('shows descriptions in other formats unchanged', () => {
   })
 })
 
-it('chooses artwork by household name and falls back for unknown names', () => {
-  expect(avatarKey('Jordan & Maya')).toBe('jordan')
-  expect(avatarKey('  Patricia ')).toBe('patricia')
-  expect(avatarKey('Sofia')).toBe('sofia')
-  expect(avatarKey('Alex')).toBe('alex')
-  expect(avatarKey('Someone New')).toBe('generic')
-  expect(avatarTone('Someone New')).toBe('neutral')
+it.each([
+  ['Alex', 'alex', '#dcebf9'],
+  [' ALEX Smith ', 'alex', '#dcebf9'],
+  ['Jordan & Maya', 'jordan', '#fbe5e3'],
+  ['Jordan,Maya', 'jordan', '#fbe5e3'],
+  ['  Patricia ', 'patricia', '#e4ead9'],
+  ['Sofia', 'sofia', '#ebe4f5'],
+  ['Generic', 'generic', '#e9e9e9'],
+  ['Someone New', 'generic', '#e9e9e9'],
+  ['', 'generic', '#e9e9e9'],
+  ['constructor', 'generic', '#e9e9e9'],
+  ['__proto__', 'generic', '#e9e9e9'],
+])('chooses the artwork and tone for %j', (name, key, tone) => {
+  expect(avatarKey(name)).toBe(key)
+  expect(avatarTone(name)).toBe(tone)
 })

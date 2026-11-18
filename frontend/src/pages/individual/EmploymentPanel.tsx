@@ -24,6 +24,7 @@ import {
   type BillAction,
 } from '../../components/simulation/BillControls'
 import { formatUsd } from '../../lib/money'
+import { useSimulationMutation } from '../../state/simulationMutation'
 
 export function EmploymentPanel({
   run,
@@ -34,7 +35,7 @@ export function EmploymentPanel({
   onPendingChange,
 }: {
   run: LoadedPlaythrough
-  onCommit: (snapshot: CommittedEmployment) => void
+  onCommit: (snapshot: CommittedEmployment) => void | Promise<void>
   bills?: BillSnapshot | null
   billBusy?: boolean
   onBillAction?: BillAction
@@ -47,16 +48,48 @@ export function EmploymentPanel({
   const [recoverable, setRecoverable] = useState(false)
   const [uncertain, setUncertain] = useState(false)
   const [pending, setPending] = useState(false)
+  const [replaying, setReplaying] = useState(false)
   const busy = useRef(false)
+  const mutation = useSimulationMutation()
+  const markUncertain = mutation.uncertain
+  async function startReplay(support: boolean) {
+    if (busy.current || billBusy) return
+    busy.current = true
+    setReplaying(true)
+    setError('')
+    try {
+      await replay(support)
+      navigate(paths.individual)
+    } catch {
+      setError(
+        'Unable to prepare replay. Check browser storage and try Replay again.',
+      )
+    } finally {
+      busy.current = false
+      setReplaying(false)
+    }
+  }
   useEffect(() => {
     onPendingChange?.(pending)
   }, [pending, onPendingChange])
+  // Content identity is independent of financial synchronization. A payment or
+  // decision can change cash/revision without changing the mounted day's panel.
+  // Missing snapshots never establish that a day has no scheduled bills.
+  const dayContentReady = Boolean(
+    bills &&
+    snapshot &&
+    run.id === snapshot.run.id &&
+    run.versionId === snapshot.run.versionId &&
+    bills.run.id === snapshot.run.id &&
+    bills.run.versionId === snapshot.run.versionId &&
+    bills.run.currentDay === snapshot.run.currentDay &&
+    bills.run.currentScenarioId === snapshot.run.currentScenarioId,
+  )
   const billsReady =
-    !bills ||
+    dayContentReady &&
     Boolean(
       bills &&
       snapshot &&
-      bills.run.currentDay === snapshot.run.currentDay &&
       bills.run.currentBalance === snapshot.run.currentBalance &&
       (bills.run.employmentState as { revision?: number })?.revision ===
         snapshot.revision,
@@ -71,6 +104,7 @@ export function EmploymentPanel({
           setSnapshot(s)
           setEmployment(s.state ? { runId: run.id, state: s.state } : null)
           setUncertain(p)
+          markUncertain('employment', p)
         }
       },
       (cause) => {
@@ -86,9 +120,9 @@ export function EmploymentPanel({
     return () => {
       current = false
     }
-  }, [run, setEmployment])
+  }, [run, setEmployment, markUncertain])
   async function send(action: EmploymentAction, retry = false) {
-    if (!snapshot || busy.current || billBusy) return
+    if (!snapshot || busy.current || billBusy || !mutation.begin(retry)) return
     busy.current = true
     setPending(true)
     setError('')
@@ -100,14 +134,18 @@ export function EmploymentPanel({
         retry,
       )
       setSnapshot(s)
-      onCommit(s)
+      await onCommit(s)
       setUncertain(false)
+      mutation.uncertain('employment', false)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Submission failed')
-      setUncertain(await hasPending(run.id).catch(() => true))
+      const unresolved = await hasPending(run.id).catch(() => true)
+      setUncertain(unresolved)
+      mutation.uncertain('employment', unresolved)
     } finally {
       busy.current = false
       setPending(false)
+      mutation.finish()
     }
   }
   const advanceAutomatically = useEffectEvent(() => {
@@ -115,7 +153,8 @@ export function EmploymentPanel({
   })
   useEffect(() => {
     const state = snapshot?.state
-    if (!state || pending || uncertain || error || billBusy) return
+    if (!state || pending || uncertain || error || billBusy || mutation.busy)
+      return
     if (
       state.stage === 'income' ||
       (state.stage === 'day' &&
@@ -126,8 +165,24 @@ export function EmploymentPanel({
       const timer = window.setTimeout(() => advanceAutomatically(), 0)
       return () => window.clearTimeout(timer)
     }
-  }, [snapshot, pending, uncertain, error, billBusy, billsReady, dueToday])
+  }, [
+    snapshot,
+    pending,
+    uncertain,
+    error,
+    billBusy,
+    billsReady,
+    dueToday,
+    mutation.busy,
+  ])
   const state = snapshot?.state
+  const allowPlaceholder =
+    billsReady &&
+    !billBusy &&
+    !uncertain &&
+    !error &&
+    !dueToday &&
+    !snapshot?.run.currentScenarioId
   const skipInterviewDay =
     state?.stage === 'day' &&
     billsReady &&
@@ -151,16 +206,25 @@ export function EmploymentPanel({
       <fieldset
         disabled={
           pending ||
+          replaying ||
           uncertain ||
           automatic ||
           billBusy ||
+          mutation.busy ||
           (state?.stage === 'day' && !billsReady)
         }
         aria-busy={pending || automatic}
         className="employment-controls"
       >
-        {state?.stage === 'day' && !billsReady ? (
-          <p role="status">Loading saved bills…</p>
+        {state?.stage === 'income' ? (
+          <p className="scenario-loading" role="status">
+            Loading…
+          </p>
+        ) : state?.stage === 'day' &&
+          (!dayContentReady || (dueToday && !onBillAction)) ? (
+          <p className="scenario-loading" role="status">
+            Loading…
+          </p>
         ) : skipInterviewDay ? (
           <p className="sr-only" role="status">
             Opening Day {state.day + 1}…
@@ -179,21 +243,23 @@ export function EmploymentPanel({
             key={`${snapshot.run.id}:${snapshot.run.currentScenarioId}`}
             run={snapshot.run}
             onCommit={(run) => {
-              void employmentSnapshot(run).then(
-                (value) => {
+              return employmentSnapshot(run).then(
+                async (value) => {
                   setSnapshot(value)
-                  onCommit(value)
+                  await onCommit(value)
                 },
-                () =>
-                  setError(
-                    'Unable to restore saved progress. Reload to retry.',
-                  ),
+                (cause) => {
+                  setError('Unable to restore saved progress. Reload to retry.')
+                  throw cause
+                },
               )
             }}
             onContinue={() => void send({ type: 'continue' })}
           />
         ) : snapshot?.state ? (
           <EmploymentGame
+            runId={snapshot.run.id}
+            loading={pending || automatic}
             recapFacts={
               snapshot.run.versionId ? (
                 <ScenarioFacts
@@ -212,17 +278,13 @@ export function EmploymentPanel({
                 />
               ) : undefined
             }
-            state={
-              snapshot.state.stage === 'income'
-                ? { ...snapshot.state, stage: 'day' }
-                : snapshot.state
-            }
+            state={snapshot.state}
+            allowPlaceholder={allowPlaceholder}
             dispatch={(a) => {
               void send(a)
             }}
             onReplay={(support) => {
-              replay(support)
-              navigate(paths.individual)
+              void startReplay(support)
             }}
           />
         ) : (

@@ -1,22 +1,149 @@
-import type { Bill, BillSnapshot } from '../../services/billGameplay'
+import type {
+  Bill,
+  BillDecisionAction,
+  BillSnapshot,
+} from '../../services/billGameplay'
+import { useState, useRef, useEffect } from 'react'
+import { RadioGroup } from '../ui/RadioGroup'
+import { scenarioDescription } from '../../lib/gameplayText'
 import { settlement } from '../../services/billGameplay'
 import { formatUsd } from '../../lib/money'
 import { Button } from '../ui/Button'
 import { ExpenseRow } from './ExpenseRow'
 import { ScenarioFacts } from './ScenarioFacts'
+import { DecisionRecap } from './DecisionRecap'
+import { usdCents } from '../../types/domain'
 
-export type BillAction = (id: string, action: 'pay' | 'ignore') => void
+export type BillAction = (id: string, action: BillDecisionAction) => void
+
+const cacBillLabel = 'Use CAC assistance to pay the bill'
+
+function BillDecision({
+  bill,
+  snapshot,
+  onAction,
+  busy,
+}: {
+  bill: Bill
+  snapshot: BillSnapshot
+  onAction: BillAction
+  busy: boolean
+}) {
+  const [selected, select] = useState<BillDecisionAction | null>(null)
+  const sending = useRef(false)
+  const wasBusy = useRef(false)
+  useEffect(() => {
+    if (wasBusy.current && !busy) sending.current = false
+    wasBusy.current = busy
+  }, [busy])
+  const resolved = Boolean(bill.paidAt || bill.ignoredAt)
+  return (
+    <article className="bill-decision" aria-label={bill.name}>
+      <DecisionRecap
+        title={bill.name}
+        description={
+          bill.description
+            ? scenarioDescription(
+                bill.description,
+                snapshot.run.supportEnabled === true,
+              )
+            : undefined
+        }
+        day={bill.dueDay}
+        receipt={
+          resolved
+            ? {
+                choice: bill.paidAt
+                  ? bill.paidWithCac
+                    ? cacBillLabel
+                    : 'Pay the bill'
+                  : 'Ignore the bill for now',
+                change:
+                  bill.paidAt && !bill.paidWithCac
+                    ? usdCents(-settlement(bill))
+                    : usdCents(0),
+                balanceAfter: bill.paymentBalanceAfter ?? undefined,
+                outstanding:
+                  bill.ignoredAt && !bill.paidAt ? settlement(bill) : undefined,
+              }
+            : undefined
+        }
+      />
+      {!resolved ? (
+        <fieldset
+          className="employment-controls scenario-choice-controls"
+          disabled={busy}
+          aria-busy={busy}
+        >
+          <RadioGroup
+            label="Your decision"
+            name={`bill-${bill.id}`}
+            value={selected}
+            onChange={(value) => {
+              if (!busy && !sending.current) {
+                sending.current = true
+                select(value as BillDecisionAction)
+                onAction(bill.id, value as BillDecisionAction)
+              }
+            }}
+            options={[
+              {
+                value: 'pay',
+                label: 'Pay the bill',
+                description: `Pay ${formatUsd(settlement(bill))} now.`,
+                ariaLabel: `Pay ${bill.name}`,
+              },
+              ...(snapshot.run.supportEnabled === true
+                ? [
+                    {
+                      value: 'cac',
+                      label: cacBillLabel,
+                      description:
+                        'CAC covers the full amount. Your balance stays the same.',
+                      ariaLabel: `Use CAC assistance to pay ${bill.name}`,
+                    },
+                  ]
+                : []),
+              {
+                value: 'ignore',
+                label: 'Ignore the bill for now',
+                description:
+                  bill.fee > 0
+                    ? `A late fee of ${formatUsd(bill.fee)} will be added to what you owe.`
+                    : 'The bill will remain unpaid.',
+                ariaLabel: `Ignore ${bill.name}`,
+              },
+            ]}
+          />
+        </fieldset>
+      ) : (
+        <>
+          {snapshot.run.versionId && (
+            <ScenarioFacts
+              runId={snapshot.run.id}
+              scenarioId={`bill:${bill.id}`}
+              versionId={snapshot.run.versionId}
+              supportEnabled={snapshot.run.supportEnabled === true}
+            />
+          )}
+        </>
+      )}
+    </article>
+  )
+}
 
 function BillRow({
   bill,
   onAction,
   busy,
   overdue = false,
+  supportEnabled,
 }: {
   bill: Bill
   onAction: BillAction
   busy: boolean
   overdue?: boolean
+  supportEnabled: boolean
 }) {
   const pay = (
     <Button
@@ -66,7 +193,20 @@ function BillRow({
       variant={overdue ? 'overdue' : 'due'}
       detail={detail}
       iconActions={overdue && !resolved ? pay : undefined}
-      actions={!overdue && !resolved ? controls : undefined}
+      actions={
+        !resolved && overdue && supportEnabled ? (
+          <Button
+            disabled={busy}
+            variant="secondary"
+            aria-label={`Use CAC assistance to pay ${bill.name}`}
+            onClick={() => onAction(bill.id, 'cac')}
+          >
+            Pay with CAC
+          </Button>
+        ) : !overdue && !resolved ? (
+          controls
+        ) : undefined
+      }
     />
   )
 }
@@ -86,23 +226,15 @@ export function DueBillsPanel({
   const resolved = due.every((b) => b.paidAt || b.ignoredAt)
   return (
     <section aria-label="Bills due today">
-      <h2>Your household bills</h2>
-      <ul className="finance-upcoming">
-        {due.map((bill) => (
-          <BillRow key={bill.id} bill={bill} onAction={onAction} busy={busy} />
-        ))}
-      </ul>
-      {resolved &&
-        snapshot.run.versionId &&
-        due.map((bill) => (
-          <ScenarioFacts
-            key={bill.id}
-            runId={snapshot.run.id}
-            scenarioId={`bill:${bill.id}`}
-            versionId={snapshot.run.versionId!}
-            supportEnabled={snapshot.run.supportEnabled === true}
-          />
-        ))}
+      {due.map((bill) => (
+        <BillDecision
+          key={bill.id}
+          bill={bill}
+          snapshot={snapshot}
+          onAction={onAction}
+          busy={busy}
+        />
+      ))}
       <div className="scenario-continue">
         {' '}
         <Button disabled={busy || !resolved} onClick={onContinue}>
@@ -142,6 +274,7 @@ export function OverdueBills({
             bill={bill}
             onAction={onAction}
             busy={busy || !active}
+            supportEnabled={snapshot.run.supportEnabled === true}
             overdue
           />
         ))}

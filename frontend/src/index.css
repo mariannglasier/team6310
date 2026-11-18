@@ -7,9 +7,9 @@
   font-synthesis: none;
   --primary: #b3261e;
   --primary-hover: #8f1e18;
-  --accent: #245f8a;
-  --accent-hover: #194767;
-  --accent-surface: #eaf2f8;
+  --accent: #b3261e;
+  --accent-hover: #8f1e18;
+  --accent-surface: #f8e9e8;
   --text: #111111;
   --text-muted: #595959;
   --surface: #ffffff;
@@ -17,7 +17,7 @@
   --border: #767676;
   --divider: #d9d9d9;
   --disabled-surface: #e0e0e0;
-  --focus: #245f8a;
+  --focus: #b3261e;
 }
 * {
   box-sizing: border-box;

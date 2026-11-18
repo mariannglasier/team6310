@@ -1,3 +1,4 @@
+import { individualPlayerId } from './individualSession'
 import { getSupabaseClient } from './supabase'
 import { contentService, parseUsdCents } from './contentService'
 import type { LoadedPlaythrough } from '../types/playthrough'
@@ -9,6 +10,48 @@ export interface CommittedEmployment {
   run: LoadedPlaythrough
   state: Walkthrough | null
   revision: number
+  beforeEmploymentEnded?: boolean
+}
+export function isBeforeEmploymentEnd(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const s = value as Record<string, unknown>
+  if (
+    Object.keys(s).length !== 6 ||
+    s.engine !== 'employment-v1' ||
+    s.schemaVersion !== 1 ||
+    s.stage !== 'ended' ||
+    s.revision !== 1 ||
+    s.reason !== 'You ended the walkthrough.' ||
+    !s.receipts ||
+    typeof s.receipts !== 'object' ||
+    Array.isArray(s.receipts)
+  )
+    return false
+  const entries = Object.entries(s.receipts)
+  if (
+    entries.length !== 1 ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      entries[0][0],
+    )
+  )
+    return false
+  const receipt = entries[0][1] as Record<string, unknown>
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt))
+    return false
+  const action = receipt.action
+  return (
+    Object.keys(receipt).length === 6 &&
+    !!action &&
+    typeof action === 'object' &&
+    !Array.isArray(action) &&
+    Object.keys(action).length === 1 &&
+    (action as Record<string, unknown>).type === 'end' &&
+    receipt.expectedRevision === 0 &&
+    receipt.revision === 1 &&
+    receipt.day === 1 &&
+    receipt.change === '0' &&
+    receipt.stage === 'ended'
+  )
 }
 const stages = [
   'uninitialized',
@@ -91,11 +134,23 @@ export function documentState(value: unknown): Record<string, unknown> {
           'history',
           'creditedDays',
           'reason',
+          'clothingCost',
         ].includes(k),
     )
   )
     throw new UnsupportedEmploymentDocumentError(
       'Unfamiliar employment document',
+    )
+  // Hosted edition prices are positive USD strings below $1,000,000.
+  // Bounding the digits also keeps conversion to integer cents exact and safe.
+  if (
+    'clothingCost' in s &&
+    (typeof s.clothingCost !== 'string' ||
+      !/^\d{1,6}(?:\.\d{1,2})?$/.test(s.clothingCost) ||
+      parseUsdCents(s.clothingCost, 'clothingCost') <= 0)
+  )
+    throw new UnsupportedEmploymentDocumentError(
+      'Invalid employment clothing cost',
     )
   for (const value of Object.values(s.receipts as Record<string, unknown>)) {
     if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -180,6 +235,23 @@ export function documentState(value: unknown): Record<string, unknown> {
 export async function employmentSnapshot(
   run: LoadedPlaythrough,
 ): Promise<CommittedEmployment> {
+  if (isBeforeEmploymentEnd(run.employmentState)) {
+    if (
+      run.status !== 'ended' ||
+      run.currentDay !== 1 ||
+      run.currentJobId !== null ||
+      run.currentScenarioId !== null ||
+      run.sessionId !== null ||
+      run.supportEnabled !== null ||
+      run.currentBalance === null ||
+      !run.versionId ||
+      !run.persona
+    )
+      throw new UnsupportedEmploymentDocumentError(
+        'Inconsistent pre-employment ending',
+      )
+    return { run, state: null, revision: 1, beforeEmploymentEnded: true }
+  }
   const s = documentState(run.employmentState)
   if (s.stage === 'uninitialized') {
     if (
@@ -235,7 +307,8 @@ export async function employmentSnapshot(
     },
     jobs: jobs.map((job) => ({ job })),
     support: run.supportEnabled,
-    clothingCost: parseUsdCents('60.00', 'clothing'),
+    // Legacy documents use the same fixed price as the backend's fallback.
+    clothingCost: parseUsdCents(s.clothingCost ?? '60.00', 'clothingCost'),
     stage: run.status === 'ended' ? 'ended' : (s.stage as Walkthrough['stage']),
     day: pregame ? 0 : run.currentDay,
     balance: run.currentBalance,
@@ -266,11 +339,7 @@ export async function employmentSnapshot(
   return { run, state, revision: Number(s.revision) }
 }
 export async function participantId() {
-  const client = await getSupabaseClient()
-  const { data, error } = await client.auth.getUser()
-  if (error || !data.user || data.user.is_anonymous !== true)
-    throw new Error('Existing participant session required')
-  return data.user.id
+  return individualPlayerId()
 }
 const key = (owner: string, suffix: string) =>
   `cac-employment-v1:${owner}:${suffix}`
@@ -283,6 +352,16 @@ export async function rememberedRun() {
 export async function forgetRun(id: string) {
   const locator = key(await participantId(), 'run')
   if (localStorage.getItem(locator) === id) localStorage.removeItem(locator)
+}
+// Replay intent is a locator only. The initialize RPC validates its owner and
+// eligibility; storing it grants no support or financial benefit.
+export async function rememberedReplay() {
+  return localStorage.getItem(key(await participantId(), 'replay')) ?? undefined
+}
+export async function rememberReplay(id?: string) {
+  const locator = key(await participantId(), 'replay')
+  if (id) localStorage.setItem(locator, id)
+  else localStorage.removeItem(locator)
 }
 export async function submitEmployment(
   run: LoadedPlaythrough,

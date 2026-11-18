@@ -49,13 +49,25 @@ Supabase Auth manages password storage and verification. Never store passwords i
 
 ## Authorization matrix
 
-| Actor | Allowed | Denied |
-| --- | --- | --- |
-| Public visitor | Read public saved simulation content and privacy-safe aggregates | Read private runs, staff records, drafts, or session credentials; change content |
-| Anonymous player | Create owned runs; read owned state; submit valid decisions through protected operations | Access another player's raw run; directly set balances, completion flags, or content versions |
-| Group participant | Join an active group through a validated code; access own household/run and permitted group aggregates | Advance other participants, end the group, inspect others' raw histories |
-| Group host | Create owned sessions, view participant progress, advance session members individually, end owned sessions, view group comparisons | Control another host's session, change participant answers, edit simulation content |
-| Authorized CAC staff | Read/edit statistics and questions; inspect content status and audit records | Unrestricted access to player identities, credentials, or raw runs merely because they can edit content |
+Staff individual-gameplay database authorization is applied and verified on
+local Supabase, including [genuine Stage 3 Auth/API testing](staff-individual-stage3-api-verification.md).
+It has not been deployed to hosted Supabase. The frontend
+now includes the separate [Stage 2 individual identity service](staff-individual-frontend.md);
+staff gameplay requires the Stage 1 database contract on the target environment.
+See the [Stage 1 implementation and
+verification record](staff-individual-authorization.md) for the approved rule,
+revocation behavior and exact migration scope. The
+[Stage 4 browser walkthrough](staff-individual-stage4-browser-verification.md)
+also passed locally, with an unchanged staff Auth UUID and no anonymous signup
+or sign-out during staff gameplay.
+
+| Actor                | Allowed                                                                                                                            | Denied                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Public visitor       | Read public saved simulation content and privacy-safe aggregates                                                                   | Read private runs, staff records, drafts, or session credentials; change content                        |
+| Anonymous player     | Create owned runs; read owned state; submit valid decisions through protected operations                                           | Access another player's raw run; directly set balances, completion flags, or content versions           |
+| Group participant    | Join an active group through a validated code; access own household/run and permitted group aggregates                             | Advance other participants, end the group, inspect others' raw histories                                |
+| Group host           | Create owned sessions, view participant progress, advance session members individually, end owned sessions, view group comparisons | Control another host's session, change participant answers, edit simulation content                     |
+| Authorized CAC staff | Read/edit statistics and questions; inspect content status and audit records                                                       | Unrestricted access to player identities, credentials, or raw runs merely because they can edit content |
 
 A person may have multiple capabilities, but each operation must check the appropriate one. Apply access checks to API calls, database operations, and realtime subscriptions, not only to visible buttons.
 
@@ -95,6 +107,8 @@ Describe player data accurately as anonymous to other users but linked internall
 Public visualizations return aggregate values only. Never return raw session identifiers, Auth IDs, tokens, timestamps, or complete individual histories as part of chart payloads. Suppress public filtered cohorts smaller than five eligible runs/responses; show Insufficient responses instead of exact counts/percentages. Apply this threshold consistently to filter combinations and derived views to reduce identification through subtraction. This restriction does not prevent a player viewing their own result or authorized session members viewing their group debrief.
 
 Question aggregates may include submitted responses from early-ended runs. Ending-balance/support-use aggregates use completed runs as defined in the design files. Keep incompatible content versions separate. Replays create distinct runs and do not imply distinct people; label counts as runs or responses rather than unique individuals.
+
+The private individual end screen shows a decision comparison for any nonempty cohort matching the player's saved answer, household, edition, and assistance setting. The endpoint requires ownership of the finished run and exposes aggregate values only.
 
 Raw data is not retained indefinitely. Retention and cleanup are centrally configured and enforced by maintenance tooling rather than hardcoded into UI components. Retain active state for supported recovery and historical content while referenced by retained runs. Cleanup must cover expired anonymous identities, orphaned group/run records, and unnecessary logs. Do not delete credentials/content still required by active runs. Restrict maintenance actions to trusted operators.
 

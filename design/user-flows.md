@@ -44,7 +44,7 @@ flowchart TD
 2. No household is selected by default. Select one approved profile to enable Start simulation.
 3. Start simulation confirms the household and creates a fresh run through the protected start operation, then opens pre-game job search. No Review screen intervenes. Lock controls during creation; show errors without claiming success and retain the selection for explicit retry.
 4. Legacy Review URLs redirect to household selection, or to the existing active run. Revisiting setup must not create another run.
-5. The new run uses the selected persona and approved published `version_id`. Weekly income starts at $0. Regular runs start without support; a completed regular run may offer a fresh CAC replay. Employment and assistance state belong to the run.
+5. The new run uses the selected persona and approved published `version_id`. Weekly income starts at $0. Regular runs start without support. Either individual ending offers a fresh CAC replay. Employment and assistance state belong to the run.
 6. Once started, the player cannot inspect or edit setup. The active run offers End Simulation rather than Back to Review.
 
 Setup Back actions preserve choices. Changing a household before confirmation uses that household's starting values when the run is initialized; it does not create a financial transaction.
@@ -97,17 +97,31 @@ On refresh, restore the latest committed state. A committed decision returns to 
 
 ## Ending and replay
 
-| Trigger                       | Result                                                       |
-| ----------------------------- | ------------------------------------------------------------ |
-| Day 30 question completed     | Full results with 30 days completed                          |
-| Player selects End Simulation | Partial results with actual progress and completed decisions |
-| Host ends the group early     | Each participant receives results for their completed work   |
+| Trigger                   | Result                                                       |
+| ------------------------- | ------------------------------------------------------------ |
+| Day 30 question completed | Full results with 30 days completed                          |
+| Player confirms Give Up   | Partial results with actual progress and completed decisions |
+| Host ends the group early | Each participant receives results for their completed work   |
 
 An ended run no longer accepts decisions. Partial summaries must be labeled as early endings and must not imply the player completed the month. Include balance, decisions/consequences, support availability/use, and applicable comparisons. Unanswered questions have no invented choices or outcomes.
 
-Replay returns to household selection with no household selected. The player chooses a household and confirms with Start simulation. Preserve the chosen replay mode. A new run uses the published content available when it starts and resets finances, day, expense state, circumstances and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
+Approved November 12, 2026: active individual gameplay provides a red Give Up
+button below the finance sidebar at 761px and above, and below all simulation
+components at 760px and below. The existing modal asks **Give Up?** and **Are you
+sure you want to give up on this simulation?**, with Cancel and red Give Up
+actions. Confirmation pauses automatic advancement; Cancel submits nothing.
+Pending or uncertain gameplay and financial reconciliation block termination.
+The action is available immediately after Start simulation, before See who's
+hiring. It preserves actual progress, bills, financial state and employment data;
+it does not initialize employment. A run ended from the fresh marker displays
+the existing early-ending results with **Before Day 1**, its actual balance, and
+ordinary replay. CAC replay is also available from this early ending.
+See [the implementation and verification record](../docs/give-up.md) for the
+local/hosted deployment boundary.
 
-Return Home opens the landing page. Donate to CAC and Visit CAC Site use configured CAC-approved links. View Data Visualization opens a separate interactive data page.
+Replay clears the previous selected run and its matching browser locator before returning to household selection with no household selected. Invalidate pending restoration so refresh cannot reselect the old run. The player chooses a household and confirms with Start simulation. Preserve the chosen CAC replay source in owner-scoped browser storage across refresh; the protected initialization operation still validates eligibility. A new run uses the published content available when it starts and resets finances, day, expense state, circumstances and decision history. Preserve the previous run as a separate result rather than overwriting its response records.
+
+The shared header and footer CAC/home logos open the landing page; there is no dedicated terminal Return Home control. For completed or ended individual runs, verify saved status and await `SetupProvider.leavePlaythrough()` cleanup before navigation. For active runs, preserve the selected run and locator for resumption; navigation does not terminate gameplay. Cleanup retains historical records and anonymous authentication, touches no unrelated storage, and reports recoverable failures without navigating away. Donate to CAC and Visit CAC Site use configured CAC-approved links. View Data Visualization opens a separate interactive data page. The obsolete employment-specific End Walkthrough button remains removed; Give Up belongs to the overall simulation layout.
 
 ## Comparison and data exploration
 
