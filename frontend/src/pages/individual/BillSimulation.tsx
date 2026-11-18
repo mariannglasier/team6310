@@ -205,10 +205,10 @@ export function BillSimulation({
       finish()
     }
   }
-  async function replayBeforeEmployment() {
+  async function replayBeforeEmployment(support: boolean) {
     if (!saved || !begin()) return
     try {
-      await replay(false, saved.bills.run)
+      await replay(support, saved.bills.run)
       navigate(paths.individual)
     } catch {
       setError(
@@ -309,7 +309,8 @@ export function BillSimulation({
               <SimulationResult
                 reason="You ended the walkthrough."
                 balance={saved.bills.run.currentBalance!}
-                onReplay={() => void replayBeforeEmployment()}
+                runId={saved.bills.run.id}
+                onReplay={(support) => void replayBeforeEmployment(support)}
               />
             </fieldset>
           </section>

@@ -33,6 +33,9 @@ import { usdCents } from '../../types/domain'
 import { localScenario } from '../../development/scenarioTestFixture'
 
 vi.mock('../../services/supabase', () => ({ getSupabaseClient: vi.fn() }))
+vi.mock('../../services/resultComparisons', () => ({
+  loadResultComparisons: async () => [],
+}))
 vi.mock('../../services/billGameplay', async (original) => ({
   ...(await original<typeof import('../../services/billGameplay')>()),
   loadBillSnapshot: vi.fn(),
@@ -307,7 +310,9 @@ it('gives up before employment without initialization and restores/replays the t
     ).getByText('$100.00'),
   ).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Give Up' })).toBeNull()
-  expect(screen.queryByRole('button', { name: 'Try another mode' })).toBeNull()
+  expect(
+    screen.getByRole('button', { name: 'Play with CAC assistance' }),
+  ).toBeEnabled()
   page.unmount()
   show()
   expect(

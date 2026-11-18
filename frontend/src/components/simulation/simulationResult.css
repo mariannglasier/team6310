@@ -1,0 +1,94 @@
+﻿.simulation-result {
+  display: grid;
+  gap: clamp(1.25rem, 4vw, 2rem);
+}
+
+.simulation-result__help {
+  padding: clamp(1rem, 4vw, 2rem);
+  border: 1px solid var(--divider);
+  border-inline-start: 5px solid var(--primary);
+  border-radius: 1rem;
+  background: var(--accent-surface);
+}
+
+.simulation-result h3 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.simulation-result p {
+  max-width: 67ch;
+}
+
+.simulation-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.simulation-result__outcome {
+  border-block-end: 1px solid var(--divider);
+  padding-block-end: 1.25rem;
+}
+
+.simulation-result__outcome strong {
+  display: block;
+  font-size: 1.75rem;
+}
+
+.simulation-result__note,
+.simulation-result__category {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.simulation-result__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+}
+
+.simulation-result__cards article {
+  min-width: 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.simulation-result__cards h4 {
+  font-size: 1.125rem;
+  margin-block: 0.25rem;
+}
+
+.simulation-result__cards article > p > span {
+  display: block;
+}
+
+.simulation-result__cards ul {
+  list-style: none;
+  padding: 0;
+}
+
+.simulation-result__cards li {
+  margin-block: 0.65rem;
+}
+
+.simulation-result__cards li div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.simulation-result progress {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.simulation-result > .ui-button {
+  justify-self: start;
+}

@@ -251,6 +251,7 @@ export function EmploymentPanel({
           />
         ) : snapshot?.state ? (
           <EmploymentGame
+            runId={snapshot.run.id}
             loading={pending || automatic}
             recapFacts={
               snapshot.run.versionId ? (

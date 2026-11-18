@@ -31,12 +31,14 @@ export function EmploymentGame({
   dispatch,
   onReplay,
   recapFacts,
+  runId,
   loading = false,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
   onReplay: (support: boolean) => void
   recapFacts?: ReactNode
+  runId?: string
   loading?: boolean
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
@@ -192,7 +194,7 @@ export function EmploymentGame({
             <SimulationResult
               reason={state.reason}
               balance={state.balance}
-              cacReplay={state.stage === 'complete' && !state.support}
+              runId={runId}
               onReplay={onReplay}
             />
           )}

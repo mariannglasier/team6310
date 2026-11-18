@@ -158,7 +158,9 @@ it('separates selection and submission, reapplies the same day and reaches Day 3
   expect(
     screen.queryByRole('heading', { name: 'Employment and financial history' }),
   ).toBeNull()
-  expect(screen.queryByRole('button', { name: /CAC/ })).toBeNull()
+  expect(
+    screen.getByRole('button', { name: 'Play with CAC assistance' }),
+  ).toBeEnabled()
   await user.click(
     screen.getByRole('button', { name: 'Replay from household selection' }),
   )
