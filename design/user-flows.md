@@ -129,7 +129,7 @@ After a decision, retrieve approved statistics associated with its question. Sho
 
 Anonymous response counts or percentages must relate to the correct question and be labeled as simulation responses, not representative community research. Missing statistics or zero responses produce an unavailable-data state and do not block gameplay.
 
-The shared header's Explore Data link opens the public data explorer (`/data`): choose a topic tab, test a challenge in the scene, switch to See CAC impact, and read the sourced facts beneath. It requires no run and shows no player data. See UI specification section 9A.
+The shared header's Explore Data link opens the public data explorer (`/data`): follow the topic path (or use Next), test a challenge in the scene, switch to See CAC impact, and switch between community data and CAC outcomes beneath. It requires no run and shows no player data. See UI specification section 9A.
 
 View Data Visualization opens a separate interactive page with four measures: decision distribution, ending balance distribution, CAC support use, and community context. Use the chart definitions and color tokens in the UI specification.
 

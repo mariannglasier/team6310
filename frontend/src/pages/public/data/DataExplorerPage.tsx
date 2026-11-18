@@ -1,17 +1,16 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { PageSection } from '../../../components/ui/PageSection'
-import {
-  categories,
-  zoomOutFacts,
-  type CategoryId,
-  type Mode,
-} from './dataExplorerContent'
+import type { CategoryId, Mode } from './dataExplorerContent'
+import { useExplorerCategories } from './useExplorerCategories'
+import { useExplorerStatistics } from './useExplorerStatistics'
+import { useZoomOutStatistics } from './useZoomOutStatistics'
 import { ClothingViz } from './ClothingViz'
 import { EmploymentViz } from './EmploymentViz'
-import { ExplorerIcon, FactCard, type VizProps } from './ExplorerParts'
+import { ExplorerIcon, type VizProps } from './ExplorerParts'
 import { FinanceViz } from './FinanceViz'
 import { FoodViz } from './FoodViz'
 import { HousingViz } from './HousingViz'
+import { StatisticPager } from './StatisticVisuals'
 import { YouthViz } from './YouthViz'
 import './DataExplorer.css'
 
@@ -33,13 +32,32 @@ function renderVisualization(id: CategoryId, props: VizProps) {
 }
 
 export function DataExplorerPage() {
+  const categories = useExplorerCategories()
+  const zoomOut = useZoomOutStatistics()
   const [activeId, setActiveId] = useState<CategoryId>('housing')
+  // Topics the visitor has opened, shown as a small check on the path.
+  const [visited, setVisited] = useState<ReadonlySet<CategoryId>>(
+    () => new Set<CategoryId>(['housing']),
+  )
+  const { state: live, retry: retryLive } = useExplorerStatistics(activeId)
   const [mode, setMode] = useState<Mode>('challenge')
   const tabRefs = useRef<Partial<Record<CategoryId, HTMLButtonElement | null>>>(
     {},
   )
 
-  const active = categories.find((category) => category.id === activeId)!
+  const activeIndex = categories.findIndex(
+    (category) => category.id === activeId,
+  )
+  const active = categories[activeIndex]
+  const next = categories[activeIndex + 1] ?? categories[0]
+  const lastTopic = activeIndex === categories.length - 1
+
+  function selectTopic(id: CategoryId) {
+    setActiveId(id)
+    setVisited((previous) =>
+      previous.has(id) ? previous : new Set(previous).add(id),
+    )
+  }
 
   function onTabKeyDown(
     event: KeyboardEvent<HTMLButtonElement>,
@@ -58,25 +76,32 @@ export function DataExplorerPage() {
               : null
     if (target === null) return
     event.preventDefault()
-    const next = categories[target].id
-    setActiveId(next)
-    tabRefs.current[next]?.focus()
+    const nextId = categories[target].id
+    selectTopic(nextId)
+    tabRefs.current[nextId]?.focus()
+  }
+
+  function goToNext() {
+    selectTopic(next.id)
+    tabRefs.current[next.id]?.focus()
   }
 
   return (
     <div className="data-explorer">
-      <PageSection title="Explore our community" eyebrow="Explore data">
-        <p className="data-explorer__lead">
-          Pick a topic, test a challenge, then see how community support changes
-          the picture.
-        </p>
-      </PageSection>
+      <PageSection title="Explore our community" eyebrow="Explore data" />
       <div
-        className="explorer-tabs"
+        className="topic-path"
         role="tablist"
         aria-label="Topics"
         aria-orientation="horizontal"
       >
+        <div className="topic-path__track" aria-hidden="true">
+          <span
+            style={{
+              width: `${(activeIndex / Math.max(1, categories.length - 1)) * 100}%`,
+            }}
+          />
+        </div>
         {categories.map((category, index) => (
           <button
             key={category.id}
@@ -86,15 +111,23 @@ export function DataExplorerPage() {
             type="button"
             role="tab"
             id={`explorer-tab-${category.id}`}
-            className="explorer-tab"
+            className="topic-stop"
+            data-visited={
+              visited.has(category.id) && category.id !== activeId
+                ? 'true'
+                : undefined
+            }
             aria-selected={category.id === activeId}
             aria-controls="explorer-panel"
             tabIndex={category.id === activeId ? 0 : -1}
-            onClick={() => setActiveId(category.id)}
+            onClick={() => selectTopic(category.id)}
             onKeyDown={(event) => onTabKeyDown(event, index)}
           >
-            <ExplorerIcon kind={category.id} />
-            {category.label}
+            <span className="topic-stop__medallion">
+              <ExplorerIcon kind={category.id} size={26} />
+              <span className="topic-stop__check" aria-hidden="true" />
+            </span>
+            <span className="topic-stop__label">{category.label}</span>
           </button>
         ))}
       </div>
@@ -103,25 +136,36 @@ export function DataExplorerPage() {
         role="tabpanel"
         id="explorer-panel"
         aria-labelledby={`explorer-tab-${activeId}`}
+        aria-describedby="explorer-description"
       >
         {renderVisualization(activeId, {
           category: active,
           mode,
           onModeChange: setMode,
+          live,
+          onRetryLive: retryLive,
         })}
       </div>
-      <section className="zoom-out" aria-labelledby="zoom-out-heading">
-        <h2 id="zoom-out-heading">Zoom out: poverty at three scales</h2>
-        <p>
-          Each figure describes a different group. Read them side by side, not
-          as one scale.
-        </p>
-        <ul className="fact-grid">
-          {zoomOutFacts.map((fact) => (
-            <FactCard key={fact.id} fact={fact} />
-          ))}
-        </ul>
-      </section>
+      <button
+        type="button"
+        className="ui-button ui-button--primary topic-next"
+        onClick={goToNext}
+      >
+        {lastTopic ? `Back to ${next.label}` : `Next: ${next.label}`}
+        <ExplorerIcon kind="arrow" size={18} />
+      </button>
+      {zoomOut.length > 0 && (
+        <details className="zoom-out">
+          <summary>
+            <h2>Zoom out: poverty at different scales</h2>
+          </summary>
+          <p>
+            Each figure describes a different group. Read them side by side, not
+            as one scale.
+          </p>
+          <StatisticPager statistics={zoomOut} pageSize={zoomOut.length} />
+        </details>
+      )}
     </div>
   )
 }

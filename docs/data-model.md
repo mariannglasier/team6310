@@ -100,6 +100,23 @@ Junction table connecting scenarios and relevant statistics.
 | version_id   | uuid                     | Version associated with the link. | Required; composite references enforce the same edition as scenario and statistic. |
 | fact_role    | text                     | `general` or `cac`.               | Required; exactly one of each role per scenario per edition.                       |
 
+### Explorer statistics (public Explore Data)
+
+The public Explore Data page uses its own tables, separate from the edition-scoped `statistics` and `scenario_statistics` above. They are not tied to scenarios, personas, or content versions, and nothing here feeds the simulation. The schema is in `supabase/migrations/20261117150000_explorer_statistics.sql`. It was verified on a disposable local database (`supabase/tests/explorer-statistics.sql`) and applied to the hosted project on November 17, 2026, with hosted allow/deny checks recorded in the catalog's hosted deployment record. All 27 statistics were published automatically on November 18, 2026. The proposed statistic list is in [explorer-statistics-catalog.md](explorer-statistics-catalog.md).
+
+| Table | Purpose and key fields |
+| --- | --- |
+| `explorer_sources` | Provenance: `source_id` PK, name, title, HTTPS `url`, `access_method` (`api`, `file_import`, `manual`, `client_provided`), `update_cadence`. |
+| `explorer_categories` | The six categories: `category_key` PK, `name`, `short_label`, `description`, `icon_key`, unique `display_order`, `visualization_type` (scene), `published`. |
+| `explorer_statistics` | One definition per statistic: category and source FKs, `title`, `description` (what it measures), `context_note`, `unit` (`percent`, `percent_change`, `usd`, `cents_per_kwh`, `index`, `count`), `geography`, `geography_code`, statistic `visualization_type` (`meter`, `pictogram`, `trend`, `comparison`, `figure`) and `visualization_config`, non-secret `source_reference`, `is_derived` with required `derivation_note`, `display_order`, `active`, `last_checked_at`. A meter or pictogram must use unit `percent`; a pictogram needs an `icon` and a `total` from 1 to 100. |
+| `explorer_statistic_observations` | Immutable values: `value`, optional `value_high` (range), `period_label`, optional period dates, `revision_key`, `retrieved_at`, `retrieval_method`, `status` (`staged`, `published`, `superseded`, `rejected`), `published_at`, `published_by`. Unique per statistic, period, and revision. At most one `published` observation per statistic. Percent values must be 0 to 100. |
+
+Only status transitions are permitted after insert (`staged` to `published` or `rejected`, `published` to `superseded`, `superseded` back to `published`); values cannot be edited and rows cannot be deleted. These limits are triggers and apply to every role.
+
+`record_explorer_observation` (service role only) is the ingestion entry point. It is idempotent per statistic, period, and revision, updates `last_checked_at`, and publishes without staff approval (November 17 and 18, 2026 decisions; migration `20261118120000_explorer_automatic_publication.sql`). The first value of a statistic publishes at once. An observation identical to one already recorded changes nothing, so the published value is kept. A newer period, or a revision of the same period, publishes and supersedes the current value. A period older than the published one stays `staged` and never replaces it. Automatic publications have `published_by` NULL.
+
+The schema seeds the six category names, the documented sources, and statistic definitions (27 as of November 18, 2026). It seeds no statistic values; the monthly refresh supplies them.
+
 ### `categories`
 
 The six approved scenario categories: Housing & Utilities; Food & Nutrition; Employment & Adult Education; Essential Goods & Clothing; Childcare & Youth; and Financial Literacy & Taxes. Category names and scenario/persona applicability are content decisions, not eligibility policy.
