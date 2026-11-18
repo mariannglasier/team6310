@@ -18,16 +18,8 @@ import {
   type CmsPublicationReport,
 } from '../../../services/cms'
 
-function recordName(record: Record<string, unknown>, content: CmsContent) {
-  return (record.title ??
-    record.name ??
-    record.choice_text ??
-    content.scenarios.find((s) => s.scenario_id === record.scenario_id)
-      ?.title ??
-    content.jobs?.find((j) => j.job_id === record.job_id)?.title ??
-    content.personas.find((p) => p.persona_id === record.persona_id)?.name ??
-    'Edition or related record') as string
-}
+import { publicationFindingView } from './publicationFindings'
+
 export function PublicationReview({
   content,
   dirty,
@@ -36,6 +28,7 @@ export function PublicationReview({
   onPending,
   onPublished,
   onRecovered,
+  onOpenScenario,
 }: {
   content: CmsContent
   dirty: boolean
@@ -44,6 +37,7 @@ export function PublicationReview({
   onPending: (pending: boolean) => void
   onPublished: (loaded: CmsContent) => Promise<void>
   onRecovered: (id: string) => Promise<void>
+  onOpenScenario: (id: string) => void
 }) {
   const [report, setReport] = useState<CmsPublicationReport | null>(null)
   const [confirm, setConfirm] = useState(false)
@@ -87,7 +81,7 @@ export function PublicationReview({
       <Dialog
         open={report !== null && !confirm && !recovery}
         title="Publication review"
-        description={`Review “${content.workspace.name}” · saved revision ${report?.revision ?? ''}. Blockers prevent publication; platform findings may require separately authorized gameplay work.`}
+        description={`Review “${content.workspace.name}” · saved revision ${report?.revision ?? ''}. Fix blockers before publishing. Warnings are optional content concerns to review.`}
         dismissDisabled={busy || uncertain}
         onDismiss={() => setReport(null)}
       >
@@ -104,75 +98,79 @@ export function PublicationReview({
                   then review again.
                 </p>
               )}
-              {(['blocker', 'warning', 'information'] as const).map(
-                (severity) => {
-                  const findings = report.findings.filter(
-                    (f) => f.severity === severity,
-                  )
-                  const codes = [...new Set(findings.map((f) => f.code))]
-                  return (
-                    <details key={severity} open={severity === 'blocker'}>
-                      <summary>
-                        {severity === 'blocker'
-                          ? 'Blockers'
-                          : severity === 'warning'
-                            ? 'Warnings'
-                            : 'Information'}{' '}
-                        ({findings.length})
-                      </summary>
+              {(['blocker', 'warning'] as const).map((severity) => {
+                const findings = [
+                  ...new Map(
+                    report.findings
+                      .filter((f) => f.severity === severity)
+                      .map((f) => {
+                        const view = publicationFindingView(f, content)
+                        return [
+                          JSON.stringify([f.code, view.locations]),
+                          f,
+                        ] as const
+                      }),
+                  ).values(),
+                ]
+                return (
+                  <details
+                    key={severity}
+                    className={`cms-publication-category cms-publication-category--${severity}`}
+                    open={severity === 'blocker'}
+                  >
+                    <summary>
+                      {severity === 'blocker' ? 'Blockers' : 'Warnings'} (
+                      {findings.length})
+                    </summary>
+                    <div className="cms-publication-findings">
                       {!findings.length && <p>No {severity} findings.</p>}
-                      {codes.map((code) => (
-                        <details key={code} className="cms-publication-finding">
-                          <summary>
-                            <code>{code}</code> (
-                            {findings.filter((f) => f.code === code).length})
-                          </summary>
-                          {findings
-                            .filter((f) => f.code === code)
-                            .map((finding, index) => (
-                              <article key={index}>
-                                <p>{finding.message}</p>
-                                <p className="admin-muted">
-                                  {finding.origin === 'platform'
-                                    ? 'Gameplay implementation issue'
-                                    : finding.origin === 'database'
-                                      ? 'Database safety issue'
-                                      : 'Saved content'}{' '}
-                                  · {finding.basis}
-                                </p>
-                                {finding.affected.map((record, i) => (
-                                  <details key={i}>
-                                    <summary>
-                                      {recordName(record, content)}
-                                    </summary>
-                                    <dl>
-                                      {Object.entries(record).map(
-                                        ([key, value]) => (
-                                          <div key={key}>
-                                            <dt>
-                                              {key === 'verified'
-                                                ? 'Eligible for gameplay display'
-                                                : key.replaceAll('_', ' ')}
-                                            </dt>
-                                            <dd>
-                                              {typeof value === 'string'
-                                                ? value
-                                                : JSON.stringify(value)}
-                                            </dd>
-                                          </div>
-                                        ),
-                                      )}
-                                    </dl>
-                                  </details>
-                                ))}
-                              </article>
-                            ))}
-                        </details>
-                      ))}
-                    </details>
-                  )
-                },
-              )}
+                      {findings.map((finding, index) => {
+                        const view = publicationFindingView(finding, content)
+                        return (
+                          <details
+                            key={index}
+                            className="cms-publication-finding"
+                          >
+                            <summary>
+                              <strong>{view.title}</strong>
+                              <span className="cms-publication-locations">
+                                {view.locations.map((r) => r.label).join('; ')}
+                              </span>
+                            </summary>
+                            <div className="cms-publication-explanation">
+                              <p>{view.explanation}</p>
+                              {[
+                                ...new Set(
+                                  view.locations
+                                    .map((r) => r.scenarioId)
+                                    .filter((id) => id !== undefined),
+                                ),
+                              ].map((id) => (
+                                <Button
+                                  key={id}
+                                  variant="secondary"
+                                  disabled={busy}
+                                  onClick={() => {
+                                    setReport(null)
+                                    onOpenScenario(id)
+                                  }}
+                                >
+                                  Open scenario:{' '}
+                                  {
+                                    content.scenarios.find(
+                                      (s) => s.scenario_id === id,
+                                    )?.title
+                                  }
+                                </Button>
+                              ))}
+                            </div>
+                          </details>
+                        )
+                      })}
+                    </div>
+                  </details>
+                )
+              })}
             </div>
             <Button
               variant="secondary"

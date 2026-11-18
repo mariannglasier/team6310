@@ -92,5 +92,7 @@ Publication now runs through protected read-only preflight and atomic
 actor-bound retries and in-place IDs. Published workspaces reopen read-only;
 new drafts can copy published CMS sources, retaining choice-order lineage.
 Overtaken recovery explicitly creates from the latest canonical published edition
-without merging old edits. Known supported-group failures block publication
-readiness. See [the publication contract and implementation record](cms-publication-design.md#9-actual-local-implementation-and-verification).
+without merging old edits. Minimum publication requires one usable persona and two
+startable jobs; scenarios, bills and facts are optional. Known group failures remain
+separate demo compatibility issues and do not block canonical publication. See
+[the publication contract and implementation record](cms-publication-design.md).

@@ -24,7 +24,7 @@ function sql(statement: string) {
   )
 }
 
-test('publication review blocks incomplete content, confirms/retries, reopens immutable results and recovers from latest', async ({
+test('publication review permits optional incomplete content, confirms/retries, reopens immutable results and recovers from latest', async ({
   page,
 }, info) => {
   test.setTimeout(120000)
@@ -36,6 +36,11 @@ test('publication review blocks incomplete content, confirms/retries, reopens im
     readFileSync(
       resolve('../supabase/tests/fixtures/cms-publication-source.sql'),
       'utf8',
+      // Intentionally omit optional reporting periods so the warning review has
+      // real actionable findings; ineligibility itself is no longer a warning.
+    ).replace(
+      "'2026',false,jsonb_build_object",
+      'NULL,false,jsonb_build_object',
     ) + '\nSELECT pg_temp.publication_source();',
   )
     .trim()
@@ -118,10 +123,16 @@ test('publication review blocks incomplete content, confirms/retries, reopens im
     ).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'Continue to confirmation' }),
-    ).toBeDisabled()
+    ).toBeEnabled()
+    await page.getByText(/^Warnings \(/).click()
+    await expect(
+      page.getByText('No choice is available without CAC support', {
+        exact: true,
+      }),
+    ).toBeVisible()
     await expect(
       page.getByText('SCN-ANSWER-AVAILABLE', { exact: true }),
-    ).toBeVisible()
+    ).toHaveCount(0)
     await page.getByRole('button', { name: 'Close', exact: true }).click()
     await page
       .getByRole('button', {
@@ -184,6 +195,46 @@ test('publication review blocks incomplete content, confirms/retries, reopens im
     ).toBeEnabled()
     await page.getByRole('button', { name: 'Close', exact: true }).click()
     const target = await create(newName)
+    const jobChange = async (revision: number, active: boolean) => {
+      const response = await page.request.post(
+        'http://127.0.0.1:55321/rest/v1/rpc/cms_save_job',
+        {
+          headers: auth,
+          data: {
+            p_version: target.workspace.version_id,
+            p_revision: revision,
+            p_request: randomUUID(),
+            p_job: target.jobs[0].job_id,
+            p_fields: { is_active: active },
+          },
+        },
+      )
+      expect(response.ok()).toBeTruthy()
+    }
+    await jobChange(0, false)
+    await page
+      .getByRole('button', { name: 'Reload draft', exact: true })
+      .click()
+    await page
+      .getByRole('button', { name: 'Review publication', exact: true })
+      .click()
+    await expect(
+      page.getByText('At least two starting jobs are needed', { exact: true }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Continue to confirmation' }),
+    ).toBeDisabled()
+    expect(
+      await page
+        .locator('.cms-publication-category--blocker')
+        .evaluate((e) => getComputedStyle(e).color),
+    ).toBe('rgb(143, 30, 24)')
+    await page.getByRole('button', { name: 'Close', exact: true }).click()
+    await jobChange(1, true)
+    await page
+      .getByRole('button', { name: 'Reload draft', exact: true })
+      .click()
+
     await page
       .getByRole('button', { name: 'Review publication', exact: true })
       .click()
@@ -193,7 +244,38 @@ test('publication review blocks incomplete content, confirms/retries, reopens im
     ).toBeEnabled()
     await page.setViewportSize({ width: 390, height: 844 })
     await page.getByText(/^Warnings \(/).click()
-    await page.getByText('FACT-DISPLAY-INELIGIBLE', { exact: true }).click()
+    const finding = page
+      .locator('.cms-publication-finding')
+      .filter({
+        has: page.getByText('Fact source details may be incomplete', {
+          exact: true,
+        }),
+      })
+      .first()
+    await expect(
+      finding.locator('.cms-publication-explanation'),
+    ).not.toBeVisible()
+    await finding.locator('summary').focus()
+    await page.keyboard.press('Enter')
+    await expect(finding.locator('.cms-publication-explanation')).toBeVisible()
+    await expect(
+      page
+        .locator('.cms-publication-finding')
+        .nth(1)
+        .locator('.cms-publication-explanation'),
+    ).not.toBeVisible()
+    const geometry = await finding.evaluate((element) => {
+      const parent = element.closest('.cms-publication-category')!
+      return {
+        child: element.getBoundingClientRect().left,
+        parent: parent.getBoundingClientRect().left,
+        color: getComputedStyle(parent).color,
+      }
+    })
+    expect(geometry.child).toBeGreaterThan(geometry.parent + 10)
+    expect(geometry.color).toBe('rgb(92, 61, 0)')
+    await expect(page.getByText(/^Information \(/)).toHaveCount(0)
+    await expect(page.locator('.cms-publication-report code')).toHaveCount(0)
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -281,7 +363,9 @@ test('publication review blocks incomplete content, confirms/retries, reopens im
     await page
       .getByRole('button', { name: 'Review publication', exact: true })
       .click()
-    await expect(page.getByText('PUB-ORDER', { exact: true })).toBeVisible()
+    await expect(
+      page.getByText('A newer edition has been published', { exact: true }),
+    ).toBeVisible()
     await page
       .getByRole('button', { name: 'Create fresh draft from latest edition' })
       .click()

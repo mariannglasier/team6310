@@ -18,7 +18,7 @@ sql = local.sql
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def canonical_journeys(h, edition, staff, suffix, expected_balance, replay=False):
+def canonical_journeys(h, edition, staff, suffix, expected_balance, replay=False, minimal=False):
     bundle = h.rpc('cms_read_draft', {'p_version': edition}, staff) if suffix == 'published' else None
     if bundle:
         personas, jobs = bundle['personas'], bundle['jobs']
@@ -70,8 +70,11 @@ def canonical_journeys(h, edition, staff, suffix, expected_balance, replay=False
         assert final['run']['status'] == 'completed' and final['run']['current_day'] == 30
         if not replay_of:
             assert final['run']['current_balance'] == expected_balance, final['run']['current_balance']
-        tax = next(s['scenario_id'] for s in (bundle['scenarios'] if bundle else h.request('/rest/v1/scenarios?select=*&version_id=eq.' + edition)) if s['title'] == 'Configured tax')
-        assert decisions.count(tax) == 1
+        if minimal:
+            assert not decisions, 'No optional scenario or tax content is required'
+        else:
+            tax = next(s['scenario_id'] for s in (bundle['scenarios'] if bundle else h.request('/rest/v1/scenarios?select=*&version_id=eq.' + edition)) if s['title'] == 'Configured tax')
+            assert decisions.count(tax) == 1
         h.refresh(actor)
         assert final == h.snapshot(rid, actor)
         return rid
@@ -87,6 +90,9 @@ def canonical_journeys(h, edition, staff, suffix, expected_balance, replay=False
         h.rpc('join_group_session', {'p_code': session['joinCode']}, member)
         h.rpc('update_group_participant_setup', {'p_session_id': gid, 'p_persona_id': pid, 'p_ready': True}, member)
         state = h.rpc('control_group_session', {'p_session_id': gid, 'p_action': 'start'}, host)
+        if minimal:
+            assert 'error' in state, 'Known group 30-question incompatibility should be reproduced, not bypassed'
+            return rid, gid
         assert 'error' not in state, state.get('error')
         if support:
             h.rpc('submit_group_employment_vote', {'p_session_id': gid, 'p_option_id': 'prepare'}, member)
@@ -127,6 +133,7 @@ def main():
     source = draft = None
     editions = []
     negative_editions = []
+    minimal_editions = []
     schema_before = h.schema()
     rows_before = h.fingerprints()
     content_before = sql("SELECT md5(coalesce(jsonb_agg(to_jsonb(v) ORDER BY version_id),'[]')::text) FROM public.content_versions v")
@@ -252,15 +259,27 @@ def main():
             negative = h.rpc('cms_create_draft', {'p_source': negative_source, 'p_name': 'Group incompatibility fixture', 'p_request': str(uuid.uuid4())}, staff)
             negative_editions.append(negative)
             failing = h.rpc('cms_publication_preflight', {'p_version': negative}, staff)
-            holds = [f for f in failing['findings'] if f['code'] == 'PUB-SUPPORTED-MODE-FAILURE']
-            assert holds and not failing['can_publish']
-            assert any('weekly' in f['message'] for f in holds)
-            assert any('bill' in f['message'] for f in holds)
-            h.rpc('cms_publish_draft', publish_args(negative), staff, denied=True)
-            assert h.rpc('cms_read_draft', {'p_version': negative}, staff)['edition']['status'] == 'draft'
-            print('PASS: known group failure reproduced: canonical individual final balance 153 versus group 40 for the same positive-wage/bill fixture; preflight and publication correctly block this incompatibility')
+            assert failing['can_publish']
+            assert not any(f['code'] == 'PUB-SUPPORTED-MODE-FAILURE' for f in failing['findings'])
+            h.rpc('cms_publish_draft', publish_args(negative), staff)
+            assert h.rpc('cms_read_draft', {'p_version': negative}, staff)['edition']['status'] == 'published'
+            print('PASS: known group failure reproduced: canonical individual final balance 153 versus group 40; canonical publication remains allowed without group-only content requirements')
+
+            # Minimum-only content uses the same normal protected publication.
+            minimum_script = (ROOT / 'supabase/tests/fixtures/cms-publication-source.sql').read_text().replace('FOR i IN 1..31 LOOP', 'FOR i IN 1..0 LOOP')
+            minimum_source = sql(minimum_script + '\nSELECT pg_temp.publication_source();').splitlines()[-1]
+            minimal_editions.append(minimum_source)
+            minimum = h.rpc('cms_create_draft', {'p_source': minimum_source, 'p_name': 'Minimum-only edition', 'p_request': str(uuid.uuid4())}, staff)
+            minimal_editions.append(minimum)
+            review = h.rpc('cms_publication_preflight', {'p_version': minimum}, staff)
+            assert review['can_publish'] and not review['findings']
+            h.rpc('cms_publish_draft', publish_args(minimum), staff)
+            canonical_journeys(h, minimum, staff, 'minimum', 40, minimal=True)
+            print('PASS: one-persona/two-job edition publishes without scenarios, bills, facts or tax, completes individual Day 30, and reproduces group startup incompatibility without blocking publication')
 
     finally:
+        if minimal_editions:
+            cleanup(minimal_editions)
         if negative_editions:
             cleanup(negative_editions)
         if editions:

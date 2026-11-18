@@ -417,6 +417,16 @@ export function ScenarioWorkspace({
                 busy={busy}
                 perform={perform}
                 onPending={setPublicationPending}
+                onOpenScenario={(id) => {
+                  const scenario = content.scenarios.find(
+                    (s) => s.scenario_id === id,
+                  )
+                  if (scenario)
+                    navigate(() => {
+                      setSection('scenarios')
+                      edit(scenario)
+                    })
+                }}
                 onPublished={async (loaded) => {
                   const [draftRows, publicationRows] = await Promise.all([
                     listCmsDrafts(),

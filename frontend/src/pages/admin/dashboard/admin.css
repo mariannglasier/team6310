@@ -1056,19 +1056,48 @@ button.admin-stat:hover {
   cursor: pointer;
   padding-block: 0.5rem;
 }
-.cms-publication-finding article {
-  border-top: 1px solid var(--divider);
-  padding-block: 0.75rem;
+/* Use the existing CMS red/amber badge palette for readable severity. */
+.cms-publication-category {
+  border: 1px solid;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
 }
-.cms-publication-report dl {
-  margin: 0;
-  display: grid;
-  gap: 0.5rem;
+.cms-publication-category--blocker {
+  color: #8f1e18;
+  background: #fdeceb;
+  border-color: #f0b8b4;
 }
-.cms-publication-report dd {
-  margin: 0;
+.cms-publication-category--warning {
+  color: #5c3d00;
+  background: #fff1cf;
+  border-color: #efd28b;
 }
-.cms-publication-report dt {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+.cms-publication-category > summary {
+  font-weight: 700;
+}
+.cms-publication-findings {
+  margin-inline-start: 0.65rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 2px solid currentColor;
+}
+.cms-publication-finding {
+  border-top: 1px solid currentColor;
+}
+.cms-publication-finding:first-child {
+  border-top: 0;
+}
+.cms-publication-locations {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+.cms-publication-explanation {
+  color: var(--text-primary);
+  background: var(--surface, #fff);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.cms-publication-explanation p {
+  margin-top: 0;
 }

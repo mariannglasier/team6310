@@ -90,41 +90,56 @@ function saved() {
     { ...result, name: content.workspace.name, source_version: 'source' },
   ])
 }
-test('review groups findings, preserves warnings and exposes affected record identities', async () => {
+test('review has only two nested categories with plain labels and independent hidden explanations', async () => {
+  vi.mocked(cms.preflightCmsPublication).mockResolvedValue({
+    ...report,
+    findings: [
+      ...report.findings,
+      {
+        ...report.findings[0],
+        code: 'INFO-EDITION-SNAPSHOT',
+        severity: 'information',
+      },
+    ],
+  })
   const user = await review()
   expect(screen.getByText('Blockers (0)')).toBeVisible()
+  expect(screen.queryByText(/^Information/)).not.toBeInTheDocument()
   await user.click(screen.getByText('Warnings (1)'))
-  await user.click(screen.getByText('FACT-DISPLAY-INELIGIBLE'))
-  expect(screen.getByText('Authored fact remains ineligible.')).toBeVisible()
-  await user.click(screen.getByText('Edition or related record'))
-  expect(screen.getByText('scenario')).toBeVisible()
-  expect(screen.getByText('Eligible for gameplay display')).toBeVisible()
+  expect(screen.queryByText('FACT-DISPLAY-INELIGIBLE')).not.toBeInTheDocument()
+  expect(screen.queryByText('Verified runtime')).not.toBeInTheDocument()
+  expect(
+    screen.getByText('Eligibility is optional.', { exact: false }),
+  ).not.toBeVisible()
+  const summary = screen.getByText('Fact is not eligible for gameplay display')
+  expect(summary.closest('.cms-publication-findings')).not.toBeNull()
+  expect(summary.closest('.cms-publication-category--warning')).not.toBeNull()
+  await user.click(summary)
+  expect(
+    screen.getByText('Eligibility is optional.', { exact: false }),
+  ).toBeVisible()
   expect(
     screen.getByRole('button', { name: 'Continue to confirmation' }),
   ).toBeEnabled()
   expect(cms.publishCmsDraft).not.toHaveBeenCalled()
 })
-test('blockers prevent confirmation and explain platform ownership', async () => {
+test('structural blockers prevent confirmation with a compact red finding', async () => {
   vi.mocked(cms.preflightCmsPublication).mockResolvedValue({
     ...report,
     can_publish: false,
     findings: [
-      {
-        ...report.findings[0],
-        code: 'PUB-SUPPORTED-MODE-FAILURE',
-        severity: 'blocker',
-        origin: 'platform',
-        message: 'Group start fails; gameplay work is required.',
-      },
+      { ...report.findings[0], code: 'PER-CATALOG', severity: 'blocker' },
     ],
   })
   const user = await review()
   expect(
     screen.getByRole('button', { name: 'Continue to confirmation' }),
   ).toBeDisabled()
-  await user.click(screen.getByText('PUB-SUPPORTED-MODE-FAILURE'))
-  expect(screen.getByText(/Group start fails/)).toBeVisible()
-  expect(screen.getByText(/Gameplay implementation issue/)).toBeVisible()
+  const title = screen.getByText('Add at least one persona')
+  expect(title.closest('.cms-publication-category--blocker')).not.toBeNull()
+  await user.click(title)
+  expect(screen.getByText(/Players must select a persona/)).toBeVisible()
+  expect(screen.queryByText('PER-CATALOG')).not.toBeInTheDocument()
 })
 test('unsaved Scenario edits prevent saved-edition review', async () => {
   const user = await open()
@@ -277,5 +292,36 @@ test('a newer saved revision found during preflight explains how to reload befor
   expect(
     screen.getByRole('button', { name: 'Continue to confirmation' }),
   ).toBeDisabled()
+  expect(cms.publishCmsDraft).not.toHaveBeenCalled()
+})
+
+test('scenario findings navigate to the affected existing editor', async () => {
+  vi.mocked(cms.readCmsDraft).mockResolvedValue({
+    ...content,
+    scenarios: [
+      {
+        scenario_id: 'scenario',
+        title: 'Decision for Day 4',
+        description: 'Existing narrative',
+        category_id: null,
+        persona_intent: null,
+        schedule_type: 'non_scheduled',
+      },
+    ],
+  })
+  const user = await review()
+  await user.click(screen.getByText('Warnings (1)'))
+  await user.click(
+    screen.getByText('Fact is not eligible for gameplay display'),
+  )
+  await user.click(
+    screen.getByRole('button', { name: 'Open scenario: Decision for Day 4' }),
+  )
+  expect(
+    screen.queryByRole('dialog', { name: 'Publication review' }),
+  ).not.toBeInTheDocument()
+  expect(screen.getByLabelText(/^Scenario title/)).toHaveValue(
+    'Decision for Day 4',
+  )
   expect(cms.publishCmsDraft).not.toHaveBeenCalled()
 })

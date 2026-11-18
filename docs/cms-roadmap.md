@@ -7,7 +7,7 @@ filtering; no duplicate editors or automatic persona variants.
 
 Current scope: persisted draft creation/reopening, scenario fields and scheduling,
 choices/direct effects, compact controls, and protected scenario/draft deletion.
-Publication tooling is implemented locally with edition-wide preflight, an atomic staff-only transition, read-only published reopening and explicit fresh-draft recovery. Full demo readiness remains blocked by reproduced group financial incompatibilities; see the [publication implementation record](cms-publication-design.md#9-actual-local-implementation-and-verification). Historical editions and gameplay remain isolated.
+Publication tooling is implemented locally with edition-wide preflight, an atomic staff-only transition, read-only published reopening and explicit fresh-draft recovery. Minimum publication requires one usable persona and two startable jobs, with optional scenarios, bills and facts. Group implementation incompatibilities remain separate demo-readiness risks, not content publication gates; see the [publication implementation record](cms-publication-design.md). Historical editions and gameplay remain isolated.
 
 Implemented: supporting-copy authoring inside Scenario Editor, informed by
 [cms-post-choice-flow.md](cms-post-choice-flow.md). This includes source/period and
