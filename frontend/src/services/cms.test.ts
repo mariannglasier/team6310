@@ -1,6 +1,11 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 import {
   saveCmsScenario,
+  preflightCmsPublication,
+  publishCmsDraft,
+  recoverCmsDraft,
+  CmsPublicationUncertain,
+  CmsPublicationBlocked,
   saveCmsJob,
   deleteCmsJob,
   CmsJobSaveUncertain,
@@ -245,4 +250,69 @@ test('unknown job save outcome is recoverable using the same request', async () 
   await expect(
     saveCmsJob('draft', 0, 'r', null, { title: 'New' }),
   ).rejects.toBeInstanceOf(CmsJobSaveUncertain)
+})
+
+const review = {
+  version_id: 'draft',
+  version_number: 3,
+  revision: 4,
+  validator: 'cms-publication-v1',
+  heads: { individual: 'source', group: 'source' },
+  can_publish: true,
+  findings: [],
+}
+test('publication uses protected revision/head-bound RPCs, never browser table writes', async () => {
+  rpc.mockResolvedValue({ data: review, error: null })
+  expect(await preflightCmsPublication('draft')).toEqual(review)
+  await publishCmsDraft(review, 'request')
+  expect(rpc).toHaveBeenLastCalledWith('cms_publish_draft', {
+    p_version: 'draft',
+    p_revision: 4,
+    p_request: 'request',
+    p_validator: 'cms-publication-v1',
+    p_heads: review.heads,
+  })
+  await recoverCmsDraft(review, 'Fresh', 'recovery')
+  expect(rpc).toHaveBeenLastCalledWith('cms_recover_draft', {
+    p_version: 'draft',
+    p_revision: 4,
+    p_source: 'source',
+    p_name: 'Fresh',
+    p_request: 'recovery',
+  })
+})
+test('uncertain publication and fresh creation retain retry-safe outcome types', async () => {
+  rpc.mockRejectedValue(new TypeError('Offline'))
+  await expect(publishCmsDraft(review, 'request')).rejects.toBeInstanceOf(
+    CmsPublicationUncertain,
+  )
+  await expect(
+    recoverCmsDraft(review, 'Fresh', 'recovery'),
+  ).rejects.toBeInstanceOf(CmsPublicationUncertain)
+})
+test('blocked server preflight detail is exposed without claiming publication success', async () => {
+  rpc.mockResolvedValue({
+    data: null,
+    error: {
+      code: 'P0001',
+      message: 'Publication blocked',
+      details: JSON.stringify({ ...review, can_publish: false }),
+    },
+  })
+  await expect(publishCmsDraft(review, 'request')).rejects.toBeInstanceOf(
+    CmsPublicationBlocked,
+  )
+})
+test.each([
+  ['40001', 'stale'],
+  ['42501', 'staff'],
+  ['55P03', 'busy'],
+])('publication failure %s has actionable feedback', async (code, expected) => {
+  rpc.mockResolvedValue({
+    data: null,
+    error: { code, message: 'Database failure' },
+  })
+  await expect(publishCmsDraft(review, 'request')).rejects.toThrow(
+    new RegExp(expected, 'i'),
+  )
 })

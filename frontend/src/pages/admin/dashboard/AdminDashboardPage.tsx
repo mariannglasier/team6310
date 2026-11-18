@@ -30,6 +30,7 @@ function latestEdition(editions: readonly AdminEdition[]) {
 export function AdminDashboardPage() {
   const { state: auth, signOut } = useStaffAuth()
   const { state, reload } = useAdminContent()
+  const [publicationChanged, setPublicationChanged] = useState(false)
   const [workspace, setWorkspace] = useState(false)
   const [cmsDirty, setCmsDirty] = useState(false)
   const [openedWorkspace, setOpenedWorkspace] = useState(false)
@@ -53,6 +54,10 @@ export function AdminDashboardPage() {
             variant="secondary"
             aria-label={workspace ? 'Switch to Viewer' : 'Switch to Editor'}
             onClick={() => {
+              if (workspace && publicationChanged) {
+                reload()
+                setPublicationChanged(false)
+              }
               setOpenedWorkspace(true)
               setWorkspace(!workspace)
             }}
@@ -77,6 +82,7 @@ export function AdminDashboardPage() {
           <ScenarioWorkspace
             editions={state.content.editions}
             onDirtyChange={setCmsDirty}
+            onPublication={() => setPublicationChanged(true)}
           />
         </div>
       )}

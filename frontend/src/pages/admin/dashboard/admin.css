@@ -1037,3 +1037,38 @@ button.admin-stat:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.cms-publication-launch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.cms-publication-report {
+  flex-basis: 100%;
+  order: -1;
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.cms-publication-report summary {
+  cursor: pointer;
+  padding-block: 0.5rem;
+}
+.cms-publication-finding article {
+  border-top: 1px solid var(--divider);
+  padding-block: 0.75rem;
+}
+.cms-publication-report dl {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.cms-publication-report dd {
+  margin: 0;
+}
+.cms-publication-report dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

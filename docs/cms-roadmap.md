@@ -7,7 +7,7 @@ filtering; no duplicate editors or automatic persona variants.
 
 Current scope: persisted draft creation/reopening, scenario fields and scheduling,
 choices/direct effects, compact controls, and protected scenario/draft deletion.
-Publication is absent; published editions and gameplay remain isolated.
+Publication tooling is implemented locally with edition-wide preflight, an atomic staff-only transition, read-only published reopening and explicit fresh-draft recovery. Full demo readiness remains blocked by reproduced group financial incompatibilities; see the [publication implementation record](cms-publication-design.md#9-actual-local-implementation-and-verification). Historical editions and gameplay remain isolated.
 
 Implemented: supporting-copy authoring inside Scenario Editor, informed by
 [cms-post-choice-flow.md](cms-post-choice-flow.md). This includes source/period and

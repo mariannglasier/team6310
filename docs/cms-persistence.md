@@ -86,3 +86,11 @@ unknown requirements metadata and re-read PostgreSQL-generated weekly income.
 Referenced jobs cannot be deleted; published/source rows and persona income remain
 unchanged. See [Job Editor contract](cms-job-editor.md) for the field inventory,
 copying, historical-reference protection, locking and local verification coverage.
+
+Publication now runs through protected read-only preflight and atomic
+`cms_publish_draft`, with exact saved revision/head binding, immutable audit,
+actor-bound retries and in-place IDs. Published workspaces reopen read-only;
+new drafts can copy published CMS sources, retaining choice-order lineage.
+Overtaken recovery explicitly creates from the latest canonical published edition
+without merging old edits. Known supported-group failures block publication
+readiness. See [the publication contract and implementation record](cms-publication-design.md#9-actual-local-implementation-and-verification).

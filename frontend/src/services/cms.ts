@@ -119,8 +119,55 @@ export type CmsJobFields = Partial<
   > & { requirements_notes: string | null }
 >
 export class CmsJobSaveUncertain extends Error {}
+export interface CmsPublicationFinding {
+  code: string
+  severity: 'blocker' | 'warning' | 'information'
+  origin: string
+  message: string
+  description: string
+  basis: string
+  affected: Record<string, unknown>[]
+}
+export interface CmsPublicationReport {
+  version_id: string
+  version_number: number
+  revision: number
+  validator: string
+  heads: { individual: string | null; group: string | null }
+  can_publish: boolean
+  findings: CmsPublicationFinding[]
+}
+export interface CmsPublicationResult {
+  version_id: string
+  version_number: number
+  revision: number
+  published_at: string
+  published_by: string
+  validator: string
+}
+export interface CmsPublishedEdition extends CmsPublicationResult {
+  name: string
+  source_version: string
+}
+export class CmsPublicationUncertain extends Error {}
+export class CmsPublicationBlocked extends Error {
+  readonly report: CmsPublicationReport
+  constructor(report: CmsPublicationReport) {
+    super(
+      'Publication blocked. Review the current saved edition and affected records.',
+    )
+    this.report = report
+  }
+}
 export interface CmsContent {
   workspace: CmsDraft
+  edition?: {
+    version_id: string
+    version_number: number
+    status: string
+    published_at: string | null
+  }
+  publication?: CmsPublicationResult | null
   jobs?: CmsJob[]
   facts?: CmsFact[]
   choices?: CmsChoice[]
@@ -149,6 +196,14 @@ async function rpc<T>(
   try {
     response = await client.rpc(name, args)
   } catch (failure) {
+    if (name === 'cms_recover_draft')
+      throw new CmsPublicationUncertain(
+        'Unable to confirm fresh-draft creation. Retry the same request before changing its name.',
+      )
+    if (name === 'cms_publish_draft')
+      throw new CmsPublicationUncertain(
+        'Unable to confirm publication. Retry the same request to resolve its outcome.',
+      )
     if (name === 'cms_save_job')
       throw new CmsJobSaveUncertain(
         'Unable to confirm the job save. Retry Save Changes to recover the same request before editing further.',
@@ -161,6 +216,60 @@ async function rpc<T>(
   }
   const { data, error } = response
   if (error) {
+    if (
+      [
+        'cms_publication_preflight',
+        'cms_publish_draft',
+        'cms_recover_draft',
+        'cms_list_publications',
+      ].includes(name)
+    ) {
+      if (error.code === '42501')
+        throw new Error(
+          'Active staff access is required. Sign in again; no edits were discarded.',
+        )
+      if (error.code === '40001')
+        throw new Error(
+          'Publication review is stale. The saved revision or published edition changed. Run review again.',
+        )
+      if (error.code === '55P03' || error.code === '40P01')
+        throw new Error(
+          'The workspace is busy. Wait briefly and retry the same operation.',
+        )
+      if (error.code === 'P0002')
+        throw new Error(
+          'This workspace is no longer available. Reopen a saved workspace.',
+        )
+      if (error.code === 'P0001') {
+        if (name === 'cms_publish_draft' && error.details) {
+          let report: CmsPublicationReport | undefined
+          try {
+            report = JSON.parse(error.details) as CmsPublicationReport
+          } catch {
+            /* Plain database detail is not a report. */
+          }
+          if (
+            report &&
+            Array.isArray(report.findings) &&
+            report.version_id === args?.p_version
+          )
+            throw new CmsPublicationBlocked(report)
+        }
+        throw new Error(error.message)
+      }
+      if (name === 'cms_recover_draft')
+        throw new CmsPublicationUncertain(
+          'Unable to confirm fresh-draft creation. Retry the same request before changing its name.',
+        )
+      if (name === 'cms_publish_draft')
+        throw new CmsPublicationUncertain(
+          'Publication outcome is uncertain. Retry the same request before continuing.',
+        )
+      throw new Error(
+        'Unable to load publication information. Check your staff access and retry.',
+      )
+    }
+
     if (
       (name === 'cms_delete_draft' || name === 'cms_delete_scenario') &&
       error.message?.includes('external dependencies')
@@ -412,4 +521,32 @@ export const deleteCmsJob = (
     p_revision: revision,
     p_request: request,
     p_job: job,
+  })
+
+export const preflightCmsPublication = (version: string) =>
+  rpc<CmsPublicationReport>('cms_publication_preflight', { p_version: version })
+export const publishCmsDraft = (
+  report: CmsPublicationReport,
+  request: string,
+) =>
+  rpc<CmsPublicationResult>('cms_publish_draft', {
+    p_version: report.version_id,
+    p_revision: report.revision,
+    p_request: request,
+    p_validator: report.validator,
+    p_heads: report.heads,
+  })
+export const listCmsPublications = () =>
+  rpc<CmsPublishedEdition[]>('cms_list_publications')
+export const recoverCmsDraft = (
+  report: CmsPublicationReport,
+  name: string,
+  request: string,
+) =>
+  rpc<string>('cms_recover_draft', {
+    p_version: report.version_id,
+    p_revision: report.revision,
+    p_source: report.heads.individual,
+    p_name: name,
+    p_request: request,
   })
