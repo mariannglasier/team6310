@@ -73,6 +73,7 @@ const session: GroupSession = {
 beforeEach(() => {
   sessionStorage.removeItem('cac.group.participant-session')
   vi.resetAllMocks()
+  vi.mocked(loadScenarioFacts).mockResolvedValue([])
   vi.mocked(groupSessionService.review).mockResolvedValue([])
   vi.mocked(groupSessionService.restore).mockResolvedValue(null)
 })
@@ -728,6 +729,7 @@ test.each(['host', 'participant'] as const)(
       cacSupportEnabled: true,
       roundState: 'results',
       currentDay: 4,
+      voteCount: 2,
       question: {
         scenarioId: 'scenario',
         title: 'Plan your lunches',
@@ -757,7 +759,7 @@ test.each(['host', 'participant'] as const)(
     }
     const fact = await screen.findByText('610 students')
     expect(
-      screen.getByText('2 votes').compareDocumentPosition(fact) &
+      screen.getByText('2 votes (100%)').compareDocumentPosition(fact) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
     expect(loadScenarioFacts).toHaveBeenCalledWith(
