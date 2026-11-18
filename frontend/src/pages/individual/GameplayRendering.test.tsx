@@ -402,7 +402,7 @@ it('resolves an income transition to a bill day without rendering a scenario pla
   show(incomeRun)
   await waitFor(() => expect(submitEmployment).toHaveBeenCalledOnce())
   expect(screen.getByText('Loading…')).toBeVisible()
-  expect(screen.queryByText('Placeholder')).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   const billRun = {
     ...incomeRun,
     employmentState: { stage: 'day', revision: 2 },
@@ -413,7 +413,7 @@ it('resolves an income transition to a bill day without rendering a scenario pla
   expect(
     screen.getByRole('button', { name: 'Pay Scheduled bill' }),
   ).toBeDisabled()
-  expect(screen.queryByText('Placeholder')).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   await act(async () => financial.resolve({ ...currentBills, run: billRun }))
   await waitFor(() =>
     expect(
@@ -448,7 +448,7 @@ it.each(['bill', 'scenario'] as const)(
     }
     await act(async () => next.resolve(employment(nextRun)))
     expect(screen.getByText('Loading…')).toBeVisible()
-    expect(screen.queryByText('Placeholder')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     expect(screen.queryByRole('region', { name: 'Bills due today' })).toBeNull()
     if (contentType === 'bill') {
       await act(async () =>
@@ -471,7 +471,7 @@ it.each(['bill', 'scenario'] as const)(
       expect(
         await screen.findByRole('region', { name: 'Bills due today' }),
       ).toBeVisible()
-      expect(screen.queryByText('Placeholder')).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
       expect(
         screen.getByRole('button', { name: 'Continue to next day' }),
       ).toBeDisabled()
