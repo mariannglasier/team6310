@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { HostPage, JoinPage } from './GroupPages'
+import { GroupUpcomingExpenses } from './GroupBills'
+import { GroupRoundDebrief } from './GroupRoundDebrief'
 import { groupSessionService } from '../../services/groupSessionService'
 import type { GroupSession } from '../../services/groupSessionService'
 vi.mock('../../services/groupSessionService', () => ({
@@ -17,11 +19,13 @@ vi.mock('../../services/groupSessionService', () => ({
     voteEmployment: vi.fn(),
     updateSetup: vi.fn(),
     review: vi.fn(),
+    controlBill: vi.fn(),
+    voteBill: vi.fn(),
   },
 }))
 const session: GroupSession = {
   sessionId: 'session',
-  joinCode: 'ABCD1234EF56',
+  joinCode: 'K7M4',
   status: 'open',
   currentScenarioId: null,
   createdAt: '2026-11-09T15:00:00Z',
@@ -65,6 +69,7 @@ const session: GroupSession = {
   sharedExpenses: null,
 }
 beforeEach(() => {
+  sessionStorage.removeItem('cac.group.participant-session')
   vi.resetAllMocks()
   vi.mocked(groupSessionService.review).mockResolvedValue([])
   vi.mocked(groupSessionService.restore).mockResolvedValue(null)
@@ -77,6 +82,419 @@ const endedSession: GroupSession = {
   currentDay: 8,
   sharedBalance: 123.45,
 }
+
+test('explains unanswered votes and gives a discussion prompt when no one votes', () => {
+  render(
+    <GroupRoundDebrief
+      session={{ ...session, roundState: 'results', participantCount: 3 }}
+    />,
+  )
+  expect(screen.getByText('0 of 3 answered · 3 unanswered')).toBeVisible()
+  expect(screen.getByText('No votes were cast.')).toBeVisible()
+  expect(
+    screen.getByText('What trade-offs in this situation shaped your choice?'),
+  ).toBeVisible()
+})
+
+test('the facilitator sees both sides of a tie, a linked fact, and controls advancement', async () => {
+  const user = userEvent.setup()
+  const fact = 'This household decision has a verified local fact.'
+  vi.mocked(groupSessionService.restore).mockResolvedValue({
+    ...session,
+    currentDay: 1,
+    roundState: 'results',
+    participantCount: 3,
+    voteCount: 2,
+    question: {
+      scenarioId: 'q',
+      title: 'Groceries',
+      description: 'Plan your groceries.',
+      choices: [
+        { choiceId: 'buy', text: 'Buy groceries', voteCount: 1 },
+        { choiceId: 'wait', text: 'Wait', voteCount: 1 },
+      ],
+    },
+    roundFacts: [
+      {
+        role: 'general',
+        text: fact,
+        sourceUrl: 'https://example.com/fact',
+        copyKind: 'fact',
+      },
+    ],
+  })
+  render(
+    <MemoryRouter>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  expect(await screen.findByText(fact)).toBeVisible()
+  expect(screen.getAllByText('1 vote (50%)')).toHaveLength(2)
+  expect(screen.getByText('2 of 3 answered · 1 unanswered')).toBeVisible()
+  expect(
+    screen.getByText('Percentages are based on 2 votes cast.'),
+  ).toBeVisible()
+  expect(groupSessionService.control).not.toHaveBeenCalled()
+  await user.click(screen.getByRole('button', { name: 'Continue to Day 2' }))
+  expect(groupSessionService.control).toHaveBeenCalledWith(
+    session.sessionId,
+    'next',
+  )
+})
+
+test('shows the next three dated occurrences and drops expired recurring bills', () => {
+  const expenseSession: GroupSession = {
+    ...session,
+    currentDay: 9,
+    sharedExpenses: [
+      {
+        expenseId: 'rent',
+        name: 'Rent',
+        amount: 500,
+        firstDueDay: 4,
+        repeatIntervalDays: null,
+      },
+      {
+        expenseId: 'bus',
+        name: 'Bus pass',
+        amount: 10,
+        firstDueDay: 2,
+        repeatIntervalDays: 7,
+      },
+      {
+        expenseId: 'phone',
+        name: 'Phone bill',
+        amount: 15,
+        firstDueDay: 12,
+        repeatIntervalDays: null,
+      },
+    ],
+  }
+  const { rerender } = render(
+    <GroupUpcomingExpenses session={expenseSession} />,
+  )
+  expect(screen.getAllByRole('listitem')).toHaveLength(3)
+  expect(
+    screen.getAllByRole('listitem').map((item) => item.textContent),
+  ).toEqual([
+    'Bus pass$10.00Day 9',
+    'Phone bill$15.00Day 12',
+    'Bus pass$10.00Day 16',
+  ])
+  rerender(
+    <GroupUpcomingExpenses session={{ ...expenseSession, currentDay: 13 }} />,
+  )
+  expect(
+    screen.getAllByRole('listitem').map((item) => item.textContent),
+  ).toEqual([
+    'Bus pass$10.00Day 16',
+    'Bus pass$10.00Day 23',
+    'Bus pass$10.00Day 30',
+  ])
+  rerender(
+    <GroupUpcomingExpenses session={{ ...expenseSession, currentDay: 24 }} />,
+  )
+  expect(screen.getAllByRole('listitem')).toHaveLength(1)
+  rerender(
+    <GroupUpcomingExpenses
+      session={{ ...expenseSession, upcomingBills: [] }}
+    />,
+  )
+  expect(screen.queryByText('Shared upcoming expenses')).toBeNull()
+})
+
+const dueBill = {
+  billId: 'rent',
+  name: 'Rent',
+  dueDay: 7,
+  principal: 500,
+  lateFee: 20,
+  total: 500,
+  round: 3,
+  payVotes: null,
+  ignoreVotes: null,
+  selectedChoice: null,
+  voteCount: 0,
+}
+
+test('shows the Day 11 repair bill in place of the ordinary expense card', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.join).mockResolvedValue({
+    ...session,
+    isHost: false,
+    participantId: 'member',
+    currentDay: 11,
+    roundState: 'voting',
+    isBillDay: true,
+    activeBill: { ...dueBill, name: 'The repair bill', dueDay: 11 },
+    acceptingVotes: true,
+    question: {
+      scenarioId: 'ordinary-expense',
+      title: 'Unexpected expense',
+      description: 'An unexpected expense came up.',
+      choices: [],
+    },
+  })
+  render(
+    <MemoryRouter>
+      <JoinPage />
+    </MemoryRouter>,
+  )
+  await user.type(screen.getByLabelText(/Session code/), session.joinCode)
+  await user.click(screen.getByRole('button', { name: /Join session/ }))
+  expect(
+    await screen.findByRole('heading', { name: 'The repair bill' }),
+  ).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Pay bill' })).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Ignore bill' })).toBeVisible()
+  expect(
+    screen.queryByRole('heading', { name: 'Unexpected expense' }),
+  ).toBeNull()
+  expect(screen.queryByRole('button', { name: 'End bill voting' })).toBeNull()
+  expect(
+    screen.queryByRole('button', { name: 'Confirm bill decision' }),
+  ).toBeNull()
+  expect(screen.queryByRole('button', { name: 'End group session' })).toBeNull()
+})
+
+test.each(['INVAL1D', 'C7Q2'])(
+  'keeps the join form open when the API rejects %s',
+  async (code) => {
+    const user = userEvent.setup()
+    vi.mocked(groupSessionService.join).mockRejectedValue(
+      new Error('Session unavailable. Check with your facilitator.'),
+    )
+    render(
+      <MemoryRouter>
+        <JoinPage />
+      </MemoryRouter>,
+    )
+    await user.type(screen.getByLabelText(/Session code/), code)
+    await user.click(screen.getByRole('button', { name: /Join session/ }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Session unavailable.',
+    )
+    expect(screen.getByLabelText(/Session code/)).toHaveValue(code)
+  },
+)
+
+test('shows the paycheck and lets an enrolled participant vote on the due bill', async () => {
+  const user = userEvent.setup()
+  const billSession: GroupSession = {
+    ...session,
+    isHost: false,
+    participantId: 'member',
+    currentDay: 7,
+    lastPayday: 7,
+    weeklyIncome: 300,
+    sharedBalance: 800,
+    roundState: 'voting',
+    isBillDay: true,
+    activeBill: dueBill,
+    acceptingVotes: true,
+  }
+  vi.mocked(groupSessionService.join).mockResolvedValue(billSession)
+  vi.mocked(groupSessionService.voteBill).mockResolvedValue({
+    ...billSession,
+    activeBill: { ...dueBill, selectedChoice: 'pay', voteCount: 1 },
+  })
+  render(
+    <MemoryRouter>
+      <JoinPage />
+    </MemoryRouter>,
+  )
+  await user.type(screen.getByLabelText(/Session code/), session.joinCode)
+  await user.click(screen.getByRole('button', { name: /Join session/ }))
+  expect(await screen.findByText('Paycheck deposited: $300.00')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: 'Pay bill' }))
+  expect(groupSessionService.voteBill).toHaveBeenCalledWith(
+    session.sessionId,
+    'rent',
+    3,
+    'pay',
+  )
+  expect(
+    await screen.findByRole('button', { name: 'Pay bill', pressed: true }),
+  ).toBeVisible()
+  expect(screen.getByText('$800.00')).toBeVisible()
+})
+
+test('the facilitator can confirm a winning bill vote and see the resulting balance', async () => {
+  const user = userEvent.setup()
+  const billSession: GroupSession = {
+    ...session,
+    currentDay: 7,
+    sharedBalance: 800,
+    roundState: 'results',
+    isBillDay: true,
+    billVoteRound: 3,
+    activeBill: { ...dueBill, payVotes: 1, ignoreVotes: 0, voteCount: 1 },
+  }
+  vi.mocked(groupSessionService.restore).mockResolvedValue(billSession)
+  vi.mocked(groupSessionService.controlBill).mockResolvedValue({
+    ...billSession,
+    activeBill: null,
+    sharedBalance: 300,
+    resolvedBills: [{ billId: 'rent', name: 'Rent', paid: true, total: 500 }],
+  })
+  render(
+    <MemoryRouter>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  expect(await screen.findByText('1 vote (100%)')).toBeVisible()
+  await user.click(
+    screen.getByRole('button', { name: 'Confirm bill decision' }),
+  )
+  expect(groupSessionService.controlBill).toHaveBeenCalledWith(
+    session.sessionId,
+    'rent',
+    3,
+    'confirm',
+  )
+  expect(await screen.findByText('Rent · Paid · $500.00')).toBeVisible()
+  expect(screen.getByText('$300.00')).toBeVisible()
+  expect(
+    screen.getByRole('button', { name: 'Continue to Day 8' }),
+  ).toBeVisible()
+})
+
+test.each([
+  [0, 'At least one participant must join before you can start.'],
+  [
+    1,
+    'Wait for every participant to choose a household and mark themselves ready.',
+  ],
+])(
+  'explains why start is disabled with %i participants',
+  async (count, reason) => {
+    vi.mocked(groupSessionService.restore).mockResolvedValue({
+      ...session,
+      participantCount: count,
+    })
+    render(
+      <MemoryRouter>
+        <HostPage />
+      </MemoryRouter>,
+    )
+    expect(
+      await screen.findByRole('button', { name: 'Start session' }),
+    ).toBeDisabled()
+    expect(screen.getByText(reason)).toBeVisible()
+  },
+)
+
+test('shows a rejected start in the lobby and can retry into voting', async () => {
+  const user = userEvent.setup()
+  const ready = { ...session, participantCount: 1, readyCount: 1 }
+  const message =
+    'A complete 30-day scenario set is unavailable for the winning household.'
+  vi.mocked(groupSessionService.restore).mockResolvedValue(ready)
+  vi.mocked(groupSessionService.control)
+    .mockRejectedValueOnce(new Error(message))
+    .mockResolvedValueOnce({
+      ...ready,
+      roundState: 'voting',
+      roundType: 'job',
+      acceptingVotes: true,
+    })
+  render(
+    <MemoryRouter>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  await user.click(await screen.findByRole('button', { name: 'Start session' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(message)
+  await user.click(screen.getByRole('button', { name: 'Start session' }))
+  expect(
+    await screen.findByRole('button', { name: 'End voting' }),
+  ).toBeVisible()
+  expect(groupSessionService.control).toHaveBeenLastCalledWith(
+    session.sessionId,
+    'start',
+  )
+})
+
+test('leaving the lobby closes the session before returning home', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.restore).mockResolvedValue(session)
+  vi.mocked(groupSessionService.control).mockResolvedValue({
+    ...endedSession,
+    endedByHost: true,
+  })
+  render(
+    <MemoryRouter initialEntries={['/group/host']}>
+      <Routes>
+        <Route path="/group/host" element={<HostPage />} />
+        <Route path="/" element={<h1>Home</h1>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+  await user.click(await screen.findByRole('button', { name: 'Back to home' }))
+  expect(await screen.findByRole('heading', { name: 'Home' })).toBeVisible()
+  expect(groupSessionService.control).toHaveBeenCalledExactlyOnceWith(
+    session.sessionId,
+    'close',
+  )
+})
+
+test('hosting from the landing page replaces an unfinished session', async () => {
+  const user = userEvent.setup()
+  vi.mocked(groupSessionService.restore).mockResolvedValue({
+    ...session,
+    roundState: 'results',
+    currentDay: 30,
+  })
+  vi.mocked(groupSessionService.control).mockResolvedValue({
+    ...endedSession,
+    endedByHost: true,
+  })
+  vi.mocked(groupSessionService.create).mockResolvedValue({
+    ...session,
+    sessionId: 'fresh-session',
+    joinCode: 'M7Q2',
+  })
+  render(
+    <MemoryRouter initialEntries={['/group/host?new=1']}>
+      <HostPage />
+    </MemoryRouter>,
+  )
+  await user.click(
+    await screen.findByRole('button', { name: /Create group session/ }),
+  )
+  expect(groupSessionService.control).toHaveBeenCalledWith(
+    session.sessionId,
+    'close',
+  )
+  expect(await screen.findByText('M7Q2')).toBeVisible()
+})
+
+test('a facilitator exit returns an enrolled player to the empty join form', async () => {
+  const user = userEvent.setup()
+  const member = { ...session, isHost: false, participantId: 'member' }
+  vi.mocked(groupSessionService.join).mockResolvedValue(member)
+  vi.mocked(groupSessionService.get).mockResolvedValue({
+    ...member,
+    status: 'closed',
+    roundState: 'completed',
+    endedByHost: true,
+  })
+  render(
+    <MemoryRouter>
+      <JoinPage />
+    </MemoryRouter>,
+  )
+  await user.type(screen.getByLabelText(/Session code/), session.joinCode)
+  await user.click(screen.getByRole('button', { name: /Join session/ }))
+  expect(
+    await screen.findByText(
+      'Your facilitator ended the group session.',
+      {},
+      { timeout: 3500 },
+    ),
+  ).toBeVisible()
+  expect(screen.getByLabelText(/Session code/)).toHaveValue('')
+})
 
 test.each([true, false])(
   'host replays with assistance %s in a fresh session',
@@ -145,7 +563,12 @@ test('participant reviews saved tallies and their own vote, then joins again', a
       title: 'Groceries',
       selectedChoiceId: 'a',
       choices: [
-        { choiceId: 'a', text: 'Buy groceries', voteCount: 2 },
+        {
+          choiceId: 'a',
+          text: 'Buy groceries',
+          voteCount: 2,
+          balanceChange: -42.5,
+        },
         { choiceId: 'b', text: 'Wait', voteCount: 1 },
       ],
     },
@@ -158,8 +581,9 @@ test('participant reviews saved tallies and their own vote, then joins again', a
   await user.type(screen.getByLabelText(/Session code/), session.joinCode)
   await user.click(screen.getByRole('button', { name: /Join session/ }))
   await user.click(await screen.findByText('Day 3 · Groceries'))
-  expect(screen.getByText('2 votes')).toBeVisible()
-  expect(screen.getByText('1 vote')).toBeVisible()
+  expect(screen.getByText('2 votes (66.7%)')).toBeVisible()
+  expect(screen.getByText('Cost $42.50')).toBeVisible()
+  expect(screen.getByText('1 vote (33.3%)')).toBeVisible()
   expect(screen.getByText(/Your vote/)).toBeVisible()
   expect(
     screen.queryByRole('button', { name: 'Replay with CAC assistance' }),
@@ -328,46 +752,58 @@ test('shows when the participant voting timer has ended', async () => {
   )
 })
 
-test('shows the shared interview clothing vote to the host', async () => {
-  vi.mocked(groupSessionService.restore).mockResolvedValue({
-    ...session,
-    participantCount: 3,
-    sharedHouseholdName: 'Patricia',
-    sharedBalance: 1200,
-    cacSupportEnabled: true,
-    roundState: 'voting',
-    roundType: 'clothing',
-    employmentStage: 'clothing',
-    roundDeadline: new Date(Date.now() + 60_000).toISOString(),
-    acceptingVotes: true,
-    employmentOptions: [
-      {
-        optionId: 'purchase',
-        text: 'Buy professional clothes',
-        cost: 60,
-        voteCount: null,
-      },
-      {
-        optionId: 'cac',
-        text: 'Use the CAC clothing closet',
-        cost: 0,
-        voteCount: null,
-      },
-    ],
-  })
+test.each(['voting', 'results', 'empty results'] as const)(
+  'shows the shared interview clothing vote to the host during %s',
+  async (stage) => {
+    const voting = stage === 'voting'
+    const hasVotes = stage === 'results'
+    vi.mocked(groupSessionService.restore).mockResolvedValue({
+      ...session,
+      participantCount: 4,
+      voteCount: hasVotes ? 3 : 0,
+      sharedHouseholdName: 'Patricia',
+      sharedBalance: 1200,
+      cacSupportEnabled: true,
+      roundState: voting ? 'voting' : 'results',
+      roundType: 'clothing',
+      employmentStage: 'clothing',
+      roundDeadline: new Date(Date.now() + 60_000).toISOString(),
+      acceptingVotes: voting,
+      employmentOptions: [
+        {
+          optionId: 'purchase',
+          text: 'Buy professional clothes',
+          cost: 60,
+          voteCount: voting ? null : hasVotes ? 2 : 0,
+        },
+        {
+          optionId: 'cac',
+          text: 'Use the CAC clothing closet',
+          cost: 0,
+          voteCount: voting ? null : hasVotes ? 1 : 0,
+        },
+      ],
+    })
 
-  render(
-    <MemoryRouter>
-      <HostPage />
-    </MemoryRouter>,
-  )
+    render(
+      <MemoryRouter>
+        <HostPage />
+      </MemoryRouter>,
+    )
 
-  expect(
-    await screen.findByRole('heading', {
-      name: 'What will the household wear?',
-    }),
-  ).toBeInTheDocument()
-  expect(screen.getByText('Buy professional clothes')).toBeInTheDocument()
-  expect(screen.getByText('Use the CAC clothing closet')).toBeInTheDocument()
-  expect(screen.getByText('$1,200.00')).toBeInTheDocument()
-})
+    expect(
+      await screen.findByRole('heading', {
+        name: 'What will the household wear?',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Buy professional clothes')).toBeInTheDocument()
+    expect(screen.getByText('Use the CAC clothing closet')).toBeInTheDocument()
+    expect(screen.getByText('$1,200.00')).toBeInTheDocument()
+    if (hasVotes) {
+      expect(screen.getByText('2 votes (66.7%)')).toBeVisible()
+      expect(screen.getByText('1 vote (33.3%)')).toBeVisible()
+    } else if (!voting) {
+      expect(screen.getAllByText('0 votes (0%)')).toHaveLength(2)
+    }
+  },
+)

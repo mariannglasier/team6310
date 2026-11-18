@@ -11,6 +11,8 @@ import {
   type GroupDecisionReview,
   type GroupSession,
 } from '../../services/groupSessionService'
+import { countVotes, formatVoteTally } from './voteTally'
+import { GroupChoicePrice } from './GroupChoicePrice'
 
 export function GroupEnding({
   session,
@@ -72,6 +74,17 @@ export function GroupEnding({
             <dt>Day reached</dt>
             <dd>{session.currentDay} of 30</dd>
           </div>
+          {session.unpaidBillTotal !== undefined && (
+            <div>
+              <dt>Unpaid bills and fees</dt>
+              <dd>
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(Number(session.unpaidBillTotal))}
+              </dd>
+            </div>
+          )}
           <div>
             <dt>CAC assistance</dt>
             <dd>
@@ -92,35 +105,41 @@ export function GroupEnding({
         ) : review.length === 0 ? (
           <p>No scenario votes were recorded.</p>
         ) : (
-          review.map((decision) => (
-            <details
-              className="group-ending-decision"
-              key={decision.scenarioId}
-            >
-              <summary>
-                Day {decision.day} · {decision.title}
-              </summary>
-              <ul>
-                {decision.choices.map((choice) => (
-                  <li key={choice.choiceId}>
-                    <span>
-                      {choice.text}
-                      {decision.selectedChoiceId === choice.choiceId && (
-                        <strong> · Your vote</strong>
-                      )}
-                    </span>
-                    <strong>
-                      {choice.voteCount}{' '}
-                      {choice.voteCount === 1 ? 'vote' : 'votes'}
-                    </strong>
-                  </li>
-                ))}
-              </ul>
-              {!session.isHost && !decision.selectedChoiceId && (
-                <p>You did not vote on this situation.</p>
-              )}
-            </details>
-          ))
+          review.map((decision) => {
+            const totalVotes = countVotes(decision.choices)
+            return (
+              <details
+                className="group-ending-decision"
+                key={decision.scenarioId}
+              >
+                <summary>
+                  Day {decision.day} · {decision.title}
+                </summary>
+                <ul>
+                  {decision.choices.map((choice) => (
+                    <li key={choice.choiceId}>
+                      <span>
+                        {choice.text}
+                        {decision.selectedChoiceId === choice.choiceId && (
+                          <strong> · Your vote</strong>
+                        )}
+                        <GroupChoicePrice
+                          balanceChange={choice.balanceChange}
+                          upfrontCost={choice.upfrontCost}
+                        />
+                      </span>
+                      <strong>
+                        {formatVoteTally(choice.voteCount, totalVotes)}
+                      </strong>
+                    </li>
+                  ))}
+                </ul>
+                {!session.isHost && !decision.selectedChoiceId && (
+                  <p>You did not vote on this situation.</p>
+                )}
+              </details>
+            )
+          })
         )}
         <div className="group-ending-reflection">
           <h2>A moment to reflect</h2>

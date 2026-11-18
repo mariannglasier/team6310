@@ -56,6 +56,53 @@ beforeEach(() => {
     ReturnType<typeof getSupabaseClient>
   >)
 })
+test('loads edition-pinned choice prices when the group RPC omits them', async () => {
+  const inChoices = vi.fn().mockResolvedValue({
+    data: [
+      { choice_id: 'choice', balance_change: '1739', upfront_cost: '250' },
+    ],
+    error: null,
+  })
+  const scenarioFilter = vi.fn().mockReturnValue({ in: inChoices })
+  const editionFilter = vi.fn().mockReturnValue({ eq: scenarioFilter })
+  const from = vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnValue({ eq: editionFilter }),
+  })
+  vi.mocked(getSupabaseClient).mockResolvedValue({
+    rpc,
+    from,
+  } as unknown as Awaited<ReturnType<typeof getSupabaseClient>>)
+  rpc.mockResolvedValue({
+    error: null,
+    data: {
+      sessionId: 'session',
+      joinCode: 'ABC',
+      status: 'open',
+      currentScenarioId: 'taxes',
+      createdAt: 'date',
+      versionId: 'edition',
+      decisionDurationSeconds: 60,
+      participantCount: 1,
+      participantId: null,
+      isHost: true,
+      question: {
+        scenarioId: 'taxes',
+        title: 'Time to file taxes',
+        description: 'Choose how to file.',
+        choices: [{ choiceId: 'choice', text: 'Pay someone', voteCount: null }],
+      },
+    },
+  })
+  const session = await groupSessionService.get('session')
+  expect(from).toHaveBeenCalledWith('choices')
+  expect(editionFilter).toHaveBeenCalledWith('version_id', 'edition')
+  expect(scenarioFilter).toHaveBeenCalledWith('scenario_id', 'taxes')
+  expect(inChoices).toHaveBeenCalledWith('choice_id', ['choice'])
+  expect(session?.question?.choices[0]).toMatchObject({
+    upfrontCost: '250',
+    balanceChange: '1739',
+  })
+})
 test('verifies identity and normalizes the code before enrollment', async () => {
   rpc.mockResolvedValue({
     data: {
@@ -193,12 +240,12 @@ test('sends protected host controls and participant votes', async () => {
     p_action: 'start',
   })
   await groupSessionService.vote('session-id', 'choice-id')
-  expect(rpc).toHaveBeenNthCalledWith(3, 'submit_group_vote', {
+  expect(rpc).toHaveBeenNthCalledWith(2, 'submit_group_vote', {
     p_session_id: 'session-id',
     p_choice_id: 'choice-id',
   })
   await groupSessionService.voteJob('session-id', 'job-id')
-  expect(rpc).toHaveBeenNthCalledWith(5, 'submit_group_job_vote', {
+  expect(rpc).toHaveBeenNthCalledWith(4, 'submit_group_job_vote', {
     p_session_id: 'session-id',
     p_job_id: 'job-id',
   })

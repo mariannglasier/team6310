@@ -55,6 +55,44 @@ do $$ declare r jsonb; fresh jsonb; begin
   assert fresh->>'sessionId' <> current_setting('test.review_session'), 'Replay must create a distinct session';
   assert fresh->>'joinCode' <> current_setting('test.review_code'), 'Replay must use a fresh code';
   assert r = public.get_group_session_review(current_setting('test.review_session')::uuid), 'Replay must preserve previous votes';
+  perform set_config('test.exit_session', fresh->>'sessionId', true);
+  perform set_config('test.exit_code', fresh->>'joinCode', true);
+end $$;
+reset role;
+select set_config('request.jwt.claims', '{"sub":"63100000-0000-4000-8000-000000000082","is_anonymous":true,"role":"authenticated"}', true);
+set local role authenticated;
+do $$ begin
+  assert public.join_group_session(current_setting('test.exit_code'))->>'sessionId'
+    = current_setting('test.exit_session');
+  begin
+    perform public.control_group_session(current_setting('test.exit_session')::uuid, 'close');
+    assert false, 'A participant cannot end the session';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+-- Exercise the same close action with an active, in-progress round.
+update public.group_sessions set round_state='voting', current_question_number=8,
+  round_deadline=now()+interval '1 minute'
+where session_id=current_setting('test.exit_session')::uuid;
+select set_config('request.jwt.claims', '{"sub":"63100000-0000-4000-8000-000000000081","is_anonymous":true,"role":"authenticated"}', true);
+set local role authenticated;
+do $$ declare closed jsonb; fresh jsonb; begin
+  closed := public.control_group_session(current_setting('test.exit_session')::uuid, 'close');
+  assert closed->>'status' = 'closed';
+  assert closed->>'endedByHost' = 'true';
+  assert closed->>'currentDay' = '8';
+  assert closed->>'roundDeadline' is null;
+  fresh := public.configure_host_group_session(true, 60, false);
+  assert fresh->>'roundState' = 'lobby';
+  assert fresh->>'participantCount' = '0';
+  assert fresh->>'joinCode' <> current_setting('test.exit_code');
+end $$;
+reset role;
+select set_config('request.jwt.claims', '{"sub":"63100000-0000-4000-8000-000000000082","is_anonymous":true,"role":"authenticated"}', true);
+set local role authenticated;
+do $$ begin
+  assert public.get_group_session_state(current_setting('test.exit_session')::uuid)->>'endedByHost' = 'true';
+  assert public.join_group_session(current_setting('test.exit_code'))->>'error' is not null;
 end $$;
 reset role;
 select set_config('request.jwt.claims', '{"sub":"63100000-0000-4000-8000-000000000083","is_anonymous":true,"role":"authenticated"}', true);

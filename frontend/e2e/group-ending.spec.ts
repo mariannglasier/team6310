@@ -87,7 +87,7 @@ test('group ending supports keyboard review and assistance replay', async ({
   const summary = page.locator('summary', { hasText: 'Day 1' })
   await summary.focus()
   await page.keyboard.press('Enter')
-  await expect(page.getByText('2 votes', { exact: true })).toBeVisible()
+  await expect(page.getByText('2 votes (66.7%)', { exact: true })).toBeVisible()
   await expect(page.getByText('$123.45')).toBeVisible()
   expect(
     await page.evaluate(

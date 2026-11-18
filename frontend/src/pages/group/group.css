@@ -522,6 +522,22 @@
   outline-offset: 3px;
 }
 
+.group-round-debrief {
+  margin-block: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--finance-rule, #cbd5e1);
+  border-radius: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.group-round-debrief > :first-child {
+  margin-top: 0;
+}
+
+.group-round-debrief > :last-child {
+  margin-bottom: 0;
+}
+
 .group-scenario-actions {
   display: flex;
   flex-wrap: wrap;
@@ -717,6 +733,9 @@
 }
 .group-ending-decision li > strong {
   white-space: nowrap;
+}
+.group-ending-decision .group-choice-price {
+  display: block;
 }
 .group-ending-reflection {
   background: var(--group-blue);

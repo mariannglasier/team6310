@@ -2,9 +2,11 @@ import { ensureParticipantSession } from './participantSession'
 import { getSupabaseClient } from './supabase'
 
 export interface GroupSession {
+  roundFacts?: GroupRoundFact[]
   sessionId: string
   joinCode: string
   status: 'open' | 'closed'
+  endedByHost?: boolean
   currentScenarioId: string | null
   createdAt: string
   versionId: string
@@ -47,17 +49,54 @@ export interface GroupSession {
   clothingChoice: 'purchase' | 'current' | 'cac' | 'owned' | null
   interviewHired: boolean | null
   weeklyIncome: number | string
+  lastPayday?: number | null
+  activeBill?: GroupBillRound | null
+  isBillDay?: boolean
+  overdueBills?: GroupBill[]
+  billVoteRound?: number
+  unpaidBillTotal?: number | string
+  resolvedBills?: GroupBillReceipt[]
   selectedEmploymentOption: string | null
   employmentOptions: GroupEmploymentOption[] | null
   householdVotes: GroupHouseholdVote[] | null
   sharedExpenses: GroupSharedExpense[] | null
+  upcomingBills?: GroupUpcomingBill[]
+}
+export interface GroupRoundFact {
+  role: 'general' | 'cac'
+  text: string
+  sourceUrl: string
+  copyKind: 'fact' | 'context'
+}
+export interface GroupBill {
+  billId: string
+  name: string
+  dueDay: number
+  principal: number | string
+  lateFee: number | string
+  total: number | string
+}
+export type BillChoice = 'pay' | 'ignore'
+export interface GroupBillReceipt {
+  billId: string
+  name: string
+  paid: boolean
+  total: number | string
+}
+export type BillAction = 'end_voting' | 'confirm' | 'reopen' | 'open_overdue'
+export interface GroupBillRound extends GroupBill {
+  round: number
+  payVotes: number | null
+  ignoreVotes: number | null
+  voteCount: number
+  selectedChoice: BillChoice | null
 }
 export interface GroupDecisionReview {
   day: number
   scenarioId: string
   title: string
   selectedChoiceId: string | null
-  choices: Array<{ choiceId: string; text: string; voteCount: number }>
+  choices: Array<GroupChoice & { voteCount: number }>
 }
 export interface GroupEmploymentOption {
   optionId: string
@@ -76,6 +115,12 @@ export interface GroupSharedExpense {
   amount: number | string
   firstDueDay: number
   repeatIntervalDays: number | null
+}
+export interface GroupUpcomingBill {
+  billId: string
+  name: string
+  amount: number | string
+  dueDay: number
 }
 export interface GroupJob {
   jobId: string
@@ -96,7 +141,14 @@ export interface GroupQuestion {
   scenarioId: string
   title: string
   description: string
-  choices: Array<{ choiceId: string; text: string; voteCount: number | null }>
+  choices: GroupChoice[]
+}
+export interface GroupChoice {
+  choiceId: string
+  text: string
+  voteCount: number | null
+  balanceChange?: number | string | null
+  upfrontCost?: number | string | null
 }
 export type DecisionDuration = 30 | 60 | 90 | 120
 async function request(
@@ -109,6 +161,8 @@ async function request(
     | 'submit_group_vote'
     | 'submit_group_job_vote'
     | 'submit_group_employment_vote'
+    | 'vote_group_bill'
+    | 'control_group_bill'
     | 'update_group_participant_setup',
   args: Record<string, unknown>,
 ): Promise<GroupSession | null> {
@@ -148,8 +202,42 @@ async function request(
       !Array.isArray(question.choices))
   )
     throw new Error('Session information is unavailable. Please retry.')
+  const currentQuestion = (question ?? null) as GroupQuestion | null
+  if (
+    currentQuestion?.choices.some((choice) => choice.upfrontCost === undefined)
+  ) {
+    const { data: prices, error: priceError } = await client
+      .from('choices')
+      .select('choice_id,balance_change,upfront_cost')
+      .eq('version_id', data.versionId)
+      .eq('scenario_id', currentQuestion.scenarioId)
+      .in(
+        'choice_id',
+        currentQuestion.choices.map((choice) => choice.choiceId),
+      )
+    if (!priceError && prices) {
+      const byId = new Map(prices.map((price) => [price.choice_id, price]))
+      currentQuestion.choices = currentQuestion.choices.map((choice) => {
+        const price = byId.get(choice.choiceId)
+        return price
+          ? {
+              ...choice,
+              balanceChange:
+                choice.balanceChange === undefined
+                  ? price.balance_change
+                  : choice.balanceChange,
+              upfrontCost:
+                choice.upfrontCost === undefined
+                  ? price.upfront_cost
+                  : choice.upfrontCost,
+            }
+          : choice
+      })
+    }
+  }
   return {
     ...data,
+    endedByHost: data.endedByHost === true,
     roundState: data.roundState ?? 'lobby',
     currentQuestionNumber: data.currentQuestionNumber ?? 0,
     totalQuestionCount: data.totalQuestionCount ?? 0,
@@ -157,7 +245,7 @@ async function request(
     acceptingVotes: data.acceptingVotes ?? false,
     selectedChoiceId: data.selectedChoiceId ?? null,
     voteCount: data.voteCount ?? 0,
-    question: question ?? null,
+    question: currentQuestion,
     householdId: data.householdId ?? null,
     householdName: data.householdName ?? null,
     ready: data.ready ?? false,
@@ -179,6 +267,7 @@ async function request(
     clothingChoice: data.clothingChoice ?? null,
     interviewHired: data.interviewHired ?? null,
     weeklyIncome: data.weeklyIncome ?? 0,
+    lastPayday: data.lastPayday ?? null,
     selectedEmploymentOption: data.selectedEmploymentOption ?? null,
     employmentOptions: data.employmentOptions ?? null,
     householdVotes: data.householdVotes ?? null,
@@ -259,18 +348,38 @@ export const groupSessionService = {
       p_status: status,
       p_current_scenario_id: currentScenarioId,
     }),
-  control: async (
+  control: (
     sessionId: string,
     action: 'start' | 'end_voting' | 'next' | 'close',
-  ) => {
-    const session = await request('control_group_session', {
+  ) =>
+    request('control_group_session', {
       p_session_id: sessionId,
       p_action: action,
-    })
-    return session
-      ? request('get_group_session_state', { p_session_id: sessionId })
-      : null
-  },
+    }),
+  controlBill: (
+    sessionId: string,
+    billId: string,
+    round: number,
+    action: BillAction,
+  ) =>
+    request('control_group_bill', {
+      p_session_id: sessionId,
+      p_bill_id: billId,
+      p_round: round,
+      p_action: action,
+    }),
+  voteBill: (
+    sessionId: string,
+    billId: string,
+    round: number,
+    choice: BillChoice,
+  ) =>
+    request('vote_group_bill', {
+      p_session_id: sessionId,
+      p_bill_id: billId,
+      p_round: round,
+      p_choice: choice,
+    }),
   vote: async (sessionId: string, choiceId: string) => {
     const session = await request('submit_group_vote', {
       p_session_id: sessionId,

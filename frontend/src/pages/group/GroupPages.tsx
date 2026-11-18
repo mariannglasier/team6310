@@ -1,4 +1,13 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from 'react'
+import { useLocation, useNavigate } from 'react-router'
 import { PageSection } from '../../components/ui/PageSection'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { SelectField, TextField } from '../../components/ui/FormFields'
@@ -10,11 +19,22 @@ import '../../components/simulation/financialTracking.css'
 import '../../components/simulation/employment.css'
 import {
   groupSessionService,
+  type BillAction,
+  type BillChoice,
   type DecisionDuration,
   type GroupSession,
 } from '../../services/groupSessionService'
 import './group.css'
 import { GroupEnding } from './GroupEnding'
+import { GroupRoundDebrief } from './GroupRoundDebrief'
+import { GroupChoicePrice } from './GroupChoicePrice'
+import {
+  GroupBillBallot,
+  GroupBillResults,
+  GroupOverdueBills,
+  GroupUpcomingExpenses,
+} from './GroupBills'
+import { countVotes, formatVoteTally } from './voteTally'
 
 const weeklyPay = (value: number | string) =>
   new Intl.NumberFormat('en-US', {
@@ -22,6 +42,52 @@ const weeklyPay = (value: number | string) =>
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(Number(value))
+
+function useGroupPolling(
+  sessionId: string | undefined,
+  busy: boolean,
+  setSession: Dispatch<SetStateAction<GroupSession | null>>,
+  onEndedByHost?: () => void,
+) {
+  const [staleSession, setStaleSession] = useState<string>()
+  useEffect(() => {
+    if (!sessionId || busy) return
+    const id = sessionId
+    let active = true
+    let timer: number
+    async function refresh() {
+      try {
+        const value = await groupSessionService.get(id)
+        if (!active) return
+        if (value?.sessionId !== id) {
+          setStaleSession(id)
+          return
+        }
+        setStaleSession(undefined)
+        if (value.status === 'closed' && value.endedByHost) onEndedByHost?.()
+        setSession((current) =>
+          current?.sessionId === id && current.status === 'open'
+            ? value
+            : current,
+        )
+      } catch {
+        if (active) setStaleSession(id)
+      } finally {
+        if (active) timer = window.setTimeout(refresh, 2000)
+      }
+    }
+    timer = window.setTimeout(refresh, 2000)
+    return () => {
+      active = false
+      window.clearTimeout(timer)
+    }
+  }, [busy, onEndedByHost, sessionId, setSession])
+  return sessionId !== undefined && staleSession === sessionId
+}
+
+function GroupConnectionNotice() {
+  return <p role="status">Group updates are delayed. Reconnecting…</p>
+}
 
 function VotingCountdown({ session }: { session: GroupSession }) {
   const deadline = session.roundDeadline
@@ -79,6 +145,9 @@ function GroupJobBoard({
 }) {
   return (
     <div className="employment-board" role="group" aria-label="Available jobs">
+      {session.jobs?.length === 0 && (
+        <p>No jobs are available for this household right now.</p>
+      )}
       <div className="employment-board__postings">
         {session.jobs?.map((job) => (
           <button
@@ -98,7 +167,7 @@ function GroupJobBoard({
             <span className="employment-posting__pin" aria-hidden="true" />
             <span className="employment-posting__status">
               {session.roundState === 'results'
-                ? `${job.voteCount ?? 0} votes`
+                ? formatVoteTally(job.voteCount ?? 0, session.voteCount)
                 : session.employmentAttempt === 2 &&
                     session.winningJobId === job.jobId
                   ? 'Already interviewed'
@@ -155,12 +224,15 @@ function GroupEmploymentOptions({
               )}
           </strong>
           <span>
-            {session.roundState === 'results'
-              ? `${option.voteCount ?? 0} votes`
-              : Number(option.cost ?? 0) > 0
-                ? weeklyPay(option.cost ?? 0)
-                : 'No cost'}
+            {Number(option.cost ?? 0) > 0
+              ? `Cost ${weeklyPay(option.cost ?? 0)}`
+              : 'No cost'}
           </span>
+          {session.roundState === 'results' && (
+            <span>
+              {formatVoteTally(option.voteCount ?? 0, session.voteCount)}
+            </span>
+          )}
         </button>
       ))}
     </div>
@@ -311,6 +383,11 @@ function GroupScenarioShell({
                   ? 'Playing with CAC support'
                   : 'Playing without CAC support'}
               </span>
+              {session.lastPayday === session.currentDay && (
+                <span role="status">
+                  Paycheck deposited: {weeklyPay(session.weeklyIncome)}
+                </span>
+              )}
             </section>
           </aside>
           <main className="finance-main stage__panel">
@@ -339,24 +416,12 @@ function GroupScenarioShell({
                 <div>
                   <dt>Votes received</dt>
                   <dd>
-                    {session.voteCount}/{session.participantCount}
+                    {session.activeBill?.voteCount ?? session.voteCount}/
+                    {session.participantCount}
                   </dd>
                 </div>
               </dl>
-              {!!session.sharedExpenses?.length && (
-                <div className="group-shared-expenses">
-                  <h3>Shared upcoming expenses</h3>
-                  <ul>
-                    {session.sharedExpenses.slice(0, 3).map((expense) => (
-                      <li key={expense.expenseId}>
-                        <span>{expense.name}</span>
-                        <strong>{weeklyPay(expense.amount)}</strong>
-                        <small>Day {expense.firstDueDay}</small>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <GroupUpcomingExpenses session={session} />
               <small>
                 {role === 'host'
                   ? 'End voting to reveal results, then advance when the group is ready.'
@@ -370,7 +435,18 @@ function GroupScenarioShell({
   )
 }
 
+async function closeHostedSession(sessionId: string) {
+  const closed = await groupSessionService.control(sessionId, 'close')
+  if (closed?.status !== 'closed')
+    throw new Error('Unable to end the session. Please retry.')
+  return closed
+}
+
 export function HostPage() {
+  const navigate = useNavigate()
+  const { search } = useLocation()
+  const newSessionRequested = useRef(new URLSearchParams(search).has('new'))
+  const openSessionId = useRef<string | null>(null)
   const [session, setSession] = useState<GroupSession | null>(null)
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
@@ -378,6 +454,22 @@ export function HostPage() {
   const [duration, setDuration] = useState<DecisionDuration>(60)
   const [cacSupport, setCacSupport] = useState(false)
   const [replaying, setReplaying] = useState(false)
+
+  useEffect(() => {
+    openSessionId.current =
+      session?.status === 'open' ? session.sessionId : null
+  }, [session])
+
+  useEffect(
+    () => () => {
+      if (openSessionId.current) {
+        void closeHostedSession(openSessionId.current).catch(() => {
+          // The next visit from the landing page retries closing this session.
+        })
+      }
+    },
+    [],
+  )
   async function replay(withAssistance: boolean) {
     if (!session || replaying) return
     setReplaying(true)
@@ -402,8 +494,17 @@ export function HostPage() {
     let active = true
     groupSessionService
       .restore()
-      .then((value) => {
-        if (active) setSession(value)
+      .then(async (value) => {
+        if (!active) return
+        if (newSessionRequested.current) {
+          if (value?.status === 'open')
+            await closeHostedSession(value.sessionId)
+          if (!active) return
+          newSessionRequested.current = false
+          void navigate(paths.host, { replace: true })
+        } else {
+          setSession(value)
+        }
       })
       .catch(() => {
         if (active) setError('Unable to restore your session. Please retry.')
@@ -414,18 +515,23 @@ export function HostPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [navigate])
   async function load(create: boolean) {
     setBusy(true)
     setError('')
     setNotice('')
-    setSession(null)
     try {
-      setSession(
-        await (create
-          ? groupSessionService.create(duration, cacSupport)
-          : groupSessionService.restore()),
-      )
+      if (newSessionRequested.current) {
+        const previous = await groupSessionService.restore()
+        if (previous?.status === 'open')
+          await closeHostedSession(previous.sessionId)
+        newSessionRequested.current = false
+        void navigate(paths.host, { replace: true })
+      } else if (!create) {
+        setSession(await groupSessionService.restore())
+      }
+      if (create)
+        setSession(await groupSessionService.create(duration, cacSupport))
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -446,21 +552,23 @@ export function HostPage() {
     }
   }
   const sessionId = session?.status === 'open' ? session.sessionId : undefined
-  useEffect(() => {
-    if (!sessionId) return
-    const timer = window.setInterval(() => {
-      void groupSessionService.get(sessionId).then((value) => {
-        if (value) setSession(value)
-      })
-    }, 2000)
-    return () => window.clearInterval(timer)
-  }, [sessionId])
-  async function control(action: 'start' | 'end_voting' | 'next' | 'close') {
+  const stale = useGroupPolling(sessionId, busy, setSession)
+  async function control(
+    action: 'start' | 'end_voting' | 'next' | 'close',
+    exitToHome = false,
+  ) {
     if (!session || busy) return
     setBusy(true)
     setError('')
     try {
-      setSession(await groupSessionService.control(session.sessionId, action))
+      const updated = await (action === 'close'
+        ? closeHostedSession(session.sessionId)
+        : groupSessionService.control(session.sessionId, action))
+      if (!updated)
+        throw new Error('The session could not be updated. Please retry.')
+      if (updated?.status === 'closed') openSessionId.current = null
+      setSession(updated)
+      if (exitToHome) void navigate(paths.home)
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -471,7 +579,28 @@ export function HostPage() {
       setBusy(false)
     }
   }
-  if (busy) {
+  async function controlBill(billId: string, action: BillAction) {
+    if (!session || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      const updated = await groupSessionService.controlBill(
+        session.sessionId,
+        billId,
+        session.billVoteRound ?? 0,
+        action,
+      )
+      if (!updated) throw new Error('Unable to update this bill. Please retry.')
+      setSession(updated)
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : 'Unable to update this bill.',
+      )
+    } finally {
+      setBusy(false)
+    }
+  }
+  if (busy && !session) {
     return (
       <PageSection title="Host a Group" eyebrow="Facilitator">
         <p role="status">Loading session…</p>
@@ -493,7 +622,7 @@ export function HostPage() {
               </li>
               <li>
                 <strong>Choose a perspective</strong>
-                <p>Each participant chooses their own household and support.</p>
+                <p>Participants vote for a household. You set CAC support.</p>
               </li>
               <li>
                 <strong>Make space to reflect</strong>
@@ -593,9 +722,11 @@ export function HostPage() {
           aria-labelledby="page-heading"
         >
           <span className="group-badge">
-            Host · {session.joinCode} · {session.voteCount}/
+            Host · {session.joinCode} ·{' '}
+            {session.activeBill?.voteCount ?? session.voteCount}/
             {session.participantCount} voted
           </span>
+          {stale && <GroupConnectionNotice />}
           {
             <>
               <p className="placeholder-label">
@@ -603,7 +734,15 @@ export function HostPage() {
                   ? 'Before Day 1 · Employment'
                   : `Day ${session.currentDay} of 30`}
               </p>
-              {session.roundType !== 'scenario' ? (
+              {session.activeBill ? (
+                <GroupBillBallot
+                  bill={session.activeBill}
+                  currentDay={session.currentDay}
+                  acceptingVotes={false}
+                />
+              ) : session.isBillDay ? (
+                <GroupBillResults bills={session.resolvedBills ?? []} />
+              ) : session.roundType !== 'scenario' ? (
                 <GroupEmploymentRound session={session} />
               ) : (
                 <>
@@ -616,8 +755,17 @@ export function HostPage() {
                         key={choice.choiceId}
                       >
                         <strong>{choice.text}</strong>
+                        <GroupChoicePrice
+                          balanceChange={choice.balanceChange}
+                          upfrontCost={choice.upfrontCost}
+                        />
                         {choice.voteCount !== null && (
-                          <span>{choice.voteCount} votes</span>
+                          <span>
+                            {formatVoteTally(
+                              choice.voteCount,
+                              session.voteCount,
+                            )}
+                          </span>
                         )}
                       </div>
                     ))}
@@ -626,19 +774,65 @@ export function HostPage() {
               )}
               {session.roundState === 'voting' && !session.acceptingVotes && (
                 <p role="status">
-                  The decision timer has ended. Close voting to show results.
+                  Voting is closed. Reveal the results when you’re ready.
                 </p>
               )}
             </>
           }
+          <GroupRoundDebrief session={session} />
+          {!session.activeBill &&
+            session.roundType === 'scenario' &&
+            session.roundState === 'results' && (
+              <GroupOverdueBills
+                bills={session.overdueBills ?? []}
+                busy={busy}
+                onOpen={(billId) => void controlBill(billId, 'open_overdue')}
+              />
+            )}
           {error && <p role="alert">{error}</p>}
           <div className="employment-actions group-scenario-actions">
-            {session.roundState === 'voting' && (
-              <Button loading={busy} onClick={() => control('end_voting')}>
-                End voting
+            {session.activeBill && session.roundState === 'voting' && (
+              <Button
+                loading={busy}
+                onClick={() => {
+                  if (session.activeBill)
+                    void controlBill(session.activeBill.billId, 'end_voting')
+                }}
+              >
+                {session.acceptingVotes
+                  ? 'End bill voting'
+                  : 'Reveal bill results'}
               </Button>
             )}
-            {session.roundState === 'results' && (
+            {session.activeBill && session.roundState === 'results' && (
+              <>
+                <Button
+                  loading={busy}
+                  onClick={() => {
+                    if (session.activeBill)
+                      void controlBill(session.activeBill.billId, 'confirm')
+                  }}
+                >
+                  Confirm bill decision
+                </Button>
+                <Button
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    if (session.activeBill)
+                      void controlBill(session.activeBill.billId, 'reopen')
+                  }}
+                >
+                  Reopen bill voting
+                </Button>
+              </>
+            )}
+            {!session.activeBill && session.roundState === 'voting' && (
+              <Button loading={busy} onClick={() => control('end_voting')}>
+                {session.acceptingVotes ? 'End voting' : 'Reveal results'}
+              </Button>
+            )}
+            {!session.activeBill && session.roundState === 'results' && (
               <Button loading={busy} onClick={() => control('next')}>
                 {session.roundType === 'job'
                   ? 'Continue to clothing decision'
@@ -670,6 +864,14 @@ export function HostPage() {
     )
   }
 
+  const startBlockedReason =
+    session.participantCount === 0
+      ? 'At least one participant must join before you can start.'
+      : session.readyCount !== session.participantCount
+        ? 'Wait for every participant to choose a household and mark themselves ready.'
+        : null
+  const householdVoteTotal = countVotes(session.householdVotes ?? [])
+
   return (
     <section className="group-page" aria-labelledby="page-heading">
       <div className="group-lobby-grid">
@@ -689,6 +891,7 @@ export function HostPage() {
           </div>
         </aside>
         <div className="group-card group-card--lobby">
+          {stale && <GroupConnectionNotice />}
           <span className="group-badge">Host lobby · {session.joinCode}</span>
           <h1 id="page-heading" tabIndex={-1}>
             Bring your group together.
@@ -755,18 +958,18 @@ export function HostPage() {
               {session.householdVotes.map((household) => (
                 <p key={household.householdId}>
                   <span>{household.householdName}</span>
-                  <strong>{household.voteCount} votes</strong>
+                  <strong>
+                    {formatVoteTally(household.voteCount, householdVoteTotal)}
+                  </strong>
                 </p>
               ))}
             </div>
           )}
+          {startBlockedReason && <p role="status">{startBlockedReason}</p>}
+          {error && <p role="alert">{error}</p>}
           <div className="group-actions group-actions--lobby">
             <Button
-              disabled={
-                busy ||
-                session.participantCount === 0 ||
-                session.readyCount !== session.participantCount
-              }
+              disabled={busy || startBlockedReason !== null}
               loading={busy}
               onClick={() => control('start')}
             >
@@ -779,9 +982,9 @@ export function HostPage() {
             >
               Refresh session
             </Button>
-            <ButtonLink to={paths.home} variant="text">
+            <Button variant="text" onClick={() => control('close', true)}>
               Back to home
-            </ButtonLink>
+            </Button>
           </div>
         </div>
         <aside className="group-before" aria-labelledby="before-heading">
@@ -817,18 +1020,56 @@ export function HostPage() {
     </section>
   )
 }
+const groupResumeKey = 'cac.group.participant-session'
+
 export function JoinPage() {
   const [code, setCode] = useState('')
   const [session, setSession] = useState<GroupSession | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [resumeId] = useState(() => sessionStorage.getItem(groupResumeKey))
+  const [busy, setBusy] = useState(Boolean(resumeId))
   const [error, setError] = useState('')
   const { state: households, retry: retryHouseholds } = useHouseholds()
+  const endedByHost = session?.status === 'closed' && session.endedByHost
+  useEffect(() => {
+    if (!resumeId) return
+    let active = true
+    void groupSessionService
+      .get(resumeId)
+      .then((saved) => {
+        if (!active) return
+        if (
+          saved?.sessionId !== resumeId ||
+          !saved.participantId ||
+          saved.isHost
+        )
+          throw new Error('Participant membership unavailable')
+        if (saved.endedByHost) sessionStorage.removeItem(groupResumeKey)
+        setSession(saved)
+      })
+      .catch(() => {
+        if (!active) return
+        sessionStorage.removeItem(groupResumeKey)
+        setError(
+          'Unable to reconnect. Enter your facilitator’s code to try again.',
+        )
+      })
+      .finally(() => {
+        if (active) setBusy(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [resumeId])
+
   async function join() {
     if (busy) return
     setBusy(true)
     setError('')
     try {
-      setSession(await groupSessionService.join(code))
+      const joined = await groupSessionService.join(code)
+      if (joined?.participantId && !joined.isHost)
+        sessionStorage.setItem(groupResumeKey, joined.sessionId)
+      setSession(joined)
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -840,21 +1081,24 @@ export function JoinPage() {
     }
   }
   const sessionId = session?.status === 'open' ? session.sessionId : undefined
-  useEffect(() => {
-    if (!sessionId) return
-    const timer = window.setInterval(() => {
-      void groupSessionService.get(sessionId).then((value) => {
-        if (value) setSession(value)
-      })
-    }, 2000)
-    return () => window.clearInterval(timer)
-  }, [sessionId])
+  const onEndedByHost = useCallback(() => {
+    sessionStorage.removeItem(groupResumeKey)
+    setCode('')
+  }, [])
+  const stale = useGroupPolling(sessionId, busy, setSession, onEndedByHost)
+  function applyUpdate(value: GroupSession | null) {
+    setSession((current) =>
+      current?.sessionId === value?.sessionId && current?.status === 'open'
+        ? value
+        : current,
+    )
+  }
   async function vote(choiceId: string) {
     if (!session || busy) return
     setBusy(true)
     setError('')
     try {
-      setSession(await groupSessionService.vote(session.sessionId, choiceId))
+      applyUpdate(await groupSessionService.vote(session.sessionId, choiceId))
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : 'Unable to record your vote.',
@@ -868,7 +1112,7 @@ export function JoinPage() {
     setBusy(true)
     setError('')
     try {
-      setSession(await groupSessionService.voteJob(session.sessionId, jobId))
+      applyUpdate(await groupSessionService.voteJob(session.sessionId, jobId))
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -884,7 +1128,7 @@ export function JoinPage() {
     setBusy(true)
     setError('')
     try {
-      setSession(
+      applyUpdate(
         await groupSessionService.voteEmployment(session.sessionId, optionId),
       )
     } catch (cause) {
@@ -897,12 +1141,35 @@ export function JoinPage() {
       setBusy(false)
     }
   }
+  async function voteBill(choice: BillChoice) {
+    if (!session?.activeBill || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      applyUpdate(
+        await groupSessionService.voteBill(
+          session.sessionId,
+          session.activeBill.billId,
+          session.activeBill.round,
+          choice,
+        ),
+      )
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'Unable to record your bill vote.',
+      )
+    } finally {
+      setBusy(false)
+    }
+  }
   async function updateSetup(householdId: string | null, ready: boolean) {
     if (!session || busy) return
     setBusy(true)
     setError('')
     try {
-      setSession(
+      applyUpdate(
         await groupSessionService.updateSetup(
           session.sessionId,
           householdId,
@@ -918,13 +1185,14 @@ export function JoinPage() {
     }
   }
 
-  if (session) {
+  if (session && !endedByHost) {
     if (session.roundState === 'completed' || session.status === 'closed') {
       return (
         <GroupEnding
           key={session.sessionId}
           session={session}
           onJoinAgain={() => {
+            sessionStorage.removeItem(groupResumeKey)
             setSession(null)
             setCode('')
             setError('')
@@ -940,6 +1208,7 @@ export function JoinPage() {
             aria-labelledby="page-heading"
           >
             <span className="group-badge">Session {session.joinCode}</span>
+            {stale && <GroupConnectionNotice />}
             {
               <>
                 <p className="placeholder-label">
@@ -947,10 +1216,21 @@ export function JoinPage() {
                     ? 'Before Day 1 · Employment'
                     : `Day ${session.currentDay} of 30`}
                 </p>
-                {session.roundType !== 'scenario' ? (
+                {session.activeBill ? (
+                  <>
+                    <GroupBillBallot
+                      bill={session.activeBill}
+                      currentDay={session.currentDay}
+                      acceptingVotes={session.acceptingVotes && !busy && !stale}
+                      onVote={(choice) => void voteBill(choice)}
+                    />
+                  </>
+                ) : session.isBillDay ? (
+                  <GroupBillResults bills={session.resolvedBills ?? []} />
+                ) : session.roundType !== 'scenario' ? (
                   <GroupEmploymentRound
                     session={session}
-                    busy={busy}
+                    busy={busy || stale}
                     onJobVote={(jobId) => void voteJob(jobId)}
                     onEmploymentVote={(optionId) =>
                       void voteEmployment(optionId)
@@ -971,7 +1251,7 @@ export function JoinPage() {
                           aria-pressed={
                             session.selectedChoiceId === choice.choiceId
                           }
-                          disabled={!session.acceptingVotes || busy}
+                          disabled={!session.acceptingVotes || busy || stale}
                           onClick={() => void vote(choice.choiceId)}
                         >
                           <strong>
@@ -983,8 +1263,17 @@ export function JoinPage() {
                               </span>
                             )}
                           </strong>
+                          <GroupChoicePrice
+                            balanceChange={choice.balanceChange}
+                            upfrontCost={choice.upfrontCost}
+                          />
                           {choice.voteCount !== null && (
-                            <span>{choice.voteCount} votes</span>
+                            <span>
+                              {formatVoteTally(
+                                choice.voteCount,
+                                session.voteCount,
+                              )}
+                            </span>
                           )}
                         </button>
                       ))}
@@ -999,15 +1288,22 @@ export function JoinPage() {
                           session.selectedEmploymentOption
                           ? 'Vote recorded. You can change it until voting ends.'
                           : 'Choose the group’s preferred option.'
-                        : session.selectedChoiceId
+                        : (
+                              session.activeBill
+                                ? session.activeBill.selectedChoice
+                                : session.selectedChoiceId
+                            )
                           ? 'Vote recorded. You can change it until voting ends.'
                           : 'Choose your preferred option.'
-                      : 'Voting has ended. Waiting for the facilitator.'}
+                      : 'Voting is closed. Waiting for the facilitator to reveal the results.'}
                   </p>
                 )}
+                <GroupRoundDebrief session={session} />
                 {session.roundState === 'results' && (
                   <p role="status">
-                    Results are in. Waiting for the next question.
+                    {session.activeBill
+                      ? 'Waiting for your facilitator to confirm the bill decision.'
+                      : 'Results are in. Waiting for the facilitator to continue.'}
                   </p>
                 )}
               </>
@@ -1021,6 +1317,7 @@ export function JoinPage() {
       return (
         <section className="group-page" aria-labelledby="page-heading">
           <div className="group-card group-card--household">
+            {stale && <GroupConnectionNotice />}
             <span className="group-badge">Group mode · {session.joinCode}</span>
             <p className="group-kicker">Vote for a household</p>
             <h1 id="page-heading">Every household has a story.</h1>
@@ -1069,6 +1366,7 @@ export function JoinPage() {
             <h2>{session.joinCode}</h2>
           </aside>
           <div className="group-card group-card--confirmation" role="status">
+            {stale && <GroupConnectionNotice />}
             <span
               className="group-emblem group-emblem--ready"
               aria-hidden="true"
@@ -1083,8 +1381,8 @@ export function JoinPage() {
               Waiting for your facilitator to continue the group session.
             </p>
             <p>
-              <strong>{session.householdName}</strong> selected. Your household
-              locks when gameplay starts.
+              You voted for <strong>{session.householdName}</strong>. The
+              group’s household is chosen when gameplay starts.
             </p>
             <div className="group-joined-details">
               <p>
@@ -1128,7 +1426,7 @@ export function JoinPage() {
             <br />
             Room to reflect.
           </h2>
-          <p>Explore the same month, at each household’s own pace.</p>
+          <p>Explore a month of decisions together.</p>
         </aside>
         <div className="group-card group-card--join">
           <span className="group-emblem" aria-hidden="true">
@@ -1138,9 +1436,12 @@ export function JoinPage() {
           <h1 id="page-heading" tabIndex={-1}>
             Play with a group!
           </h1>
+          {endedByHost && (
+            <p role="status">Your facilitator ended the group session.</p>
+          )}
           <p className="group-lead">
-            Enter the code shared by your facilitator. You’ll choose your own
-            household and support settings next.
+            Enter your facilitator’s code to vote for the group’s household.
+            Your facilitator sets CAC support.
           </p>
           <form
             className="group-form"
@@ -1151,7 +1452,7 @@ export function JoinPage() {
           >
             <TextField
               label="Session code"
-              hint="Enter the 12-character code shown by your facilitator."
+              hint="Enter the session code shown by your facilitator."
               value={code}
               required
               maxLength={12}
@@ -1199,7 +1500,7 @@ export function JoinPage() {
             </li>
             <li>
               <strong>Choose a perspective</strong>
-              <p>Choose a household and CAC support setting.</p>
+              <p>Vote for the household the group will play.</p>
             </li>
             <li>
               <strong>Make space to reflect</strong>

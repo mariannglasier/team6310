@@ -57,7 +57,7 @@ export function LandingPage() {
               </ButtonLink>
               <ButtonLink to={paths.join}>Join a group</ButtonLink>
             </div>
-            <Link className="landing-host-link" to={paths.host}>
+            <Link className="landing-host-link" to={`${paths.host}?new=1`}>
               Host a group
             </Link>
           </PageSection>
