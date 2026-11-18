@@ -279,7 +279,7 @@ Record the selected target job and whether the qualifying education/preparation 
 
 ### Day 2: first interview
 
-Offer buying professional clothes, making current clothes work, or using the CAC clothing closet when CAC is enabled and applicable. Record ownership of professional clothing after purchase or CAC provision.
+Offer buying professional clothes, making current clothes work, or finding interview clothes at CAC?s Canopy Thrift when CAC is enabled and applicable. Record ownership of professional clothing after purchase or CAC provision.
 
 | Preparation completed before Day 1 | Interview clothing | Result |
 | --- | --- | --- |

@@ -1,4 +1,8 @@
-import type { Bill, BillSnapshot } from '../../services/billGameplay'
+import type {
+  Bill,
+  BillDecisionAction,
+  BillSnapshot,
+} from '../../services/billGameplay'
 import { useState, useRef, useEffect } from 'react'
 import { RadioGroup } from '../ui/RadioGroup'
 import { scenarioDescription } from '../../lib/gameplayText'
@@ -10,7 +14,9 @@ import { ScenarioFacts } from './ScenarioFacts'
 import { DecisionRecap } from './DecisionRecap'
 import { usdCents } from '../../types/domain'
 
-export type BillAction = (id: string, action: 'pay' | 'ignore') => void
+export type BillAction = (id: string, action: BillDecisionAction) => void
+
+const cacBillLabel = 'Use CAC assistance to pay the bill'
 
 function BillDecision({
   bill,
@@ -23,7 +29,7 @@ function BillDecision({
   onAction: BillAction
   busy: boolean
 }) {
-  const [selected, select] = useState<'pay' | 'ignore' | null>(null)
+  const [selected, select] = useState<BillDecisionAction | null>(null)
   const sending = useRef(false)
   const wasBusy = useRef(false)
   useEffect(() => {
@@ -48,9 +54,14 @@ function BillDecision({
           resolved
             ? {
                 choice: bill.paidAt
-                  ? 'Pay the bill'
+                  ? bill.paidWithCac
+                    ? cacBillLabel
+                    : 'Pay the bill'
                   : 'Ignore the bill for now',
-                change: bill.paidAt ? usdCents(-settlement(bill)) : usdCents(0),
+                change:
+                  bill.paidAt && !bill.paidWithCac
+                    ? usdCents(-settlement(bill))
+                    : usdCents(0),
                 balanceAfter: bill.paymentBalanceAfter ?? undefined,
                 outstanding:
                   bill.ignoredAt && !bill.paidAt ? settlement(bill) : undefined,
@@ -58,11 +69,6 @@ function BillDecision({
             : undefined
         }
       />
-      {!resolved && (
-        <p className="bill-decision__due">
-          Due Day {bill.dueDay} · {formatUsd(settlement(bill))}
-        </p>
-      )}
       {!resolved ? (
         <fieldset
           className="employment-controls scenario-choice-controls"
@@ -76,8 +82,8 @@ function BillDecision({
             onChange={(value) => {
               if (!busy && !sending.current) {
                 sending.current = true
-                select(value as 'pay' | 'ignore')
-                onAction(bill.id, value as 'pay' | 'ignore')
+                select(value as BillDecisionAction)
+                onAction(bill.id, value as BillDecisionAction)
               }
             }}
             options={[
@@ -87,6 +93,17 @@ function BillDecision({
                 description: `Pay ${formatUsd(settlement(bill))} now.`,
                 ariaLabel: `Pay ${bill.name}`,
               },
+              ...(snapshot.run.supportEnabled === true
+                ? [
+                    {
+                      value: 'cac',
+                      label: cacBillLabel,
+                      description:
+                        'CAC covers the full amount. Your balance stays the same.',
+                      ariaLabel: `Use CAC assistance to pay ${bill.name}`,
+                    },
+                  ]
+                : []),
               {
                 value: 'ignore',
                 label: 'Ignore the bill for now',
@@ -120,11 +137,13 @@ function BillRow({
   onAction,
   busy,
   overdue = false,
+  supportEnabled,
 }: {
   bill: Bill
   onAction: BillAction
   busy: boolean
   overdue?: boolean
+  supportEnabled: boolean
 }) {
   const pay = (
     <Button
@@ -174,7 +193,20 @@ function BillRow({
       variant={overdue ? 'overdue' : 'due'}
       detail={detail}
       iconActions={overdue && !resolved ? pay : undefined}
-      actions={!overdue && !resolved ? controls : undefined}
+      actions={
+        !resolved && overdue && supportEnabled ? (
+          <Button
+            disabled={busy}
+            variant="secondary"
+            aria-label={`Use CAC assistance to pay ${bill.name}`}
+            onClick={() => onAction(bill.id, 'cac')}
+          >
+            Pay with CAC
+          </Button>
+        ) : !overdue && !resolved ? (
+          controls
+        ) : undefined
+      }
     />
   )
 }
@@ -242,6 +274,7 @@ export function OverdueBills({
             bill={bill}
             onAction={onAction}
             busy={busy || !active}
+            supportEnabled={snapshot.run.supportEnabled === true}
             overdue
           />
         ))}

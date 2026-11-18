@@ -108,6 +108,8 @@ Public visualizations return aggregate values only. Never return raw session ide
 
 Question aggregates may include submitted responses from early-ended runs. Ending-balance/support-use aggregates use completed runs as defined in the design files. Keep incompatible content versions separate. Replays create distinct runs and do not imply distinct people; label counts as runs or responses rather than unique individuals.
 
+The private individual end screen shows a decision comparison for any nonempty cohort matching the player's saved answer, household, edition, and assistance setting. The endpoint requires ownership of the finished run and exposes aggregate values only.
+
 Raw data is not retained indefinitely. Retention and cleanup are centrally configured and enforced by maintenance tooling rather than hardcoded into UI components. Retain active state for supported recovery and historical content while referenced by retained runs. Cleanup must cover expired anonymous identities, orphaned group/run records, and unnecessary logs. Do not delete credentials/content still required by active runs. Restrict maintenance actions to trusted operators.
 
 ## Content integrity and auditing

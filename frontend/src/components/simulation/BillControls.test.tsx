@@ -56,6 +56,9 @@ it('keeps simultaneous bills independent and prevents departure before each is r
     screen.getByRole('button', { name: 'Ignore Fixture rent' }),
   )
   expect(action).toHaveBeenCalledOnce()
+  expect(
+    screen.queryByRole('button', { name: /Use CAC assistance/ }),
+  ).toBeNull()
   expect(screen.getAllByText(bill.description!)).toHaveLength(2)
   expect(action).toHaveBeenCalledWith('rent', 'ignore')
   expect(
@@ -98,6 +101,48 @@ it('keeps simultaneous bills independent and prevents departure before each is r
     screen.getByRole('button', { name: 'Continue to next day' }),
   )
   expect(next).toHaveBeenCalledOnce()
+})
+it('lets a CAC household settle a bill and shows a zero-dollar cash change', async () => {
+  const action = vi.fn()
+  const supported = {
+    ...snapshot,
+    run: { ...snapshot.run, supportEnabled: true },
+    items: [bill],
+  }
+  const view = (value: BillSnapshot) => (
+    <DueBillsPanel
+      snapshot={value}
+      onAction={action}
+      busy={false}
+      onContinue={vi.fn()}
+    />
+  )
+  const { rerender } = render(view(supported))
+  await userEvent.click(
+    screen.getByRole('button', {
+      name: 'Use CAC assistance to pay Fixture rent',
+    }),
+  )
+  expect(action).toHaveBeenCalledWith('rent', 'cac')
+  rerender(
+    view({
+      ...supported,
+      items: [
+        {
+          ...bill,
+          paidAt: '2026-11-08',
+          paidWithCac: true,
+          paymentBalanceAfter: usdCents(10000),
+        },
+      ],
+    }),
+  )
+  const receipt = screen.getByLabelText('Decision receipt')
+  expect(receipt).toHaveTextContent('Use CAC assistance to pay the bill')
+  expect(receipt).toHaveTextContent('CASH CHANGE$0.00')
+  expect(
+    screen.getByRole('button', { name: 'Continue to next day' }),
+  ).toBeEnabled()
 })
 it('shows full overdue settlements and disables payment outside the playable day stage', () => {
   const overdue = {

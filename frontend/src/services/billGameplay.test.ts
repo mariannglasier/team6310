@@ -38,9 +38,10 @@ const raw = () => ({
       amount_due: '10.00',
       late_fee_amount: '2.00',
       ignored_at: null as string | null,
-      paid_at: null,
-      paid_day: null,
-      payment_balance_after: null,
+      paid_at: null as string | null,
+      paid_day: null as number | null,
+      paid_with_cac: false,
+      payment_balance_after: null as string | null,
     },
   ],
   paid_total: '0.00',
@@ -105,6 +106,33 @@ it('reports insufficient funds without calling any ending operation', async () =
     p_run_id: 'run',
     p_occurrence_id: 'bill',
   })
+})
+
+it('excludes CAC settlements and their late fees from household spending', async () => {
+  const value = raw()
+  value.run.cac_support_enabledabled = true
+  value.bills = [
+    {
+      ...value.bills[0],
+      ignored_at: '2026-11-08T12:01:00Z',
+      paid_at: '2026-11-08T12:02:00Z',
+      paid_day: 2,
+      payment_balance_after: '50.00',
+      paid_with_cac: true,
+    },
+  ]
+  value.paid_total = '12.00'
+  rpc
+    .mockResolvedValueOnce({ data: {}, error: null })
+    .mockResolvedValueOnce({ data: value, error: null })
+  const result = await submitBill(expected, 'bill', 'cac')
+  expect(rpc).toHaveBeenNthCalledWith(1, 'pay_bill_with_cac', {
+    p_run_id: 'run',
+    p_occurrence_id: 'bill',
+  })
+  expect(result.items[0].paidWithCac).toBe(true)
+  expect(result.run.currentBalance).toBe(5000)
+  expect(result.paidTotal).toBe(0)
 })
 
 it('restores an initialized empty schedule without falling back to definitions', async () => {

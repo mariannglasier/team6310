@@ -102,9 +102,9 @@ function ResultComparisons({ runId }: { runId: string }) {
       className="simulation-result__comparison"
       aria-labelledby="result-comparison"
     >
-      <h3 id="result-comparison">How others answered</h3>
+      <h3 id="result-comparison">How players answered</h3>
       <p>
-        Decisions you answered, compared with other players using the same
+        Decisions you answered, with comparisons to other players using the same
         household and assistance setting.
       </p>
       {failed ? (
@@ -133,35 +133,73 @@ function ResultComparisons({ runId }: { runId: string }) {
               <p>
                 <strong>Your answer</strong> <span>{row.answer}</span>
               </p>
-              {row.responses === null ? (
-                <p>
-                  Percentages appear once five other comparable runs have
-                  answered this question.
-                </p>
-              ) : (
-                <>
-                  <p>{row.responses} other runs answered</p>
-                  <ul>
-                    {row.options.map((option) => (
-                      <li key={option.id}>
-                        <div>
-                          <span>{option.label}</span>
-                          <strong>{option.percent}%</strong>
-                        </div>
-                        <progress
-                          aria-label={option.label}
-                          max={100}
-                          value={option.percent}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+              <p>
+                {row.responses ?? 1}{' '}
+                {(row.responses ?? 1) === 1 ? 'response' : 'responses'}
+              </p>
+              <ComparisonPie
+                options={
+                  row.responses === null
+                    ? [{ id: 'own', label: row.answer, percent: 100 }]
+                    : row.options
+                }
+              />
             </article>
           ))}
         </div>
       )}
     </section>
+  )
+}
+
+const pieColors = [
+  '#9e203b',
+  '#456345',
+  '#315e80',
+  '#90571c',
+  '#68518b',
+  '#216a6c',
+]
+
+function ComparisonPie({ options }: { options: ResultComparison['options'] }) {
+  const total = options.reduce((sum, option) => sum + option.percent, 0)
+  let offset = 0
+  const slices = options.map((option, index) => {
+    const color = pieColors[index % pieColors.length]
+    const start = offset
+    offset += option.percent
+    return {
+      ...option,
+      color,
+      stop: `${color} ${(100 * start) / total}% ${(100 * offset) / total}%`,
+    }
+  })
+  return (
+    <>
+      {total > 0 && (
+        <div
+          aria-hidden="true"
+          className="simulation-result__pie"
+          style={{
+            background: `conic-gradient(${slices
+              .filter((slice) => slice.percent > 0)
+              .map((slice) => slice.stop)
+              .join(', ')}, transparent 100%)`,
+          }}
+        />
+      )}
+      <ul
+        className="simulation-result__legend"
+        aria-label="Response percentages"
+      >
+        {slices.map((slice) => (
+          <li key={slice.id}>
+            <span aria-hidden="true" style={{ backgroundColor: slice.color }} />
+            <span>{slice.label}</span>
+            <strong>{slice.percent}%</strong>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }

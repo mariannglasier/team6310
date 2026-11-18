@@ -31,6 +31,21 @@ it('never displays a CAC observation in regular mode', async () => {
   expect(await screen.findByText(general.text)).toBeVisible()
   expect(screen.queryByText(cac.text)).toBeNull()
 })
+it('highlights the full CAC statistic even when the number has a qualifier', async () => {
+  load.mockResolvedValue([
+    {
+      ...cac,
+      text: 'In 2025, CAC reported 610 total students in Adult Education programs.',
+    },
+  ])
+  render(<ScenarioFacts {...props} supportEnabled />)
+  expect(await screen.findByText('610 total students')).toHaveClass(
+    'scenario-facts__stat',
+  )
+  expect(screen.getByText(/CAC reported/)).toHaveTextContent(
+    'In 2025, CAC reported 610 total students in Adult Education programs.',
+  )
+})
 it('does not invent a fact for a missing observation', async () => {
   load.mockResolvedValue([])
   render(<ScenarioFacts {...props} supportEnabled />)

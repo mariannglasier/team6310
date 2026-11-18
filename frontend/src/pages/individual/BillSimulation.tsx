@@ -6,6 +6,7 @@ import {
   submitBill,
   settlement,
   type BillSnapshot,
+  type BillDecisionAction,
 } from '../../services/billGameplay'
 import {
   employmentSnapshot,
@@ -141,7 +142,7 @@ export function BillSimulation({
     // The run locator is fixed for this mounted simulation. Committed refreshes
     // are explicitly requested after operations, never inferred from cash alone.
   }, [initialRun.id])
-  async function action(id: string, action: 'pay' | 'ignore') {
+  async function action(id: string, action: BillDecisionAction) {
     if (!saved || !begin()) return
     const sequence = ++generation.current
     setLoading(true)

@@ -159,7 +159,7 @@ function InterviewChoices({
           ? [
               {
                 id: "cac" as const,
-                title: "Use the CAC clothing closet",
+                title: "Find interview clothes at CAC's Canopy Thrift",
                 description:
                   "Choose professional clothing through CAC for this interview.",
                 cost: "No cost",

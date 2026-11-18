@@ -201,7 +201,7 @@ export const facts = {
   clothingPending: {
     id: 'clothing-pending',
     value: 'Coming soon',
-    label: 'Clothing closet totals, once CAC provides approved figures.',
+    label: 'Canopy Thrift totals, once CAC provides approved figures.',
     geography: 'Sandy Springs and Dunwoody',
     period: 'Pending CAC-approved figures',
     sourceId: 'cac',
@@ -377,11 +377,11 @@ export const categories: readonly CategoryContent[] = [
       challenge:
         'Empty hangers pass by. The highlighted ones match the moment you chose.',
       impact:
-        'Each hanger is filled. The clothing closet gives neighbors something to wear for the moment ahead.',
+        'Each hanger is filled. Canopy Thrift gives neighbors something to wear for the moment ahead.',
     },
     facts: [facts.clothingPending],
     cac: {
-      title: 'CAC clothing closet',
+      title: 'CAC Canopy Thrift',
       body: 'CAC provides access to clothing and essential items for neighbors facing financial hardship.',
     },
   },

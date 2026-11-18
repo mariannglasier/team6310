@@ -15,6 +15,7 @@
 
 .scenario-facts__card--cac {
   background: var(--finance-green, #e6eadc);
+  container-type: inline-size;
 }
 
 .scenario-facts__card h3 {
@@ -39,7 +40,26 @@
   overflow-wrap: anywhere;
 }
 .scenario-facts__card--cac .scenario-facts__stat {
+  display: block;
   color: #465c3d;
+  /* Keep the larger statistic within the previous line and margins. */
+  font-size: clamp(0.9375rem, var(--stat-width-font-size), 2.5rem);
+  line-height: 1;
+  text-align: center;
+}
+
+.scenario-facts__card--cac:has(.scenario-facts__stat--final),
+.scenario-facts__card--cac p:has(.scenario-facts__stat--final) {
+  display: flex;
+  flex-direction: column;
+}
+
+.scenario-facts__card--cac p:has(.scenario-facts__stat--final) {
+  flex: 1;
+}
+
+.scenario-facts__stat--final {
+  margin-block: auto;
 }
 
 .scenario-choice-controls > .ui-button {

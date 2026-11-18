@@ -14,12 +14,19 @@ export async function loadScenarioFacts(
   scenarioId: string,
   versionId: string,
   supportEnabled: boolean,
+  source: 'individual' | 'group' = 'individual',
 ): Promise<ScenarioFact[]> {
   const client = await getSupabaseClient()
-  const { data, error } = await client.rpc('get_event_recap_facts', {
-    p_run_id: runId,
-    p_event_key: scenarioId,
-  })
+  const { data, error } =
+    source === 'group'
+      ? await client.rpc('get_group_scenario_facts', {
+          p_session_id: runId,
+          p_scenario_id: scenarioId,
+        })
+      : await client.rpc('get_event_recap_facts', {
+          p_run_id: runId,
+          p_event_key: scenarioId,
+        })
   if (error) throw error
   if (!Array.isArray(data)) throw new Error('Invalid scenario facts')
   const roles = new Set<string>()

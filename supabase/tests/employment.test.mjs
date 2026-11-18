@@ -164,4 +164,18 @@ assert.deepEqual(await compare(run), [{
   ],
 }]);
 console.log('PASS: assisted replay from either ending, private result ownership, peer percentages, and small-cohort suppression');
+await db.exec('reset role');
+await db.exec(readFileSync(new URL('../migrations/20261118070000_show_small_end_screen_comparisons.sql', import.meta.url), 'utf8'));
+for (let count = 0; count < 5; count++) {
+  await db.query(
+    'update playthroughs set cac_support_enabledabled = (playthrough_id >= $1) where playthrough_id between $2 and $3',
+    [uuid(60 + count), uuid(60), uuid(64)],
+  );
+  await db.exec('set role authenticated');
+  const [row] = await compare(run);
+  assert.equal(row.responses, count || null);
+  assert.deepEqual(row.options.map(option => option.percent), count ? [100, 0] : []);
+  await db.exec('reset role');
+}
+console.log('PASS: end-screen comparisons show one through four matching peer responses');
 await db.close();

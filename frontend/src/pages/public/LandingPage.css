@@ -120,6 +120,16 @@
   line-height: 1.6;
   color: var(--text-muted);
 }
+.landing-instructions {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.landing-instructions li + li {
+  margin-block-start: 0.75rem;
+}
 @media (max-width: 64rem) {
   .landing-hero {
     grid-template-columns: 1fr;

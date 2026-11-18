@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { PageSection } from '../../components/ui/PageSection'
 import { PriceUpdateStatus } from '../../components/simulation/PriceUpdateStatus'
+import { ScenarioFacts } from '../../components/simulation/ScenarioFacts'
 import { scenarioDescription } from '../../lib/gameplayText'
+import { cacInterviewClothingLabel } from '../../state/employmentWalkthrough'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { SelectField, TextField } from '../../components/ui/FormFields'
 import { paths } from '../../app/paths'
@@ -24,6 +26,24 @@ const weeklyPay = (value: number | string) =>
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(Number(value))
+
+function GroupScenarioFacts({ session }: { session: GroupSession }) {
+  if (
+    session.roundType !== 'scenario' ||
+    session.roundState !== 'results' ||
+    !session.question
+  )
+    return null
+  return (
+    <ScenarioFacts
+      source="group"
+      runId={session.sessionId}
+      scenarioId={session.question.scenarioId}
+      versionId={session.versionId}
+      supportEnabled={session.cacSupportEnabled}
+    />
+  )
+}
 
 function VotingCountdown({ session }: { session: GroupSession }) {
   const deadline = session.roundDeadline
@@ -150,7 +170,9 @@ function GroupEmploymentOptions({
           onClick={() => onVote?.(option.optionId)}
         >
           <strong>
-            {option.text}
+            {session.roundType === 'clothing' && option.optionId === 'cac'
+              ? cacInterviewClothingLabel
+              : option.text}
             {session.selectedEmploymentOption === option.optionId &&
               session.roundState === 'voting' && (
                 <span className="employment-selected"> · Selected</span>
@@ -619,6 +641,7 @@ export function HostPage() {
             </>
           )}
           {error && <p role="alert">{error}</p>}
+          <GroupScenarioFacts session={session} />
           <div className="employment-actions group-scenario-actions">
             {session.roundState === 'voting' && (
               <Button loading={busy} onClick={() => control('end_voting')}>
@@ -993,6 +1016,7 @@ export function JoinPage() {
                     Results are in. Waiting for the next question.
                   </p>
                 )}
+                <GroupScenarioFacts session={session} />
               </>
             )}
             {error && <p role="alert">{error}</p>}

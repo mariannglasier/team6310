@@ -54,9 +54,13 @@ it('offers both replay paths and shows percentages only where available', async 
   expect(replay.mock.calls).toEqual([[true], [false]])
   const [food, transportation] = await screen.findAllByRole('article')
   expect(within(food!).getByText('80%')).toBeInTheDocument()
-  expect(within(transportation!).getByText('Take the bus')).toBeInTheDocument()
+  expect(within(food!).getByText('5 responses')).toBeInTheDocument()
+  expect(within(transportation!).getByText('1 response')).toBeInTheDocument()
+  expect(within(transportation!).getByText('100%')).toBeInTheDocument()
   expect(
-    within(transportation!).getByText(/five other comparable runs/),
+    within(transportation!).getByRole('list', { name: 'Response percentages' }),
+  ).toHaveTextContent('Take the bus100%')
+  expect(
+    transportation!.querySelector('.simulation-result__pie'),
   ).toBeInTheDocument()
-  expect(within(transportation!).queryByRole('progressbar')).toBeNull()
 })

@@ -4,6 +4,7 @@ import { JobBoard } from '../../components/simulation/JobBoard'
 import { formatUsd } from '../../lib/money'
 import {
   availableJobs,
+  cacInterviewClothingLabel,
   clothingOptions,
   type Action,
   type Clothing,
@@ -58,7 +59,7 @@ export function EmploymentGame({
   const labels: Record<Clothing, string> = {
     purchase: 'Buy professional clothes',
     current: 'Make my current clothes work',
-    cac: 'Use the CAC clothing closet',
+    cac: cacInterviewClothingLabel,
     owned: 'Wear my professional clothes',
   }
   return (

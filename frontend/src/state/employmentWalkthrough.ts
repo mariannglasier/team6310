@@ -147,6 +147,9 @@ export function availableJobs(state: Walkthrough) {
   )
 }
 
+export const cacInterviewClothingLabel =
+  "Find interview clothes at CAC's Canopy Thrift"
+
 export function clothingOptions(state: Walkthrough): readonly Clothing[] {
   return state.clothing !== 'none'
     ? ['owned']

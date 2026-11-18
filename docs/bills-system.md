@@ -1,6 +1,8 @@
 # Independent bills — approved November 8, 2026
 
-**November 17 presentation update:** Main bill events show their stored descriptions. Activating Pay or Ignore immediately saves the decision and opens its receipt and facts; there is no separate Submit button. Pending actions remain locked against duplicate activation. Continue remains available after the saved recap. All existing bill finances and departure guards remain in effect.
+Main bill events show their stored descriptions. Activating a bill option immediately saves the decision and opens its receipt and facts. Pending actions remain locked against duplicate activation. Continue remains available after the saved recap.
+
+For now, CAC-enabled individual runs can use CAC assistance to pay any due or overdue bill in full, including incurred late fees, with no change to their cash balance. The server records the settled occurrence and the use of CAC assistance. The authorization and departure guards apply to these payments.
 
 ## Six bill cap approved November 17 2026
 

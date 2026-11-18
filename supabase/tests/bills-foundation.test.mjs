@@ -334,4 +334,38 @@ for(const signature of ['pay_bill(uuid,uuid)','ignore_bill(uuid,uuid)','get_bill
  assert.deepEqual(access,{allowed:true,anonymous:false,leaked:false});
 }
 console.log('PASS: Day 2 hiring with Day 2/3 bills, wages before bill controls, atomic payment rollback, read-only final snapshot and RPC ACLs');
+await db.exec('create function public.is_cac_staff() returns boolean language sql as $$select false$$');
+await db.exec(migration('20261118060000_cac_bill_assistance'));
+const assisted = await start(p);
+const assist = async (id, bill) => (await db.query(
+  'select pay_bill_with_cac($1,$2) result', [id, bill],
+)).rows[0].result;
+await assert.rejects(() => assist(game, firstBill.playthrough_expense_id), /assistance unavailable/);
+await act(assisted,{type:'initialize',replayOf:game});
+const billsForAssistance = await bills(assisted);
+const due = billsForAssistance.find(b => b.due_day === 2);
+await assert.rejects(() => assist(assisted, due.playthrough_expense_id), /payment unavailable/);
+await act(assisted,{type:'prepare'});
+await act(assisted,{type:'continue'});
+await act(assisted,{type:'apply',jobId:uuid(50)});
+await act(assisted,{type:'continue'});
+await act(assisted,{type:'continue'});
+await act(assisted,{type:'interview',choice:'cac'});
+await act(assisted,{type:'continue'});
+await ignore(assisted, due.playthrough_expense_id);
+await act(assisted,{type:'continue'});
+const cashBefore = Number((await state(assisted)).current_balance);
+await db.exec(`set role authenticated; set test.uid='${uuid(99)}'`);
+await assert.rejects(() => assist(assisted, due.playthrough_expense_id), /assistance unavailable/);
+await db.exec(`set test.uid='${owner}'`);
+const settled = await assist(assisted, due.playthrough_expense_id);
+assert.equal(settled.bill.paid_with_cac, true);
+assert.equal(Number(settled.bill.payment_balance_after), cashBefore);
+assert.equal(Number(settled.run.current_balance), cashBefore);
+assert.equal(settled.run.employment_state.assistanceUsed, true);
+assert.equal((await assist(assisted, due.playthrough_expense_id)).bill.paid_at, settled.bill.paid_at);
+assert.equal((await pay(assisted, due.playthrough_expense_id)).run.current_balance, settled.run.current_balance);
+assert.equal(Number((await db.query('select get_bill_snapshot($1) result', [assisted])).rows[0].result.overdue_total), 0);
+await db.exec('reset role');
+console.log('PASS: full CAC bill assistance, overdue settlement, repeat safety, and access checks');
 await db.close();

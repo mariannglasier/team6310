@@ -95,24 +95,30 @@
   display: block;
 }
 
-.simulation-result__cards ul {
+.simulation-result__pie {
+  width: min(100%, 9rem);
+  aspect-ratio: 1;
+  margin: 1rem auto;
+  border-radius: 50%;
+}
+
+.simulation-result__legend {
   list-style: none;
   padding: 0;
 }
 
-.simulation-result__cards li {
+.simulation-result__legend li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.5rem;
   margin-block: 0.65rem;
 }
 
-.simulation-result__cards li div {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.simulation-result progress {
-  width: 100%;
-  accent-color: var(--primary);
+.simulation-result__legend li > span:first-child {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
 }
 
 .simulation-result > .ui-button {
