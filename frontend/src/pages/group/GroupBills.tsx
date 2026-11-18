@@ -93,19 +93,29 @@ export function GroupBillBallot({
         {(['pay', 'ignore'] as const).map((choice) => {
           const votes = choice === 'pay' ? bill.payVotes : bill.ignoreVotes
           const label = choice === 'pay' ? 'Pay bill' : 'Ignore bill'
+          const selected = Boolean(onVote) && bill.selectedChoice === choice
+          const optionLabel = (
+            <>
+              {label}
+              {selected && (
+                <span className="employment-selected"> · Selected</span>
+              )}
+            </>
+          )
           return (
             <div className="employment-choice" key={choice}>
               {onVote && votes === null ? (
                 <Button
                   variant="secondary"
+                  className="group-vote-option"
                   disabled={!acceptingVotes}
-                  aria-pressed={bill.selectedChoice === choice}
+                  aria-pressed={selected}
                   onClick={() => onVote(choice)}
                 >
-                  {label}
+                  {optionLabel}
                 </Button>
               ) : (
-                <strong>{label}</strong>
+                <strong>{optionLabel}</strong>
               )}
               <span>
                 {votes !== null

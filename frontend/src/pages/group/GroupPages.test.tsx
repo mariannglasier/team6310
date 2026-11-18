@@ -314,7 +314,24 @@ test('shows the paycheck and lets an enrolled participant vote on the due bill',
     'pay',
   )
   expect(
-    await screen.findByRole('button', { name: 'Pay bill', pressed: true }),
+    await screen.findByRole('button', {
+      name: /Pay bill.*Selected/,
+      pressed: true,
+    }),
+  ).toBeVisible()
+  vi.mocked(groupSessionService.voteBill).mockResolvedValueOnce({
+    ...billSession,
+    activeBill: { ...dueBill, selectedChoice: 'ignore', voteCount: 1 },
+  })
+  await user.click(screen.getByRole('button', { name: 'Ignore bill' }))
+  expect(
+    await screen.findByRole('button', {
+      name: /Ignore bill.*Selected/,
+      pressed: true,
+    }),
+  ).toBeVisible()
+  expect(
+    screen.getByRole('button', { name: 'Pay bill', pressed: false }),
   ).toBeVisible()
   expect(screen.getByText('$800.00')).toBeVisible()
 })
