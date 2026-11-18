@@ -32,18 +32,18 @@ export function EmploymentGame({
   dispatch,
   onReplay,
   recapFacts,
+  allowPlaceholder = false,
   runId,
   loading = false,
-  allowPlaceholder = false,
 }: {
   state: Walkthrough
   dispatch: (action: Action) => void
   onReplay: (support: boolean) => void
   recapFacts?: ReactNode
-  runId?: string
-  loading?: boolean
   // The caller must resolve bills and real scenarios before allowing fallback.
   allowPlaceholder?: boolean
+  runId?: string
+  loading?: boolean
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {

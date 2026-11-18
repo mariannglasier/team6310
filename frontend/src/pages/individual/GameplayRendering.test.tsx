@@ -255,6 +255,24 @@ it.each([undefined, null])(
     expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   },
 )
+it('waits for the bill handler when a matching snapshot has a bill due today', async () => {
+  const restoredRun = { ...run, currentScenarioId: null }
+  render(
+    <MemoryRouter>
+      <SetupProvider>
+        <EmploymentPanel
+          run={restoredRun}
+          bills={scheduledBills(restoredRun)}
+          onCommit={vi.fn()}
+        />
+      </SetupProvider>
+    </MemoryRouter>,
+  )
+  expect(await screen.findByText('Loading…')).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  expect(screen.queryByText('No more decisions today.')).toBeNull()
+  expect(submitEmployment).not.toHaveBeenCalled()
+})
 it('withdraws fallback eligibility while an existing empty snapshot is refreshing', async () => {
   const restoredRun = { ...run, currentScenarioId: null }
   const empty = bills(restoredRun)

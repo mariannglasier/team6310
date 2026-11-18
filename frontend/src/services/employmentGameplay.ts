@@ -229,13 +229,6 @@ export function documentState(value: unknown): Record<string, unknown> {
       )
         throw new UnsupportedEmploymentDocumentError()
     parseUsdCents(s.weeklyIncome, 'weeklyIncome')
-    if (
-      s.clothingCost !== undefined &&
-      (typeof s.clothingCost !== 'string' ||
-        !/^\d+(?:\.\d{1,2})?$/.test(s.clothingCost) ||
-        parseUsdCents(s.clothingCost, 'clothing') <= 0)
-    )
-      throw new UnsupportedEmploymentDocumentError('Invalid clothing price')
   }
   return s
 }

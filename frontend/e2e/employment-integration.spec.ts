@@ -378,7 +378,7 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.screenshot({
     path: testInfo.outputPath('employment-complete.png'),
   })
-  await page.getByRole('button', { name: 'Try another mode' }).click()
+  await page.getByRole('button', { name: 'Play with CAC assistance' }).click()
   await page.getByText('Choose this household').first().click()
   await page.getByRole('button', { name: 'Start simulation' }).click()
   await setupPreview()
@@ -397,7 +397,9 @@ test('integrated employment keeps saved finances and supports a full local month
   await page.getByRole('button', { name: 'Start Day 1' }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
   await page
-    .getByRole('button', { name: /Use the CAC clothing closet/ })
+    .getByRole('button', {
+      name: /Find interview clothes at CAC's Canopy Thrift/,
+    })
     .click()
   await expect(
     page.getByRole('heading', { name: 'You got the Office job job.' }),

@@ -107,7 +107,7 @@ it('keeps unqualified jobs disabled and submits an eligible job from the keyboar
     jobId: 'First job',
   })
 })
-it('separates selection and submission, reapplies the same day and reaches Day 30', async () => {
+it('commits choices on activation, reapplies the same day and reaches Day 30', async () => {
   const user = userEvent.setup()
   const replay = vi.fn()
   render(
@@ -188,6 +188,7 @@ it('shows only a small loading status while a day transition is pending', () => 
       state={state}
       dispatch={vi.fn()}
       onReplay={vi.fn()}
+      allowPlaceholder
       loading
     />,
   )

@@ -180,6 +180,7 @@ test('bills show narrative decision cards with confirmation and compact overdue 
       'Your electricity bill is due. Decide how to handle the bill.',
     ),
   ).toBeVisible()
+  await expect(due.locator('.bill-decision__due')).toHaveCount(0)
   await expect(due.getByRole('button', { name: /Submit/ })).toHaveCount(0)
   await expect(page.getByText('Select option', { exact: true })).toHaveCount(0)
   await expect(overdue.locator('.finance-expense-amount')).toHaveText('$55.00')
@@ -200,14 +201,14 @@ test('bills show narrative decision cards with confirmation and compact overdue 
       width: innerWidth,
       overflow: document.documentElement.scrollWidth > innerWidth,
       pay: box(row, 'button'),
-      amount: box(due, '.bill-decision__due'),
+      story: box(due, '.decision-summary__story'),
       actions: box(due, '.ui-radio-options'),
     }
   })
   expect(geometry.overflow).toBe(false)
   await expect(overdue.locator('svg')).toHaveCount(0)
   await expect(overdue.getByText(/Due Day/)).toHaveCount(0)
-  expect(geometry.actions.y).toBeGreaterThanOrEqual(geometry.amount.bottom)
+  expect(geometry.actions.y).toBeGreaterThanOrEqual(geometry.story.bottom)
   await expect(overdue.getByRole('button')).toHaveCSS(
     'background-color',
     'rgb(181, 9, 53)',
