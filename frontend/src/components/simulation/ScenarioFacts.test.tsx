@@ -18,18 +18,33 @@ const cac = {
   sourceUrl: 'https://www.ourcac.org/',
 }
 beforeEach(() => vi.clearAllMocks())
-it('shows general and CAC cards without source buttons in CAC mode', async () => {
+it('shows authored general and CAC text without source buttons in CAC mode', async () => {
   load.mockResolvedValue([cac, general])
   render(<ScenarioFacts {...props} supportEnabled />)
   expect(await screen.findByText(general.text)).toBeVisible()
   expect(screen.getByText(cac.text)).toBeVisible()
-  expect(screen.queryByRole('link', { name: 'Source' })).toBeNull()
+  expect(screen.queryByRole('link', { name: /Source/ })).toBeNull()
 })
 it('never displays a CAC observation in regular mode', async () => {
   load.mockResolvedValue([general, cac])
   render(<ScenarioFacts {...props} supportEnabled={false} />)
   expect(await screen.findByText(general.text)).toBeVisible()
   expect(screen.queryByText(cac.text)).toBeNull()
+})
+it('highlights the full CAC statistic even when the number has a qualifier', async () => {
+  load.mockResolvedValue([
+    {
+      ...cac,
+      text: 'In 2025, CAC reported 610 total students in Adult Education programs.',
+    },
+  ])
+  render(<ScenarioFacts {...props} supportEnabled />)
+  expect(await screen.findByText('610 total students')).toHaveClass(
+    'scenario-facts__stat',
+  )
+  expect(screen.getByText(/CAC reported/)).toHaveTextContent(
+    'In 2025, CAC reported 610 total students in Adult Education programs.',
+  )
 })
 it('does not invent a fact for a missing observation', async () => {
   load.mockResolvedValue([])

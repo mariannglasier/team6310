@@ -6,6 +6,7 @@ import {
   submitBill,
   settlement,
   type BillSnapshot,
+  type BillDecisionAction,
 } from '../../services/billGameplay'
 import {
   employmentSnapshot,
@@ -141,7 +142,7 @@ export function BillSimulation({
     // The run locator is fixed for this mounted simulation. Committed refreshes
     // are explicitly requested after operations, never inferred from cash alone.
   }, [initialRun.id])
-  async function action(id: string, action: 'pay' | 'ignore') {
+  async function action(id: string, action: BillDecisionAction) {
     if (!saved || !begin()) return
     const sequence = ++generation.current
     setLoading(true)
@@ -205,10 +206,10 @@ export function BillSimulation({
       finish()
     }
   }
-  async function replayBeforeEmployment() {
+  async function replayBeforeEmployment(support: boolean) {
     if (!saved || !begin()) return
     try {
-      await replay(false, saved.bills.run)
+      await replay(support, saved.bills.run)
       navigate(paths.individual)
     } catch {
       setError(
@@ -309,7 +310,8 @@ export function BillSimulation({
               <SimulationResult
                 reason="You ended the walkthrough."
                 balance={saved.bills.run.currentBalance!}
-                onReplay={() => void replayBeforeEmployment()}
+                runId={saved.bills.run.id}
+                onReplay={(support) => void replayBeforeEmployment(support)}
               />
             </fieldset>
           </section>

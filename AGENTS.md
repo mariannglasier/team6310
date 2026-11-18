@@ -6,6 +6,8 @@
 
 # AGENTS.md — CAC Poverty Exercise
 
+> **Approved interaction update November 17, 2026:** Individual gameplay choices now commit on activation, without a separate Submit button, per the user's explicit request. This supersedes earlier staged-selection instructions for ordinary decisions, bills, job applications and interview clothing. Keep server-authoritative/idempotent operations, pending locks, error recovery and recap-before-Continue. Setup and administrative forms remain staged. Receipt recaps and brand-red interactive highlighting follow the updated `design/ui-spec.md`.
+
 ## 1. Role and project authority
 
 Assist Georgia Tech Team 6310 in developing the CAC Poverty Exercise for the Community Assistance Center in Sandy Springs, Georgia. Project specifications define what to build; this file defines how to work.

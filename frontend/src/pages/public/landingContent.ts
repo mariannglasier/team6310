@@ -15,15 +15,18 @@ export const landingContent = {
     },
     {
       icon: 'receipt',
-      title: 'Navigate 30 days',
-      description:
-        'Weigh decisions about housing, food, work, transportation, and other everyday needs.',
+      title: 'Make choices and track your balance',
+      instructions: [
+        'Read the situation. Selecting an option confirms your choice.',
+        'Check your balance. Spending lowers it, income raises it, and some choices leave it unchanged.',
+        'Review what happened, then continue to the next day.',
+      ],
     },
     {
       icon: 'chart',
       title: 'Reflect on the experience',
       description:
-        'Consider the trade-offs and how access to community support can shape a household’s options.',
+        'Reflect on the trade-offs you made, then try another run with CAC assistance to see how its services can help your household.',
     },
   ],
 } as const

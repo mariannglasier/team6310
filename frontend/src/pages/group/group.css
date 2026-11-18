@@ -513,13 +513,29 @@
 }
 
 .group-vote-option[aria-pressed='true'] {
-  border-color: var(--finance-blue-ink);
-  background: var(--finance-blue);
+  border-color: var(--primary);
+  background: var(--accent-surface);
 }
 
 .group-vote-option:focus-visible {
-  outline: 3px solid #245f8a;
+  outline: 3px solid var(--primary);
   outline-offset: 3px;
+}
+
+.group-round-debrief {
+  margin-block: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--finance-rule, #cbd5e1);
+  border-radius: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.group-round-debrief > :first-child {
+  margin-top: 0;
+}
+
+.group-round-debrief > :last-child {
+  margin-bottom: 0;
 }
 
 .group-scenario-actions {
@@ -664,4 +680,85 @@
 
 .group-shared-expenses small {
   grid-column: 1 / -1;
+}
+.group-ending {
+  max-width: 64rem;
+  margin-inline: auto;
+  text-align: left;
+}
+.group-ending h1 {
+  margin-top: 1rem;
+}
+.group-ending h2 {
+  margin-top: 2rem;
+}
+.group-ending-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 2rem;
+}
+.group-ending-totals > div {
+  background: var(--group-green);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+.group-ending-totals dd {
+  margin: 0.5rem 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.group-ending-decision {
+  border-bottom: 1px solid #ccd9df;
+  padding-block: 1rem;
+}
+.group-ending-decision summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.5rem;
+}
+.group-ending-decision summary:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+.group-ending-decision ul {
+  list-style: none;
+  padding: 0;
+}
+.group-ending-decision li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+.group-ending-decision li > strong {
+  white-space: nowrap;
+}
+.group-ending-decision .group-choice-price {
+  display: block;
+}
+.group-ending-reflection {
+  background: var(--group-blue);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  margin-block: 2rem;
+}
+.group-ending-reflection h2 {
+  margin-top: 0;
+}
+.group-ending-reflection li {
+  margin-block: 0.5rem;
+}
+.group-ending-replay {
+  border-top: 1px solid #ccd9df;
+  margin-block: 2rem;
+}
+@media (max-width: 40rem) {
+  .group-ending-totals {
+    grid-template-columns: 1fr;
+  }
+  .group-ending .group-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

@@ -369,7 +369,8 @@ DDL, composite references, idempotency, and ownership/RLS before implementation.
 The team approved globally unique join codes, enrollment only while a session is
 in its lobby, and same-browser restoration of the host's existing open session.
 The join-code implementation uses one open session per host and non-reused
-12-character database-generated codes. Codes have no clock-based expiration;
+four-character database-generated codes for new sessions. Existing 12-character
+codes remain valid while their sessions are open. Codes have no clock-based expiration;
 starting the first voting round closes enrollment. See
 [implementation](group-join-codes.md).
 

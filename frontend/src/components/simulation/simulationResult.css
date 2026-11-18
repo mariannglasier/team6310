@@ -1,0 +1,126 @@
+﻿.simulation-result {
+  display: grid;
+  gap: clamp(1.25rem, 4vw, 2rem);
+}
+
+.simulation-result__help {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: clamp(1rem, 4vw, 2rem);
+  border: 1px solid var(--divider);
+  border-inline-start: 5px solid var(--primary);
+  border-radius: 1rem;
+  background: var(--accent-surface);
+}
+
+.simulation-result__reason {
+  margin: 0;
+  font-weight: 600;
+}
+
+.simulation-result__help-photo {
+  width: 100%;
+  height: 100%;
+  min-height: 10rem;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 40rem) {
+  .simulation-result__help {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .simulation-result__help-photo {
+    height: 12rem;
+  }
+}
+
+.simulation-result h3 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.simulation-result p {
+  max-width: 67ch;
+}
+
+.simulation-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.simulation-result__outcome {
+  border-block-end: 1px solid var(--divider);
+  padding-block-end: 1.25rem;
+}
+
+.simulation-result__outcome strong {
+  display: block;
+  font-size: 1.75rem;
+}
+
+.simulation-result__note,
+.simulation-result__category {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.simulation-result__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+}
+
+.simulation-result__cards article {
+  min-width: 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.simulation-result__cards h4 {
+  font-size: 1.125rem;
+  margin-block: 0.25rem;
+}
+
+.simulation-result__cards article > p > span {
+  display: block;
+}
+
+.simulation-result__pie {
+  width: min(100%, 9rem);
+  aspect-ratio: 1;
+  margin: 1rem auto;
+  border-radius: 50%;
+}
+
+.simulation-result__legend {
+  list-style: none;
+  padding: 0;
+}
+
+.simulation-result__legend li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-block: 0.65rem;
+}
+
+.simulation-result__legend li > span:first-child {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+}
+
+.simulation-result > .ui-button {
+  justify-self: start;
+}

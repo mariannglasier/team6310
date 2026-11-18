@@ -137,11 +137,11 @@ export const categories: readonly CategoryContent[] = [
       challenge:
         'Empty hangers pass by. The highlighted ones match the moment you chose.',
       impact:
-        'Each hanger is filled. The clothing closet gives neighbors something to wear for the moment ahead.',
+        'Each hanger is filled. Canopy Thrift gives neighbors something to wear for the moment ahead.',
     },
     facts: cacFactsFor('clothing'),
     cac: {
-      title: 'CAC clothing closet',
+      title: 'CAC Canopy Thrift',
       body: 'CAC provides access to clothing and essential items for neighbors facing financial hardship.',
     },
   },

@@ -15,6 +15,7 @@ declare a jsonb; question_id uuid;
 begin
   a := public.configure_host_group_session(true, 90);
   assert a->>'sessionId' is not null;
+  assert a->>'joinCode' ~ '^[A-HJ-NP-Z2-9]{4}$';
   assert a->>'status' = 'open';
   assert a->>'decisionDurationSeconds' = '90';
   assert a->>'participantCount' = '0';

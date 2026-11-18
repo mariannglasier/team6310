@@ -57,7 +57,7 @@ export function LandingPage() {
               </ButtonLink>
               <ButtonLink to={paths.join}>Join a group</ButtonLink>
             </div>
-            <Link className="landing-host-link" to={paths.host}>
+            <Link className="landing-host-link" to={`${paths.host}?new=1`}>
               Host a group
             </Link>
           </PageSection>
@@ -84,7 +84,15 @@ export function LandingPage() {
               </span>
               <div>
                 <h3>{step.title}</h3>
-                <p>{step.description}</p>
+                {'instructions' in step ? (
+                  <ol className="landing-instructions">
+                    {step.instructions.map((instruction) => (
+                      <li key={instruction}>{instruction}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p>{step.description}</p>
+                )}
               </div>
             </article>
           ))}

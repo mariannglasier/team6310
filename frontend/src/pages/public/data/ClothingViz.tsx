@@ -140,7 +140,7 @@ export function ClothingViz({
                 <span className="key key--hanger-filled" aria-hidden="true">
                   <ExplorerIcon kind="check" size={12} />
                 </span>
-                Filled with a check: given through the clothing closet
+                Filled with a check: given through Canopy Thrift
               </li>
             )}
           </ul>

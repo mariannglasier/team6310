@@ -1,0 +1,11 @@
+# Alex starting balance
+
+November 17, 2026: increase Alex's starting cash from $350 to $1,500 after the user reported repeatedly ending before his first paycheck. Rent is $783.99 on Day 6; car insurance is $130 on Day 4, and the available clinic bill is $190 on Day 7. Interview clothing and ordinary decisions compete with that money. The six-bill cap determines which optional bills enter a particular run; rent is always retained.
+
+The approved adjustment is a starting-cash game-design setting. It is not a market price. The catalog declares `startingBalances.Alex = 1500`, and the edition publisher applies validated overrides when cloning household profiles. Monthly editions retain this setting, so a source refresh cannot reset Alex to $350. Other household starting amounts remain Jordan $850, Sofia $600 and Patricia $1,200. Active games retain their earlier balances; start a new run to receive $1,500.
+
+Published version `f1dde602-710d-2346-672c-ce007646a7f2` contains the increase. All prices, wages, facts, employment rules and bill schedules are copied from the preceding edition. No provider requests or rent API calls were required.
+
+Additional checks passed: 26 compiler/provider tests, Edge entry type checking, and hosted publisher validation rejecting negative, excessive, sub-cent, null and unknown-household overrides without leaving partial editions. The other three published starting balances were checked directly and remain unchanged.
+
+`supabase/tests/alex-first-payday.sql` passed 20 transactional trials using the real starting cash: ten regular-mode and ten CAC-mode runs, paying every due bill and selecting the cheapest available ordinary choice. Alex reached Day 10's first payday in regular mode and Day 9's first payday after CAC preparation. Standard-mode interview clothing was purchased; the subsequent interview reused it. No balance top-ups were made. After verifying each first-payday segment, the disposable fixture is marked complete solely to permit the CAC replay; this is not a claim that those trials played the entire month. All fixture data was rolled back. The lowest observed balance after the first paycheck was $706.81 in regular mode and $774.66 in CAC mode. These trials demonstrate an affordable route, not that every expensive purchase sequence succeeds.

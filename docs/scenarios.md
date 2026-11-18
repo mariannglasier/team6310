@@ -1,3 +1,5 @@
+> **November 16 facts and prices revision.** The approved changes from facts fixes.docx and facts fixes part 2.pdf are implemented in the source catalog, prepared edition artifact, monthly source adapters and Supabase setup guide. The active catalog has 51 cards. D016/D017/D023/D031/D037/D038/D041/D057/D060 are retired and every household owns a car. See [setup and current verification limits](supabase-game-data-setup.md). Hosted edition 6 with six-ZIP weighted rent and CPI-adjusted household tax credits is deployed. Automatic refreshes use JSON APIs, with BLS inflation for prices lacking a dedicated API. The monthly schedule is active. Live BLS/EIA retrieval passed. RentCast data is cached following the November 17 authorized request. The monthly refresh also publishes validated wages and carries forward prior values when sources fail. Last updated marks retained values. PolicyEngine credentials are no longer required.
+
 > **Documentation reconciliation — November 6, 2026:** Separated ordinary and employment event days are approved design, preserving the Day 2 interview/result/immediate reapplication exception. This approval does not authorize gameplay implementation changes.
 >
 > **Bills approval — November 8, 2026:** Independent bills, fixed per-expense fees incurred once on Ignore, later full settlement, non-ending payment rejection, post-employment Day 2/3 bills, and Day 30 completion with unpaid obligations are approved. See [the bills specification and staged implementation record](bills-system.md). This supersedes the earlier optional-only notices and scenario-based bill flow. Actual content remains designer-supplied. The branch now includes prepared SQL and frontend integration; this is not evidence of hosted deployment. See the staged implementation and verification record.
@@ -9,6 +11,8 @@
 **November 7 baseline correction:** Historical scenario dollar examples are not verified market prices. The [online baseline audit](scenario-data-sourcing.md#online-baseline-evidence---november-7-2026) records checked evidence and replacement proposals for rent and other costs, renewed API candidates, and unresolved components across all 60 cards. In particular, $650 is unsupported as full-apartment Sandy Springs monthly rent. Complete the specified housing/product/service quantities and all-in charges before publication; CPI cannot validate an unsupported baseline. This is documentation, not a gameplay price change.
 
 ## Required tax scenario and combined VITA fact - November 7, 2026
+
+**November 17 starting-cash adjustment:** Alex now starts new runs with $1,500 instead of $350. Other household starting balances are unchanged. Monthly editions preserve the approved starting-cash setting, and existing runs retain their earlier balances. Twenty no-top-up first-payday trials passed across both support modes; see [the rationale and validation](alex-starting-balance.md).
 
 **Required occurrence - user decision, November 7, 2026:** D005 is mandatory once in every playthrough, in both support modes and for every persona. Reserve a scheduled ordinary-day slot; it must not be omitted by random selection, selected again, or collide with employment events. This supersedes earlier non-scheduled/optional sampling instructions for D005. The exact due day remains to be configured; the earlier Day 18 is a proposal, not a newly approved day. Early-ended runs cannot show later days: they may end before reaching the reserved tax event, but every complete route must include it. Existing early-ending rules are unchanged. If literal display before every possible early ending is required, its placement needs a separate explicit change; no new pre-game event is inferred. Verify exactly-once inclusion, all personas/modes, routing and refresh restoration. This is a documentation requirement; scheduling is not implemented here.
 
@@ -275,7 +279,7 @@ Record the selected target job and whether the qualifying education/preparation 
 
 ### Day 2: first interview
 
-Offer buying professional clothes, making current clothes work, or using the CAC clothing closet when CAC is enabled and applicable. Record ownership of professional clothing after purchase or CAC provision.
+Offer buying professional clothes, making current clothes work, or finding interview clothes at CAC?s Canopy Thrift when CAC is enabled and applicable. Record ownership of professional clothing after purchase or CAC provision.
 
 | Preparation completed before Day 1 | Interview clothing | Result |
 | --- | --- | --- |
