@@ -177,18 +177,18 @@ it.each(['anonymous', 'staff'])(
     vi.mocked(loadBillSnapshot).mockReturnValueOnce(first.promise)
     const view = show(restoredRun)
     expect(screen.getByText('Loading your bills and progress…')).toBeVisible()
-    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     await act(async () => first.resolve(scheduledBills(restoredRun)))
     expect(
       await screen.findByRole('region', { name: 'Bills due today' }),
     ).toBeVisible()
-    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     view.unmount()
     const refreshed = deferred<BillSnapshot>()
     vi.mocked(loadBillSnapshot).mockReturnValueOnce(refreshed.promise)
     show(restoredRun)
     expect(screen.getByText('Loading your bills and progress…')).toBeVisible()
-    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     await act(async () => refreshed.resolve(scheduledBills(restoredRun)))
     expect(
       await screen.findByRole('region', { name: 'Bills due today' }),
@@ -208,11 +208,9 @@ it.each(['anonymous', 'staff'])(
     const financial = deferred<BillSnapshot>()
     vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
     show(restoredRun)
-    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     await act(async () => financial.resolve(bills(restoredRun)))
-    expect(
-      await screen.findByRole('heading', { name: 'Placeholder' }),
-    ).toBeVisible()
+    expect(await screen.findByRole('button', { name: 'Next' })).toBeVisible()
     expect(loadScenario).not.toHaveBeenCalled()
   },
 )
@@ -225,18 +223,18 @@ it('preserves a bill loading error and retries without showing the fallback', as
   expect(await screen.findByRole('alert')).toHaveTextContent(
     'Bill service unavailable',
   )
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   const retry = deferred<BillSnapshot>()
   vi.mocked(loadBillSnapshot).mockReturnValueOnce(retry.promise)
   await userEvent.click(
     screen.getByRole('button', { name: 'Reload saved bills' }),
   )
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   await act(async () => retry.resolve(scheduledBills(restoredRun)))
   expect(
     await screen.findByRole('region', { name: 'Bills due today' }),
   ).toBeVisible()
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
 })
 it.each([undefined, null])(
   'does not treat a missing bill snapshot (%s) as an empty schedule',
@@ -253,10 +251,28 @@ it.each([undefined, null])(
         </SetupProvider>
       </MemoryRouter>,
     )
-    expect(await screen.findByText("Loading today's content…")).toBeVisible()
-    expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+    expect(await screen.findByText('Loading…')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   },
 )
+it('waits for the bill handler when a matching snapshot has a bill due today', async () => {
+  const restoredRun = { ...run, currentScenarioId: null }
+  render(
+    <MemoryRouter>
+      <SetupProvider>
+        <EmploymentPanel
+          run={restoredRun}
+          bills={scheduledBills(restoredRun)}
+          onCommit={vi.fn()}
+        />
+      </SetupProvider>
+    </MemoryRouter>,
+  )
+  expect(await screen.findByText('Loading…')).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  expect(screen.queryByText('No more decisions today.')).toBeNull()
+  expect(submitEmployment).not.toHaveBeenCalled()
+})
 it('withdraws fallback eligibility while an existing empty snapshot is refreshing', async () => {
   const restoredRun = { ...run, currentScenarioId: null }
   const empty = bills(restoredRun)
@@ -273,25 +289,21 @@ it('withdraws fallback eligibility while an existing empty snapshot is refreshin
     </MemoryRouter>
   )
   const view = render(renderPanel(false))
-  expect(
-    await screen.findByRole('heading', { name: 'Placeholder' }),
-  ).toBeVisible()
+  expect(await screen.findByRole('button', { name: 'Next' })).toBeVisible()
   view.rerender(renderPanel(true))
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
-  expect(screen.getByText("Loading today's content…")).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
+  expect(screen.getByText('Loading…')).toBeVisible()
   view.rerender(renderPanel(false))
-  expect(
-    await screen.findByRole('heading', { name: 'Placeholder' }),
-  ).toBeVisible()
+  expect(await screen.findByRole('button', { name: 'Next' })).toBeVisible()
 })
 it('shows a real scenario instead of the fallback once an empty bill schedule is known', async () => {
   const financial = deferred<BillSnapshot>()
   vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
   show()
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   await act(async () => financial.resolve(bills()))
   expect(await screen.findByText(localScenario.description)).toBeVisible()
-  expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
 })
 
 it('keeps the scenario description mounted while committed finances and secondary facts load independently', async () => {
@@ -307,8 +319,7 @@ it('keeps the scenario description mounted while committed finances and secondar
   await userEvent.click(
     screen.getByRole('button', { name: /Receive assistance/ }),
   )
-  expect(submitScenario).not.toHaveBeenCalled()
-  await userEvent.click(screen.getByRole('button', { name: 'Submit decision' }))
+  expect(submitScenario).toHaveBeenCalledOnce()
   expect(description).toBeInTheDocument()
   const committedRun = { ...run, currentBalance: usdCents(12500) }
   vi.mocked(loadBillSnapshot).mockReturnValue(financial.promise)
@@ -327,7 +338,7 @@ it('keeps the scenario description mounted while committed finances and secondar
   await waitFor(() => expect(loadScenarioFacts).toHaveBeenCalledOnce())
   expect(screen.getByText(localScenario.description)).toBe(description)
   expect(screen.getByRole('region', { name: 'Ordinary scenario' })).toBe(panel)
-  expect(screen.queryByText('Loading scenario…')).toBeNull()
+  expect(screen.queryByText('Loading…')).toBeNull()
   expect(
     screen.getByRole('button', { name: 'Continue to next day' }),
   ).toBeDisabled()
@@ -390,7 +401,7 @@ it('resolves an income transition to a bill day without rendering a scenario pla
   vi.mocked(submitEmployment).mockReturnValue(advance.promise)
   show(incomeRun)
   await waitFor(() => expect(submitEmployment).toHaveBeenCalledOnce())
-  expect(screen.getByText("Opening today's content…")).toBeVisible()
+  expect(screen.getByText('Loading…')).toBeVisible()
   expect(screen.queryByText('Placeholder')).toBeNull()
   const billRun = {
     ...incomeRun,
@@ -436,7 +447,7 @@ it.each(['bill', 'scenario'] as const)(
       employmentState: { stage: 'day', revision: 2 },
     }
     await act(async () => next.resolve(employment(nextRun)))
-    expect(screen.getByText("Loading today's content…")).toBeVisible()
+    expect(screen.getByText('Loading…')).toBeVisible()
     expect(screen.queryByText('Placeholder')).toBeNull()
     expect(screen.queryByRole('region', { name: 'Bills due today' })).toBeNull()
     if (contentType === 'bill') {
@@ -468,7 +479,7 @@ it.each(['bill', 'scenario'] as const)(
       return
     }
     await act(async () => financial.resolve(bills(nextRun)))
-    expect(await screen.findByText('Loading scenario…')).toBeVisible()
+    expect(await screen.findByText('Loading…')).toBeVisible()
     expect(screen.queryByRole('region', { name: 'Bills due today' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
     await act(async () => scenario.resolve(localScenario))
@@ -502,11 +513,10 @@ it('updates an overdue payment and financial indicators without remounting the u
   const description = await screen.findByText(localScenario.description)
   const panel = screen.getByRole('region', { name: 'Ordinary scenario' })
   const choice = screen.getByRole('button', { name: /Decline assistance/ })
-  await userEvent.click(choice)
   const pay = screen.getByRole('button', { name: 'Pay Earlier bill' })
   await userEvent.click(pay)
   expect(pay).toBeDisabled()
-  expect(screen.getByRole('button', { name: 'Submit decision' })).toBeDisabled()
+  expect(choice).toBeDisabled()
   await userEvent.click(pay)
   expect(submitBill).toHaveBeenCalledOnce()
   await act(async () =>
@@ -527,7 +537,7 @@ it('updates an overdue payment and financial indicators without remounting the u
   )
   await waitFor(() =>
     expect(
-      screen.getByRole('button', { name: 'Submit decision' }),
+      screen.getByRole('button', { name: /Decline assistance/ }),
     ).toBeEnabled(),
   )
   expect(screen.getByText(localScenario.description)).toBe(description)
@@ -535,7 +545,7 @@ it('updates an overdue payment and financial indicators without remounting the u
   expect(screen.getByRole('button', { name: /Decline assistance/ })).toBe(
     choice,
   )
-  expect(choice).toHaveAttribute('aria-pressed', 'true')
+  expect(choice).toHaveAttribute('aria-pressed', 'false')
   expect(screen.getByText('$88.00')).toBeVisible()
   expect(screen.getByText('Recorded payments')).toBeVisible()
   expect(screen.getByText('Paid')).toBeVisible()

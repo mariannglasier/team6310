@@ -10,6 +10,9 @@ venv/
 .env.local
 .env.*.local
 integrations/**/.env
+supabase/functions/.env
+supabase/functions/.env.*
+!supabase/functions/.env.example
 
 # Downloaded BLS source files
 integrations/bls_oews/data/

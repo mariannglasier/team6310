@@ -186,6 +186,20 @@ test('landing header and hero reflect the revised actions and photo', () => {
   expect(document.querySelectorAll('.landing-step__icon svg')).toHaveLength(3)
 })
 
+test('homepage instructions explain choices in a numbered list', () => {
+  renderRoute()
+  const instructions = within(
+    screen.getByRole('region', { name: 'How the simulation works' }),
+  )
+  const steps = within(instructions.getByRole('list')).getAllByRole('listitem')
+  expect(steps).toHaveLength(3)
+  expect(steps[0]).toHaveTextContent('Selecting an option confirms your choice')
+  expect(steps[1]).toHaveTextContent('Spending lowers it, income raises it')
+  expect(steps[2]).toHaveTextContent('continue to the next day')
+  expect(instructions.queryByRole('link')).not.toBeInTheDocument()
+  expect(instructions.queryByRole('button')).not.toBeInTheDocument()
+})
+
 test('footer provides the CAC logo, contact links, and unavailable future resources', () => {
   renderRoute()
   const footer = within(screen.getByRole('contentinfo'))

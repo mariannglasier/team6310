@@ -1,5 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { PageSection } from '../../components/ui/PageSection'
+import { PriceUpdateStatus } from '../../components/simulation/PriceUpdateStatus'
+import { ScenarioFacts } from '../../components/simulation/ScenarioFacts'
+import { scenarioDescription } from '../../lib/gameplayText'
+import { cacInterviewClothingLabel } from '../../state/employmentWalkthrough'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { SelectField, TextField } from '../../components/ui/FormFields'
 import { paths } from '../../app/paths'
@@ -22,6 +26,24 @@ const weeklyPay = (value: number | string) =>
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(Number(value))
+
+function GroupScenarioFacts({ session }: { session: GroupSession }) {
+  if (
+    session.roundType !== 'scenario' ||
+    session.roundState !== 'results' ||
+    !session.question
+  )
+    return null
+  return (
+    <ScenarioFacts
+      source="group"
+      runId={session.sessionId}
+      scenarioId={session.question.scenarioId}
+      versionId={session.versionId}
+      supportEnabled={session.cacSupportEnabled}
+    />
+  )
+}
 
 function VotingCountdown({ session }: { session: GroupSession }) {
   const deadline = session.roundDeadline
@@ -148,7 +170,9 @@ function GroupEmploymentOptions({
           onClick={() => onVote?.(option.optionId)}
         >
           <strong>
-            {option.text}
+            {session.roundType === 'clothing' && option.optionId === 'cac'
+              ? cacInterviewClothingLabel
+              : option.text}
             {session.selectedEmploymentOption === option.optionId &&
               session.roundState === 'voting' && (
                 <span className="employment-selected"> · Selected</span>
@@ -251,6 +275,7 @@ function GroupScenarioShell({
   return (
     <div className="group-scenario-stage">
       <div className="financial-tracking group-scenario-tracking">
+        <PriceUpdateStatus versionId={session.versionId} />
         <ol className="finance-timeline" aria-label="Group question progress">
           {Array.from({ length: 30 }, (_, index) => index + 1).map(
             (question) => (
@@ -317,7 +342,7 @@ function GroupScenarioShell({
               <span>
                 {session.cacSupportEnabled
                   ? 'Playing with CAC support'
-                  : 'Playing without CAC support'}
+                  : 'Standard mode'}
               </span>
             </section>
           </aside>
@@ -586,7 +611,13 @@ export function HostPage() {
               ) : (
                 <>
                   <h1 id="page-heading">{question?.title}</h1>
-                  <p className="group-lead">{question?.description}</p>
+                  <p className="group-lead">
+                    {question?.description &&
+                      scenarioDescription(
+                        question.description,
+                        session.cacSupportEnabled === true,
+                      )}
+                  </p>
                   <div className="group-vote-options group-decision-cards">
                     {question?.choices.map((choice) => (
                       <div
@@ -610,6 +641,7 @@ export function HostPage() {
             </>
           )}
           {error && <p role="alert">{error}</p>}
+          <GroupScenarioFacts session={session} />
           <div className="employment-actions group-scenario-actions">
             {session.roundState === 'voting' && (
               <Button loading={busy} onClick={() => control('end_voting')}>
@@ -786,7 +818,7 @@ export function HostPage() {
               <strong>
                 {session.cacSupportEnabled
                   ? 'With CAC support'
-                  : 'Without CAC support'}
+                  : 'Standard mode'}
               </strong>
             </p>
           </div>
@@ -930,7 +962,11 @@ export function JoinPage() {
                   <>
                     <h1 id="page-heading">{session.question?.title}</h1>
                     <p className="group-lead">
-                      {session.question?.description}
+                      {session.question?.description &&
+                        scenarioDescription(
+                          session.question.description,
+                          session.cacSupportEnabled === true,
+                        )}
                     </p>
                     <div className="group-vote-options group-decision-cards">
                       {session.question?.choices.map((choice) => (
@@ -980,6 +1016,7 @@ export function JoinPage() {
                     Results are in. Waiting for the next question.
                   </p>
                 )}
+                <GroupScenarioFacts session={session} />
               </>
             )}
             {error && <p role="alert">{error}</p>}

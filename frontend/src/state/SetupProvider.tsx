@@ -101,12 +101,11 @@ export function SetupProvider({ children }: { children: ReactNode }) {
   }
   async function replay(support: boolean, terminalRun?: LoadedPlaythrough) {
     if (
-      !support &&
       terminalRun?.id === selectedRun.current?.id &&
       terminalRun?.status === 'ended' &&
       isBeforeEmploymentEnd(terminalRun.employmentState)
     ) {
-      await leavePlaythrough()
+      await leavePlaythrough(support ? terminalRun.id : undefined)
       return
     }
     if (
@@ -114,11 +113,6 @@ export function SetupProvider({ children }: { children: ReactNode }) {
       employment?.state.stage !== 'ended'
     )
       throw new Error('Only a finished playthrough can be replayed.')
-    if (
-      support &&
-      (employment.state.stage !== 'complete' || employment.state.support)
-    )
-      throw new Error('This playthrough is not eligible for CAC replay.')
     await leavePlaythrough(support ? employment.runId : undefined)
   }
   return (

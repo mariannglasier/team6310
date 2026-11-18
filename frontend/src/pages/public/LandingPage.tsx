@@ -84,7 +84,15 @@ export function LandingPage() {
               </span>
               <div>
                 <h3>{step.title}</h3>
-                <p>{step.description}</p>
+                {'instructions' in step ? (
+                  <ol className="landing-instructions">
+                    {step.instructions.map((instruction) => (
+                      <li key={instruction}>{instruction}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p>{step.description}</p>
+                )}
               </div>
             </article>
           ))}

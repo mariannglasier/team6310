@@ -17,6 +17,9 @@ import type { LoadedPlaythrough } from '../../types/playthrough'
 import { usdCents } from '../../types/domain'
 
 vi.mock('../../services/supabase', () => ({ getSupabaseClient: vi.fn() }))
+vi.mock('../../services/resultComparisons', () => ({
+  loadResultComparisons: async () => [],
+}))
 vi.mock('../../services/loadPlaythrough', () => ({ loadPlaythrough: vi.fn() }))
 vi.mock('../../services/playthroughService', () => ({
   createIndividualPlaythrough: vi.fn(),
@@ -265,7 +268,7 @@ it.each([false, true])(
     await userEvent.click(
       await screen.findByRole('button', {
         name: support
-          ? 'Try again with CAC support'
+          ? 'Play with CAC assistance'
           : 'Replay from household selection',
       }),
     )

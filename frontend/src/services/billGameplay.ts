@@ -7,11 +7,13 @@ import { usdCents, type UsdCents } from '../types/domain'
 export interface Bill {
   id: string
   name: string
+  description?: string | null
   principal: UsdCents
   fee: UsdCents
   dueDay: number
   ignoredAt: string | null
   paidAt: string | null
+  paidWithCac?: boolean
   paymentBalanceAfter: UsdCents | null
 }
 export interface BillSnapshot {
@@ -24,6 +26,7 @@ export interface BillSnapshot {
   scenarioIncome: UsdCents
   scenarioCharged: UsdCents
 }
+export type BillDecisionAction = 'pay' | 'ignore' | 'cac'
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('Invalid saved bill data')
@@ -107,11 +110,13 @@ export async function loadBillSnapshot(
     return {
       id,
       name: text(b.name_snapshot),
+      description: b.description == null ? null : text(b.description),
       principal: money(b.amount_due),
       fee: money(b.late_fee_amount),
       dueDay: Number(b.due_day),
       ignoredAt,
       paidAt,
+      ...(b.paid_with_cac === true ? { paidWithCac: true } : {}),
       paymentBalanceAfter: paidAt ? money(b.payment_balance_after) : null,
     }
   })
@@ -128,7 +133,13 @@ export async function loadBillSnapshot(
       employmentState: r.employment_state,
     },
     items,
-    paidTotal: money(value.paid_total),
+    paidTotal: usdCents(
+      money(value.paid_total) -
+        items.reduce(
+          (total, bill) => total + (bill.paidWithCac ? settlement(bill) : 0),
+          0,
+        ),
+    ),
     overdueTotal: money(value.overdue_total),
     outstandingTotal: money(value.outstanding_total),
     upcomingTotal: money(value.upcoming_total),
@@ -139,11 +150,13 @@ export async function loadBillSnapshot(
 export async function submitBill(
   run: LoadedPlaythrough,
   id: string,
-  action: 'pay' | 'ignore',
+  action: BillDecisionAction,
 ) {
   const client = await getSupabaseClient()
   const { error } = await client.rpc(
-    action === 'pay' ? 'pay_bill' : 'ignore_bill',
+    { pay: 'pay_bill', ignore: 'ignore_bill', cac: 'pay_bill_with_cac' }[
+      action
+    ],
     {
       p_run_id: run.id,
       p_occurrence_id: id,
@@ -152,7 +165,9 @@ export async function submitBill(
   if (error) {
     if (error.code === 'P0001' && error.message.includes('Insufficient funds'))
       throw new Error(
-        'There is not enough money to pay this bill in full. You can Ignore it for now.',
+        run.supportEnabled
+          ? 'There is not enough money to pay this bill in full. You can use CAC assistance.'
+          : 'There is not enough money to pay this bill in full. You can Ignore it for now.',
       )
     throw new Error(
       'Payment or Ignore was not confirmed. Reload saved bills before retrying.',

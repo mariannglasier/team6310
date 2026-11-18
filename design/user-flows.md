@@ -44,7 +44,7 @@ flowchart TD
 2. No household is selected by default. Select one approved profile to enable Start simulation.
 3. Start simulation confirms the household and creates a fresh run through the protected start operation, then opens pre-game job search. No Review screen intervenes. Lock controls during creation; show errors without claiming success and retain the selection for explicit retry.
 4. Legacy Review URLs redirect to household selection, or to the existing active run. Revisiting setup must not create another run.
-5. The new run uses the selected persona and approved published `version_id`. Weekly income starts at $0. Regular runs start without support; a completed regular run may offer a fresh CAC replay. Employment and assistance state belong to the run.
+5. The new run uses the selected persona and approved published `version_id`. Weekly income starts at $0. Regular runs start without support. Either individual ending offers a fresh CAC replay. Employment and assistance state belong to the run.
 6. Once started, the player cannot inspect or edit setup. The active run offers End Simulation rather than Back to Review.
 
 Setup Back actions preserve choices. Changing a household before confirmation uses that household's starting values when the run is initialized; it does not create a financial transaction.
@@ -115,7 +115,7 @@ The action is available immediately after Start simulation, before See who's
 hiring. It preserves actual progress, bills, financial state and employment data;
 it does not initialize employment. A run ended from the fresh marker displays
 the existing early-ending results with **Before Day 1**, its actual balance, and
-ordinary replay. CAC replay still requires an eligible completed unsupported run.
+ordinary replay. CAC replay is also available from this early ending.
 See [the implementation and verification record](../docs/give-up.md) for the
 local/hosted deployment boundary.
 

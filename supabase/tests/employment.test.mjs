@@ -102,4 +102,80 @@ await assert.rejects(()=>act(run,{type:'end'},0),/authentication/);await db.exec
 const wrongBalance=uuid(26);await db.query(`insert into playthroughs(playthrough_id,persona_id,version_id,owner_user_id,current_balance,current_day,status,started_at) values($1,$2,$3,$4,999,1,'active',now())`,[wrongBalance,persona,version,owner]);assert.equal((await state(wrongBalance)).employment_state,null);
 const foreignInsert=uuid(27);await db.query(`insert into playthroughs(playthrough_id,persona_id,version_id,owner_user_id,current_balance,current_day,status,started_at) values($1,$2,$3,$4,100,1,'active',now())`,[foreignInsert,persona,version,uuid(99)]);assert.equal((await state(foreignInsert)).employment_state,null);
 console.log('PASS: fresh/legacy compatibility, ownership/RLS, exact costs, retry receipts, stale requests, both hiring/payday routes, replay ownership/eligibility, insufficient funds and unknown documents');
+
+await db.exec(`
+ create table categories(category_id uuid primary key, name text);
+ create table scenarios(scenario_id uuid primary key, version_id uuid, category_id uuid, description text);
+ create table choices(choice_id uuid primary key, version_id uuid, scenario_id uuid, choice_text text, requires_cac boolean);
+ create table player_responses(response_id uuid primary key default gen_random_uuid(), playthrough_id uuid,
+   choice_id uuid, version_id uuid, answered_at timestamptz default now());
+ insert into categories values ('${uuid(50)}', 'Food');
+ insert into scenarios values ('${uuid(51)}', '${version}', '${uuid(50)}', 'How will you get groceries?');
+ insert into choices values
+   ('${uuid(52)}', '${version}', '${uuid(51)}', 'Shop nearby', false),
+   ('${uuid(53)}', '${version}', '${uuid(51)}', 'Use what you have', false),
+   ('${uuid(54)}', '${version}', '${uuid(51)}', 'Use CAC assistance', true);
+ insert into player_responses(playthrough_id, choice_id, version_id) values
+   ('${run}', '${uuid(52)}', '${version}'),
+   ('${poor}', '${uuid(53)}', '${version}');
+`);
+await db.exec(readFileSync(new URL('../migrations/20261118040000_individual_result_comparisons.sql', import.meta.url), 'utf8'));
+const fromEarly = await fresh(55);
+await act(fromEarly, {type:'initialize', replayOf:poor});
+assert.equal((await state(fromEarly)).cac_support_enabledabled, true);
+await act(next, {type:'initialize', replayOf:replay});
+assert.equal((await state(next)).cac_support_enabledabled, true);
+await assert.rejects(() => act(deniedReplay, {type:'initialize', replayOf:corruptPrevious}), /eligible/);
+await assert.rejects(() => act(deniedReplay, {type:'initialize', replayOf:fromEarly}), /eligible/);
+
+const compare = async (id) => (await db.query(
+  'select public.get_individual_result_comparisons($1) result', [id],
+)).rows[0].result;
+const suppressed = {
+  category: 'Food', question: 'How will you get groceries?', answer: 'Shop nearby',
+  responses: null, options: [],
+};
+await db.exec('set role authenticated');
+assert.deepEqual(await compare(run), [suppressed]);
+assert.deepEqual(await compare(replay), []);
+await assert.rejects(() => compare(fromEarly), /unavailable/);
+await db.exec(`set test.uid='${uuid(99)}'`);
+await assert.rejects(() => compare(run), /unavailable/);
+await db.exec(`reset role; set test.uid='${owner}'; set role anon`);
+await assert.rejects(() => compare(run), /permission denied/);
+await db.exec('reset role; set role leaked_default');
+await assert.rejects(() => compare(run), /permission denied/);
+await db.exec('reset role');
+
+for (let index = 0; index < 5; index++) {
+  const peer = await fresh(60 + index);
+  await db.query("update playthroughs set owner_user_id=$1, cac_support_enabledabled=false, status='ended' where playthrough_id=$2",
+    [uuid(70 + index), peer]);
+  await db.query('insert into player_responses(playthrough_id, choice_id, version_id) values ($1,$2,$3)',
+    [peer, uuid(index < 4 ? 52 : 53), version]);
+}
+await db.exec('set role authenticated');
+assert.deepEqual(await compare(run), [{
+  ...suppressed,
+  responses: 5,
+  options: [
+    {id: uuid(52), label: 'Shop nearby', percent: 80},
+    {id: uuid(53), label: 'Use what you have', percent: 20},
+  ],
+}]);
+console.log('PASS: assisted replay from either ending, private result ownership, peer percentages, and small-cohort suppression');
+await db.exec('reset role');
+await db.exec(readFileSync(new URL('../migrations/20261118070000_show_small_end_screen_comparisons.sql', import.meta.url), 'utf8'));
+for (let count = 0; count < 5; count++) {
+  await db.query(
+    'update playthroughs set cac_support_enabledabled = (playthrough_id >= $1) where playthrough_id between $2 and $3',
+    [uuid(60 + count), uuid(60), uuid(64)],
+  );
+  await db.exec('set role authenticated');
+  const [row] = await compare(run);
+  assert.equal(row.responses, count || null);
+  assert.deepEqual(row.options.map(option => option.percent), count ? [100, 0] : []);
+  await db.exec('reset role');
+}
+console.log('PASS: end-screen comparisons show one through four matching peer responses');
 await db.close();

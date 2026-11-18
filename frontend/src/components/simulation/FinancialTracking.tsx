@@ -14,6 +14,7 @@ import './financialTracking.css'
 import type { BillSnapshot } from '../../services/billGameplay'
 import { OverdueBills, type BillAction } from './BillControls'
 import { ExpenseRow } from './ExpenseRow'
+import { PriceUpdateStatus } from './PriceUpdateStatus'
 
 function ExpenseList({
   items,
@@ -149,6 +150,7 @@ export function FinancialTracking({
           </h1>
         </div>
       </div>
+      <PriceUpdateStatus versionId={run.versionId} />
       <ol className="finance-timeline" aria-label="30-day month progress">
         {Array.from({ length: 30 }, (_, index) => index + 1).map((day) => {
           const payday =
@@ -211,14 +213,11 @@ export function FinancialTracking({
                 Weekly income:{' '}
                 {committed ? formatUsd(committed.weeklyIncome) : 'Unavailable'}
               </small>
-              <small className="finance-profile-detail">
-                CAC enrollment status:{' '}
-                {support === null
-                  ? 'Unavailable'
-                  : support
-                    ? 'client of the CAC'
-                    : 'not a client'}
-              </small>
+              {support === true && (
+                <small className="finance-profile-detail">
+                  CAC enrollment status: client of the CAC
+                </small>
+              )}
             </section>
             <section className="finance-money" aria-label="Current balance">
               <span className="finance-label">

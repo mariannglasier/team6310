@@ -65,10 +65,6 @@ for (const [label, amount] of [
       .getByRole('button', { name: new RegExp(label.replace(/[.$]/g, '\\$&')) })
       .click()
     await expect(
-      page.getByLabel('Current balance $140.00', { exact: true }),
-    ).toBeVisible()
-    await page.getByRole('button', { name: 'Submit decision' }).click()
-    await expect(
       page.getByRole('button', { name: 'Continue to next day', exact: true }),
     ).toBeVisible()
     await expect(
@@ -119,9 +115,6 @@ for (const [label, amount] of [
         }),
       ).toBeVisible()
       await page.getByRole('button', { name: /No financial change/ }).click()
-      await page
-        .getByRole('button', { name: 'Submit decision', exact: true })
-        .click()
       await expect(
         page.getByText(`Day ${day}: Your balance is unchanged.`, {
           exact: true,

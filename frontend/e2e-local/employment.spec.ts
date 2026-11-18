@@ -110,9 +110,7 @@ for (const width of [1280, 320]) {
     await expect(
       page.getByRole('complementary', { name: 'Upcoming household expenses' }),
     ).toContainText('Local rent')
-    await page
-      .getByRole('button', { name: 'Try again with CAC support' })
-      .click()
+    await page.getByRole('button', { name: 'Try another mode' }).click()
     await page.getByText('Choose this household').first().click()
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
     await page.getByRole('button', { name: 'Confirm selection' }).click()
