@@ -170,7 +170,7 @@ Hosts create sessions with join codes and choose whether CAC support is availabl
 
 The interface shows approved question-linked community statistics and a separate interactive data page. Its measures include decision distributions, ending-balance distributions, CAC support use, and community context. Population statistics and simulation response aggregates have separate labels and sources. Charts use the populations, filters, and denominators defined in the UI specification. Missing comparisons do not prevent gameplay.
 
-The public Explore Data page (`/data`) is a separate, static data explorer for the six scenario categories. Its content lives in `frontend/src/pages/public/data/dataExplorerContent.ts`, makes no network calls, and uses no database or Auth session. API connections are a later phase; see `docs/data-explorer.md`.
+The public Explore Data page (`/data`) is a separate data explorer for the six scenario categories. Its topic structure lives in `frontend/src/pages/public/data/dataExplorerContent.ts`; CAC outcome facts come from `frontend/src/data/cac-outcomes.csv`; and every other figure is a published statistic read through the two public Supabase RPCs, so the page opens an anonymous Auth session like the simulation. The statistics are refreshed from FRED, EIA, Census and Fulton County open data by the `refresh-explorer-statistics` Edge Function on a monthly pg_cron schedule and publish with no staff approval; see `docs/data-explorer.md` and `docs/explorer-statistics-catalog.md`.
 
 Public navigation and results provide client-approved CAC information and donation links. The application does not process donation payments.
 

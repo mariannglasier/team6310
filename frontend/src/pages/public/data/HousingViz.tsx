@@ -1,42 +1,61 @@
 import { useState } from 'react'
-import { facts } from './dataExplorerContent'
 import {
   WINDOW_COUNT,
   WINDOW_DARK_ORDER,
   darkWindowCount,
   relitWindowCount,
 } from './dataExplorerLogic'
-import { ChoiceGroup, ExplorerLayout, type VizProps } from './ExplorerParts'
+import {
+  ChoiceGroup,
+  ExplorerLayout,
+  SceneDetails,
+  type VizProps,
+} from './ExplorerParts'
+import { findShare, formatStatisticValue } from './explorerStatistics'
+import type { LiveStatisticsState } from './useExplorerStatistics'
 
-type Subject = 'rent' | 'utilities'
-type Season = 'winter' | 'summer'
+// The windows are drawn only from a published renter cost burden. The same
+// measure is published for Sandy Springs and for the United States, so the
+// player can compare the two on the same 20 windows.
+const PLACES = [
+  { key: 'sandy_springs_renter_cost_burden', label: 'Sandy Springs' },
+  { key: 'us_renter_cost_burden', label: 'United States' },
+] as const
 
-const seasonNotes: Record<Season, string> = {
-  winter:
-    'Winter: heating keeps a home safe on the coldest nights, and the bill climbs as the temperature falls.',
-  summer:
-    'Summer: cooling matters in Georgia heat, and the bill climbs as the temperature rises.',
+function unavailableMessage(live: LiveStatisticsState) {
+  if (live.status === 'loading')
+    return 'Loading the latest published statistic for the windows…'
+  if (live.status === 'error')
+    return 'The statistic for the windows could not be loaded, so they are not marked.'
+  return 'No published statistic is available yet for renter households, so the windows are not marked.'
 }
 
-export function HousingViz({ category, mode, onModeChange }: VizProps) {
-  const [subject, setSubject] = useState<Subject>('rent')
-  const [season, setSeason] = useState<Season>('winter')
+export function HousingViz({
+  category,
+  mode,
+  onModeChange,
+  live,
+  onRetryLive,
+}: VizProps) {
+  const [placeKey, setPlaceKey] = useState<string>(PLACES[0].key)
 
-  const fact = subject === 'rent' ? facts.rentBurden : facts.energyInsecurity
-  const dark = darkWindowCount(fact.percent)
-  const relit = mode === 'impact' ? relitWindowCount(dark) : 0
-  const stat =
-    subject === 'rent'
-      ? 'about 1 in 2 renter households'
-      : 'about 1 in 3 households'
+  // Without a published share the windows stay unmarked rather than showing a
+  // made-up figure.
+  const published = PLACES.filter((place) => findShare(live, place.key))
+  const place = published.find((item) => item.key === placeKey) ?? published[0]
+  const share = place ? findShare(live, place.key) : undefined
+  const dark = share ? darkWindowCount(share.value) : null
+  const relit = dark !== null && mode === 'impact' ? relitWindowCount(dark) : 0
   const summary =
-    mode === 'impact'
-      ? `${dark} of ${WINDOW_COUNT} windows are dark and ${relit} are lit again with support.`
-      : `${dark} of ${WINDOW_COUNT} windows are dark.`
+    dark === null
+      ? unavailableMessage(live)
+      : mode === 'impact'
+        ? `${dark} of ${WINDOW_COUNT} windows are dark and ${relit} are lit again with support.`
+        : `${dark} of ${WINDOW_COUNT} windows are dark.`
 
   const windows = Array.from({ length: WINDOW_COUNT }, (_, index) => {
     const rank = WINDOW_DARK_ORDER.indexOf(index)
-    const isDark = rank < dark
+    const isDark = dark !== null && rank < dark
     const isRelit = isDark && rank < relit
     return { index, isDark, isRelit }
   })
@@ -46,11 +65,13 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
       category={category}
       mode={mode}
       onModeChange={onModeChange}
+      live={live}
+      onRetryLive={onRetryLive}
       sceneLabel="Apartment building with windows"
       scene={
         <>
           <svg
-            className={`housing-scene housing-scene--${subject === 'utilities' ? season : 'rent'}`}
+            className="housing-scene"
             viewBox="0 0 360 300"
             role="img"
             aria-label={`Apartment building with ${WINDOW_COUNT} windows. ${summary}`}
@@ -63,25 +84,6 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
               width="360"
               height="300"
             />
-            {subject === 'utilities' && season === 'summer' && (
-              <g className="housing-sun">
-                <circle cx="312" cy="46" r="22" />
-                <path d="M312 8v10M312 74v10M274 46h10M340 46h10M285 19l7 7M332 66l7 7M339 19l-7 7M292 66l-7 7" />
-              </g>
-            )}
-            {subject === 'utilities' && season === 'winter' && (
-              <g className="housing-snow" aria-hidden="true">
-                {[40, 90, 150, 230, 290, 330].map((x, i) => (
-                  <circle
-                    key={x}
-                    cx={x}
-                    cy={30 + ((i * 37) % 120)}
-                    r={3}
-                    style={{ animationDelay: `${i * 0.6}s` }}
-                  />
-                ))}
-              </g>
-            )}
             <rect
               className="housing-ground"
               x="0"
@@ -116,7 +118,9 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
                         ? 'win win--relit'
                         : isDark
                           ? 'win win--dark'
-                          : 'win win--lit'
+                          : dark === null
+                            ? 'win win--neutral'
+                            : 'win win--lit'
                     }
                     x={x}
                     y={y}
@@ -150,15 +154,24 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
             />
           </svg>
           <ul className="scene-legend" aria-label="Window key">
-            <li>
-              <span className="key key--lit" aria-hidden="true" />
-              Lit: not under pressure
-            </li>
-            <li>
-              <span className="key key--dark" aria-hidden="true" />
-              Dark with an X: under pressure
-            </li>
-            {mode === 'impact' && (
+            {dark === null ? (
+              <li>
+                <span className="key key--neutral" aria-hidden="true" />
+                Grey: no published statistic to mark
+              </li>
+            ) : (
+              <>
+                <li>
+                  <span className="key key--lit" aria-hidden="true" />
+                  Lit: not under pressure
+                </li>
+                <li>
+                  <span className="key key--dark" aria-hidden="true" />
+                  Dark with an X: under pressure
+                </li>
+              </>
+            )}
+            {mode === 'impact' && dark !== null && (
               <li>
                 <span className="key key--relit" aria-hidden="true" />
                 Lit with a check: helped by support
@@ -166,10 +179,25 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
             )}
           </ul>
           <p className="scene-readout">
-            <strong>{summary}</strong> Each window stands for 5 of every 100
-            households. {fact.value} · {stat}.
+            <strong>{summary}</strong>
+            {share && <> Published value: {formatStatisticValue(share)}.</>}
           </p>
-          {mode === 'impact' && (
+          {share && (
+            <SceneDetails>
+              Each window stands for 5 of every 100 households, rounded to the
+              nearest window. {share.geography} · {share.periodLabel}.
+            </SceneDetails>
+          )}
+          {dark === null && live.status === 'error' && (
+            <button
+              type="button"
+              className="live-stats__retry"
+              onClick={onRetryLive}
+            >
+              Retry
+            </button>
+          )}
+          {mode === 'impact' && dark !== null && (
             <p className="scene-note">
               Illustration of support at work, not a measured CAC result.
             </p>
@@ -177,29 +205,14 @@ export function HousingViz({ category, mode, onModeChange }: VizProps) {
         </>
       }
       controls={
-        <>
+        published.length > 1 ? (
           <ChoiceGroup
-            label="What are we looking at?"
-            value={subject}
-            onChange={setSubject}
-            options={[
-              { value: 'rent', label: 'Rent' },
-              { value: 'utilities', label: 'Utilities' },
-            ]}
+            label="Compare places"
+            value={place.key}
+            onChange={setPlaceKey}
+            options={published.map(({ key, label }) => ({ value: key, label }))}
           />
-          {subject === 'utilities' && (
-            <ChoiceGroup
-              label="Season"
-              value={season}
-              onChange={setSeason}
-              options={[
-                { value: 'winter', label: 'Winter' },
-                { value: 'summer', label: 'Summer' },
-              ]}
-              hint={seasonNotes[season]}
-            />
-          )}
-        </>
+        ) : null
       }
     />
   )

@@ -75,7 +75,13 @@ function Garment({
   )
 }
 
-export function ClothingViz({ category, mode, onModeChange }: VizProps) {
+export function ClothingViz({
+  category,
+  mode,
+  onModeChange,
+  live,
+  onRetryLive,
+}: VizProps) {
   const [moment, setMoment] = useState<Moment>('interview')
   const [paused, setPaused] = useState(false)
   const selected = moments[moment]
@@ -86,6 +92,8 @@ export function ClothingViz({ category, mode, onModeChange }: VizProps) {
       category={category}
       mode={mode}
       onModeChange={onModeChange}
+      live={live}
+      onRetryLive={onRetryLive}
       sceneLabel="Clothing conveyor belt"
       scene={
         <div className="clothing-scene">

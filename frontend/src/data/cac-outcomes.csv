@@ -1,0 +1,67 @@
+key,program,group,metric,year,value,unit
+clients.unduplicated_number_of_households,CAC PROGRAM,Unduplicated Number of Clients Overall services,Unduplicated # of households,2025,4440,Number
+clients.unduplicated_number_of_individuals,CAC PROGRAM,Unduplicated Number of Clients Overall services,Unduplicated # of individuals,2025,9632,Number
+clients.new_households_first_time_ever,CAC PROGRAM,Unduplicated Number of Clients Overall services,New Households (first time ever),2025,2153,Number
+financial_assistance.evictions_prevented_households,BASIC NEEDS,Financial Assistance,Evictions Prevented (households),2025,1108,Number
+financial_assistance.people_keeping_a_roof_to_live_individuals,BASIC NEEDS,Financial Assistance,People keeping a roof to live (individuals),2025,2345,Number
+financial_assistance.amount_paid,BASIC NEEDS,Financial Assistance,Amount paid,2025,796416.64,Dollars
+food.households,BASIC NEEDS,Food,Households,2025,2995,Number
+food.individuals,BASIC NEEDS,Food,Individuals,2025,7034,Number
+food.visits_to_mini_market,BASIC NEEDS,Food,Visits to Mini-Market,2025,36521,Number
+food.pounds_of_food_provided_to_clients,BASIC NEEDS,Food,Pounds of food provided to clients,2025,1096486.4,Pounds
+food.meals_provided,BASIC NEEDS,Food,Meals Provided,2025,913738.666667,Number
+food.pounds_donated,BASIC NEEDS,Food,Pounds Donated,2025,1140047,Pounds
+food.waste,BASIC NEEDS,Food,Waste,2025,120644,Pounds
+food.pounds_purchased,BASIC NEEDS,Food,Pounds purchased,2025,140925,Pounds
+food.pounds_available_purchase_donated_wasted,BASIC NEEDS,Food,Pounds Available (purchase+Donated-Wasted),2025,1160328,Pounds
+food.food_purchased,BASIC NEEDS,Food,Food Purchased,2025,98077.79,Dollars
+clothing.households_undup,BASIC NEEDS,Clothing,Households (Undup),2025,2152,Number
+clothing.individuals,BASIC NEEDS,Clothing,Individuals,2025,5501,Number
+clothing.sales_taxes,BASIC NEEDS,Clothing,Sales (+taxes),2025,386946.75,Dollars
+clothing.thrift_credit_clients,BASIC NEEDS,Clothing,Thrift Credit (clients),2025,206768.67,Dollars
+meals_for_kids.children,SPECIAL PROGRAMS,Meals for kids,Children,2025,1097,Number
+meals_for_kids.pounds_of_food_provided_to_clients,SPECIAL PROGRAMS,Meals for kids,Pounds of food provided to clients,2025,18522.19,Pounds
+meals_for_kids.meals,SPECIAL PROGRAMS,Meals for kids,Meals,2025,15435.158333,Number
+meals_for_kids.value_in_kind,SPECIAL PROGRAMS,Meals for kids,Value In-kind,2025,6678.22,Dollars
+school_supply.households,SPECIAL PROGRAMS,School Supply,Households,2025,435,Number
+school_supply.children,SPECIAL PROGRAMS,School Supply,Children,2025,1090,Number
+school_supply.value_in_kind,SPECIAL PROGRAMS,School Supply,Value In-kind,2025,32264,Dollars
+teachers_closet.requests,SPECIAL PROGRAMS,Teacher's Closet,Requests,2025,222,Number
+teachers_closet.children,SPECIAL PROGRAMS,Teacher's Closet,Children,2025,8660,Number
+teachers_closet.value_in_kind,SPECIAL PROGRAMS,Teacher's Closet,Value In-kind,2025,27343.46,Dollars
+coats_for_kids.households,SPECIAL PROGRAMS,Coats for Kids # clients goal,Households,2025,243,Number
+coats_for_kids.children,SPECIAL PROGRAMS,Coats for Kids # clients goal,Children,2025,623,Number
+coats_for_kids.value_in_kind,SPECIAL PROGRAMS,Coats for Kids # clients goal,Value In-kind,2025,13508,Dollars
+hope_for_the_holidays.households,SPECIAL PROGRAMS,Hope for the Holidays,Households,2025,614,Number
+hope_for_the_holidays.individuals,SPECIAL PROGRAMS,Hope for the Holidays,Individuals,2025,1450,Number
+hope_for_the_holidays.sponsors,SPECIAL PROGRAMS,Hope for the Holidays,Sponsors,2025,328,Number
+hope_for_the_holidays.value_in_kind,SPECIAL PROGRAMS,Hope for the Holidays,Value In-kind,2025,145000,Dollars
+holiday_basket.households,SPECIAL PROGRAMS,Holiday Basket,Households,2025,984,Number
+holiday_basket.individuals,SPECIAL PROGRAMS,Holiday Basket,Individuals,2025,2647,Number
+holiday_basket.pounds,SPECIAL PROGRAMS,Holiday Basket,Pounds,2025,15967.14,Pounds
+empowerment_center.career_services,EMPOWERMENT CENTER,,Career Services,2025,229,Number
+empowerment_center.job_placement,EMPOWERMENT CENTER,,Job placement,2025,80,Number
+empowerment_center.events_ssc_bc_participants,EMPOWERMENT CENTER,,Events (SSC / BC) participants,2025,432,Number
+workforce_development.thrive_participants_workforce_development,EMPOWERMENT CENTER,"Workforce Development - NEW - Started Oct, 2025",Thrive participants - Workforce development,2025,9,Number
+workforce_development.tcc_scholarships,EMPOWERMENT CENTER,"Workforce Development - NEW - Started Oct, 2025",TCC/Scholarships,2025,4,Number
+workforce_development.rent_assistance,EMPOWERMENT CENTER,"Workforce Development - NEW - Started Oct, 2025",Rent Assistance,2025,4,Number
+workforce_development.transportation,EMPOWERMENT CENTER,"Workforce Development - NEW - Started Oct, 2025",Transportation,2025,1,Number
+adult_education.total_undup_students,EMPOWERMENT CENTER,Adult Education - # students,Total undup students,2025,610,Number
+adult_education.esol,EMPOWERMENT CENTER,Adult Education - # students,ESOL,2025,521,Number
+adult_education.computers,EMPOWERMENT CENTER,Adult Education - # students,Computers,2025,42,Number
+adult_education.financial_goals,EMPOWERMENT CENTER,Adult Education - # students,Financial Goals,2025,218,Number
+vita.volunteer_hrs,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Volunteer hrs,2025,2054.03,Number
+vita.number_volunteers,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,# Volunteers,2025,39,Number
+vita.returns,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Returns,2025,503,Number
+vita.federal_returns_prepared,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Federal Returns Prepared,2025,590,Number
+vita.federal_refund,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Federal Refund,2025,582083,Dollars
+vita.earned_income_credit,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Earned Income Credit,2025,196721,Dollars
+vita.child_tax_credit,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Child Tax Credit,2025,216049,Dollars
+vita.education_credits,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,Education Credits,2025,43699,Dollars
+vita.total_credits_earned_income_child_and_education_credit,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,"Total Credits (Earned Income, Child and Education credit)",2025,456469,Dollars
+vita.state_returns_prepared,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,State Returns prepared,2025,586,Number
+vita.state_refund,EMPOWERMENT CENTER,Volunteer Income Tax Assistance - VITA,State Refund,2025,89973,Dollars
+volunteers.number_of_volunteers,VOLUNTEERS,,Number of volunteers,2025,526.333333,Number
+volunteers.reg_vol_hrs,VOLUNTEERS,,Reg. Vol hrs,2025,51573,Number
+volunteers.total_volunteer_hours,VOLUNTEERS,,Total Volunteer Hours,2025,52994.8,Number
+volunteers.dollar_value_of_volunteer_hours,VOLUNTEERS,,Dollar value of volunteer hours,2025,1774795.852,Dollars

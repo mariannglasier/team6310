@@ -1,49 +1,69 @@
 import { useState } from 'react'
+import { cacFigure } from './cacFacts'
 import {
-  NEED_RIDER_SLOTS,
   RIDER_COUNT,
+  RIDER_NEED_ORDER,
   ridersInNeed,
 } from './dataExplorerLogic'
-import { ChoiceGroup, ExplorerLayout, type VizProps } from './ExplorerParts'
+import {
+  ChoiceGroup,
+  ExplorerLayout,
+  SceneDetails,
+  type VizProps,
+} from './ExplorerParts'
+import { findShare, formatStatisticValue } from './explorerStatistics'
+import type { LiveStatisticsState } from './useExplorerStatistics'
 
-type Season = 'summer' | 'fall' | 'winter'
+// The same measure is published for four places, so the riders can be
+// re-marked to compare them. The bus holds 18 riders; each is marked to the
+// nearest whole rider.
+const PLACES = [
+  { key: 'sandy_springs_child_poverty_rate', label: 'Sandy Springs' },
+  { key: 'fulton_child_poverty_rate', label: 'Fulton County' },
+  { key: 'dekalb_child_poverty_rate', label: 'DeKalb County' },
+  { key: 'us_child_poverty_rate', label: 'United States' },
+] as const
 
-const seasons: Record<
-  Season,
-  { label: string; need: string; support: string }
-> = {
-  summer: {
-    label: 'Summer',
-    need: 'School is out, and so are school breakfasts and lunches.',
-    support:
-      'CAC’s Meals for Kids provides summer meals to over 660 local families in the Sandy Springs and Dunwoody area.',
-  },
-  fall: {
-    label: 'Fall',
-    need: 'Back to school means backpacks, notebooks, and supplies all at once.',
-    support:
-      'CAC provides access to clothing and essential items for neighbors facing financial hardship.',
-  },
-  winter: {
-    label: 'Winter',
-    need: 'Coats, warm clothes, and holiday gifts add up as the weather turns cold.',
-    support:
-      'CAC provides food assistance and access to clothing and essential items for neighbors facing financial hardship.',
-  },
+function mealsForKidsSupport(): string {
+  const served = cacFigure('meals_for_kids.children')
+  return served
+    ? `CAC’s Meals for Kids served ${served.value} children in ${served.year}.`
+    : 'CAC’s Meals for Kids provides summer meals to local children.'
 }
 
-export function YouthViz({ category, mode, onModeChange }: VizProps) {
-  const [season, setSeason] = useState<Season>('summer')
-  const need = ridersInNeed(1, 6)
-  const slots = NEED_RIDER_SLOTS.slice(0, need)
+function unavailableMessage(live: LiveStatisticsState) {
+  if (live.status === 'loading')
+    return 'Loading the latest published statistic for the riders…'
+  if (live.status === 'error')
+    return 'The statistic for the riders could not be loaded, so none are marked.'
+  return 'No published statistic is available yet for children, so no riders are marked.'
+}
+
+export function YouthViz({
+  category,
+  mode,
+  onModeChange,
+  live,
+  onRetryLive,
+}: VizProps) {
+  const [placeKey, setPlaceKey] = useState<string>(PLACES[0].key)
+  const published = PLACES.filter((item) => findShare(live, item.key))
+  const place = published.find((item) => item.key === placeKey) ?? published[0]
+  const share = place ? findShare(live, place.key) : undefined
+  const need = share ? ridersInNeed(share.value, 100) : null
+  const slots = need === null ? [] : RIDER_NEED_ORDER.slice(0, need)
+  const shareText = share
+    ? `${formatStatisticValue(share)} of ${share.geography} children live below the poverty line (${share.periodLabel})`
+    : null
   const impact = mode === 'impact'
-  const copy = seasons[season]
 
   return (
     <ExplorerLayout
       category={category}
       mode={mode}
       onModeChange={onModeChange}
+      live={live}
+      onRetryLive={onRetryLive}
       sceneLabel="School bus and children boarding"
       scene={
         <>
@@ -54,7 +74,9 @@ export function YouthViz({ category, mode, onModeChange }: VizProps) {
             aria-label={
               impact
                 ? `${RIDER_COUNT} children boarding a school bus. With support, all ${RIDER_COUNT} board on equal footing.`
-                : `${RIDER_COUNT} children boarding a school bus. ${need} of ${RIDER_COUNT} are marked: 1 in 6 may face hunger.`
+                : need === null
+                  ? `${RIDER_COUNT} children boarding a school bus. ${unavailableMessage(live)}`
+                  : `${RIDER_COUNT} children boarding a school bus. ${need} of ${RIDER_COUNT} are marked: ${shareText}.`
             }
           >
             <rect className="youth-sky" x="0" y="0" width="360" height="270" />
@@ -146,10 +168,10 @@ export function YouthViz({ category, mode, onModeChange }: VizProps) {
               <span className="key key--kid" aria-hidden="true" />
               Boarding as usual
             </li>
-            {!impact && (
+            {!impact && need !== null && (
               <li>
                 <span className="key key--kid-need" aria-hidden="true" />
-                Triangle and red ring: may go without (1 in 6)
+                Triangle and red ring: lives below the poverty line
               </li>
             )}
             {impact && (
@@ -163,22 +185,37 @@ export function YouthViz({ category, mode, onModeChange }: VizProps) {
             <strong>
               {impact
                 ? `All ${RIDER_COUNT} riders board on equal footing.`
-                : `${need} of ${RIDER_COUNT} riders are marked.`}
+                : need === null
+                  ? unavailableMessage(live)
+                  : `${need} of ${RIDER_COUNT} riders are marked${share ? ` (${formatStatisticValue(share)})` : ''}.`}
             </strong>{' '}
-            {copy.label}: {impact ? copy.support : copy.need}
+            {impact && mealsForKidsSupport()}
           </p>
+          {shareText && (
+            <SceneDetails summary="Where this number comes from">
+              {shareText}. Riders are marked to the nearest whole rider.
+            </SceneDetails>
+          )}
+          {need === null && live.status === 'error' && (
+            <button
+              type="button"
+              className="live-stats__retry"
+              onClick={onRetryLive}
+            >
+              Retry
+            </button>
+          )}
         </>
       }
       controls={
-        <ChoiceGroup
-          label="Season"
-          value={season}
-          onChange={setSeason}
-          options={(Object.keys(seasons) as Season[]).map((key) => ({
-            value: key,
-            label: seasons[key].label,
-          }))}
-        />
+        published.length > 1 ? (
+          <ChoiceGroup
+            label="Compare places"
+            value={place.key}
+            onChange={setPlaceKey}
+            options={published.map(({ key, label }) => ({ value: key, label }))}
+          />
+        ) : null
       }
     />
   )

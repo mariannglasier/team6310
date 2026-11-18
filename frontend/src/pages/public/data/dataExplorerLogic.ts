@@ -1,6 +1,7 @@
 // Pure calculations for the Explore Data visualizations. Money is integer
-// cents. Sample values (cart items, job board, budget) are illustrative
-// design values, not approved simulation or source data.
+// cents. The sample basket's prices are an illustrative design value, not
+// approved simulation or source data; every percentage comes from a published
+// statistic.
 import { formatUsd } from '../../../lib/money'
 import { usdCents } from '../../../types/domain'
 
@@ -15,10 +16,6 @@ export function usd(cents: number): string {
   return cents % 100 === 0
     ? usdWhole.format(cents / 100)
     : formatUsd(usdCents(cents))
-}
-
-export function formatTenths(tenths: number): string {
-  return `${(tenths / 10).toFixed(1)}%`
 }
 
 // ---------------------------------------------------------------- Housing
@@ -40,15 +37,13 @@ export function relitWindowCount(dark: number) {
 
 // ------------------------------------------------------------------- Food
 
-export const GROCERY_BUDGET_CENTS = 50_000
-
 export interface GroceryItem {
   readonly id: string
   readonly label: string
   readonly cents: number
 }
 
-// Illustrative $500 cart.
+// Illustrative $500 basket.
 export const GROCERY_ITEMS: readonly GroceryItem[] = [
   { id: 'produce', label: 'Fresh produce', cents: 9_500 },
   { id: 'dairy', label: 'Milk and eggs', cents: 7_000 },
@@ -65,162 +60,48 @@ export function priceAfterIncrease(cents: number, tenths: number) {
   return Math.round((cents * (1000 + tenths)) / 1000)
 }
 
-export function summarizeCart(
-  removedIds: ReadonlySet<string>,
-  tenths: number,
-  budget = GROCERY_BUDGET_CENTS,
-) {
-  let fullCents = 0
-  let payCents = 0
-  for (const item of GROCERY_ITEMS) {
-    const price = priceAfterIncrease(item.cents, tenths)
-    fullCents += price
-    if (!removedIds.has(item.id)) payCents += price
+export const MAX_PRICE_CHANGE_TENTHS = 150
+
+export interface PricePreset {
+  readonly value: number
+  readonly label: string
+  /** Place and period behind the figure, shown once the preset is chosen. */
+  readonly detail?: string
+}
+
+/**
+ * Slider presets taken from published price changes. A change that is not a
+ * rise inside the slider's range cannot be shown, and two changes that land on
+ * the same slider position are shown once, under the first label.
+ */
+export function pricePresets(
+  published: readonly {
+    readonly percent: number
+    readonly label: string
+    readonly detail?: string
+  }[],
+): readonly PricePreset[] {
+  const presets: PricePreset[] = [{ value: 0, label: 'Last year’s prices' }]
+  for (const { percent, label, detail } of published) {
+    const tenths = Math.round(percent * 10)
+    if (
+      !Number.isFinite(percent) ||
+      tenths <= 0 ||
+      tenths > MAX_PRICE_CHANGE_TENTHS ||
+      presets.some((preset) => preset.value === tenths)
+    )
+      continue
+    presets.push({ value: tenths, label, detail })
   }
-  return {
-    fullCents,
-    payCents,
-    pantryCents: fullCents - payCents,
-    overByCents: Math.max(0, payCents - budget),
-    remainingCents: budget - payCents,
-    removedCount: removedIds.size,
-  }
+  return presets
 }
 
-// ------------------------------------------------------------- Employment
-
-export type Education = 'none' | 'diploma' | 'college'
-export type EnglishLevel = 'limited' | 'proficient'
-
-export interface JobProfile {
-  readonly education: Education
-  readonly english: EnglishLevel
-  readonly digital: boolean
-}
-
-export interface SampleJob {
-  readonly id: string
-  readonly title: string
-  readonly education: Education
-  readonly strongEnglish: boolean
-  readonly digital: boolean
-}
-
-const educationRank: Record<Education, number> = {
-  none: 0,
-  diploma: 1,
-  college: 2,
-}
-
-export const educationLabels: Record<Education, string> = {
-  none: 'No diploma needed',
-  diploma: 'High school diploma or GED',
-  college: 'College degree',
-}
-
-// Illustrative sample board, not real postings and not the simulation's
-// approved job catalog.
-export const SAMPLE_JOBS: readonly SampleJob[] = [
-  {
-    id: 'warehouse',
-    title: 'Warehouse associate',
-    education: 'none',
-    strongEnglish: false,
-    digital: false,
-  },
-  {
-    id: 'housekeeper',
-    title: 'Housekeeper',
-    education: 'none',
-    strongEnglish: false,
-    digital: false,
-  },
-  {
-    id: 'landscaper',
-    title: 'Landscaping crew member',
-    education: 'none',
-    strongEnglish: false,
-    digital: false,
-  },
-  {
-    id: 'cook',
-    title: 'Line cook',
-    education: 'none',
-    strongEnglish: false,
-    digital: false,
-  },
-  {
-    id: 'cashier',
-    title: 'Retail cashier',
-    education: 'none',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'greeter',
-    title: 'Hotel front desk',
-    education: 'none',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'aide',
-    title: 'Home health aide',
-    education: 'diploma',
-    strongEnglish: true,
-    digital: false,
-  },
-  {
-    id: 'service',
-    title: 'Customer service representative',
-    education: 'diploma',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'office',
-    title: 'Office assistant',
-    education: 'diploma',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'reception',
-    title: 'Medical receptionist',
-    education: 'diploma',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'clerk',
-    title: 'Accounting clerk',
-    education: 'college',
-    strongEnglish: true,
-    digital: true,
-  },
-  {
-    id: 'support',
-    title: 'IT support specialist',
-    education: 'college',
-    strongEnglish: true,
-    digital: true,
-  },
-]
-
-/** Reasons a profile does not meet a job's requirements; empty when it does. */
-export function jobBlockers(job: SampleJob, profile: JobProfile): string[] {
-  const reasons: string[] = []
-  if (educationRank[profile.education] < educationRank[job.education])
-    reasons.push(`needs ${educationLabels[job.education].toLowerCase()}`)
-  if (job.strongEnglish && profile.english !== 'proficient')
-    reasons.push('needs strong English')
-  if (job.digital && !profile.digital) reasons.push('needs computer skills')
-  return reasons
-}
-
-export function openJobCount(profile: JobProfile) {
-  return SAMPLE_JOBS.filter((job) => jobBlockers(job, profile).length === 0)
-    .length
+/** What the sample basket costs after a price change of `tenths`. */
+export function basketCents(tenths: number) {
+  return GROCERY_ITEMS.reduce(
+    (sum, item) => sum + priceAfterIncrease(item.cents, tenths),
+    0,
+  )
 }
 
 // --------------------------------------------------------------- Clothing
@@ -242,51 +123,16 @@ export const BELT_GARMENTS: readonly GarmentKind[] = [
 // ------------------------------------------------------------------ Youth
 
 export const RIDER_COUNT = 18
-// Seat positions drawn as "in need"; spread across the queue.
-export const NEED_RIDER_SLOTS: readonly number[] = [2, 9, 15]
+// Fixed order in which seats are marked, spread across the queue, so the same
+// riders stay marked as the share grows.
+export const RIDER_NEED_ORDER: readonly number[] = [
+  2, 9, 15, 6, 12, 0, 17, 4, 10, 13, 7, 1, 16, 5, 11, 3, 14, 8,
+]
 
 export function ridersInNeed(
   numerator: number,
   denominator: number,
   total = RIDER_COUNT,
 ) {
-  return Math.round((total * numerator) / denominator)
-}
-
-// ---------------------------------------------------------------- Finance
-
-export const BUDGET_INCOME_CENTS = 200_000
-export const BUDGET_ESSENTIALS_CENTS = 185_000
-export const BUDGET_STEP_CENTS = 2_500
-export const BUDGET_LEFT_CENTS = BUDGET_INCOME_CENTS - BUDGET_ESSENTIALS_CENTS
-
-export interface Allocation {
-  readonly save: number
-  readonly bills: number
-  readonly setAside: number
-}
-
-export const EMPTY_ALLOCATION: Allocation = { save: 0, bills: 0, setAside: 0 }
-
-export function planBudget(emergencyCents: number, allocation: Allocation) {
-  const allocated = allocation.save + allocation.bills + allocation.setAside
-  return {
-    leftCents: BUDGET_LEFT_CENTS,
-    allocatedCents: allocated,
-    unallocatedCents: BUDGET_LEFT_CENTS - allocated,
-    // Only money saved counts toward the emergency.
-    gapCents: Math.max(0, emergencyCents - allocation.save),
-  }
-}
-
-/** Moves one allocation by `deltaCents`, never below zero or past the money left. */
-export function adjustAllocation(
-  allocation: Allocation,
-  key: keyof Allocation,
-  deltaCents: number,
-): Allocation {
-  const { unallocatedCents } = planBudget(0, allocation)
-  const next = allocation[key] + deltaCents
-  if (next < 0 || deltaCents > unallocatedCents) return allocation
-  return { ...allocation, [key]: next }
+  return Math.min(total, Math.round((total * numerator) / denominator))
 }

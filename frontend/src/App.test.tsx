@@ -11,6 +11,13 @@ vi.mock('./services/staffAuth', async (importOriginal) => ({
   onStaffSignedOut: vi.fn(() => () => {}),
 }))
 
+// The public Explore page reads published statistics; tests never use the network.
+vi.mock('./services/explorerService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./services/explorerService')>()),
+  loadExplorerCategories: vi.fn().mockResolvedValue([]),
+  loadExplorerStatistics: vi.fn().mockResolvedValue([]),
+}))
+
 function HistoryControls() {
   const navigate = useNavigate()
   const { pathname } = useLocation()

@@ -10,7 +10,7 @@ export function PageSection({
   eyebrow?: string
   /** Content rendered inside the section before the eyebrow and heading. */
   leading?: ReactNode
-  children: ReactNode
+  children?: ReactNode
 }) {
   return (
     <section aria-labelledby="page-heading">
