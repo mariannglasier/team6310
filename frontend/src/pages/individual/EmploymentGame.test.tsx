@@ -225,9 +225,7 @@ it.each(['day', 'income'] as const)(
         />
       </MemoryRouter>,
     )
-    expect(screen.getByRole('status')).toHaveTextContent(
-      "Loading today's content",
-    )
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…')
     expect(screen.queryByRole('heading', { name: 'Placeholder' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Next' })).toBeNull()
   },
@@ -276,10 +274,6 @@ it('displays the restored clothing price and uses exact cents for a purchase', a
       screen.getByRole('button', {
         name: /Buy professional clothes.*\$83\.27/,
       }),
-    )
-    expect(dispatch).not.toHaveBeenCalled()
-    await user.click(
-      screen.getByRole('button', { name: 'Submit clothing decision' }),
     )
     expect(dispatch).toHaveBeenCalledExactlyOnceWith({
       type: 'interview',

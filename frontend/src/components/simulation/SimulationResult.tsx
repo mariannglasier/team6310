@@ -163,15 +163,16 @@ const pieColors = [
 
 function ComparisonPie({ options }: { options: ResultComparison['options'] }) {
   const total = options.reduce((sum, option) => sum + option.percent, 0)
-  let offset = 0
   const slices = options.map((option, index) => {
     const color = pieColors[index % pieColors.length]
-    const start = offset
-    offset += option.percent
+    const start = options
+      .slice(0, index)
+      .reduce((sum, previous) => sum + previous.percent, 0)
+    const end = start + option.percent
     return {
       ...option,
       color,
-      stop: `${color} ${(100 * start) / total}% ${(100 * offset) / total}%`,
+      stop: `${color} ${(100 * start) / total}% ${(100 * end) / total}%`,
     }
   })
   return (
